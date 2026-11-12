@@ -45,3 +45,15 @@ python -m src.agent_eval evaluate --output output/evaluation-report.json
 - `src/feedback_eval.py`：純離線結果標註 schema 驗證、預測品質指標、baseline 對比、保留測試 SHA 與 group 隔離檢查。
 - `evaluations/feedback/synthetic-*.json`：**僅 36 筆合成回歸資料**，不代表真實工程成果。
 - 真實人類標註和 sealed holdout **不得進入公開 GitHub**；目前沒有真實任務的人工標註樣本，也沒有真正 ML/DL 微調證據。
+
+## 離線真實任務事件管線候選（依賴 PR #1）
+
+新功能詳見 `docs/TASK_EVENT_INGESTION.md` 和 `docs/TASK_EVENT_INGESTION_DEPENDENCIES.md`，新增：
+
+- `schemas/task-event-batch.schema.json`：安全工程事件結構。
+- `schemas/task-ingest-authorization.schema.json`：操作者提供的用途、專案與操作白名單、來源 SHA 聲明。
+- `schemas/pending-review-queue.schema.json`：永遠保持 `PENDING_HUMAN_REVIEW` 的標註佇列。
+- `src/task_ingest.py`：只讀本機結構化 JSON，強制丟棄自由文字；有明確輸出路徑才建立獨立待審佇列。
+- `evaluations/ingestion/`：不含真實工程資料的合成案例。
+
+**此功能尚在相依的 PR #2，不能視為 main 正式能力，也不會自動讀取其他專案或真人資料。**

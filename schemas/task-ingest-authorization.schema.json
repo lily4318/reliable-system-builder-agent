@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Local human-asserted authorization metadata (not a cryptographic approval)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scope",
+    "purpose",
+    "approved",
+    "approved_by",
+    "expires_at_utc",
+    "allowed_operations",
+    "allowed_projects",
+    "source_sha256",
+    "operator_confirmed"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "scope": {
+      "enum": [
+        "synthetic",
+        "reviewed_real"
+      ]
+    },
+    "purpose": {
+      "const": "engineering_task_feedback"
+    },
+    "approved": {
+      "const": true
+    },
+    "operator_confirmed": {
+      "const": true
+    },
+    "approved_by": {
+      "type": "string",
+      "description": "SYNTHETIC_FIXTURE for synthetic; REV_{12 hex} for real"
+    },
+    "expires_at_utc": {
+      "type": "string"
+    },
+    "allowed_operations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string"
+      }
+    },
+    "allowed_projects": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "pattern": "^P_[0-9a-f]{12}$"
+      }
+    },
+    "source_sha256": {
+      "anyOf": [
+        {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,209 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Pending human review queue (never an approved label)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "scope",
+    "batch_id",
+    "source_sha256",
+    "authorization_attested",
+    "authorization_externally_verified",
+    "records",
+    "redacted_free_text_count",
+    "source_was_modified",
+    "formal_review_completed"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "scope": {
+      "enum": [
+        "synthetic",
+        "reviewed_real"
+      ]
+    },
+    "batch_id": {
+      "type": "string",
+      "pattern": "^B_[0-9a-f]{12}$"
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "authorization_attested": {
+      "const": true
+    },
+    "authorization_externally_verified": {
+      "const": false
+    },
+    "redacted_free_text_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "source_was_modified": {
+      "const": false
+    },
+    "formal_review_completed": {
+      "const": false
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/record"
+      }
+    }
+  },
+  "$defs": {
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "queue_id",
+        "case_id",
+        "group_id",
+        "project_id",
+        "task_family",
+        "event_ids",
+        "evidence_sha256",
+        "status",
+        "verified",
+        "outcome",
+        "expected_action",
+        "write_authorized",
+        "human_review_required",
+        "events"
+      ],
+      "properties": {
+        "queue_id": {
+          "type": "string",
+          "pattern": "^Q_[0-9a-f]{12}$"
+        },
+        "case_id": {
+          "type": "string",
+          "pattern": "^C_[0-9a-f]{12}$"
+        },
+        "group_id": {
+          "type": "string",
+          "pattern": "^G_[0-9a-f]{12}$"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^P_[0-9a-f]{12}$"
+        },
+        "task_family": {
+          "type": "string"
+        },
+        "event_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "evidence_sha256": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[0-9a-f]{64}$"
+          }
+        },
+        "status": {
+          "const": "PENDING_HUMAN_REVIEW"
+        },
+        "verified": {
+          "const": false
+        },
+        "outcome": {
+          "const": "unknown"
+        },
+        "expected_action": {
+          "type": "null"
+        },
+        "write_authorized": {
+          "const": false
+        },
+        "human_review_required": {
+          "const": true
+        },
+        "events": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "event_id",
+              "occurred_at_utc",
+              "source_kind",
+              "operation",
+              "result",
+              "http_status",
+              "evidence_type",
+              "evidence_sha256",
+              "source_commit_sha",
+              "write_authorized_at_event"
+            ],
+            "properties": {
+              "event_id": {
+                "type": "string",
+                "pattern": "^EV_[0-9a-f]{12}$"
+              },
+              "occurred_at_utc": {
+                "type": "string"
+              },
+              "source_kind": {
+                "type": "string"
+              },
+              "operation": {
+                "type": "string"
+              },
+              "result": {
+                "type": "string"
+              },
+              "http_status": {
+                "anyOf": [
+                  {
+                    "type": "integer"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "evidence_type": {
+                "type": "string"
+              },
+              "evidence_sha256": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{64}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "source_commit_sha": {
+                "anyOf": [
+                  {
+                    "type": "string",
+                    "pattern": "^[0-9a-f]{40}$"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              },
+              "write_authorized_at_event": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

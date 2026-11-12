@@ -53,3 +53,18 @@ LAST_VERIFIED_STEP: 以 PR CI / head SHA 實際回讀為準；未合併不得宣
 BLOCKERS: 真實人類審核標註尚未收集；獨立外部保留測試尚未實施；第二位人類 PR 審核者尚未建立；正式 Release 人工門檻尚未完成
 NEXT_ACTION: 檢查 PR CI 和程式案例；取得人工標註流程授權，封存資料後再進行真正的独立 holdout; 人工決定是否合併
 SYNC_STATUS: PR_PENDING_MERGE; 外部 Study1 任何 Repo/GAS/Sheets 未操作
+
+## 2026-11-12｜PR #2 離線工程事件管線接續
+TASK_DOMAIN: RELIABLE_AGENT_TASK_EVENT_PIPELINE
+SOURCE_REPO: lily4318/reliable-system-builder-agent
+BASE_MAIN_SHA: c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57
+DEPENDENCY_PR: #1 (HEAD 99a53db2e384c75545f10741a4f9fbaefd855707)
+HEAD_BRANCH: feat/offline-task-event-ingestion-v01
+BASE_BRANCH: feat/evidence-feedback-holdout-v01
+ADDED_SCHEMA: schemas/task-event-batch.schema.json, schemas/task-ingest-authorization.schema.json, schemas/pending-review-queue.schema.json
+INGESTION_TOOL: src/task_ingest.py
+SOURCE_EVIDENCE: only public synthetic fixtures in evaluations/ingestion/
+BLOCKERS: PR #1 未合併；尚無授權真實資料、真實人類標註／正式 UI；使用者尚未核准任何正式收件資料用途
+WRITE_OWNER: lily4318 (Agent repo 候選 PR)
+NEXT_ACTION: PR #2 CI 與變更範圍回讀；人類審查 PR #1 後再評估 PR #2 base 變更
+SYNC_STATUS: PR_PENDING_MERGE, NO_STUDY1_WRITE, NO_REAL_DATA_ACCESS

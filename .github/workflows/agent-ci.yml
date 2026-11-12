@@ -36,6 +36,15 @@ jobs:
         run: python -m src.feedback_eval validate --labels evaluations/feedback/synthetic-labels.json
       - name: Test baseline-to-candidate feedback comparison (synthetic only)
         run: python -m src.feedback_eval compare --labels evaluations/feedback/synthetic-labels.json --baseline evaluations/feedback/synthetic-baseline-predictions.json --candidate evaluations/feedback/synthetic-candidate-predictions.json --output output/feedback-synthetic.json
+      - name: Validate offline structured synthetic task events
+        run: python -m src.task_ingest validate --scope synthetic --input evaluations/ingestion/synthetic-events.json --authorization evaluations/ingestion/synthetic-authorization.json
+      - name: Preview pending human review queue without writing
+        run: python -m src.task_ingest preview --scope synthetic --input evaluations/ingestion/synthetic-events.json --authorization evaluations/ingestion/synthetic-authorization.json
+      - name: Verify published task ingestion JSON schemas
+        run: |
+          python -m json.tool schemas/task-event-batch.schema.json > /dev/null
+          python -m json.tool schemas/task-ingest-authorization.schema.json > /dev/null
+          python -m json.tool schemas/pending-review-queue.schema.json > /dev/null
       - name: Attach non-sensitive evaluation report
         if: always()
         uses: actions/upload-artifact@v4

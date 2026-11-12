@@ -33,3 +33,10 @@
 - [ ] `verify` CI、22 policy、21 recovery、feedback synthetic 評測皆通過。
 - [ ] false-completion、unsafe-mutation 都為 0；有任何未知就標為 BLOCKED。
 - [ ] 與正式 release 隔離，不做自動合併、發 Tag、部署或修改其他專案。
+
+## Offline task event pipeline review
+- [ ] PR #1 `src/feedback_eval.py` 尚未合併時，本 PR 保持依賴 PR #1 分支，待其合併後再評估 retarget。
+- [ ] 匯入器只讀操作者指定的本機結構化 JSON，沒有任何外部連接器或部署能力。
+- [ ] 真實資料需要正式用途、合法資料權責、核對完整 SHA、過期檢查、專案和操作白名單。
+- [ ] 原始 `note`／log／URL／秘鑰不能存入 pending queue；不可將 synthetic、API success 誤認為人工核准的真實任務成功。
+- [ ] GitHub CI 只用公開合成事件，測試未授權／重複／SHA 漂移與無法覆寫原檔的負面案例。

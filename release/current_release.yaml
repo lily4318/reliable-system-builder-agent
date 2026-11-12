@@ -42,4 +42,12 @@ feedback_candidate:
   independently_sealed_holdout_evaluated: false
   pr_merge_required: true
   formal_approval_status: pending
+task_event_ingestion_candidate:
+  source: src/task_ingest.py
+  schema: schemas/task-event-batch.schema.json
+  review_queue: schemas/pending-review-queue.schema.json
+  real_data_ingested: false
+  formal_human_review_completed: false
+  dependency: PR_1
+  status: pr_pending_merge
 

@@ -52,3 +52,18 @@ continual_improvement_pr:
   automatic_merge: false
   required_ci_check: verify
   must_show_baseline_comparison: true
+
+task_event_ingestion_candidate:
+  code: src/task_ingest.py
+  schema: schemas/task-event-batch.schema.json
+  authorization_schema: schemas/task-ingest-authorization.schema.json
+  pending_queue_schema: schemas/pending-review-queue.schema.json
+  offline_only: true
+  network_access: false
+  real_records_in_public_repo: false
+  human_approval_manifest_required: true
+  note_and_unstructured_logs: drop_or_reject
+  generated_queue_status: PENDING_HUMAN_REVIEW
+  source_mutation: forbidden
+  synthetic_public_ci_only: true
+  dependency: pr_1_open

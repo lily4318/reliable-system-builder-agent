@@ -1,0 +1,18 @@
+{
+  "schema_version": 1,
+  "scope": "synthetic",
+  "purpose": "engineering_task_feedback",
+  "approved": true,
+  "operator_confirmed": true,
+  "approved_by": "SYNTHETIC_FIXTURE",
+  "expires_at_utc": "2035-01-01T00:00:00Z",
+  "allowed_operations": [
+    "CREATE_VERSION",
+    "GET_INVENTORY",
+    "READ_DATA"
+  ],
+  "allowed_projects": [
+    "P_000000000001"
+  ],
+  "source_sha256": null
+}

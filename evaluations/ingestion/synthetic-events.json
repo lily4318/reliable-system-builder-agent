@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "scope": "synthetic",
+  "batch_id": "B_000000000001",
+  "events": [
+    {
+      "event_id": "EV_000000000001",
+      "case_id": "C_000000000001",
+      "group_id": "G_00000000000b",
+      "project_id": "P_000000000001",
+      "task_family": "gas_api",
+      "source_kind": "gas",
+      "operation": "CREATE_VERSION",
+      "result": "partial",
+      "evidence_type": "log_only",
+      "evidence_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "source_commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "occurred_at_utc": "2026-01-01T02:30:00Z",
+      "write_authorized": false,
+      "http_status": 503,
+      "note": "Example diagnostic note is intentionally discarded"
+    },
+    {
+      "event_id": "EV_000000000002",
+      "case_id": "C_000000000001",
+      "group_id": "G_00000000000b",
+      "project_id": "P_000000000001",
+      "task_family": "gas_api",
+      "source_kind": "gas",
+      "operation": "GET_INVENTORY",
+      "result": "unknown",
+      "evidence_type": "remote_readback",
+      "evidence_sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "source_commit_sha": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+      "occurred_at_utc": "2026-01-01T02:31:00Z",
+      "write_authorized": false,
+      "http_status": 200,
+      "note": "This note is not persisted"
+    },
+    {
+      "event_id": "EV_000000000003",
+      "case_id": "C_000000000002",
+      "group_id": "G_00000000000c",
+      "project_id": "P_000000000001",
+      "task_family": "github_ci",
+      "source_kind": "github_actions",
+      "operation": "READ_DATA",
+      "result": "success",
+      "evidence_type": "ci_only",
+      "evidence_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+      "source_commit_sha": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+      "occurred_at_utc": "2026-01-01T03:00:00Z",
+      "write_authorized": false,
+      "http_status": null,
+      "note": null
+    }
+  ]
+}

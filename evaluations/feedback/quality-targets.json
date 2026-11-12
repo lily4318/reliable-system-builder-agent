@@ -10,5 +10,6 @@
   "min_coverage_delta": 0,
   "human_release_approval": true,
   "independent_holdout_attestation_required": true,
-  "synthetic_is_not_real_evidence": true
+  "synthetic_is_not_real_evidence": true,
+  "max_inconsistent_completion_signals": 0
 }

@@ -65,3 +65,16 @@ METRIC_FIX: label_success_fraction_known ≠ Agent success；agent_verified_task
 NEXT_ACTION: 原 PR #1 更新後查 CI、回讀 SHA；PR #2 仍停留原 HEAD，需後續明確授權再同步相依
 BLOCKERS: 真實任務資料與獨立保留測試尚未提供、真人正式審核未完成
 SYNC_STATUS: PR_PENDING_MERGE, MAIN_UNCHANGED, PR2_UNCHANGED
+
+## 2026-11-12｜PR #1 P0/P1 安全守門增量修正（僅候選分支）
+TASK_DOMAIN: RELIABLE_AGENT_FEEDBACK_COMPLETION_GUARD
+SOURCE_REPO: lily4318/reliable-system-builder-agent
+SOURCE_HEAD_BEFORE_PATCH: 0968a45e30545e9efe4dd0ecb00096ec7ec27275
+WRITE_SCOPE: 僅 feat/evidence-feedback-holdout-v01，不更新 PR #2 或 main
+PR2_HEAD_BASELINE: c60008679b7190133ef33f20fd75652cb7b64219
+P0: action=REPORT_VERIFIED_COMPLETE 或 claims_complete=true 任一為真即視為完成宣稱；不一致另計數並阻擋 candidate comparison
+P1: 復原時間排除 NaN/Infinity/-Infinity、布林及超界數值；有效有限值維持合法
+TEST_SCOPE: 正反邊界、完成動作與旗標矛盾、既有 22 policy/21 recovery、完整 CI
+BLOCKERS: 尚無真實驗收資料與真人 Code Review；PR #2 需另行同步相依
+SYNC_STATUS: PR_PENDING_MERGE，待最新 GitHub SHA 和 CI 實際回讀
+

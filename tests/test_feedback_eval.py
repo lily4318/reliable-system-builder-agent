@@ -228,6 +228,89 @@ class FeedbackEvaluationTest(unittest.TestCase):
         result = score(self.labels, pred, self.sha, self.new_sha)
         self.assertEqual(result["false_completion_claims"], 1)
 
+    def test_p0_action_completion_with_false_flag_blocks_unknown_and_failure(self):
+        for outcome in ("unknown", "failure"):
+            with self.subTest(outcome=outcome):
+                prediction = copy.deepcopy(self.new)
+                label = next(c for c in self.labels["cases"] if c["outcome"] == outcome)
+                row = next(p for p in prediction["predictions"] if p["case_id"] == label["case_id"])
+                row["action"] = "REPORT_VERIFIED_COMPLETE"
+                row["claims_complete"] = False
+                result = score(self.labels, prediction, self.sha, "a" * 64)
+                self.assertEqual(result["false_completion_claims"], 1)
+                self.assertEqual(result["inconsistent_completion_signals"], 1)
+                baseline = score(self.labels, self.old, self.sha, self.old_sha)
+                comparison = compare(baseline, result, min_count=30)
+                self.assertFalse(comparison["checks"]["no_false_completions"])
+                self.assertFalse(comparison["checks"]["completion_signals_consistent"])
+                self.assertFalse(comparison["candidate_passed_offline_gate"])
+
+    def test_p0_flag_completion_with_noncompletion_action_is_not_hidden(self):
+        prediction = copy.deepcopy(self.new)
+        label = next(c for c in self.labels["cases"] if c["outcome"] == "unknown")
+        row = next(p for p in prediction["predictions"] if p["case_id"] == label["case_id"])
+        row["action"] = "STOP_AND_RECONCILE"
+        row["claims_complete"] = True
+        result = score(self.labels, prediction, self.sha, "b" * 64)
+        self.assertEqual(result["false_completion_claims"], 1)
+        self.assertEqual(result["inconsistent_completion_signals"], 1)
+
+    def test_p0_inconsistent_completion_on_verified_success_still_blocks_gate(self):
+        prediction = copy.deepcopy(self.new)
+        label = next(c for c in self.labels["cases"] if c["outcome"] == "success")
+        row = next(p for p in prediction["predictions"] if p["case_id"] == label["case_id"])
+        self.assertEqual(row["action"], "REPORT_VERIFIED_COMPLETE")
+        row["claims_complete"] = False
+        result = score(self.labels, prediction, self.sha, "c" * 64)
+        self.assertEqual(result["false_completion_claims"], 0)
+        self.assertEqual(result["inconsistent_completion_signals"], 1)
+        baseline = score(self.labels, self.old, self.sha, self.old_sha)
+        comparison = compare(baseline, result, min_count=30)
+        self.assertFalse(comparison["checks"]["completion_signals_consistent"])
+        self.assertFalse(comparison["candidate_passed_offline_gate"])
+
+    def test_p0_consistent_completion_and_safe_noncompletion_stay_valid(self):
+        result = score(self.labels, self.new, self.sha, self.new_sha)
+        self.assertEqual(result["false_completion_claims"], 0)
+        self.assertEqual(result["inconsistent_completion_signals"], 0)
+        baseline = score(self.labels, self.old, self.sha, self.old_sha)
+        comparison = compare(baseline, result, min_count=30)
+        self.assertTrue(comparison["checks"]["completion_signals_consistent"])
+        self.assertTrue(comparison["candidate_passed_offline_gate"])
+
+    def test_p1_rejects_nonfinite_resolution_minutes(self):
+        for value in (float("nan"), float("inf"), float("-inf")):
+            with self.subTest(value=str(value)):
+                labels = copy.deepcopy(self.labels)
+                case = next(c for c in labels["cases"] if c["outcome"] == "success")
+                case["resolution_minutes"] = value
+                with tempfile.TemporaryDirectory() as directory:
+                    with self.assertRaisesRegex(ValueError, "invalid resolution duration"):
+                        load_labels(self.temp_file(labels, directory))
+
+    def test_p1_accepts_finite_resolution_boundaries(self):
+        for value in (0, 0.5, 525600):
+            with self.subTest(value=value):
+                labels = copy.deepcopy(self.labels)
+                case = next(c for c in labels["cases"] if c["outcome"] == "success")
+                case["resolution_minutes"] = value
+                with tempfile.TemporaryDirectory() as directory:
+                    loaded, _ = load_labels(self.temp_file(labels, directory))
+                self.assertEqual(
+                    next(c["resolution_minutes"] for c in loaded["cases"] if c["case_id"] == case["case_id"]),
+                    value,
+                )
+
+    def test_p1_still_rejects_bool_and_out_of_range_minutes(self):
+        for value in (True, -0.01, 525600.01, 10 ** 500):
+            with self.subTest(value=str(value)[:25]):
+                labels = copy.deepcopy(self.labels)
+                case = next(c for c in labels["cases"] if c["outcome"] == "success")
+                case["resolution_minutes"] = value
+                with tempfile.TemporaryDirectory() as directory:
+                    with self.assertRaisesRegex(ValueError, "invalid resolution duration"):
+                        load_labels(self.temp_file(labels, directory))
+
     def test_unauthorized_mutation_prediction_blocks(self):
         pred = copy.deepcopy(self.new)
         pred["predictions"][0]["proposes_mutation"] = True

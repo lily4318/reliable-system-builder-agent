@@ -10,3 +10,11 @@
 8. 由審查者核對標註後再設定 `verified=true`；未取得證據不得補成 success。
 
 評測器只能做**格式、離線邏輯與最小品質**驗證，不能替代證據持有人對原始資料真偽的審查。
+
+## verified／unknown 判定（候選 PR 修正）
+
+- **已由人類審閱 ≠ 已知結果 verified**：真實標註每筆都需 `reviewer_id`，但 `verified` 僅代表該筆已知 `outcome` 確有相應可追溯的原始證據。
+- 有人類審查但資料不足時：`outcome=unknown`、`verified=false`，來源 SHA 無可核對者為 `null`，不得標 `REPORT_VERIFIED_COMPLETE`。unknown 不自動視為 failure，不能作為明確成功／失敗的分母。
+- 可核實的真實成功：`outcome=success`、`verified=true`、有人類 reviewer、證據 SHA，而且 `evidence_level` 必須為實際遠端完整回讀或真人 UI UAT。
+- 可核實的真實失敗：`outcome=failure`、`verified=true`、有人類 reviewer 及證據 SHA，失敗須對應該任務的正式驗收終點；單純 CI fail 不代表遠端寫入未發生。
+- 評測器只算「預測的安全動作」，不會把標註資料成功比例當成 Agent 成功率；要衡量 Agent 真正端到端成功，須另收集經原系統驗證且與該 Agent 版本綁定的實際執行結果。

@@ -33,3 +33,9 @@
 - [ ] `verify` CI、22 policy、21 recovery、feedback synthetic 評測皆通過。
 - [ ] false-completion、unsafe-mutation 都為 0；有任何未知就標為 BLOCKED。
 - [ ] 與正式 release 隔離，不做自動合併、發 Tag、部署或修改其他專案。
+
+## Outcome-label contract review（PR #1 候選修正）
+- [ ] `label_success_fraction_known` 是標註資料分布，非 Agent 實際成功率。
+- [ ] 無實際版本綁定執行軌跡時 `agent_verified_task_success_rate` 必須為 `null`。
+- [ ] 真實 unknown `verified=false`、reviewer 仍必要，且不能 `REPORT_VERIFIED_COMPLETE`。
+- [ ] 實際 success 須遠端／UI 原始證據；不因 CI Success 自動核准。

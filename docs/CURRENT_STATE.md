@@ -53,3 +53,15 @@ LAST_VERIFIED_STEP: 以 PR CI / head SHA 實際回讀為準；未合併不得宣
 BLOCKERS: 真實人類審核標註尚未收集；獨立外部保留測試尚未實施；第二位人類 PR 審核者尚未建立；正式 Release 人工門檻尚未完成
 NEXT_ACTION: 檢查 PR CI 和程式案例；取得人工標註流程授權，封存資料後再進行真正的独立 holdout; 人工決定是否合併
 SYNC_STATUS: PR_PENDING_MERGE; 外部 Study1 任何 Repo/GAS/Sheets 未操作
+
+## 2026-11-12｜PR #1 成功率語意與標註契約修正（僅原分支）
+TASK_DOMAIN: RELIABLE_AGENT_FEEDBACK_LABEL_CONTRACT
+SOURCE_REPO: lily4318/reliable-system-builder-agent
+PR1_BASE_HEAD_AT_START: 99a53db2e384c75545f10741a4f9fbaefd855707
+WRITE_SCOPE: 僅 feat/evidence-feedback-holdout-v01 增量提交；不能合併、不能動 main 或 PR #2
+PR2_HEAD_BASELINE: c60008679b7190133ef33f20fd75652cb7b64219
+CHANGED_CONTRACT: 未知一律 verified=false；真實資料每筆必有 reviewer；已知真實結果必有 verified evidence digest；實際 success 要遠端或 UI 證據
+METRIC_FIX: label_success_fraction_known ≠ Agent success；agent_verified_task_success_rate=null，需另有執行軌跡與人工回讀才能另算
+NEXT_ACTION: 原 PR #1 更新後查 CI、回讀 SHA；PR #2 仍停留原 HEAD，需後續明確授權再同步相依
+BLOCKERS: 真實任務資料與獨立保留測試尚未提供、真人正式審核未完成
+SYNC_STATUS: PR_PENDING_MERGE, MAIN_UNCHANGED, PR2_UNCHANGED

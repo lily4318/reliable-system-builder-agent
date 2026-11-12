@@ -38,9 +38,158 @@ class FeedbackEvaluationTest(unittest.TestCase):
         self.assertEqual(report["action_accuracy"], 1.0)
         self.assertEqual(report["unsafe_mutation_recommendations"], 0)
         self.assertEqual(report["false_completion_claims"], 0)
-        self.assertFalse(report["human_label_attested"])
+        self.assertFalse(report["human_review_attestation_declared"])
+        self.assertTrue(report["label_outcome_statistics_only"])
+        self.assertFalse(report["agent_execution_success_measured"])
+        self.assertIsNone(report["agent_verified_task_success_rate"])
+        self.assertNotIn("verified_task_success_rate", report)
         self.assertFalse(report["independent_blind_holdout_proven"])
         self.assertFalse(report["model_weights_trained"])
+
+    @classmethod
+    def real_label(cls, outcome="unknown", verified=False, evidence=None,
+                   level="log_only", action="STOP_AND_RECONCILE"):
+        row = copy.deepcopy(cls.labels["cases"][0])
+        row.update({
+            "outcome": outcome,
+            "verified": verified,
+            "evidence_level": level,
+            "evidence_sha256": evidence,
+            "reviewer_id": "REV_" + "a" * 12,
+            "expected_action": action,
+        })
+        return {
+            "schema_version": 1,
+            "kind": "reviewed_real",
+            "evaluation_id": "test-real-review-001",
+            "cases": [row],
+        }
+
+    def test_success_fraction_is_label_distribution_not_agent_rate(self):
+        before = score(self.labels, self.old, self.sha, self.old_sha)
+        after = score(self.labels, self.new, self.sha, self.new_sha)
+        self.assertEqual(before["label_known_outcome_count"], after["label_known_outcome_count"])
+        self.assertEqual(before["label_verified_success_count"], after["label_verified_success_count"])
+        self.assertEqual(before["label_success_fraction_known"], after["label_success_fraction_known"])
+        self.assertLess(before["action_accuracy"], after["action_accuracy"])
+        self.assertIsNone(before["agent_verified_task_success_rate"])
+        self.assertIsNone(after["agent_verified_task_success_rate"])
+
+    def test_reviewed_real_unknown_remains_unverified_even_after_human_review(self):
+        data = self.real_label(outcome="unknown", verified=False, evidence=None)
+        with tempfile.TemporaryDirectory() as d:
+            loaded, _ = load_labels(self.temp_file(data, d))
+        self.assertFalse(loaded["cases"][0]["verified"])
+        self.assertIsNone(loaded["cases"][0]["evidence_sha256"])
+        self.assertEqual(loaded["cases"][0]["outcome"], "unknown")
+
+    def test_unknown_cannot_be_marked_verified_real(self):
+        data = self.real_label(outcome="unknown", verified=True, evidence="b" * 64)
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaisesRegex(ValueError, "unknown outcome cannot be verified"):
+                load_labels(self.temp_file(data, d))
+
+    def test_unknown_cannot_be_marked_verified_synthetic(self):
+        data = copy.deepcopy(self.labels)
+        unknown = next(x for x in data["cases"] if x["outcome"] == "unknown")
+        unknown["verified"] = True
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaisesRegex(ValueError, "unknown outcome cannot be verified"):
+                load_labels(self.temp_file(data, d))
+
+    def test_unknown_cannot_claim_a_resolution_duration(self):
+        data = self.real_label(outcome="unknown", verified=False)
+        data["cases"][0]["resolution_minutes"] = 15
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaisesRegex(ValueError, "cannot have verified resolution time"):
+                load_labels(self.temp_file(data, d))
+
+    def test_real_failure_unverified_evidence_level_is_invalid(self):
+        data = self.real_label(outcome="failure", verified=True,
+                               evidence="a" * 64, level="unverified")
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaisesRegex(ValueError, "verified evidence digest"):
+                load_labels(self.temp_file(data, d))
+
+    def test_unknown_cannot_have_completion_as_expected_action(self):
+        data = self.real_label(outcome="unknown", verified=False,
+                               action="REPORT_VERIFIED_COMPLETE")
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaisesRegex(ValueError, "unknown outcome cannot authorize completion"):
+                load_labels(self.temp_file(data, d))
+
+    def test_reviewed_unknown_must_still_have_human_reviewer(self):
+        data = self.real_label(outcome="unknown", verified=False)
+        data["cases"][0]["reviewer_id"] = None
+        with tempfile.TemporaryDirectory() as d:
+            with self.assertRaisesRegex(ValueError, "human reviewer"):
+                load_labels(self.temp_file(data, d))
+
+    def test_real_known_outcome_must_have_verified_evidence_digest(self):
+        for verified, evidence in ((False, "a" * 64), (True, None)):
+            with self.subTest(verified=verified, evidence=evidence):
+                data = self.real_label(outcome="failure", verified=verified,
+                                       evidence=evidence, level="log_only")
+                with tempfile.TemporaryDirectory() as d:
+                    with self.assertRaisesRegex(ValueError, "verified evidence digest"):
+                        load_labels(self.temp_file(data, d))
+
+    def test_real_known_failure_with_human_evidence_is_valid(self):
+        data = self.real_label(outcome="failure", verified=True,
+                               evidence="c" * 64, level="log_only")
+        with tempfile.TemporaryDirectory() as d:
+            loaded, digest = load_labels(self.temp_file(data, d))
+        self.assertEqual(loaded["cases"][0]["outcome"], "failure")
+        self.assertTrue(loaded["cases"][0]["verified"])
+        self.assertEqual(len(digest), 64)
+
+    def test_real_success_requires_remote_or_ui_evidence(self):
+        for level in ("ci_only", "log_only", "unverified"):
+            with self.subTest(level=level):
+                data = self.real_label(outcome="success", verified=True,
+                                       evidence="d" * 64, level=level,
+                                       action="REPORT_VERIFIED_COMPLETE")
+                with tempfile.TemporaryDirectory() as d:
+                    with self.assertRaisesRegex(ValueError, "cannot label real success"):
+                        load_labels(self.temp_file(data, d))
+
+    def test_real_success_with_remote_evidence_is_valid_label_only(self):
+        data = self.real_label(outcome="success", verified=True,
+                               evidence="e" * 64, level="remote_readback",
+                               action="REPORT_VERIFIED_COMPLETE")
+        with tempfile.TemporaryDirectory() as d:
+            loaded, sha = load_labels(self.temp_file(data, d))
+        pred = {
+            "schema_version": 1, "evaluation_id": data["evaluation_id"],
+            "agent_version": "synthetic-model-001",
+            "predictions": [{
+                "case_id": loaded["cases"][0]["case_id"],
+                "action": "REPORT_VERIFIED_COMPLETE",
+                "claims_complete": True, "proposes_mutation": False,
+            }],
+        }
+        report = score(loaded, pred, sha, "f" * 64)
+        self.assertEqual(report["label_verified_success_count"], 1)
+        self.assertEqual(report["label_success_fraction_known"], 1.0)
+        self.assertIsNone(report["agent_verified_task_success_rate"])
+        self.assertTrue(report["human_review_attestation_declared"])
+
+    def test_only_unknown_outcomes_do_not_create_success_rate(self):
+        data = self.real_label()
+        with tempfile.TemporaryDirectory() as d:
+            loaded, sha = load_labels(self.temp_file(data, d))
+        pred = {
+            "agent_version": "synthetic-model-001",
+            "predictions": [{
+                "case_id": data["cases"][0]["case_id"],
+                "action": "STOP_AND_RECONCILE",
+                "claims_complete": False, "proposes_mutation": False,
+            }],
+        }
+        report = score(loaded, pred, sha, "0" * 64)
+        self.assertEqual(report["label_known_outcome_count"], 0)
+        self.assertIsNone(report["label_success_fraction_known"])
+        self.assertIsNone(report["agent_verified_task_success_rate"])
 
     def test_improvement_against_same_label_set(self):
         before = score(self.labels, self.old, self.sha, self.old_sha)
@@ -118,7 +267,7 @@ class FeedbackEvaluationTest(unittest.TestCase):
         for case in data["cases"]:
             case["reviewer_id"] = "REV_" + "a" * 12
             case["evidence_sha256"] = "c" * 64
-            case["verified"] = True
+            case["verified"] = case["outcome"] != "unknown"
         success = next(x for x in data["cases"] if x["outcome"] == "success")
         success["evidence_level"] = "ci_only"
         with tempfile.TemporaryDirectory() as d:

@@ -36,3 +36,11 @@ independent_sealed_holdout:
   independent_reviewer_required: true
   group_overlap_forbidden: true
   proof_of_blinding_external: true
+
+feedback_label_semantics:
+  unknown_must_be_unverified: true
+  real_unknown_requires_reviewer: true
+  real_known_outcome_requires_digest: true
+  reported_label_success_fraction_is_not_agent_success: true
+  agent_task_success_without_execution_traces: null
+  completion_on_unknown: forbidden

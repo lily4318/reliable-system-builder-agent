@@ -37,3 +37,6 @@
 評測會計算 action accuracy、coverage、abstention、false completion claims、unauthorized mutation，以及**標註資料自身**的已知結果成功比例和標註案件耗時；使用相同 label SHA 的 baseline/candidate 比較。標註資料的成功比例與時間在不同 Agent 間不變，**不能冒稱 Agent 的端到端成功率或 MTTR**；`agent_verified_task_success_rate=null`，直到有與指定 Agent 版本綁定且經原系統驗收的執行軌跡。一般真實評測規劃至少 30 筆、無法證明的數字一律未知。未達成數據門檻不能宣稱 improved。
 
 獨立保留資料採**非公開封存**、開發／holdout group 隔離、reviewer 分離、人工 SHA 核對與候選 commit 固定；工具檢查的是離線形式和人工宣告，**不是**密碼學簽章、第三方外部驗證或底層模型重新訓練。範例與指引見 `docs/FEEDBACK_AND_HOLDOUT.md`。
+
+## E2E Execution Evidence（PR #3 候選）
+新增 src/e2e_eval.py：依固定 TaskSpec、AgentBuildManifest、獨立驗收收據、部分寫入對帳、失敗歸因、microUSD 費用，對合成 Episode 計算端到端完成率。與 PR #1 動作正確率不同。真實來源尚未驗證，real_world_e2e_certified=false；見 docs/E2E_EXECUTION_EVIDENCE.md。

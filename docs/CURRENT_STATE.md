@@ -78,3 +78,16 @@ TEST_SCOPE: 正反邊界、完成動作與旗標矛盾、既有 22 policy/21 rec
 BLOCKERS: 尚無真實驗收資料與真人 Code Review；PR #2 需另行同步相依
 SYNC_STATUS: PR_PENDING_MERGE，待最新 GitHub SHA 和 CI 實際回讀
 
+## 2026-11-12｜E2E Execution Evidence 整合候選
+TASK_DOMAIN: RELIABLE_AGENT_E2E_EVIDENCE
+SOURCE_REPO: lily4318/reliable-system-builder-agent
+BASE_MAIN_SHA: c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57
+PR1_DEPENDENCY_HEAD: 34fe85c7960062b609d2efefc9d2a1d5072a3dcb
+PR2_UNMODIFIED_HEAD: c60008679b7190133ef33f20fd75652cb7b64219
+WRITE_BRANCH: feat/e2e-execution-evidence-evaluation-v01
+WRITE_SCOPE: 新 Agent 候選分支／PR；不合併、不改 PR1/PR2/main、不得接觸 Study1
+SOURCES: src/e2e_eval.py, schemas/e2e-execution-bundle.schema.json, evaluations/e2e/synthetic-*.json
+COMPLETED: Agent 版本與任務快照、獨立驗收、部分寫入、失敗歸因、成本及合成 baseline/candidate 判定
+BLOCKERS: PR #1/2 未合併、PR #2 相依衝突；真實資料授權／獨立封存／實際 Runner 和人工 Release 尚缺
+NEXT_ACTION: 核對本輪 PR CI 和 GitHub blob SHA、完成正式程式審核；另行授權才處理 PR2 合併相依與私人實際評測
+SYNC_STATUS: PR_PENDING_MERGE, MAIN_UNCHANGED, NO_REAL_DATA, NO_STUDY1_WRITE

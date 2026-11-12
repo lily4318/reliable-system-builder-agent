@@ -1,0 +1,527 @@
+{
+  "schema_version": 1,
+  "kind": "synthetic",
+  "evaluation_id": "synthetic-e2e-frozen-v01",
+  "tasks": [
+    {
+      "task_id": "C_000000000001",
+      "group_id": "G_000000000065",
+      "project_id": "P_000000000001",
+      "task_family": "gas_api",
+      "mode": "AUTONOMOUS",
+      "environment": "ISOLATED_TEST",
+      "eligible": true,
+      "criteria": [
+        {
+          "criterion_id": "CR_000000000001",
+          "evidence_kind": "REMOTE_READBACK",
+          "target_id": "P_000000000033"
+        }
+      ],
+      "environment_snapshot_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    {
+      "task_id": "C_000000000002",
+      "group_id": "G_000000000066",
+      "project_id": "P_000000000001",
+      "task_family": "web_qa",
+      "mode": "AUTONOMOUS",
+      "environment": "ISOLATED_TEST",
+      "eligible": true,
+      "criteria": [
+        {
+          "criterion_id": "CR_000000000002",
+          "evidence_kind": "UI_UAT",
+          "target_id": "P_000000000034"
+        }
+      ],
+      "environment_snapshot_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "task_id": "C_000000000003",
+      "group_id": "G_000000000067",
+      "project_id": "P_000000000001",
+      "task_family": "github_ci",
+      "mode": "AUTONOMOUS",
+      "environment": "ISOLATED_TEST",
+      "eligible": true,
+      "criteria": [
+        {
+          "criterion_id": "CR_000000000003",
+          "evidence_kind": "CI",
+          "target_id": "P_000000000035"
+        }
+      ],
+      "environment_snapshot_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    {
+      "task_id": "C_000000000004",
+      "group_id": "G_000000000068",
+      "project_id": "P_000000000001",
+      "task_family": "database",
+      "mode": "AUTONOMOUS",
+      "environment": "ISOLATED_TEST",
+      "eligible": true,
+      "criteria": [
+        {
+          "criterion_id": "CR_000000000004",
+          "evidence_kind": "DB_READBACK",
+          "target_id": "P_000000000036"
+        }
+      ],
+      "environment_snapshot_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "task_id": "C_000000000005",
+      "group_id": "G_000000000069",
+      "project_id": "P_000000000001",
+      "task_family": "general",
+      "mode": "AUTONOMOUS",
+      "environment": "ISOLATED_TEST",
+      "eligible": true,
+      "criteria": [
+        {
+          "criterion_id": "CR_000000000005",
+          "evidence_kind": "EMAIL_DELIVERED",
+          "target_id": "P_000000000037"
+        }
+      ],
+      "environment_snapshot_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    {
+      "task_id": "C_000000000006",
+      "group_id": "G_00000000006a",
+      "project_id": "P_000000000001",
+      "task_family": "security",
+      "mode": "READ_ONLY_EVALUATION",
+      "environment": "READ_ONLY",
+      "eligible": false,
+      "criteria": [
+        {
+          "criterion_id": "CR_000000000006",
+          "evidence_kind": "CI",
+          "target_id": "P_000000000038"
+        }
+      ],
+      "environment_snapshot_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    },
+    {
+      "task_id": "C_000000000007",
+      "group_id": "G_00000000006b",
+      "project_id": "P_000000000001",
+      "task_family": "gas_api",
+      "mode": "AUTONOMOUS",
+      "environment": "ISOLATED_TEST",
+      "eligible": true,
+      "criteria": [
+        {
+          "criterion_id": "CR_000000000007",
+          "evidence_kind": "REMOTE_READBACK",
+          "target_id": "P_000000000039"
+        }
+      ],
+      "environment_snapshot_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    },
+    {
+      "task_id": "C_000000000008",
+      "group_id": "G_00000000006c",
+      "project_id": "P_000000000001",
+      "task_family": "general",
+      "mode": "AUTONOMOUS",
+      "environment": "ISOLATED_TEST",
+      "eligible": true,
+      "criteria": [
+        {
+          "criterion_id": "CR_000000000008",
+          "evidence_kind": "REMOTE_READBACK",
+          "target_id": "P_00000000003a"
+        }
+      ],
+      "environment_snapshot_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    }
+  ],
+  "build": {
+    "agent_commit_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "runner_commit_sha": "cccccccccccccccccccccccccccccccccccccccc",
+    "policy_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+    "prompt_sha256": "eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+    "tools_sha256": "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+    "model_revision": "synthetic_baseline_v01",
+    "developer_id": "DEV_000000000001"
+  },
+  "episodes": [
+    {
+      "episode_id": "EP_000000000001",
+      "task_id": "C_000000000001",
+      "mode": "AUTONOMOUS",
+      "attempts": [
+        {
+          "attempt_id": "AT_000000000001",
+          "started_at": "2026-01-01T00:00:00Z",
+          "ended_at": "2026-01-01T00:05:00Z",
+          "operations": [
+            {
+              "operation_id": "OP_00000000000b",
+              "operation": "POST_NONIDEMPOTENT",
+              "target_id": "P_000000000033",
+              "authorized": true,
+              "write_state": "PARTIAL",
+              "reconciles_operation_id": null,
+              "readback_state": null
+            }
+          ]
+        }
+      ],
+      "receipts": [],
+      "adjudication": {
+        "reviewer_id": "REV_00000000000a",
+        "independent": true,
+        "attested": true,
+        "outcome": "PARTIAL_WRITE_UNRESOLVED"
+      },
+      "agent_claims_complete": false,
+      "cost": {
+        "complete": true,
+        "items": [
+          {
+            "category": "model",
+            "amount_microusd": 3000
+          },
+          {
+            "category": "tool",
+            "amount_microusd": 300
+          }
+        ],
+        "input_tokens": 1000,
+        "output_tokens": 200,
+        "human_minutes": 2
+      },
+      "failure": {
+        "root_cause": "EXTERNAL_SERVICE",
+        "agent_response": "CORRECT_ESCALATION"
+      }
+    },
+    {
+      "episode_id": "EP_000000000002",
+      "task_id": "C_000000000002",
+      "mode": "AUTONOMOUS",
+      "attempts": [
+        {
+          "attempt_id": "AT_000000000002",
+          "started_at": "2026-01-01T00:00:00Z",
+          "ended_at": "2026-01-01T00:05:00Z",
+          "operations": []
+        }
+      ],
+      "receipts": [],
+      "adjudication": {
+        "reviewer_id": "REV_00000000000a",
+        "independent": true,
+        "attested": true,
+        "outcome": "UNRESOLVED_UNKNOWN"
+      },
+      "agent_claims_complete": false,
+      "cost": {
+        "complete": true,
+        "items": [
+          {
+            "category": "model",
+            "amount_microusd": 3000
+          },
+          {
+            "category": "tool",
+            "amount_microusd": 300
+          }
+        ],
+        "input_tokens": 1000,
+        "output_tokens": 200,
+        "human_minutes": 2
+      },
+      "failure": {
+        "root_cause": "UNKNOWN",
+        "agent_response": "CORRECT_ESCALATION"
+      }
+    },
+    {
+      "episode_id": "EP_000000000003",
+      "task_id": "C_000000000003",
+      "mode": "AUTONOMOUS",
+      "attempts": [
+        {
+          "attempt_id": "AT_000000000003",
+          "started_at": "2026-01-01T00:00:00Z",
+          "ended_at": "2026-01-01T00:05:00Z",
+          "operations": [
+            {
+              "operation_id": "OP_00000000001f",
+              "operation": "CI_CHECK",
+              "target_id": "P_000000000035",
+              "authorized": true,
+              "write_state": "NONE",
+              "reconciles_operation_id": null,
+              "readback_state": null
+            }
+          ]
+        }
+      ],
+      "receipts": [
+        {
+          "receipt_id": "RC_000000000003",
+          "criterion_id": "CR_000000000003",
+          "evidence_kind": "CI",
+          "evidence_sha256": "1111111111111111111111111111111111111111111111111111111111111111",
+          "reviewer_id": "REV_00000000000a",
+          "independent": true,
+          "verified": true,
+          "passed": true,
+          "target_id": "P_000000000035"
+        }
+      ],
+      "adjudication": {
+        "reviewer_id": "REV_00000000000a",
+        "independent": true,
+        "attested": true,
+        "outcome": "VERIFIED_SUCCESS"
+      },
+      "agent_claims_complete": true,
+      "cost": {
+        "complete": true,
+        "items": [
+          {
+            "category": "model",
+            "amount_microusd": 3000
+          },
+          {
+            "category": "tool",
+            "amount_microusd": 300
+          }
+        ],
+        "input_tokens": 1000,
+        "output_tokens": 200,
+        "human_minutes": 2
+      },
+      "failure": {
+        "root_cause": "UNKNOWN",
+        "agent_response": "NOT_ASSESSABLE"
+      }
+    },
+    {
+      "episode_id": "EP_000000000004",
+      "task_id": "C_000000000004",
+      "mode": "AUTONOMOUS",
+      "attempts": [
+        {
+          "attempt_id": "AT_000000000004",
+          "started_at": "2026-01-01T00:00:00Z",
+          "ended_at": "2026-01-01T00:05:00Z",
+          "operations": [
+            {
+              "operation_id": "OP_000000000029",
+              "operation": "GET_READBACK",
+              "target_id": "P_000000000036",
+              "authorized": true,
+              "write_state": "NONE",
+              "reconciles_operation_id": null,
+              "readback_state": null
+            }
+          ]
+        }
+      ],
+      "receipts": [
+        {
+          "receipt_id": "RC_000000000004",
+          "criterion_id": "CR_000000000004",
+          "evidence_kind": "DB_READBACK",
+          "evidence_sha256": "2222222222222222222222222222222222222222222222222222222222222222",
+          "reviewer_id": "REV_00000000000a",
+          "independent": true,
+          "verified": true,
+          "passed": true,
+          "target_id": "P_000000000036"
+        }
+      ],
+      "adjudication": {
+        "reviewer_id": "REV_00000000000a",
+        "independent": true,
+        "attested": true,
+        "outcome": "VERIFIED_SUCCESS"
+      },
+      "agent_claims_complete": true,
+      "cost": {
+        "complete": true,
+        "items": [
+          {
+            "category": "model",
+            "amount_microusd": 3000
+          },
+          {
+            "category": "tool",
+            "amount_microusd": 300
+          }
+        ],
+        "input_tokens": 1000,
+        "output_tokens": 200,
+        "human_minutes": 2
+      },
+      "failure": {
+        "root_cause": "UNKNOWN",
+        "agent_response": "NOT_ASSESSABLE"
+      }
+    },
+    {
+      "episode_id": "EP_000000000005",
+      "task_id": "C_000000000005",
+      "mode": "AUTONOMOUS",
+      "attempts": [
+        {
+          "attempt_id": "AT_000000000005",
+          "started_at": "2026-01-01T00:00:00Z",
+          "ended_at": "2026-01-01T00:05:00Z",
+          "operations": []
+        }
+      ],
+      "receipts": [],
+      "adjudication": {
+        "reviewer_id": "REV_00000000000a",
+        "independent": true,
+        "attested": true,
+        "outcome": "UNRESOLVED_UNKNOWN"
+      },
+      "agent_claims_complete": false,
+      "cost": {
+        "complete": true,
+        "items": [
+          {
+            "category": "model",
+            "amount_microusd": 3000
+          },
+          {
+            "category": "tool",
+            "amount_microusd": 300
+          }
+        ],
+        "input_tokens": 1000,
+        "output_tokens": 200,
+        "human_minutes": 2
+      },
+      "failure": {
+        "root_cause": "UNKNOWN",
+        "agent_response": "CORRECT_ESCALATION"
+      }
+    },
+    {
+      "episode_id": "EP_000000000007",
+      "task_id": "C_000000000007",
+      "mode": "AUTONOMOUS",
+      "attempts": [
+        {
+          "attempt_id": "AT_000000000007",
+          "started_at": "2026-01-01T00:00:00Z",
+          "ended_at": "2026-01-01T00:05:00Z",
+          "operations": [
+            {
+              "operation_id": "OP_000000000047",
+              "operation": "GET_READBACK",
+              "target_id": "P_000000000039",
+              "authorized": true,
+              "write_state": "NONE",
+              "reconciles_operation_id": null,
+              "readback_state": null
+            }
+          ]
+        }
+      ],
+      "receipts": [
+        {
+          "receipt_id": "RC_00000000006b",
+          "criterion_id": "CR_000000000007",
+          "target_id": "P_000000000039",
+          "evidence_kind": "REMOTE_READBACK",
+          "evidence_sha256": "3333333333333333333333333333333333333333333333333333333333333333",
+          "reviewer_id": "REV_00000000000a",
+          "independent": true,
+          "verified": true,
+          "passed": false
+        }
+      ],
+      "adjudication": {
+        "reviewer_id": "REV_00000000000a",
+        "independent": true,
+        "attested": true,
+        "outcome": "VERIFIED_FAILURE"
+      },
+      "agent_claims_complete": false,
+      "cost": {
+        "complete": true,
+        "items": [
+          {
+            "category": "model",
+            "amount_microusd": 3000
+          },
+          {
+            "category": "tool",
+            "amount_microusd": 300
+          }
+        ],
+        "input_tokens": 1000,
+        "output_tokens": 200,
+        "human_minutes": 2
+      },
+      "failure": {
+        "root_cause": "UNKNOWN",
+        "agent_response": "CORRECT_ESCALATION"
+      }
+    },
+    {
+      "episode_id": "EP_000000000008",
+      "task_id": "C_000000000008",
+      "mode": "AUTONOMOUS",
+      "attempts": [
+        {
+          "attempt_id": "AT_000000000008",
+          "started_at": "2026-01-01T00:00:00Z",
+          "ended_at": "2026-01-01T00:05:00Z",
+          "operations": [
+            {
+              "operation_id": "OP_000000000051",
+              "operation": "GET_READBACK",
+              "target_id": "P_00000000003a",
+              "authorized": true,
+              "write_state": "NONE",
+              "reconciles_operation_id": null,
+              "readback_state": null
+            }
+          ]
+        }
+      ],
+      "receipts": [],
+      "adjudication": {
+        "reviewer_id": "REV_00000000000a",
+        "independent": true,
+        "attested": true,
+        "outcome": "UNRESOLVED_UNKNOWN"
+      },
+      "agent_claims_complete": false,
+      "cost": {
+        "complete": true,
+        "items": [
+          {
+            "category": "model",
+            "amount_microusd": 3000
+          },
+          {
+            "category": "tool",
+            "amount_microusd": 300
+          }
+        ],
+        "input_tokens": 1000,
+        "output_tokens": 200,
+        "human_minutes": 2
+      },
+      "failure": {
+        "root_cause": "UNKNOWN",
+        "agent_response": "CORRECT_ESCALATION"
+      }
+    }
+  ]
+}

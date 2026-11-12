@@ -43,3 +43,10 @@
 - [ ] 真實 unknown 允許經人類審閱但 `verified=false`；不准產生「已核實完成」動作。
 - [ ] 真實已知 success/failure 必須有 reviewer、`verified=true`、證據 SHA；成功還要實際遠端／UI。
 - [ ] PR #2 為 stacked PR；若 PR #1 HEAD 更新，PR #2 的 commit 與基準不能被本輪暗中同步或改寫。
+
+## E2E 候選驗收
+- [ ] TaskSpec、環境快照與 Agent/Runner/Policy/Tools/Prompt 全部固定 SHA。
+- [ ] 遺漏執行仍納入分母，不讓只讀或人工安全停止假冒完成。
+- [ ] UI／遠端須同目標的獨立合格證據，不能靠 CI 過關。
+- [ ] 未對帳、重複非冪等 POST、未授權操作、誤稱完成皆須阻擋。
+- [ ] 公開合成 CI 不被冒稱真實成功；正式 release 核准仍為 false。

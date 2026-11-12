@@ -150,7 +150,9 @@ class FeedbackEvaluationTest(unittest.TestCase):
                                        evidence="d" * 64, level=level,
                                        action="REPORT_VERIFIED_COMPLETE")
                 with tempfile.TemporaryDirectory() as d:
-                    with self.assertRaisesRegex(ValueError, "cannot label real success"):
+                    expected = ("known real outcomes need verified evidence digest"
+                                if level == "unverified" else "cannot label real success")
+                    with self.assertRaisesRegex(ValueError, expected):
                         load_labels(self.temp_file(data, d))
 
     def test_real_success_with_remote_evidence_is_valid_label_only(self):

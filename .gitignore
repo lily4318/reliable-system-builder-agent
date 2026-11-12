@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.env.*
+!.env.example
+.clasprc.json
+.clasp.json
+*oauth*.json
+*credentials*.json
+output/
+.pytest_cache/
+.coverage
+.DS_Store

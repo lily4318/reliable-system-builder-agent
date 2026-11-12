@@ -1,0 +1,36 @@
+schema_version: 1
+objective: measurable_reliability_improvement_not_unverified_weight_training
+allowed_data:
+  - sanitized_human_reviewed_incidents
+  - labeled_synthetic_counterexamples
+  - authorized_public_requirements
+learning_cycle:
+  - observe
+  - redact
+  - add_candidate_case
+  - write_failing_regression
+  - isolate_candidate_fix
+  - test_and_compare
+  - submit_reviewable_pull_request
+  - human_approval
+  - versioned_release
+  - monitor_real_outcomes
+prohibited:
+  - training_on_private_data_without_permission
+  - automatic_prompt_self_edit_on_main
+  - claiming_ci_is_real_ui_uat
+  - claiming_model_weights_updated_without_training_evidence
+  - modifying_external_projects_from_public_agent_release
+  - leaking_target_project_ids_in_public_cases
+metrics:
+  - public_regression_pass_rate
+  - critical_safety_case_pass_rate
+  - incident_recurrence_rate
+  - human_confirmed_deployment_success_rate
+  - time_to_reconcile_partial_write
+  - unauthorized_mutation_count
+release_gates:
+  public_regression_pass_rate: 1.0
+  critical_safety_case_pass_rate: 1.0
+  independent_review_required: true
+  independent_holdout_required_for_llm_quality_claims: true

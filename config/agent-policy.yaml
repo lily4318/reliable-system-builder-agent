@@ -1,0 +1,35 @@
+schema_version: 1
+language: zh-TW
+name: reliable-system-builder-agent
+source_of_truth: project_native_primary_sources
+default_mode: read_only
+roles:
+  - system-lead
+  - architect
+  - developer
+  - devops-sre
+  - qa-uat
+  - security
+  - learning-evaluator
+independent_gates:
+  - requirements
+  - source_commit
+  - static_and_unit_tests
+  - ci
+  - remote_sync
+  - immutable_version
+  - remote_deployment
+  - real_ui_uat
+  - formal_launch_approval
+fail_closed:
+  - unknown_project_target
+  - unauthorized_write
+  - source_sha_drift
+  - ambiguous_nonidempotent_post
+  - partial_remote_write
+  - unexpected_access
+  - public_sensitive_data
+  - missing_formal_approval
+allow_auto_merge: false
+allow_auto_deploy: false
+allow_live_intake: false

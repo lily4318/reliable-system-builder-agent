@@ -1,0 +1,12 @@
+schema_version: 1
+evaluator: src.agent_eval
+case_dataset: evaluations/cases/regressions.json
+public_regression: true
+independent_blind_holdout: false
+model_training: false
+claim_limit: "只能證明公開確定性政策案例測試，不證明模型品質、實際部署成功或 UAT"
+required_gate:
+  total_pass_rate: 1.0
+  critical_pass_rate: 1.0
+report_artifact: public-policy-evaluation
+scheduled_run: weekly_read_only

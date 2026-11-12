@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "project": "EXAMPLE_PROJECT_NOT_REAL",
+  "source_repository": "owner/project",
+  "source_branch": "main",
+  "source_sha": "VERIFY_ON_EACH_TURN",
+  "formal_spec_path": "docs/system-spec.md",
+  "status_path": "docs/project-status.md",
+  "agent_repo": "https://github.com/lily4318/reliable-system-builder-agent",
+  "agent_release": "release/current_release.yaml",
+  "data_scope": "NO_PERSONAL_DATA_IN_PUBLIC_AGENT",
+  "write_mode": "READ_ONLY_UNTIL_AUTHORIZED",
+  "gates": {
+    "ci": false,
+    "remote_sync": false,
+    "private_deploy": false,
+    "ui_uat": false,
+    "formal_go_live": false
+  },
+  "guards": [
+    "DO_NOT_ASSUME_PERMISSION_FROM_URL",
+    "VERIFY_REAL_REMOTE_STATE",
+    "RECONCILE_UNKNOWN_POST_FIRST"
+  ]
+}

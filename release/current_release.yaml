@@ -1,0 +1,23 @@
+schema_version: 1
+project: reliable-system-builder-agent
+version: 0.1.0
+channel: initial-candidate
+source_branch: main
+formal_tag: null
+formal_release_approved: false
+status: ci_and_human_acceptance_required
+source_of_truth:
+  - START_HERE.md
+  - AGENTS.md
+  - config/agent-policy.yaml
+  - config/learning-policy.yaml
+  - config/evaluation-policy.yaml
+compatibility:
+  - public_url_plus_task
+  - AGENTS.md
+  - GitHub_custom_agents
+  - agent_skills
+limitations:
+  - no_real_model_weight_training
+  - no_external_project_auto_deploy
+  - no_live_intake

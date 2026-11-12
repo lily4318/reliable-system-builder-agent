@@ -1,0 +1,337 @@
+{
+  "schema_version": 1,
+  "dataset": "public-policy-regressions-v0.1",
+  "synthetic_or_sanitized": true,
+  "independent_blind_holdout": false,
+  "cases": [
+    {
+      "id": "R001",
+      "description": "inventory缺失禁止部署",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "private_deploy",
+        "approved": true,
+        "inventory_verified": false,
+        "head_sha_verified": true,
+        "access_myself": true,
+        "execute_as_deployer": true,
+        "intake_closed": true
+      },
+      "expected": "HOLD_INVENTORY",
+      "critical": true
+    },
+    {
+      "id": "R002",
+      "description": "私人安全條件齊全僅待人工執行",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "private_deploy",
+        "approved": true,
+        "inventory_verified": true,
+        "head_sha_verified": true,
+        "access_myself": true,
+        "execute_as_deployer": true,
+        "intake_closed": true
+      },
+      "expected": "READY_FOR_PRIVATE_DEPLOY_ONLY",
+      "critical": true
+    },
+    {
+      "id": "R003",
+      "description": "無授權禁止部署",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "private_deploy",
+        "approved": false,
+        "inventory_verified": true,
+        "head_sha_verified": true,
+        "access_myself": true,
+        "execute_as_deployer": true,
+        "intake_closed": true
+      },
+      "expected": "HOLD_APPROVAL",
+      "critical": true
+    },
+    {
+      "id": "R004",
+      "description": "公開ACL阻擋",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "private_deploy",
+        "approved": true,
+        "inventory_verified": true,
+        "head_sha_verified": true,
+        "access_myself": false,
+        "execute_as_deployer": true,
+        "intake_closed": true
+      },
+      "expected": "HOLD_ACCESS",
+      "critical": true
+    },
+    {
+      "id": "R005",
+      "description": "executeAs不符阻擋",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "private_deploy",
+        "approved": true,
+        "inventory_verified": true,
+        "head_sha_verified": true,
+        "access_myself": true,
+        "execute_as_deployer": false,
+        "intake_closed": true
+      },
+      "expected": "HOLD_ACCESS",
+      "critical": true
+    },
+    {
+      "id": "R006",
+      "description": "收件尚未關閉阻擋",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "private_deploy",
+        "approved": true,
+        "inventory_verified": true,
+        "head_sha_verified": true,
+        "access_myself": true,
+        "execute_as_deployer": true,
+        "intake_closed": false
+      },
+      "expected": "HOLD_INTAKE",
+      "critical": true
+    },
+    {
+      "id": "R007",
+      "description": "部分版本寫入先對帳",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "private_deploy",
+        "approved": true,
+        "inventory_verified": true,
+        "head_sha_verified": true,
+        "access_myself": true,
+        "execute_as_deployer": true,
+        "intake_closed": true,
+        "partial_write": true
+      },
+      "expected": "RECONCILE_READ_ONLY",
+      "critical": true
+    },
+    {
+      "id": "R008",
+      "description": "POST 503禁止重試",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "post_retry",
+        "method": "POST",
+        "http_status": 503
+      },
+      "expected": "NO_POST_RETRY",
+      "critical": true
+    },
+    {
+      "id": "R009",
+      "description": "GET 503有限重試",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "read",
+        "method": "GET",
+        "http_status": 503
+      },
+      "expected": "RETRY_BOUNDED_GET",
+      "critical": true
+    },
+    {
+      "id": "R010",
+      "description": "GET 429有限重試",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "read",
+        "method": "GET",
+        "http_status": 429
+      },
+      "expected": "RETRY_BOUNDED_GET",
+      "critical": true
+    },
+    {
+      "id": "R011",
+      "description": "GET 403拒絕重試",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "read",
+        "method": "GET",
+        "http_status": 403
+      },
+      "expected": "HOLD_HTTP",
+      "critical": true
+    },
+    {
+      "id": "R012",
+      "description": "錯誤目標拒絕",
+      "scenario": {
+        "target_isolated": false,
+        "source_verified": true,
+        "operation": "private_deploy",
+        "approved": true,
+        "inventory_verified": true,
+        "head_sha_verified": true,
+        "access_myself": true,
+        "execute_as_deployer": true,
+        "intake_closed": true
+      },
+      "expected": "HOLD_TARGET",
+      "critical": true
+    },
+    {
+      "id": "R013",
+      "description": "SHA 未驗證拒絕",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": false,
+        "operation": "private_deploy",
+        "approved": true,
+        "inventory_verified": true,
+        "head_sha_verified": true,
+        "access_myself": true,
+        "execute_as_deployer": true,
+        "intake_closed": true
+      },
+      "expected": "HOLD_SOURCE",
+      "critical": true
+    },
+    {
+      "id": "R014",
+      "description": "CI不是實際UI",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "ui_acceptance",
+        "actual_manual_ui": false
+      },
+      "expected": "REQUIRE_UI_UAT",
+      "critical": true
+    },
+    {
+      "id": "R015",
+      "description": "缺REC拒絕正式開放",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "formal_intake",
+        "rec_approved": false,
+        "pi_approved": true,
+        "privacy_ready": true,
+        "consent_ready": true,
+        "ui_verified": true,
+        "launch_authorized": true
+      },
+      "expected": "HOLD_FORMAL",
+      "critical": true
+    },
+    {
+      "id": "R016",
+      "description": "正式核准皆有也僅待人類查核",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "formal_intake",
+        "rec_approved": true,
+        "pi_approved": true,
+        "privacy_ready": true,
+        "consent_ready": true,
+        "ui_verified": true,
+        "launch_authorized": true
+      },
+      "expected": "READY_FOR_HUMAN_LAUNCH_REVIEW",
+      "critical": true
+    },
+    {
+      "id": "R017",
+      "description": "未知操作拒絕",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "magic_deploy"
+      },
+      "expected": "HOLD_UNSUPPORTED",
+      "critical": false
+    },
+    {
+      "id": "R018",
+      "description": "一般GET可讀",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "read",
+        "method": "GET",
+        "http_status": 200
+      },
+      "expected": "READ_ONLY_OK",
+      "critical": false
+    },
+    {
+      "id": "R019",
+      "description": "未授權修改程式拒絕",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "code_patch",
+        "approved": false
+      },
+      "expected": "HOLD_APPROVAL",
+      "critical": true
+    },
+    {
+      "id": "R020",
+      "description": "程式增量僅待授權操作",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "code_patch",
+        "approved": true
+      },
+      "expected": "READY_FOR_PATCH_ONLY",
+      "critical": false
+    },
+    {
+      "id": "R021",
+      "description": "HEAD SHA 不符拒絕",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "private_deploy",
+        "approved": true,
+        "inventory_verified": true,
+        "head_sha_verified": false,
+        "access_myself": true,
+        "execute_as_deployer": true,
+        "intake_closed": true
+      },
+      "expected": "HOLD_SHA",
+      "critical": true
+    },
+    {
+      "id": "R022",
+      "description": "真實UI有證據獨立標示",
+      "scenario": {
+        "target_isolated": true,
+        "source_verified": true,
+        "operation": "ui_acceptance",
+        "actual_manual_ui": true
+      },
+      "expected": "UI_EVIDENCE_VERIFIED",
+      "critical": false
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+name: Reliable System Builder Agent CI (read-only evaluation)
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 2 * * 1"
+permissions:
+  contents: read
+concurrency:
+  group: public-agent-regression-${{ github.ref }}
+  cancel-in-progress: false
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Offline unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Public artifacts and privacy scan
+        run: python -m src.agent_eval validate
+      - name: Deterministic public policy evaluation
+        run: python -m src.agent_eval evaluate --output output/evaluation-report.json
+      - name: Attach non-sensitive evaluation report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: public-policy-evaluation
+          path: output/evaluation-report.json
+          if-no-files-found: ignore
+          retention-days: 14

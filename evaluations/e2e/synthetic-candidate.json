@@ -110,7 +110,7 @@
       "group_id": "G_00000000006b",
       "project_id": "P_000000000001",
       "task_family": "gas_api",
-      "mode": "AUTONOMOUS",
+      "mode": "HUMAN_ASSISTED",
       "environment": "ISOLATED_TEST",
       "eligible": true,
       "criteria": [
@@ -477,7 +477,7 @@
     {
       "episode_id": "EP_000000000007",
       "task_id": "C_000000000007",
-      "mode": "AUTONOMOUS",
+      "mode": "HUMAN_ASSISTED",
       "attempts": [
         {
           "attempt_id": "AT_000000000007",

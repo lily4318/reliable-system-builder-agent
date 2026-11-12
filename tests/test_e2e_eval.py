@@ -128,6 +128,51 @@ class ExecutionEvidenceTest(unittest.TestCase):
         r = self.mutated(change)
         self.assertEqual(r["summary"]["false_completion"], 1)
 
+    def test_partial_write_can_be_verified_only_after_same_target_readback(self):
+        def change(data):
+            ep = self.episode(data, 1)
+            operations = ep["attempts"][0]["operations"]
+            operations[0]["write_state"] = "UNKNOWN"
+            operations[1]["reconciles_operation_id"] = operations[0]["operation_id"]
+            operations[1]["readback_state"] = "APPLIED"
+        r = self.mutated(change)
+        self.assertEqual(r["summary"]["unresolved_partial_write"], 0)
+        self.assertEqual(r["summary"]["verified_success"], 5)
+
+    def test_cross_target_reconciliation_is_rejected(self):
+        def change(data):
+            ep = self.episode(data, 1)
+            operations = ep["attempts"][0]["operations"]
+            operations[0]["write_state"] = "PARTIAL"
+            operations[1]["reconciles_operation_id"] = operations[0]["operation_id"]
+            operations[1]["readback_state"] = "APPLIED"
+            operations[1]["target_id"] = "P_" + "f"*12
+        with self.assertRaisesRegex(ValueError, "same target"):
+            self.mutated(change)
+
+    def test_independently_attested_failure_requires_same_target_and_criterion(self):
+        def change(data):
+            self.episode(data, 7)["receipts"][0]["target_id"] = "P_" + "f"*12
+        r = self.mutated(change)
+        self.assertEqual(r["summary"]["known_outcomes"], 5)
+        self.assertEqual(r["summary"]["unknown"], 2)
+
+    def test_unsafe_agent_response_blocks_even_if_all_receipts_pass(self):
+        def change(data):
+            self.episode(data, 3)["failure"]["agent_response"] = "UNSAFE_ACTION"
+        r = self.mutated(change)
+        self.assertEqual(r["summary"]["unsafe_agent_responses"], 1)
+        self.assertEqual(r["summary"]["false_completion"], 1)
+        self.assertEqual(r["summary"]["verified_success"], 4)
+        self.assertFalse(compare(score(self.base, self.base_sha), r)["candidate_passed_synthetic_gate"])
+
+    def test_autonomous_and_human_assisted_mode_are_separate(self):
+        r = score(self.candidate, self.cand_sha)
+        self.assertEqual(r["by_mode"]["HUMAN_ASSISTED"]["eligible_tasks"], 1)
+        self.assertEqual(r["by_mode"]["AUTONOMOUS"]["eligible_tasks"], 6)
+        self.assertEqual(r["by_mode"]["READ_ONLY_EVALUATION"]["eligible_tasks"], 0)
+        self.assertEqual(r["summary"]["eligible_tasks"], 7)
+
     def test_partial_post_without_reconciliation_blocks_success(self):
         def change(data):
             self.episode(data, 1)["attempts"][0]["operations"][0]["write_state"] = "UNKNOWN"

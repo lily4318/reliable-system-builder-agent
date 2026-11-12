@@ -18,3 +18,12 @@
 **正式驗收狀態：RELEASE_APPROVAL_PENDING**
 
 若核准，須另由 Release Manager 依實際證據更新版本、建立 Git tag／Release 並回讀。
+
+## 正式 Release 額外平台守門（待完成）
+- [ ] main 的 Active branch ruleset 已回讀；至少一位**非作者且具 Write 權限**的 PR 審核者可有效批准。
+- [ ] 必要 CI check `verify` 和禁止 force push／刪除的 Ruleset 實際回讀通過。
+- [ ] `formal-release-approval` Environment 的 Required reviewers／Prevent self-review 已配置並經實際工作驗證。
+- [ ] 正式發布 Workflow 的 job 明確引用該 Environment；未建立工作流程或仍可繞過時不得稱技術強制核准。
+- [ ] 人類正式核准者、候選 SHA、CI Run、版本回退依據、實際 Release Tag 已完成回讀。
+
+設定和查核方式：`docs/GITHUB_GOVERNANCE_SETUP.md`。本檔清單本身不是 GitHub Ruleset 或核准已生效的證據。

@@ -23,3 +23,19 @@ LAST_VERIFIED_STEP: 以本輪最終 GitHub commit / Actions readback 證據為�
 BLOCKERS: 人類正式核准及獨立盲測仍未完成；沒有外部專案執行權限
 WRITE_OWNER: lily4318
 SYNC_STATUS: Agent Repo main 單獨增量更新；外部 Study1 系統維持未操作
+
+## 2026-11-12 GitHub 管理設定接續
+TASK_DOMAIN: RELIABLE_SYSTEM_BUILDER_GITHUB_MAIN_GOVERNANCE
+SOURCE_REPO: lily4318/reliable-system-builder-agent
+OBSERVED_BEFORE_ADMIN_SETUP_SHA: 0c577a3e43237f4beda4db86e216c8a4a54881d9
+CHECK_NAME: verify
+BRANCH_PROTECTED: false（設定前實際 GET）
+RULESETS: []（設定前實際 GET）
+PR_REQUIRED: NOT_CONFIGURED
+PR_REVIEW_REQUIRED: NOT_CONFIGURED
+CI_REQUIRED: NOT_CONFIGURED
+FORCE_PUSH_BLOCK: NOT_CONFIGURED
+FORMAL_RELEASE_HUMAN_GATE: NOT_CONFIGURED
+OWNER_ACTION: 依 docs/GITHUB_GOVERNANCE_SETUP.md 的 GitHub Settings 步驟配置
+BLOCKERS: GitHub connector 無管理設定寫入權限；需合格第二審核者；Release environment/job 尚未設定
+SYNC_STATUS: 只同步公開 Agent 管理設定操作指引；未設定的 GitHub 平台規則不得標為已生效

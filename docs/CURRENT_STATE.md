@@ -39,3 +39,17 @@ FORMAL_RELEASE_HUMAN_GATE: NOT_CONFIGURED
 OWNER_ACTION: 依 docs/GITHUB_GOVERNANCE_SETUP.md 的 GitHub Settings 步驟配置
 BLOCKERS: GitHub connector 無管理設定寫入權限；需合格第二審核者；Release environment/job 尚未設定
 SYNC_STATUS: 只同步公開 Agent 管理設定操作指引；未設定的 GitHub 平台規則不得標為已生效
+
+## 2026-11-12｜持續改善回饋系統（只提交 PR）
+TASK_DOMAIN: RELIABLE_SYSTEM_BUILDER_REAL_FEEDBACK_LOOP
+BASE_MAIN_SHA: c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57
+WORK_BRANCH: feat/evidence-feedback-holdout-v01
+SOURCE_OWNER: lily4318
+WRITE_SCOPE: 只有 lily4318/reliable-system-builder-agent 的候選分支／PR
+NEW_MODULE: src/feedback_eval.py
+PRIVATE_EVIDENCE_POLICY: 真實標註與獨立封存 holdout 保留原專案權責環境，不提交至公開 Repo
+RELEASE: v0.1.0 initial-candidate; formal_release_approved=false
+LAST_VERIFIED_STEP: 以 PR CI / head SHA 實際回讀為準；未合併不得宣稱 main 已更新
+BLOCKERS: 真實人類審核標註尚未收集；獨立外部保留測試尚未實施；第二位人類 PR 審核者尚未建立；正式 Release 人工門檻尚未完成
+NEXT_ACTION: 檢查 PR CI 和程式案例；取得人工標註流程授權，封存資料後再進行真正的独立 holdout; 人工決定是否合併
+SYNC_STATUS: PR_PENDING_MERGE; 外部 Study1 任何 Repo/GAS/Sheets 未操作

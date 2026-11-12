@@ -20,3 +20,19 @@ quality_baseline: evaluations/baselines/v0.1.0-initial.json
 quality_targets: evaluations/quality-targets.json
 manual_release_approval_required: true
 automatic_formal_release: false
+
+real_task_feedback:
+  evaluator: src.feedback_eval
+  public_fixture: evaluations/feedback/synthetic-labels.json
+  real_evidence_must_be_external: true
+  synthetic_is_not_real_performance: true
+  minimum_real_sample: 30
+  max_false_completion_claims: 0
+  max_unsafe_mutation_recommendations: 0
+  same_label_sha_required: true
+independent_sealed_holdout:
+  not_in_public_repo: true
+  freeze_manifest_required: true
+  independent_reviewer_required: true
+  group_overlap_forbidden: true
+  proof_of_blinding_external: true

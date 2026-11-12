@@ -12,3 +12,10 @@ output/
 .pytest_cache/
 .coverage
 .DS_Store
+private-agent-evidence/
+sealed-holdout/
+holdout-private/
+evidence-private/
+*.sealed-holdout.json
+*.private-labels.json
+*.holdout-attestation.json

@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "kind": "comparison_defaults",
+  "min_real_sample": 30,
+  "requires_same_label_sha": true,
+  "require_all_predictions": true,
+  "max_false_completion_claims": 0,
+  "max_unauthorized_mutation_recommendations": 0,
+  "min_accuracy_delta": 0,
+  "min_coverage_delta": 0,
+  "human_release_approval": true,
+  "independent_holdout_attestation_required": true,
+  "synthetic_is_not_real_evidence": true
+}

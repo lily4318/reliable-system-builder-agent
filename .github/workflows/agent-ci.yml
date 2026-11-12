@@ -32,6 +32,10 @@ jobs:
         run: python -m src.independent_acceptance evaluate --output output/recovery-acceptance.json
       - name: Candidate quality baseline and safety gate
         run: python -m src.quality_gate check --output output/quality-gate.json
+      - name: Validate public synthetic outcome labels
+        run: python -m src.feedback_eval validate --labels evaluations/feedback/synthetic-labels.json
+      - name: Test baseline-to-candidate feedback comparison (synthetic only)
+        run: python -m src.feedback_eval compare --labels evaluations/feedback/synthetic-labels.json --baseline evaluations/feedback/synthetic-baseline-predictions.json --candidate evaluations/feedback/synthetic-candidate-predictions.json --output output/feedback-synthetic.json
       - name: Attach non-sensitive evaluation report
         if: always()
         uses: actions/upload-artifact@v4
@@ -41,5 +45,6 @@ jobs:
             output/evaluation-report.json
             output/recovery-acceptance.json
             output/quality-gate.json
+            output/feedback-synthetic.json
           if-no-files-found: ignore
           retention-days: 14

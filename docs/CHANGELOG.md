@@ -12,3 +12,10 @@
 - 與原 22 個政策回歸案例分開驗證，加入性能退步、危險動作為零的品質門檻。
 - 記錄上版實際 CI 基準，未測得的獨立盲測／真實部署不杜撰成績。
 - 建立 PR 人工審核、正式版本升版及可追溯 `git revert` 回退手冊。
+
+## v0.1.0 candidate｜未合併的持續改善 PR（待驗證）
+- 增加真實工程任務標註結構、安全完成／未知結果判定、脫敏標準與證據指紋要求。
+- 36 個**合成** feedback smoke case、離線 baseline/candidate 評測、coverage／accuracy／安全誤報及最低樣本數門檻。
+- 非公開封存 holdout 的人工審核宣告、SHA 固定、候選 commit 和跨資料集 group 洩漏檢查。
+- 僅公開合成 fixture 進 CI；私人標註／封存答案不會上傳 Actions Artifact。
+- 合併、正式 release、真實任務成果、模型微調仍待另外驗證與授權。

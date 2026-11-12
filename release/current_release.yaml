@@ -34,3 +34,12 @@ rollback:
 human_review:
   checklist: release/REVIEW_CHECKLIST.md
   completed: false
+feedback_candidate:
+  evaluation_contract: docs/FEEDBACK_AND_HOLDOUT.md
+  evaluator: src.feedback_eval
+  synthetic_fixture: evaluations/feedback/synthetic-labels.json
+  real_label_sample_count: 0
+  independently_sealed_holdout_evaluated: false
+  pr_merge_required: true
+  formal_approval_status: pending
+

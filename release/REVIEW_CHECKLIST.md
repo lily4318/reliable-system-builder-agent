@@ -27,3 +27,19 @@
 - [ ] 人類正式核准者、候選 SHA、CI Run、版本回退依據、實際 Release Tag 已完成回讀。
 
 設定和查核方式：`docs/GITHUB_GOVERNANCE_SETUP.md`。本檔清單本身不是 GitHub Ruleset 或核准已生效的證據。
+
+## 持續改善 Agent 的實際資料／品質驗收（待人工）
+- [ ] 本 PR 的 GitHub `verify` 實際通過、PR head SHA 與 main base 均已回讀。
+- [ ] 合成 smoke 成績僅當工具測試，不宣稱真實模型改善或真實部署成功。
+- [ ] 真實任務 labels 由授權人類從原始證據獨立標註，無任何未授權資料外洩。
+- [ ] 非公開 holdout 由不同的人類審查者封存，凍結標準與候選 SHA，開發／holdout group 無交叉。
+- [ ] 同一 label SHA 下 baseline/candidate accuracy、coverage 不下降，0 false completion 與 0 unauthorized mutation。
+- [ ] PR 人工審核與正式 release 核准獨立，確認未曾由 CI 或 Agent 自行標記 `formal_release_approved=true`。
+- [ ] 版本回退參考、可重現的 revert PR、下一次真實任務復發率追蹤已檢查。
+
+## PR #1 指標與 unknown 契約核對（候選）
+- [ ] `verified_task_success_rate` 已移除避免誤用；標註成功比例與 Agent 版本的端到端成功率分開。
+- [ ] `agent_verified_task_success_rate` 在缺少版本綁定的真實執行證據前為 `null`，不能由 synthetic 或 golden labels 推估。
+- [ ] 真實 unknown 允許經人類審閱但 `verified=false`；不准產生「已核實完成」動作。
+- [ ] 真實已知 success/failure 必須有 reviewer、`verified=true`、證據 SHA；成功還要實際遠端／UI。
+- [ ] PR #2 為 stacked PR；若 PR #1 HEAD 更新，PR #2 的 commit 與基準不能被本輪暗中同步或改寫。

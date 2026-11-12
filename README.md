@@ -37,3 +37,11 @@ python -m src.agent_eval evaluate --output output/evaluation-report.json
 - [安全恢復與對帳](docs/INCIDENT_RECOVERY.md)：未知或部分 POST 只做唯讀盤點，禁止重新從頭部署。
 
 上述評測無遠端 API 寫入；未證明真實 UAT、Agent 自動跨專案執行或底層模型已重新訓練。
+
+## 持續改善與真實任務回饋（候選 PR）
+- [實際工程任務標註、盲測資料隔離、品質比較](docs/FEEDBACK_AND_HOLDOUT.md)
+- [人工標註依據](docs/FEEDBACK_LABELING_RUBRIC.md)
+- [改善 PR、核准與版本回退](docs/FEEDBACK_PR_AND_ROLLBACK.md)
+- `src/feedback_eval.py`：純離線結果標註 schema 驗證、預測品質指標、baseline 對比、保留測試 SHA 與 group 隔離檢查。
+- `evaluations/feedback/synthetic-*.json`：**僅 36 筆合成回歸資料**，不代表真實工程成果。
+- 真實人類標註和 sealed holdout **不得進入公開 GitHub**；目前沒有真實任務的人工標註樣本，也沒有真正 ML/DL 微調證據。

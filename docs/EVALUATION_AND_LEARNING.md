@@ -30,3 +30,10 @@
 - 品質基準：`evaluations/baselines/v0.1.0-initial.json`；當前候選的最低門檻：`evaluations/quality-targets.json`。
 - `python -m src.quality_gate check` 比較原政策與恢復案例的覆蓋、關鍵失敗、危險操作，任何退步須停止升版。
 - 人工 Release 與安全回退見 `docs/RELEASE_REVIEW_AND_ROLLBACK.md`；此輪未授權任何外部正式系統寫入。
+
+## 真實標註、雙版本比較與封存保留資料（候選 PR）
+本輪新增 `src/feedback_eval.py`，標註由人類審核的真實任務 outcomes、證據等級、去識別化 reviewer ID、證據 SHA，拒絕 CI-only 冒充真實部署或 UI 成功；任何不能確定的狀態須標為 unknown。
+
+評測會計算 action accuracy、coverage、abstention、false completion claims、unauthorized mutation，以及**標註資料自身**的已知結果成功比例和標註案件耗時；使用相同 label SHA 的 baseline/candidate 比較。標註資料的成功比例與時間在不同 Agent 間不變，**不能冒稱 Agent 的端到端成功率或 MTTR**；`agent_verified_task_success_rate=null`，直到有與指定 Agent 版本綁定且經原系統驗收的執行軌跡。一般真實評測規劃至少 30 筆、無法證明的數字一律未知。未達成數據門檻不能宣稱 improved。
+
+獨立保留資料採**非公開封存**、開發／holdout group 隔離、reviewer 分離、人工 SHA 核對與候選 commit 固定；工具檢查的是離線形式和人工宣告，**不是**密碼學簽章、第三方外部驗證或底層模型重新訓練。範例與指引見 `docs/FEEDBACK_AND_HOLDOUT.md`。

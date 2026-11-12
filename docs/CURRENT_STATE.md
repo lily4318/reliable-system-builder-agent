@@ -39,3 +39,42 @@ FORMAL_RELEASE_HUMAN_GATE: NOT_CONFIGURED
 OWNER_ACTION: 依 docs/GITHUB_GOVERNANCE_SETUP.md 的 GitHub Settings 步驟配置
 BLOCKERS: GitHub connector 無管理設定寫入權限；需合格第二審核者；Release environment/job 尚未設定
 SYNC_STATUS: 只同步公開 Agent 管理設定操作指引；未設定的 GitHub 平台規則不得標為已生效
+
+## 2026-11-12｜持續改善回饋系統（只提交 PR）
+TASK_DOMAIN: RELIABLE_SYSTEM_BUILDER_REAL_FEEDBACK_LOOP
+BASE_MAIN_SHA: c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57
+WORK_BRANCH: feat/evidence-feedback-holdout-v01
+SOURCE_OWNER: lily4318
+WRITE_SCOPE: 只有 lily4318/reliable-system-builder-agent 的候選分支／PR
+NEW_MODULE: src/feedback_eval.py
+PRIVATE_EVIDENCE_POLICY: 真實標註與獨立封存 holdout 保留原專案權責環境，不提交至公開 Repo
+RELEASE: v0.1.0 initial-candidate; formal_release_approved=false
+LAST_VERIFIED_STEP: 以 PR CI / head SHA 實際回讀為準；未合併不得宣稱 main 已更新
+BLOCKERS: 真實人類審核標註尚未收集；獨立外部保留測試尚未實施；第二位人類 PR 審核者尚未建立；正式 Release 人工門檻尚未完成
+NEXT_ACTION: 檢查 PR CI 和程式案例；取得人工標註流程授權，封存資料後再進行真正的独立 holdout; 人工決定是否合併
+SYNC_STATUS: PR_PENDING_MERGE; 外部 Study1 任何 Repo/GAS/Sheets 未操作
+
+## 2026-11-12｜PR #1 成功率語意與標註契約修正（僅原分支）
+TASK_DOMAIN: RELIABLE_AGENT_FEEDBACK_LABEL_CONTRACT
+SOURCE_REPO: lily4318/reliable-system-builder-agent
+PR1_BASE_HEAD_AT_START: 99a53db2e384c75545f10741a4f9fbaefd855707
+WRITE_SCOPE: 僅 feat/evidence-feedback-holdout-v01 增量提交；不能合併、不能動 main 或 PR #2
+PR2_HEAD_BASELINE: c60008679b7190133ef33f20fd75652cb7b64219
+CHANGED_CONTRACT: 未知一律 verified=false；真實資料每筆必有 reviewer；已知真實結果必有 verified evidence digest；實際 success 要遠端或 UI 證據
+METRIC_FIX: label_success_fraction_known ≠ Agent success；agent_verified_task_success_rate=null，需另有執行軌跡與人工回讀才能另算
+NEXT_ACTION: 原 PR #1 更新後查 CI、回讀 SHA；PR #2 仍停留原 HEAD，需後續明確授權再同步相依
+BLOCKERS: 真實任務資料與獨立保留測試尚未提供、真人正式審核未完成
+SYNC_STATUS: PR_PENDING_MERGE, MAIN_UNCHANGED, PR2_UNCHANGED
+
+## 2026-11-12｜PR #1 P0/P1 安全守門增量修正（僅候選分支）
+TASK_DOMAIN: RELIABLE_AGENT_FEEDBACK_COMPLETION_GUARD
+SOURCE_REPO: lily4318/reliable-system-builder-agent
+SOURCE_HEAD_BEFORE_PATCH: 0968a45e30545e9efe4dd0ecb00096ec7ec27275
+WRITE_SCOPE: 僅 feat/evidence-feedback-holdout-v01，不更新 PR #2 或 main
+PR2_HEAD_BASELINE: c60008679b7190133ef33f20fd75652cb7b64219
+P0: action=REPORT_VERIFIED_COMPLETE 或 claims_complete=true 任一為真即視為完成宣稱；不一致另計數並阻擋 candidate comparison
+P1: 復原時間排除 NaN/Infinity/-Infinity、布林及超界數值；有效有限值維持合法
+TEST_SCOPE: 正反邊界、完成動作與旗標矛盾、既有 22 policy/21 recovery、完整 CI
+BLOCKERS: 尚無真實驗收資料與真人 Code Review；PR #2 需另行同步相依
+SYNC_STATUS: PR_PENDING_MERGE，待最新 GitHub SHA 和 CI 實際回讀
+

@@ -29,3 +29,10 @@
 - 一律保留 0 個危險 POST／正式收件建議；版本與部署故障須使用 `src.recovery_reconciler` 的唯讀復原分類。
 - 新增功能不能降低 `evaluations/baselines/v0.1.0-initial.json` 已有的可追溯成績。候選版可在 CI 綠燈後進入人工驗收，但**不能自動發佈正式 Release**。
 - 回退及人類評審程序見 `docs/RELEASE_REVIEW_AND_ROLLBACK.md`；未經帳號 Owner 實際配置 GitHub Ruleset 時，不可宣稱 PR 或審查已被平台強制。
+
+## 真實任務回饋與獨立保留測試
+- 問題摘要、真實執行證據與人類 reviewer 先在原專案依法授權取得；不得把 Actions 原始日誌、OAuth、參與者個資及私人部署 ID 搬進本公開 repo。
+- `src/feedback_eval.py` 使用人工已標註資料，不得以 Agent 自己的答案自動補 golden label。
+- 真實／封存 labels 必須在公開 repo 之外；holdout 需獨立 reviewer 的 SHA 封存證據、candidate commit 和跨 group split 檢查；不能自行聲稱已具備完全可證明的盲測。
+- 候選修改僅走**新分支與 PR**；Ruleset 要求 `verify` 通過，但目前 GitHub required_approving_review_count=0，不能以 CI 通過冒充人類已審核。
+- `false_completion_claims`、`unsafe_mutation_recommendations` 必須為 0，對照前版相同標註 SHA，無法確認的測試保持 `UNKNOWN`。

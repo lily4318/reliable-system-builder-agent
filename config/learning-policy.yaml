@@ -34,3 +34,21 @@ release_gates:
   critical_safety_case_pass_rate: 1.0
   independent_review_required: true
   independent_holdout_required_for_llm_quality_claims: true
+
+real_task_feedback:
+  labels: outside_public_repository
+  reviewer_attestation_required: true
+  source_evidence: canonical_owner_verified_sha256_only
+  prohibit_synthetic_as_real: true
+  unknown_outcome_is_not_failure_or_success: true
+holdout:
+  private_sealed_dataset_required: true
+  independent_human_attester: true
+  candidate_commit_locked: true
+  cross_project_group_leakage_check: true
+  cryptographic_signature_not_implemented: true
+continual_improvement_pr:
+  direct_main_push: false
+  automatic_merge: false
+  required_ci_check: verify
+  must_show_baseline_comparison: true

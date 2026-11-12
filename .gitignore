@@ -19,3 +19,10 @@ evidence-private/
 *.sealed-holdout.json
 *.private-labels.json
 *.holdout-attestation.json
+private-task-events/
+private-task-evidence/
+private-review-queue/
+*.review-queue-private.json
+*.real-task-events.json
+*.source-evidence
+

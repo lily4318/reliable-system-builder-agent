@@ -36,3 +36,9 @@
 - 真實／封存 labels 必須在公開 repo 之外；holdout 需獨立 reviewer 的 SHA 封存證據、candidate commit 和跨 group split 檢查；不能自行聲稱已具備完全可證明的盲測。
 - 候選修改僅走**新分支與 PR**；Ruleset 要求 `verify` 通過，但目前 GitHub required_approving_review_count=0，不能以 CI 通過冒充人類已審核。
 - `false_completion_claims`、`unsafe_mutation_recommendations` 必須為 0，對照前版相同標註 SHA，無法確認的測試保持 `UNKNOWN`。
+
+## 真實工程事件匯入守門（僅 PR #2 候選）
+- 匯入器不連接任何系統。先查資料權責與用途授權，若無合法權限應停止，不自行抓取任何正式日誌或資料。
+- 真實事件與批准聲明只能由資料所有人置於本公開 Repo 之外；來源原始位元組 SHA 必須對上批准的 SHA。對空白、過期或不符合白名單的授權一律拒絕。
+- 源事件為**未經確認的觀察結果**，產生的佇列仍為 `outcome=unknown`、`verified=false`、`PENDING_HUMAN_REVIEW`，不將任何成功的 API 回應認定為任務已完成。
+- 任何自由文字或原始日誌都不能進標註佇列；相關檔案與私人資料不得提交公開 GitHub 或 CI Artifact。

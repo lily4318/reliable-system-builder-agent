@@ -50,3 +50,11 @@
 - [ ] UI／遠端須同目標的獨立合格證據，不能靠 CI 過關。
 - [ ] 未對帳、重複非冪等 POST、未授權操作、誤稱完成皆須阻擋。
 - [ ] 公開合成 CI 不被冒稱真實成功；正式 release 核准仍為 false。
+
+## 同批次 E2E 實際工具沙盒驗收（僅合成）
+- [ ] `GET_READBACK: NOT_APPLIED` 不會被矛盾的 positive receipt 覆寫成 VERIFIED_SUCCESS。
+- [ ] VERIFIED_FAILURE 須另有相同 target 的實際觀測，無觀測仍為 UNKNOWN。
+- [ ] `src/e2e_sandbox.py` 僅在隔離合成狀態機執行，不存取外部資料、網路或真人帳號。
+- [ ] 合成沙盒能實際演練逾時後安全對帳、部分寫入、非冪等重複操作、UI/CI/Email 與固定任務分母。
+- [ ] 所有新的 Schema、評測器與沙盒正反測試和 CI 通過；實際來源 SHA 回讀。
+- [ ] 合成成功率與正式 Agent 的真實端到端完成率完全分開，不可由 PR / CI 自行核准。

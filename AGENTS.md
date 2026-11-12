@@ -41,3 +41,8 @@
 - 每次完成宣稱必須綁定 Agent 完整 commit、模型與工具／政策／Prompt SHA、TaskSpec、同一目標的獨立遠端／UI 驗收。
 - 無原始來源權限或證據不足時不得推定成功；部分寫入後不可盲目重送 POST；正確安全停止與工程完成分開計分。
 - 合成 E2E CI 不證明實際模型能力。真實研究與私人資料不得上傳公開 Agent，亦不得修改 Study1。
+
+## E2E 模擬工具與判定守門（PR #3）
+- 已知 GET `NOT_APPLIED` 與成功收據互相衝突時，候選測試必須阻擋成功；獨立失敗也必須有吻合驗收目標的觀測行為。
+- `src/e2e_sandbox.py` 僅供合成離線模擬，內部 oracle／reviewer 是測試假身分，不能推論真實來源核准或實際 Agent 執行。
+- 任何涉及外部資料的 Runner、真實 API、UI、部署或微調仍須分開正式授權；保留 `formal_release_approved=false`。

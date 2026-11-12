@@ -50,4 +50,11 @@ e2e_candidate:
   real_evidence_access_authorized: false
   dependency: PR_1
   pr_merge_required: true
+e2e_sandbox_candidate:
+  runner: src.e2e_sandbox
+  plan_schema: schemas/e2e-sandbox-plan.schema.json
+  real_agent_executed: false
+  synthetic_oracle_only: true
+  private_evidence_access: false
+  formal_release_approved: false
 

@@ -63,3 +63,12 @@ PR #1 的 feedback_eval.py 是安全動作評分，並非真實 Agent 執行成�
 (6) 正式 Quality Gate、版本回退與人工 Release 核准另行實施。
 
 **PR #3 不進行真實模型訓練、部署、正式資料寫入或任何 Study1 操作。**
+
+## 7. 實際新增的 E2E 安全負測與合成沙盒（本輪候選）
+
+1. 當同一個未確定 POST 已由 `GET_READBACK` 判定 `NOT_APPLIED`，即使另有形式上 `passed=true` 的收據，該 target 也**不能被判定完成**；此判定是保守策略，若後續另行修復須由真人核對完整操作歷史，不能由單筆舊收據覆蓋負面觀察。
+2. `VERIFIED_FAILURE` 亦必須有**相同驗收項目與目標**的獨立負面收據，以及與該證據類型相符的觀測操作；不能只用沒有對應 GET／UI／CI 的失敗收據自行確認遠端失敗。
+3. `src/e2e_sandbox.py` 是**離線合成工具沙盒**。輸入固定 TaskSpec 與手工設計的安全／危險操作步驟，於程式內執行模擬狀態機，由模擬 oracle 觀測寫入、GET、UI、CI 產生合成收據，再送進 `src/e2e_eval.py` 核對。完整範例、限制與命令見 `docs/E2E_SANDBOX_REPLAY.md`。
+4. 沙盒明確回報 `external_agent_executed=false`、`external_human_audit=false`、`real_world_e2e_certified=false`。Oracle 只代表**測試中與 Agent 決策分離的模擬器**，不是實際獨立人工審核；不能因 sandbox 的 VERIFIED_SUCCESS 宣稱外部 Agent 已完成真實任務。
+
+**跨 PR 依賴仍未解除**：PR #3 基於 PR #1，PR #2 未被本輪同步、合併或改寫；完整真實 Runner 與 PR #2 pending queue 的正式映射仍需另行經權責、來源及人工驗收。

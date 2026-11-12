@@ -91,3 +91,16 @@ COMPLETED: Agent 版本與任務快照、獨立驗收、部分寫入、失敗歸
 BLOCKERS: PR #1/2 未合併、PR #2 相依衝突；真實資料授權／獨立封存／實際 Runner 和人工 Release 尚缺
 NEXT_ACTION: 核對本輪 PR CI 和 GitHub blob SHA、完成正式程式審核；另行授權才處理 PR2 合併相依與私人實際評測
 SYNC_STATUS: PR_PENDING_MERGE, MAIN_UNCHANGED, NO_REAL_DATA, NO_STUDY1_WRITE
+
+## 2026-11-13｜PR #3 E2E 模擬執行與安全門檻整批增量
+TASK_DOMAIN: RELIABLE_AGENT_E2E_SANDBOX_AND_EVIDENCE_HARDENING
+SOURCE_REPO: lily4318/reliable-system-builder-agent
+SOURCE_PR3_HEAD_AT_START: 2da73e85b990d1cb4b498999129bfb2b934ae024
+DEPENDENCY_PR1_HEAD: 34fe85c7960062b609d2efefc9d2a1d5072a3dcb
+PR2_UNMODIFIED_HEAD: c60008679b7190133ef33f20fd75652cb7b64219
+WRITE_SCOPE: 僅 feat/e2e-execution-evidence-evaluation-v01；不合併，不動 main/PR1/PR2/Study1
+COMPLETED: P0 矛盾 negative readback 不得轉成功、負面裁定需實際觀測；合成 deterministic sandbox runner、schema、fixture、正反測試與 CI
+BLOCKERS: 真實 Agent Runner／正式資料權責核准／私人真實驗收／獨立封存盲測及真人 Review 尚未完成；PR2 相依衝突仍需另外處理
+LAST_VERIFIED_STEP: 需依最終 commit/PR/CI 回讀填報，CI green 不等於真人成功
+NEXT_ACTION: 獨立人工 code review，先處理 PR1 及 PR2 相依，再評估 PR3；外部資料與部署需獨立授權
+SYNC_STATUS: PR_PENDING_MERGE，NO_STUDY1_WRITE，NO_REAL_DATA

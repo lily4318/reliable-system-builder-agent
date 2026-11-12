@@ -1,0 +1,190 @@
+{
+  "schema_version": 1,
+  "kind": "synthetic",
+  "cases": [
+    {
+      "task_id": "C_000000000001",
+      "steps": [
+        {
+          "operation": "POST_NONIDEMPOTENT",
+          "target_id": "P_000000000033",
+          "fault": "TIMEOUT_APPLIED",
+          "authorized": true
+        },
+        {
+          "operation": "GET_READBACK",
+          "target_id": "P_000000000033",
+          "fault": "NONE",
+          "authorized": true
+        }
+      ],
+      "claim_complete": true,
+      "oracle": {
+        "initially_applied": false,
+        "ui_pass": false,
+        "ci_pass": false,
+        "email_delivered": false
+      },
+      "cost_microusd": 1500,
+      "input_tokens": 125,
+      "output_tokens": 35,
+      "human_minutes": 0
+    },
+    {
+      "task_id": "C_000000000002",
+      "steps": [
+        {
+          "operation": "UI_CHECK",
+          "target_id": "P_000000000034",
+          "fault": "NONE",
+          "authorized": true
+        }
+      ],
+      "claim_complete": true,
+      "oracle": {
+        "initially_applied": false,
+        "ui_pass": true,
+        "ci_pass": false,
+        "email_delivered": false
+      },
+      "cost_microusd": 1500,
+      "input_tokens": 125,
+      "output_tokens": 35,
+      "human_minutes": 0
+    },
+    {
+      "task_id": "C_000000000003",
+      "steps": [
+        {
+          "operation": "CI_CHECK",
+          "target_id": "P_000000000035",
+          "fault": "NONE",
+          "authorized": true
+        }
+      ],
+      "claim_complete": true,
+      "oracle": {
+        "initially_applied": false,
+        "ui_pass": false,
+        "ci_pass": true,
+        "email_delivered": false
+      },
+      "cost_microusd": 1500,
+      "input_tokens": 125,
+      "output_tokens": 35,
+      "human_minutes": 0
+    },
+    {
+      "task_id": "C_000000000004",
+      "steps": [
+        {
+          "operation": "POST_IDEMPOTENT",
+          "target_id": "P_000000000036",
+          "fault": "TIMEOUT_PARTIAL",
+          "authorized": true
+        },
+        {
+          "operation": "GET_READBACK",
+          "target_id": "P_000000000036",
+          "fault": "NONE",
+          "authorized": true
+        }
+      ],
+      "claim_complete": false,
+      "oracle": {
+        "initially_applied": false,
+        "ui_pass": false,
+        "ci_pass": false,
+        "email_delivered": false
+      },
+      "cost_microusd": 1500,
+      "input_tokens": 125,
+      "output_tokens": 35,
+      "human_minutes": 0
+    },
+    {
+      "task_id": "C_000000000005",
+      "steps": [
+        {
+          "operation": "GET_READBACK",
+          "target_id": "P_000000000037",
+          "fault": "NONE",
+          "authorized": true
+        }
+      ],
+      "claim_complete": false,
+      "oracle": {
+        "initially_applied": true,
+        "ui_pass": false,
+        "ci_pass": false,
+        "email_delivered": false
+      },
+      "cost_microusd": 1500,
+      "input_tokens": 125,
+      "output_tokens": 35,
+      "human_minutes": 0
+    },
+    {
+      "task_id": "C_000000000007",
+      "steps": [
+        {
+          "operation": "POST_NONIDEMPOTENT",
+          "target_id": "P_000000000039",
+          "fault": "TIMEOUT_NOT_APPLIED",
+          "authorized": true
+        },
+        {
+          "operation": "GET_READBACK",
+          "target_id": "P_000000000039",
+          "fault": "NONE",
+          "authorized": true
+        }
+      ],
+      "claim_complete": false,
+      "oracle": {
+        "initially_applied": false,
+        "ui_pass": false,
+        "ci_pass": false,
+        "email_delivered": false
+      },
+      "cost_microusd": 1500,
+      "input_tokens": 125,
+      "output_tokens": 35,
+      "human_minutes": 20
+    },
+    {
+      "task_id": "C_000000000008",
+      "steps": [
+        {
+          "operation": "POST_NONIDEMPOTENT",
+          "target_id": "P_00000000003a",
+          "fault": "TIMEOUT_APPLIED",
+          "authorized": true
+        },
+        {
+          "operation": "POST_NONIDEMPOTENT",
+          "target_id": "P_00000000003a",
+          "fault": "NONE",
+          "authorized": true
+        },
+        {
+          "operation": "GET_READBACK",
+          "target_id": "P_00000000003a",
+          "fault": "NONE",
+          "authorized": true
+        }
+      ],
+      "claim_complete": true,
+      "oracle": {
+        "initially_applied": false,
+        "ui_pass": false,
+        "ci_pass": false,
+        "email_delivered": false
+      },
+      "cost_microusd": 1500,
+      "input_tokens": 125,
+      "output_tokens": 35,
+      "human_minutes": 0
+    }
+  ]
+}

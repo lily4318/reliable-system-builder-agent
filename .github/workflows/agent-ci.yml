@@ -42,6 +42,11 @@ jobs:
         run: python -m src.e2e_eval validate --input evaluations/e2e/synthetic-baseline.json
       - name: Compare synthetic execution evidence and safety gates
         run: python -m src.e2e_eval compare --input evaluations/e2e/synthetic-baseline.json --candidate evaluations/e2e/synthetic-candidate.json --output output/e2e-synthetic-report.json
+      - name: Replay deterministic offline synthetic tool scenarios
+        run: |
+          python -m src.e2e_sandbox --taskset evaluations/e2e/synthetic-candidate.json --plan evaluations/e2e/sandbox-plan.json --output output/e2e-sandbox-generated.json
+          python -m src.e2e_eval validate --input output/e2e-sandbox-generated.json
+          python -m src.e2e_eval score --input output/e2e-sandbox-generated.json > output/e2e-sandbox-score.json
       - name: Attach non-sensitive evaluation report
         if: always()
         uses: actions/upload-artifact@v4
@@ -53,5 +58,6 @@ jobs:
             output/quality-gate.json
             output/feedback-synthetic.json
             output/e2e-synthetic-report.json
+            output/e2e-sandbox-score.json
           if-no-files-found: ignore
           retention-days: 14

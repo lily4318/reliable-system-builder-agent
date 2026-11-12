@@ -108,6 +108,50 @@ class ExecutionEvidenceTest(unittest.TestCase):
         self.assertEqual(r["summary"]["known_outcomes"], 5)
         self.assertEqual(r["summary"]["unknown"], 2)
 
+    def test_negative_reconciliation_cannot_be_overridden_by_positive_receipt(self):
+        def change(data):
+            ep = self.episode(data, 1)
+            operations = ep["attempts"][0]["operations"]
+            operations[0]["write_state"] = "UNKNOWN"
+            operations[1]["reconciles_operation_id"] = operations[0]["operation_id"]
+            operations[1]["readback_state"] = "NOT_APPLIED"
+        r = self.mutated(change)
+        self.assertEqual(r["summary"]["verified_success"], 4)
+        self.assertEqual(r["summary"]["false_completion"], 1)
+        self.assertEqual(r["summary"]["unresolved_partial_write"], 0)
+
+    def test_applied_reconciliation_still_allows_verified_success(self):
+        def change(data):
+            ep = self.episode(data, 1)
+            operations = ep["attempts"][0]["operations"]
+            operations[0]["write_state"] = "UNKNOWN"
+            operations[1]["reconciles_operation_id"] = operations[0]["operation_id"]
+            operations[1]["readback_state"] = "APPLIED"
+        r = self.mutated(change)
+        self.assertEqual(r["summary"]["verified_success"], 5)
+        self.assertEqual(r["summary"]["false_completion"], 0)
+
+    def test_failure_receipt_without_matching_observation_is_unknown(self):
+        def change(data):
+            ep = self.episode(data, 7)
+            ep["attempts"][0]["operations"].clear()
+        r = self.mutated(change)
+        self.assertEqual(r["summary"]["known_outcomes"], 5)
+        self.assertEqual(r["summary"]["unknown"], 2)
+
+    def test_failure_receipt_wrong_observation_target_is_unknown(self):
+        def change(data):
+            ep = self.episode(data, 7)
+            ep["attempts"][0]["operations"][0]["target_id"] = "P_"+"e"*12
+        r = self.mutated(change)
+        self.assertEqual(r["summary"]["known_outcomes"], 5)
+        self.assertEqual(r["summary"]["unknown"], 2)
+
+    def test_failure_receipt_matching_observation_stays_known(self):
+        r = score(self.candidate, self.cand_sha)
+        self.assertEqual(r["summary"]["known_outcomes"], 6)
+        self.assertEqual(r["summary"]["verified_success"], 5)
+
     def test_ci_only_cannot_replace_remote_readback(self):
         def change(data):
             self.episode(data, 1)["receipts"][0]["evidence_kind"] = "CI"

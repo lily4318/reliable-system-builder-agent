@@ -22,6 +22,8 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Install pinned JSON Schema validator
+        run: python -m pip install jsonschema==4.25.1
       - name: Offline unit tests
         run: python -m unittest discover -s tests -v
       - name: Public artifacts and privacy scan
@@ -36,6 +38,15 @@ jobs:
         run: python -m src.feedback_eval validate --labels evaluations/feedback/synthetic-labels.json
       - name: Test baseline-to-candidate feedback comparison (synthetic only)
         run: python -m src.feedback_eval compare --labels evaluations/feedback/synthetic-labels.json --baseline evaluations/feedback/synthetic-baseline-predictions.json --candidate evaluations/feedback/synthetic-candidate-predictions.json --output output/feedback-synthetic.json
+      - name: Validate public E2E synthetic source
+        run: python -m src.e2e_eval validate --input evaluations/e2e/synthetic-baseline.json
+      - name: Compare synthetic execution evidence and safety gates
+        run: python -m src.e2e_eval compare --input evaluations/e2e/synthetic-baseline.json --candidate evaluations/e2e/synthetic-candidate.json --output output/e2e-synthetic-report.json
+      - name: Replay deterministic offline synthetic tool scenarios
+        run: |
+          python -m src.e2e_sandbox --taskset evaluations/e2e/synthetic-candidate.json --plan evaluations/e2e/sandbox-plan.json --output output/e2e-sandbox-generated.json
+          python -m src.e2e_eval validate --input output/e2e-sandbox-generated.json
+          python -m src.e2e_eval score --input output/e2e-sandbox-generated.json > output/e2e-sandbox-score.json
       - name: Attach non-sensitive evaluation report
         if: always()
         uses: actions/upload-artifact@v4
@@ -46,5 +57,7 @@ jobs:
             output/recovery-acceptance.json
             output/quality-gate.json
             output/feedback-synthetic.json
+            output/e2e-synthetic-report.json
+            output/e2e-sandbox-score.json
           if-no-files-found: ignore
           retention-days: 14

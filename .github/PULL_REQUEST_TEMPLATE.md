@@ -39,3 +39,8 @@
 - [ ] 無實際版本綁定執行軌跡時 `agent_verified_task_success_rate` 必須為 `null`。
 - [ ] 真實 unknown `verified=false`、reviewer 仍必要，且不能 `REPORT_VERIFIED_COMPLETE`。
 - [ ] 實際 success 須遠端／UI 原始證據；不因 CI Success 自動核准。
+
+## E2E 只讀候選檢查
+- [ ] 只使用合成任務與公開 CI；沒有私人原始資料、API 呼叫或模型權重訓練。
+- [ ] 真實 E2E 成功率必須待獨立來源與授權核實，不得以合成指標宣稱真實改善。
+- [ ] PR #1/2/Study1 不更動；合併與 Release 都需另外人工核准。

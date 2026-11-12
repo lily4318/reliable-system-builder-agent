@@ -45,3 +45,15 @@ python -m src.agent_eval evaluate --output output/evaluation-report.json
 - `src/feedback_eval.py`：純離線結果標註 schema 驗證、預測品質指標、baseline 對比、保留測試 SHA 與 group 隔離檢查。
 - `evaluations/feedback/synthetic-*.json`：**僅 36 筆合成回歸資料**，不代表真實工程成果。
 - 真實人類標註和 sealed holdout **不得進入公開 GitHub**；目前沒有真實任務的人工標註樣本，也沒有真正 ML/DL 微調證據。
+
+## E2E Execution Evidence｜端到端工程任務證據評測（候選）
+- 詳細規格：docs/E2E_EXECUTION_EVIDENCE.md。
+- 新增 src/e2e_eval.py、schemas/e2e-execution-bundle.schema.json、tests/test_e2e_eval.py，及公開合成 baseline/candidate。
+- 目前只有合成軌跡播放，未真正執行 Agent；沒有真實資料、UI、GAS 或獨立盲測核准。
+- PR #3 依賴最新 PR #1；PR #2 的相依衝突保持原樣，沒有修改。
+
+## E2E 受控合成沙盒（PR #3 新增同批次）
+
+- `src/e2e_sandbox.py` + `schemas/e2e-sandbox-plan.schema.json`：使用合成 TaskSpec 與工具操作計畫，模擬遠端寫入／逾時／GET 對帳、UI、CI 與 Email 狀態，依模擬環境的獨立 oracle 產生合成收據。
+- `evaluations/e2e/sandbox-plan.json`、`tests/test_e2e_sandbox.py`：包含部分寫入、確認未寫入、重複非冪等 POST、無證據成功宣稱等正反情境。CI 在同一 PR 一併執行。
+- 完整限制及命令見 `docs/E2E_SANDBOX_REPLAY.md`。**不執行真實 Agent，不使用私人來源，不提供外部系統寫入／部署或正式證據核准**。

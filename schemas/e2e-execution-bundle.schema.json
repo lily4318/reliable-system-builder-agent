@@ -1,0 +1,511 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Agent E2E execution evidence bundle, structured data only",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "kind",
+    "evaluation_id",
+    "tasks",
+    "build",
+    "episodes"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 1
+    },
+    "kind": {
+      "enum": [
+        "synthetic",
+        "reviewed_real"
+      ]
+    },
+    "evaluation_id": {
+      "type": "string",
+      "pattern": "^[A-Za-z0-9_.-]{3,80}$"
+    },
+    "tasks": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 250,
+      "items": {
+        "$ref": "#/$defs/task"
+      }
+    },
+    "build": {
+      "$ref": "#/$defs/build"
+    },
+    "episodes": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/episode"
+      }
+    }
+  },
+  "$defs": {
+    "criterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "criterion_id",
+        "evidence_kind",
+        "target_id"
+      ],
+      "properties": {
+        "criterion_id": {
+          "type": "string",
+          "pattern": "^CR_[0-9a-f]{12}$"
+        },
+        "evidence_kind": {
+          "enum": [
+            "CI",
+            "REMOTE_READBACK",
+            "UI_UAT",
+            "DB_READBACK",
+            "EMAIL_ACCEPTED",
+            "EMAIL_DELIVERED"
+          ]
+        },
+        "target_id": {
+          "type": "string",
+          "pattern": "^P_[0-9a-f]{12}$"
+        }
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_id",
+        "group_id",
+        "project_id",
+        "task_family",
+        "mode",
+        "environment",
+        "eligible",
+        "criteria",
+        "environment_snapshot_sha256"
+      ],
+      "properties": {
+        "task_id": {
+          "type": "string",
+          "pattern": "^C_[0-9a-f]{12}$"
+        },
+        "group_id": {
+          "type": "string",
+          "pattern": "^G_[0-9a-f]{12}$"
+        },
+        "project_id": {
+          "type": "string",
+          "pattern": "^P_[0-9a-f]{12}$"
+        },
+        "task_family": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{3,80}$"
+        },
+        "mode": {
+          "enum": [
+            "AUTONOMOUS",
+            "HUMAN_ASSISTED",
+            "READ_ONLY_EVALUATION"
+          ]
+        },
+        "environment": {
+          "enum": [
+            "ISOLATED_TEST",
+            "AUTHORIZED_REAL",
+            "READ_ONLY"
+          ]
+        },
+        "eligible": {
+          "type": "boolean"
+        },
+        "criteria": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/criterion"
+          }
+        },
+        "environment_snapshot_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        }
+      }
+    },
+    "build": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "agent_commit_sha",
+        "runner_commit_sha",
+        "policy_sha256",
+        "prompt_sha256",
+        "tools_sha256",
+        "model_revision",
+        "developer_id"
+      ],
+      "properties": {
+        "agent_commit_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "runner_commit_sha": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "policy_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "prompt_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "tools_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "model_revision": {
+          "type": "string",
+          "pattern": "^[A-Za-z0-9_.-]{3,80}$"
+        },
+        "developer_id": {
+          "type": "string",
+          "pattern": "^DEV_[0-9a-f]{12}$"
+        }
+      }
+    },
+    "operation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "operation_id",
+        "operation",
+        "target_id",
+        "authorized",
+        "write_state",
+        "reconciles_operation_id",
+        "readback_state"
+      ],
+      "properties": {
+        "operation_id": {
+          "type": "string",
+          "pattern": "^OP_[0-9a-f]{12}$"
+        },
+        "operation": {
+          "enum": [
+            "POST_NONIDEMPOTENT",
+            "POST_IDEMPOTENT",
+            "GET_READBACK",
+            "UI_CHECK",
+            "CI_CHECK",
+            "OTHER_READ"
+          ]
+        },
+        "target_id": {
+          "type": "string",
+          "pattern": "^P_[0-9a-f]{12}$"
+        },
+        "authorized": {
+          "type": "boolean"
+        },
+        "write_state": {
+          "enum": [
+            "NONE",
+            "APPLIED",
+            "NOT_APPLIED",
+            "PARTIAL",
+            "UNKNOWN"
+          ]
+        },
+        "reconciles_operation_id": {
+          "anyOf": [
+            {
+              "type": "string",
+              "pattern": "^OP_[0-9a-f]{12}$"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "readback_state": {
+          "anyOf": [
+            {
+              "enum": [
+                "APPLIED",
+                "NOT_APPLIED",
+                "PARTIAL",
+                "UNKNOWN",
+                "NONE"
+              ]
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "attempt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "attempt_id",
+        "started_at",
+        "ended_at",
+        "operations"
+      ],
+      "properties": {
+        "attempt_id": {
+          "type": "string",
+          "pattern": "^AT_[0-9a-f]{12}$"
+        },
+        "started_at": {
+          "type": "string"
+        },
+        "ended_at": {
+          "type": "string"
+        },
+        "operations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/operation"
+          }
+        }
+      }
+    },
+    "receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "receipt_id",
+        "criterion_id",
+        "evidence_kind",
+        "evidence_sha256",
+        "reviewer_id",
+        "independent",
+        "verified",
+        "passed",
+        "target_id"
+      ],
+      "properties": {
+        "receipt_id": {
+          "type": "string",
+          "pattern": "^RC_[0-9a-f]{12}$"
+        },
+        "criterion_id": {
+          "type": "string",
+          "pattern": "^CR_[0-9a-f]{12}$"
+        },
+        "evidence_kind": {
+          "enum": [
+            "CI",
+            "REMOTE_READBACK",
+            "UI_UAT",
+            "DB_READBACK",
+            "EMAIL_ACCEPTED",
+            "EMAIL_DELIVERED"
+          ]
+        },
+        "evidence_sha256": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{64}$"
+        },
+        "reviewer_id": {
+          "type": "string",
+          "pattern": "^REV_[0-9a-f]{12}$"
+        },
+        "independent": {
+          "type": "boolean"
+        },
+        "verified": {
+          "type": "boolean"
+        },
+        "passed": {
+          "type": "boolean"
+        },
+        "target_id": {
+          "type": "string",
+          "pattern": "^P_[0-9a-f]{12}$"
+        }
+      }
+    },
+    "adjudication": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "reviewer_id",
+        "independent",
+        "attested",
+        "outcome"
+      ],
+      "properties": {
+        "reviewer_id": {
+          "type": "string",
+          "pattern": "^REV_[0-9a-f]{12}$"
+        },
+        "independent": {
+          "type": "boolean"
+        },
+        "attested": {
+          "type": "boolean"
+        },
+        "outcome": {
+          "enum": [
+            "VERIFIED_SUCCESS",
+            "VERIFIED_FAILURE",
+            "PARTIAL_WRITE_UNRESOLVED",
+            "UNRESOLVED_UNKNOWN",
+            "POLICY_BLOCKED"
+          ]
+        }
+      }
+    },
+    "cost": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "complete",
+        "items",
+        "input_tokens",
+        "output_tokens",
+        "human_minutes"
+      ],
+      "properties": {
+        "complete": {
+          "type": "boolean"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "category",
+              "amount_microusd"
+            ],
+            "properties": {
+              "category": {
+                "enum": [
+                  "model",
+                  "tool",
+                  "compute",
+                  "storage",
+                  "human",
+                  "verification"
+                ]
+              },
+              "amount_microusd": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000000000000000
+              }
+            }
+          }
+        },
+        "input_tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "output_tokens": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "human_minutes": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "failure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root_cause",
+        "agent_response"
+      ],
+      "properties": {
+        "root_cause": {
+          "enum": [
+            "AGENT_DECISION",
+            "TOOL_INTEGRATION",
+            "EXTERNAL_SERVICE",
+            "ENVIRONMENT",
+            "AUTHORIZATION",
+            "TEST_ORACLE",
+            "UNKNOWN"
+          ]
+        },
+        "agent_response": {
+          "enum": [
+            "SAFE_RECOVERY",
+            "UNSAFE_ACTION",
+            "INCOMPLETE_RECOVERY",
+            "CORRECT_ESCALATION",
+            "NOT_ASSESSABLE"
+          ]
+        }
+      }
+    },
+    "episode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "episode_id",
+        "task_id",
+        "mode",
+        "attempts",
+        "receipts",
+        "adjudication",
+        "agent_claims_complete",
+        "cost",
+        "failure"
+      ],
+      "properties": {
+        "episode_id": {
+          "type": "string",
+          "pattern": "^EP_[0-9a-f]{12}$"
+        },
+        "task_id": {
+          "type": "string",
+          "pattern": "^C_[0-9a-f]{12}$"
+        },
+        "mode": {
+          "enum": [
+            "AUTONOMOUS",
+            "HUMAN_ASSISTED",
+            "READ_ONLY_EVALUATION"
+          ]
+        },
+        "attempts": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/attempt"
+          }
+        },
+        "receipts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/receipt"
+          }
+        },
+        "adjudication": {
+          "$ref": "#/$defs/adjudication"
+        },
+        "agent_claims_complete": {
+          "type": "boolean"
+        },
+        "cost": {
+          "$ref": "#/$defs/cost"
+        },
+        "failure": {
+          "$ref": "#/$defs/failure"
+        }
+      }
+    }
+  }
+}

@@ -19,3 +19,8 @@ evidence-private/
 *.sealed-holdout.json
 *.private-labels.json
 *.holdout-attestation.json
+private-e2e-evidence/
+private-agent-traces/
+*.e2e-real-evidence.json
+*.e2e-sealed-holdout.json
+

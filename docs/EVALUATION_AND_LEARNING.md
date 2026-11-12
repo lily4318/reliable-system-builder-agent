@@ -23,3 +23,10 @@
 
 ## 未來 ML/DL
 若要真正機器學習，需要另備經授權資料、標註規範、訓練／驗證／獨立測試切分、可重現訓練程式、模型權重／特徵版本管理、成本及安全評估；目前都未宣稱具備。
+
+## v0.1.0 候選｜隔離式恢復驗收與品質退步保護
+- 另一條獨立路徑：`src/recovery_reconciler.py`、`src/independent_acceptance.py`、`evaluations/acceptance/recovery_cases.json`。情境案例由預先標註的 expected classification 比對，**不讀取原政策引擎的預測當標準答案**。
+- 現有公開測試不是盲測；需要外部審查者另建立真正封存盲測集，才能宣稱模型泛化。
+- 品質基準：`evaluations/baselines/v0.1.0-initial.json`；當前候選的最低門檻：`evaluations/quality-targets.json`。
+- `python -m src.quality_gate check` 比較原政策與恢復案例的覆蓋、關鍵失敗、危險操作，任何退步須停止升版。
+- 人工 Release 與安全回退見 `docs/RELEASE_REVIEW_AND_ROLLBACK.md`；此輪未授權任何外部正式系統寫入。

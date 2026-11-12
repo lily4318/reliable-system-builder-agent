@@ -29,3 +29,11 @@ python -m src.agent_eval evaluate --output output/evaluation-report.json
 - [安全政策](SECURITY.md)及[當前版本](release/current_release.yaml)
 
 **公開安全**：本儲存庫不得存放原專案的密鑰、OAuth、受試者資料、正式研究文件、私有程式碼或完整內部日誌。授權採 MIT，原專案資料仍各自保留權責。
+
+## v0.1.0 獨立故障復原驗收（候選）
+- [隔離復原案例與實際測試](docs/INDEPENDENT_ACCEPTANCE.md)：21 個合成／去識別化情境，與原政策引擎使用不同的評測路徑。
+- [品質基準](evaluations/baselines/v0.1.0-initial.json)：歷史 CI 10 單元、22/22 政策案例、18/18 重要案例；未測得的指標記 null。
+- [人工 Release／Rollback](docs/RELEASE_REVIEW_AND_ROLLBACK.md)：合格 CI 是必要條件，沒有真人審核不升正式版。
+- [安全恢復與對帳](docs/INCIDENT_RECOVERY.md)：未知或部分 POST 只做唯讀盤點，禁止重新從頭部署。
+
+上述評測無遠端 API 寫入；未證明真實 UAT、Agent 自動跨專案執行或底層模型已重新訓練。

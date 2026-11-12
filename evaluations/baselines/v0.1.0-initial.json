@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "status": "historical_observed_baseline_not_formal_release",
+  "source_main_sha": "b1b5da9c2fecc24967854075aac492706a1ef06e",
+  "github_actions_run": "https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43203963325",
+  "source": "actual_GitHub_Actions_log",
+  "policy_cases": 22,
+  "policy_passed": 22,
+  "critical_cases": 18,
+  "critical_passed": 18,
+  "unit_tests": 10,
+  "independent_recovery_cases": null,
+  "independent_recovery_passed": null,
+  "real_deployment_outcomes": null,
+  "real_ui_uat": null,
+  "note": "No historical recovery-acceptance or model metric can be inferred; null means not measured."
+}

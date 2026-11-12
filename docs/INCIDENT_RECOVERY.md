@@ -10,3 +10,16 @@
 8. CI 通過不代表真實 UI 可用；部署、正式個資、電子同意及收件許可各自驗證。
 
 抽象化案例放 incidents/sanitized-cases；原始私有事故證據留在原專案。
+
+## 可執行的唯讀對帳驗收
+`src/recovery_reconciler.py` 從去識別化 `before`／`after` snapshot、版本／部署 POST 結果與不可變內容證據做保守分類；一律 `mutation_allowed=false`。
+
+典型結果：
+- `VERSION_LIST_LAG`：版本 POST／內容驗證成功，但 versions list 尚未看到；不能重新 POST。
+- `ORPHAN_VERSION_CONFIRMED`：版本已列出但沒有新增部署；不能再建同一版本。
+- `UNKNOWN_POST_RESULT`：遠端呼叫不明，只有 GET 對帳，不可假設沒有寫入。
+- `DEPLOYMENT_LIST_LAG`：部署 POST 成功返回但清單未更新；不能立即重送。
+- `BLOCK_UNSAFE_ACL`、`BLOCK_HEAD_DRIFT`、`UNATTRIBUTED_REMOTE_CHANGE`：必須停止並由人類查核。
+- `PRIVATE_DEPLOYMENT_PRESENT_NEEDS_UAT`：版本化私人部署存在，**不代表**真實 UI 或正式營運核准。
+
+公開測試情境在 `evaluations/acceptance/recovery_cases.json`，沒有可識別的正式專案 ID，也不對外發送任何 GET/POST。

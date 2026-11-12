@@ -28,11 +28,18 @@ jobs:
         run: python -m src.agent_eval validate
       - name: Deterministic public policy evaluation
         run: python -m src.agent_eval evaluate --output output/evaluation-report.json
+      - name: Independent read-only incident recovery acceptance
+        run: python -m src.independent_acceptance evaluate --output output/recovery-acceptance.json
+      - name: Candidate quality baseline and safety gate
+        run: python -m src.quality_gate check --output output/quality-gate.json
       - name: Attach non-sensitive evaluation report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: public-policy-evaluation
-          path: output/evaluation-report.json
+          path: |
+            output/evaluation-report.json
+            output/recovery-acceptance.json
+            output/quality-gate.json
           if-no-files-found: ignore
           retention-days: 14

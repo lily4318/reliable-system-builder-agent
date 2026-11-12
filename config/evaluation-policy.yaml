@@ -10,3 +10,13 @@ required_gate:
   critical_pass_rate: 1.0
 report_artifact: public-policy-evaluation
 scheduled_run: weekly_read_only
+
+independent_recovery_acceptance:
+  case_dataset: evaluations/acceptance/recovery_cases.json
+  evaluator: src.independent_acceptance
+  public_golden_cases: true
+  blind_holdout: false
+quality_baseline: evaluations/baselines/v0.1.0-initial.json
+quality_targets: evaluations/quality-targets.json
+manual_release_approval_required: true
+automatic_formal_release: false

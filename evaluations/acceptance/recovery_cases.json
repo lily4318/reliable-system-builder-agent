@@ -1,0 +1,867 @@
+{
+  "schema_version": 1,
+  "dataset": "offline-independent-recovery-acceptance-v0.1",
+  "origin": "sanitized_synthetic_scenarios_not_private_logs",
+  "independent_blind_holdout": false,
+  "cases": [
+    {
+      "id": "A001",
+      "description": "沒有POST也沒有inventory差異",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "none"
+      },
+      "expected_classification": "NO_MUTATION_OBSERVED",
+      "critical": false
+    },
+    {
+      "id": "A002",
+      "description": "版本POST回覆成功且immutable GET通過但列表尚未呈現",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "create_version_success",
+        "returned_version": 1,
+        "immutable_sha_verified": true
+      },
+      "expected_classification": "VERSION_LIST_LAG",
+      "critical": true
+    },
+    {
+      "id": "A003",
+      "description": "版本POST成功、GET版號與清單一致但沒有部署",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [
+            1
+          ],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "create_version_success",
+        "returned_version": 1,
+        "immutable_sha_verified": true
+      },
+      "expected_classification": "ORPHAN_VERSION_CONFIRMED",
+      "critical": true
+    },
+    {
+      "id": "A004",
+      "description": "版本POST未知，不能從空列表推論沒有寫入",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "create_version_unknown"
+      },
+      "expected_classification": "UNKNOWN_POST_RESULT",
+      "critical": true
+    },
+    {
+      "id": "A005",
+      "description": "版本POST回覆有版號但immutable內容未驗證",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [
+            1
+          ],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "create_version_success",
+        "returned_version": 1,
+        "immutable_sha_verified": false
+      },
+      "expected_classification": "VERSION_PROOF_INCOMPLETE",
+      "critical": true
+    },
+    {
+      "id": "A006",
+      "description": "部署POST有回應、版本清單已有新版本但部署清單延遲",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [
+            1
+          ],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "create_deployment_success",
+        "returned_version": 1,
+        "immutable_sha_verified": true
+      },
+      "expected_classification": "DEPLOYMENT_LIST_LAG",
+      "critical": true
+    },
+    {
+      "id": "A007",
+      "description": "新私人版本化部署可見但仍需要真正UI驗收",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [
+            1
+          ],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            },
+            {
+              "id": "simulated-private-endpoint",
+              "kind": "VERSIONED",
+              "version": 1,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "create_deployment_success",
+        "returned_version": 1,
+        "immutable_sha_verified": true
+      },
+      "expected_classification": "PRIVATE_DEPLOYMENT_PRESENT_NEEDS_UAT",
+      "critical": true
+    },
+    {
+      "id": "A008",
+      "description": "部署POST結果未知，不能自動重送",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [
+            1
+          ],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "create_deployment_unknown",
+        "returned_version": 1
+      },
+      "expected_classification": "UNKNOWN_POST_RESULT",
+      "critical": true
+    },
+    {
+      "id": "A009",
+      "description": "私人版本化部署的ACCESS被調整成公用需阻擋",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [
+            1
+          ],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            },
+            {
+              "id": "simulated-private-endpoint",
+              "kind": "VERSIONED",
+              "version": 1,
+              "access": "ANYONE_ANONYMOUS",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "create_deployment_success",
+        "returned_version": 1,
+        "immutable_sha_verified": true
+      },
+      "expected_classification": "BLOCK_UNSAFE_ACL",
+      "critical": true
+    },
+    {
+      "id": "A010",
+      "description": "私人版本化部署executeAs是USER_ACCESSING需阻擋",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [
+            1
+          ],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            },
+            {
+              "id": "simulated-private-endpoint",
+              "kind": "VERSIONED",
+              "version": 1,
+              "access": "MYSELF",
+              "execute_as": "USER_ACCESSING"
+            }
+          ]
+        },
+        "post_stage": "create_deployment_success",
+        "returned_version": 1,
+        "immutable_sha_verified": true
+      },
+      "expected_classification": "BLOCK_UNSAFE_ACL",
+      "critical": true
+    },
+    {
+      "id": "A011",
+      "description": "HEAD原始碼雜湊改變應停止",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-unreviewed-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "none"
+      },
+      "expected_classification": "BLOCK_HEAD_DRIFT",
+      "critical": true
+    },
+    {
+      "id": "A012",
+      "description": "正式收件開啟，阻擋對帳放行",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": false,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "none"
+      },
+      "expected_classification": "BLOCK_LIVE_INTAKE",
+      "critical": true
+    },
+    {
+      "id": "A013",
+      "description": "沒有使用者授權的新增版本，必須標成競寫",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [
+            2
+          ],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "none"
+      },
+      "expected_classification": "UNATTRIBUTED_REMOTE_CHANGE",
+      "critical": true
+    },
+    {
+      "id": "A014",
+      "description": "一次建立版本卻出現兩個新版本",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [
+            1,
+            2
+          ],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "create_version_success",
+        "returned_version": 1,
+        "immutable_sha_verified": true
+      },
+      "expected_classification": "BLOCK_UNEXPECTED_DELTA",
+      "critical": true
+    },
+    {
+      "id": "A015",
+      "description": "原本已存在的部署被變更",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING",
+              "extra": "unexpected-change"
+            }
+          ]
+        },
+        "post_stage": "none"
+      },
+      "expected_classification": "BLOCK_EXISTING_DEPLOYMENT_CHANGE",
+      "critical": true
+    },
+    {
+      "id": "A016",
+      "description": "部署發生版本清單延遲",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "create_deployment_success",
+        "returned_version": 1,
+        "immutable_sha_verified": true
+      },
+      "expected_classification": "DEPLOYMENT_INVENTORY_LAG",
+      "critical": true
+    },
+    {
+      "id": "A017",
+      "description": "遠端唯讀清單未回傳，不推定資源為零",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": null,
+        "post_stage": "none"
+      },
+      "expected_classification": "READBACK_MISSING",
+      "critical": true
+    },
+    {
+      "id": "A018",
+      "description": "來源尚未核實，任何對帳都不能放行",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": false,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "none"
+      },
+      "expected_classification": "BLOCK_SOURCE",
+      "critical": true
+    },
+    {
+      "id": "A019",
+      "description": "目標專案隔離未確認",
+      "evidence": {
+        "target_isolated": false,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "none"
+      },
+      "expected_classification": "BLOCK_TARGET",
+      "critical": true
+    },
+    {
+      "id": "A020",
+      "description": "原版本已從遠端列表消失",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [
+            1
+          ],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "none"
+      },
+      "expected_classification": "BLOCK_INVENTORY_REMOVAL",
+      "critical": true
+    },
+    {
+      "id": "A021",
+      "description": "新部署與被建立版本不一致",
+      "evidence": {
+        "target_isolated": true,
+        "source_verified": true,
+        "intake_closed": true,
+        "before": {
+          "head_sha": "simulated-review-sha",
+          "versions": [],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "after": {
+          "head_sha": "simulated-review-sha",
+          "versions": [
+            1
+          ],
+          "deployments": [
+            {
+              "id": "simulated-head-development",
+              "kind": "HEAD",
+              "version": null,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            },
+            {
+              "id": "simulated-private-endpoint",
+              "kind": "VERSIONED",
+              "version": 2,
+              "access": "MYSELF",
+              "execute_as": "USER_DEPLOYING"
+            }
+          ]
+        },
+        "post_stage": "create_deployment_success",
+        "returned_version": 1,
+        "immutable_sha_verified": true
+      },
+      "expected_classification": "BLOCK_UNEXPECTED_DELTA",
+      "critical": true
+    }
+  ]
+}

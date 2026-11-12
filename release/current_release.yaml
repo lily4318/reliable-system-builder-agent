@@ -5,7 +5,7 @@ channel: initial-candidate
 source_branch: main
 formal_tag: null
 formal_release_approved: false
-status: ci_and_human_acceptance_required
+status: candidate_independent_acceptance_pending_human_review
 source_of_truth:
   - START_HERE.md
   - AGENTS.md
@@ -21,3 +21,16 @@ limitations:
   - no_real_model_weight_training
   - no_external_project_auto_deploy
   - no_live_intake
+independent_acceptance:
+  cases: evaluations/acceptance/recovery_cases.json
+  tool: src.independent_acceptance
+  blind_holdout: false
+quality_gate:
+  baseline: evaluations/baselines/v0.1.0-initial.json
+  targets: evaluations/quality-targets.json
+rollback:
+  previous_verified_sha: b1b5da9c2fecc24967854075aac492706a1ef06e
+  procedure: docs/RELEASE_REVIEW_AND_ROLLBACK.md
+human_review:
+  checklist: release/REVIEW_CHECKLIST.md
+  completed: false

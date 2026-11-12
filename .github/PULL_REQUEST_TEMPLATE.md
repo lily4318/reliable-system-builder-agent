@@ -16,3 +16,11 @@
 - Actions Run：
 - BLOCKERS：
 - NEXT_ACTION：
+
+## 恢復安全與升版審查
+- [ ] 新增或確認版本建立成功但清單延遲的反例，未知 POST 只做 GET
+- [ ] `python -m src.independent_acceptance evaluate` 通過，0 個危險操作
+- [ ] `python -m src.quality_gate check` 通過，與上版可信基準相比無退步
+- [ ] 當前候選版本仍未被自動升為正式版
+- [ ] 有可查證的回退基準 SHA 與人類 PR 審核
+- [ ] 若需要正式發布，另由人類依 `release/REVIEW_CHECKLIST.md` 審查和核准

@@ -5,6 +5,12 @@
 **執行層**：實際工具／瀏覽器／CI／GAS API；沒工具就不能宣稱操作成功。
 **獨立驗證層**：QA、Security、Learning Evaluator 區分模擬與真實驗收。
 
+## 工作目標分流（優先於專家角色路由）
+1. 讀本輪使用者最新明確意圖，將 `IMPROVE_AGENT` 與 `APPLY_AGENT` 區分：前者改本 Agent 的訓練候選 PR／規則／評測，後者才可能讀指定的外部目標專案。
+2. 不從 Agent URL、舊聊天或先前專案進度推導另一個專案的寫入授權；先定唯一 `TARGET_REPO`、`PROPOSED_WRITE_REPO`、權責。
+3. `src/task_scope.py` 針對**已標註**的結構化意圖提供 fail-closed 守門；它不是自然語言分類模型。新案例須包含錯誤目標、意圖更正與未授權對照組。
+4. 正式 Agent 改善採去識別化案例→負測→安全最小修改→PR/CI→人工審查→候選版本，絕不自動發布或修改外部系統。
+
 ## 任務路由
 - 不清楚版本／需求 → System Lead → Architect。
 - 程式修改 → Developer → QA → Security。

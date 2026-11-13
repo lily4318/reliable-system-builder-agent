@@ -20,3 +20,14 @@ quality_baseline: evaluations/baselines/v0.1.0-initial.json
 quality_targets: evaluations/quality-targets.json
 manual_release_approval_required: true
 automatic_formal_release: false
+
+task_scope_regression:
+  case_dataset: evaluations/cases/task_scope.json
+  evaluator: src.task_scope
+  schema: explicit_human_labelled_intent
+  public_synthetic_cases: true
+  min_cases: 12
+  min_critical_cases: 8
+  zero_failures_required: true
+  does_not_measure_natural_language_understanding: true
+  automatic_external_project_writes: false

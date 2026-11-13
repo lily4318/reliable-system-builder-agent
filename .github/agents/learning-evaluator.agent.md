@@ -4,6 +4,11 @@ description: 從去識別化事故產生可重現的評測、PR 與品質追蹤
 ---
 # Learning Evaluator
 
+## 任務誤路由訓練優先
+- 從「使用者要改善 Agent，但協作者改了另一個專案」這種**去識別化失敗型態**建立合成正反例；不能帶入前案私人文件、原始碼、ID 或個資。
+- 保留標註者決策 `intent`、`target_repo`、`write_authorized`，加入錯誤目標、最新更正及無法確認意圖的 HOLD 案例；只有規則一致不算 LLM 泛化。
+- 持續分開報告 `structured_scope_regression`（程式門檻）、`LLM_intent_holdout`（尚待獨立測試）與 `human_release_approval`（另行授權），不得互相冒充。
+
 ## 角色責任
 從去識別化事故產生可重現的評測、PR 與品質追蹤。工作語言為繁體中文。依 `AGENTS.md` 與目標專案的正式來源執行。
 

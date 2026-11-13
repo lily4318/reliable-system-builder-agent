@@ -4,6 +4,7 @@ import unittest
 from src.agent_eval import evaluate as evaluate_policy
 from src.independent_acceptance import evaluate as evaluate_recovery
 from src.quality_gate import assess, load, BASELINE, TARGETS
+from src.task_scope import evaluate as evaluate_task_scope
 
 
 class QualityGateTest(unittest.TestCase):
@@ -36,6 +37,18 @@ class QualityGateTest(unittest.TestCase):
     def test_critical_recovery_regression_blocks(self):
         bad = {**self.recovery, "critical_passed": self.recovery["critical_total"] - 1}
         self.assertFalse(assess(self.policy, bad, self.baseline, self.targets)["gate_passed"])
+
+    def test_new_task_scope_training_gate_cannot_be_skipped(self):
+        scope = evaluate_task_scope()
+        bad = {**scope, "failed": 1}
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                self.targets, scope=bad)["gate_passed"])
+        unsafe = {**scope, "critical_passed": scope["critical_total"] - 1}
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                self.targets, scope=unsafe)["gate_passed"])
+        absent = {**scope, "total": 0, "critical_total": 0}
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                self.targets, scope=absent)["gate_passed"])
 
     def test_missing_human_review_blocks(self):
         bad = {**self.targets, "requires_human_release_review": False}

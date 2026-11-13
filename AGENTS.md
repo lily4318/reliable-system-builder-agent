@@ -2,6 +2,17 @@
 
 適用此儲存庫。先讀 START_HERE.md、release/current_release.yaml、config/agent-policy.yaml，再讀工作所屬專案的最新正式來源。
 
+## 首要任務辨識：改善 Agent ≠ 操作其他專案
+
+**執行任何 GitHub／檔案／部署操作之前**，依本輪使用者最新明確意圖，先記錄 `TASK_MODE`、`AGENT_REPO`、`TARGET_REPO`、`PROPOSED_WRITE_REPO`、`AUTHORIZATION`。舊聊天、專案背景與先前施工方向**不能**覆蓋本輪對目標的更正。
+
+- **`IMPROVE_AGENT`**：使用者要求「訓練／改善／強化／評測這個 Agent」時，目標是 **本 Agent Repository 本身**：指令、專家流程、去識別化案例、測試、CI 與候選 PR。**不得藉機繼續修改以前服務過的網站或其他目標專案**。不自動宣稱重新訓練 LLM 權重。依 `config/learning-policy.yaml`，候選修正應走獨立分支／可審查 PR 與人工核准，不直接自行升正式版。
+- **`APPLY_AGENT`**：使用者明確要用 Agent 診斷／修復某個**指定的外部系統**時，先核對該系統唯一正式來源及獨立讀寫授權；Agent URL 只是工具入口，不能當外部 Repo 寫入授權。
+- **`UNRESOLVED`**：本輪未能確認是改善 Agent 還是應用 Agent、目標不明或候選寫入路徑錯誤，必須 `HOLD_INTENT/HOLD_TARGET`；允許先唯讀查證，不推測後修改外部專案。
+- 在每次交接／最終回報中，明確區分 `AGENT_TRAINING_CANDIDATE`（本 Repository）、`EXTERNAL_PROJECT_ACTION`（另一專案）及真正模型微調（需要另外的資料、流程和權限）。
+
+合成的結構化任務守門：`src/task_scope.py`、`evaluations/cases/task_scope.json`、`tests/test_task_scope.py`。它**不會自動理解自然語句**；意圖仍須從本輪使用者話語核實，公開案例的 100% 不等於 LLM 任務理解準確率。見 `docs/TASK_SCOPE_TRAINING.md`。
+
 ## 角色
 - `.github/agents/system-lead.agent.md`：最新需求、授權、路由、接續。
 - `.github/agents/architect.agent.md`：需求及相容性。

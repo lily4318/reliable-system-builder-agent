@@ -74,6 +74,29 @@ python -m src.llm_provider_evidence audit \
 - 稽核成功只會得到 `MATCHED_LOCAL_EVIDENCE_PROVIDER_AND_APPROVAL_UNVERIFIED`，其中 `local_integrity_consistent=true`，但 `provider_origin_independently_verified=false`、`model_version_provider_authenticated=false`、`provider_response_id_independently_checked=false`、`authorization_independently_verified=false`、`actual_model_accuracy_measured=false`、`live_inference_authorized_by_this_audit=false`。一組**完全偽造但自洽的檔案仍可能通過本地對帳**；必須由獨立審核者使用供應商所控制的來源再查 request ID／response ID／實際 model/version／時間與權責授權，才能談真正模型來源已認證。
 - 公開 CI 只跑**合成正反例**與無私有證據預設阻擋：腳本／Prompt／評測器 SHA 漂移、資料集／case 對不上、模型版本或 ID 錯誤、回應檔遭修改、過期或不適用授權、假稱供應商已驗證、加入 `api_key` 等額外欄位全部應安全失敗。**不得將私有 manifest、原始回應、Secret、真人資訊、holdout 或敏感 log 發布到 Repository 或 Actions artifact**；報告僅列狀態、SHA、經雜湊的 ID，不列原始回答與密鑰。
 
+### 2026-11-14｜獨立雙來源唯讀比對與 ID 重播檢查（PR #6 候選）
+**這裡的「供應商匯出」是自稱取自供應商控制台／官方唯讀記錄的第二份本地副本，未經 API 身分驗證或數位簽章驗證。** 即使兩個來源都一致，仍可由同一攻擊者偽造，不具供應商認證效力；不得標示真實 LLM 成績、模型身份已確證或人體授權已通過。
+
+命令只在本機讀取非公開路徑，不寫入任何來源、補送 API、呼叫模型、產生正式帳務或改動 ledger：
+
+```bash
+python -m src.llm_provider_dual_source audit \
+  --local-manifest /secure/runner/private-single-call-manifest.json \
+  --runner-config /secure/runner/private-runner-config.json \
+  --provider-export /secure/provider-readonly/provider-export.json \
+  --previous-ids-ledger /secure/independent-ledger/prior-request-ids.json \
+  --require-two-source-match \
+  --output /secure/results/dual-source-check.json
+```
+
+- 前置：本地 manifest 和 runner config 必須先通過 `src.llm_provider_evidence.audit_evidence`，包括 `public_dev` 資料集 SHA、實際 harness→runner payload SHA、腳本／Prompt／評測器 SHA、暫擬授權時間、模型版本、已保存回應原始位元組 SHA 與 request／response ID。
+- 第二份 `provider-export.json` 需獨立保存於不同於 runner manifest 的目錄，欄位 `schema_version=1`、`source_kind="claimed_provider_readonly_export"`、`acquisition_channel="out_of_band_readonly"`、`retrieved_by_ref`、`runner_operator_ref`、`official_account_ref`、`collected_at_utc`、`records`。兩個保管角色的代號不得相同，但**這是本地聲明，非人員身分認證**。
+- `records` 的每一列須有 `provider, request_id, response_id, model, model_version, status="completed", created_at_utc, output_sha256`。程式針對所有列拒絕重複 request 或 response ID，並確認目標 request 唯一、模型版本、回應 ID、時間與本地 manifest 一致。 `output_sha256` 必須是 `json.dumps(output, sort_keys=True, ensure_ascii=False, separators=(",",":"))` 之 UTF-8 bytes SHA-256。這是**正規化 output** 的一致性，不是特定供應商官方原始 HTTP response body 的雜湊；兩者必須分別保存、由獨立審核者追溯。
+- `prior-request-ids.json` 須有 `schema_version=1, scope="public_dev", snapshot_at_utc, prior_requests`，每筆歷史為 `request_id` 與 `response_id`。資料快照不得晚於本次呼叫開始；同列和歷史列的重複 ID 均拒絕，且要求本次 request／response ID 不曾出現於這份清冊。**此清冊並非連線一致、不可竄改或完整的供應商全域索引**；相同攻擊者可改寫清冊，也可能有快照時差／並行呼叫，因此通過僅代表「未在這份本地快照發現重播」。
+- 檢查通過仍回 `TWO_SOURCE_FIELDS_MATCH_ORIGIN_AND_AUTHORIZATION_UNVERIFIED`，其中 `two_source_fields_consistent=true`，但 `official_api_response_authenticated=false`、`external_export_origin_authenticated=false`、`human_authorization_independently_verified=false`、`replay_free_globally_verified=false`、`real_llm_performance_measured=false`。沒有任何放行真實模型使用、帳務、模型評分的狀態或副作用。
+- 真正的供應商來源驗證必須由獨立、有權限者對**供應商控制的可驗證介面／已驗簽的官方匯出**核對該次請求、模型原始版本、response、時戳和帳號所有權；配合可信的唯一 request ID／不可變事件清冊及分開核准的資料／費用授權。現有連線沒有上述權限或原件，**這個階段不實作遠端驗證，也不宣稱驗證完成**。
+- 19 項合成離線測試涵蓋**同時偽造兩個完全吻合的副本但不升格為認證**、歷史 request／response ID 重播、供應商匯出重複 ID、舊版模型、錯誤 output SHA、時間漂移、清冊缺漏、同保管角色和假 API Key 欄位；CI 僅驗證安全阻擋，完全不使用 Secret 或真正 holdout。
+
 ### 獨立 Holdout（僅在人類已完成封存後）
 ```bash
 python -m src.llm_requirements_eval evaluate \

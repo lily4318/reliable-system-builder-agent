@@ -128,3 +128,17 @@ PROVIDER_EVIDENCE_CI_VERIFIED_20261114:
 - LAST_VERIFIED_STEP: CODE_SHA_CI_VERIFIED_74B3B98; this docs-only progress append creates a new SHA requiring same-SHA CI readback.
 - NEXT_ACTION: independent security review of claim boundaries; identify independently authorized provider runner and provider-side source verification before a real public synthetic LLM evaluation.
 - SYNC_STATUS: candidate_only; PR6_Draft_open; main_unmodified; formal_release_approved=false; external_projects_untouched; provider_calls_zero.
+
+## 2026-11-14｜PR #6 雙來源獨立匯出與防重播候選
+TASK_DOMAIN: RELIABLE_AGENT_DUAL_SOURCE_RECONCILIATION
+SOURCE_OWNER: lily4318/reliable-system-builder-agent; only Draft PR #6 candidate branch
+SOURCE_MAIN_SHA: c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57
+PREVIOUS_PR6_SHA: 447e4c120bbbcd7fcfe33a29340d00c65f3101ce
+SOURCE_PATHS: src/llm_provider_dual_source.py; tests/test_llm_provider_dual_source.py; .github/workflows/agent-ci.yml; AGENTS.md; docs/LLM_REQUIREMENTS_EVAL.md; config/evaluation-policy.yaml
+COMPLETED_PENDING_CI: new offline double-source comparison (runner local manifest vs claimed independently retrieved provider readonly export) and previous request/response ID snapshot checks; 19 synthetic positive/negative tests; provider and reviewer authenticity never inferred.
+KNOWN_SECURITY_BOUNDARY: any attacker can forge both source copies or rewrite replay ledger, so a successful match is not official API authentication, human permission, global deduplication or live model performance proof.
+LAST_VERIFIED_STEP: NEW_DRAFT_PR6_CI_PENDING
+NEXT_ACTION: submit branch-only change, read exact SHA CI, review duplicate/version/source mismatches, preserve Draft state and report unverified provider-origin and real auth.
+BLOCKERS: verified official provider API/read-only source authenticity, trusted complete replay ledger or atomic lock, independent human approval, real authorized runner and genuine source response.
+WRITE_OWNER: Agent PR6 branch only, no external repo/real model/API/secret/holdout.
+SYNC_STATUS: candidate_only; no_merge; no_release; main_unchanged

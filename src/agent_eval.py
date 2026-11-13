@@ -31,6 +31,7 @@ REQUIRED = (
     "src/llm_requirements_eval.py", "tests/test_llm_requirements_eval.py",
     "src/llm_runner_preflight.py", "tests/test_llm_runner_preflight.py",
     "src/llm_provider_evidence.py", "tests/test_llm_provider_evidence.py",
+    "src/llm_provider_dual_source.py", "tests/test_llm_provider_dual_source.py",
     "evaluations/llm/public_dev_cases.json", "docs/LLM_REQUIREMENTS_EVAL.md",
     "src/llm_architecture_review.py", "tests/test_llm_architecture_review.py",
 )

@@ -24,3 +24,8 @@ output/
 /evaluations/llm/provider_evidence_private/
 /provider-response-*.json
 /provider-call-manifest-*.json
+# External provider-side source and private historical request ID snapshots.
+/evaluations/llm/provider_export_private/
+/evaluations/llm/previous_ids_private/
+/provider-readonly-export-*.json
+/prior-request-ids-*.json

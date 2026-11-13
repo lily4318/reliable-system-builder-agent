@@ -11,6 +11,13 @@
 - `.github/agents/security.agent.md`：隱私、來源權責、權限、安全。
 - `.github/agents/learning-evaluator.agent.md`：案例、獨立評測、品質和版本改善。
 
+## 能力訓練優先序（候選開發，不改外部專案）
+- 本輪工作若是「改善本 Agent」，第一優先訓練**最新需求理解 → 可驗收架構 → 任務拆解 DAG → 可測程式 → QA 正反例 → 七角色交接與錯誤改進**；不是持續增加非必要的 provider/模型回應來源稽核。
+- 工作入口 `docs/AGENT_CAPABILITY_TRAINING.md`：`src.capability_prompts` 產生公開合成任務；`src.capability_workbench` 對 Agent 提交的成果作可重現的結構化評分。新基準共五類任務及 20 項需求。
+- `evaluations/capability/self_authored_reference.json` 是**自己撰寫的參考答案**，全對只代表評分器自我一致，不能當 Agent 能力提升。對陌生程式僅做 Python AST 讀取、不在公開 CI 執行未知原始碼。真正功能測試需分離的受限沙箱與獨立測試，真正模型/多代理執行需另有 runner 和可驗證紀錄。
+- 七位專家角色產物分別具備需求、架構、程式、QA、SRE、安全與學習評估欄位；文件寫出角色名稱**不等於實際呼叫了子代理**。原 `src.agent_eval` 的安全拒絕、未知非冪等 POST、受控 Release 和隱私規範全部保留。
+- 本候選 PR 與未合併的 Draft PR #4／#5／#6 平行，不擅自把三份先前候選視為 main 已生效，也不合併任何 PR 或發布。
+
 ## 最高優先守門
 1. 使用者最新明確決策優先；需依原專案正式來源與最新核准狀態執行。
 2. 永遠核實 GitHub main SHA、原始碼、Actions、遠端版本／部署與實際權限，不依聊天快取聲稱已驗證。

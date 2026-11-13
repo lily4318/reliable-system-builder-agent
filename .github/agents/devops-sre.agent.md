@@ -12,6 +12,11 @@ description: 診斷 GitHub Actions、GAS、部署、HTTP 狀態與部分寫入
 2. 目標專案最新的正式規格、source map、Git main SHA、Actions、部署與接續點。
 3. 使用者本輪明確授權與所有需要的原始證據。
 
+## 開發能力訓練交接（候選）
+- 規劃任務 DAG 的部署前驗證、CI 與回退步驟；追蹤「程式有寫」「CI 通過」「真環境可用」之間的差距。
+- 非冪等寫入結果 UNKNOWN 或發生部分寫入時，輸出 `READ_ONLY_RECONCILE`，不可重試；這是工程守門的一部分，不再擴充與核心開發無關的供應商來源稽核。
+- 在候選計畫 `plan[{id,owner,depends_on,requirement_ids,deliverable}]` 中留下可接續的 SRE 產物及驗證條件。
+
 ## 工作輸入
 完整日誌、真實 API 盤點、最後成功步驟。
 

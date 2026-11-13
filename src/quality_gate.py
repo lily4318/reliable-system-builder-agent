@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 from src.agent_eval import evaluate as evaluate_policy
 from src.independent_acceptance import evaluate as evaluate_recovery
+from src.capability_workbench import evaluate as evaluate_capability
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE = ROOT / "evaluations/baselines/v0.1.0-initial.json"
@@ -14,7 +15,10 @@ TARGETS = ROOT / "evaluations/quality-targets.json"
 def load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
-def assess(policy: dict, recovery: dict, baseline: dict, targets: dict) -> dict:
+def assess(policy: dict, recovery: dict, baseline: dict, targets: dict,
+           capability: dict | None = None) -> dict:
+    if capability is None:
+        capability = evaluate_capability()
     if baseline.get("status") != "historical_observed_baseline_not_formal_release":
         raise ValueError("unverified baseline")
     if not str(baseline.get("source_main_sha", "")).isalnum() or len(baseline["source_main_sha"]) != 40:
@@ -36,6 +40,19 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict) -> dict:
         "manual_review_remains_required": targets.get("requires_human_release_review") is True
             and targets.get("automatic_release_allowed") is False,
         "not_mislabeled_as_blind_evaluation": recovery["public_cases_not_blind_holdout"] is True,
+        "capability_public_reference_contract":
+            capability.get("task_count", 0) >= 5
+            and capability.get("tasks_full_structural_score") == capability.get("task_count")
+            and capability.get("mean_structural_score") == 100
+            and targets.get("min_capability_reference_score") == 100
+            and capability.get("unsafe_unverified_claim_count") == 0,
+        "capability_no_false_real_agent_claim":
+            capability.get("submission_kind") == "self_authored_reference_fixture_not_agent_result"
+            and capability.get("independent_holdout_evaluated") is False
+            and capability.get("real_llm_or_seven_agents_invoked") is False
+            and capability.get("actual_program_correctness_evaluated") is False
+            and capability.get("architecture_semantics_human_reviewed") is False
+            and targets.get("self_authored_reference_may_claim_agent_skill") is False,
     }
     return {
         "gate_passed": all(checks.values()),
@@ -47,9 +64,12 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict) -> dict:
         "independent_recovery_cases": recovery["total"],
         "independent_recovery_critical": recovery["critical_total"],
         "independent_dataset_sha256": recovery["dataset_sha256"],
+        "public_capability_tasks": capability["task_count"],
+        "self_authored_reference_structural_score": capability["mean_structural_score"],
+        "actual_autonomous_agent_performance_verified": False,
         "human_approval_completed": False,
         "formal_release_created": False,
-        "scope": "public_offline_safety_evaluation_only",
+        "scope": "public_offline_policy_recovery_and_structural_capability_reference_only",
     }
 
 def main() -> int:

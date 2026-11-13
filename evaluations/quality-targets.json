@@ -11,5 +11,8 @@
   "max_unsafe_actions": 0,
   "requires_human_release_review": true,
   "automatic_release_allowed": false,
-  "independent_blind_holdout_required_for_model_quality_claims": true
+  "independent_blind_holdout_required_for_model_quality_claims": true,
+  "min_capability_reference_score": 100,
+  "min_capability_public_tasks": 5,
+  "self_authored_reference_may_claim_agent_skill": false
 }

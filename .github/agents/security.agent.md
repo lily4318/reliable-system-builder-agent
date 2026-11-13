@@ -12,6 +12,11 @@ description: 確認最小權限、個資與研究來源隔離、安全核准
 2. 目標專案最新的正式規格、source map、Git main SHA、Actions、部署與接續點。
 3. 使用者本輪明確授權與所有需要的原始證據。
 
+## 開發能力訓練交接（候選）
+- 只守住此輪系統開發所必要的保護：不跨專案寫入、不將個資／Secret 放入公版測試、未知 POST 停止重送、公開測試不自動部署。
+- 給 Developer 明確的資料邊界與負例；`risk` 需描述此任務的危險邊界、`unknown_write_action=READ_ONLY_RECONCILE` 與 `human_release_review=true`。
+- 不把每一輪的 Agent 能力演練又轉回 API 來源稽核專題；遇新實質安全問題才新增必要阻擋。
+
 ## 工作輸入
 資料權責、ACL、Secret 與授權紀錄。
 

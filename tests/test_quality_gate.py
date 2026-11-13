@@ -4,6 +4,7 @@ import unittest
 from src.agent_eval import evaluate as evaluate_policy
 from src.independent_acceptance import evaluate as evaluate_recovery
 from src.quality_gate import assess, load, BASELINE, TARGETS
+from src.capability_workbench import evaluate as evaluate_capability
 
 
 class QualityGateTest(unittest.TestCase):
@@ -36,6 +37,19 @@ class QualityGateTest(unittest.TestCase):
     def test_critical_recovery_regression_blocks(self):
         bad = {**self.recovery, "critical_passed": self.recovery["critical_total"] - 1}
         self.assertFalse(assess(self.policy, bad, self.baseline, self.targets)["gate_passed"])
+
+    def test_structural_capability_reference_cannot_be_weakened(self):
+        cap = evaluate_capability()
+        self.assertTrue(assess(self.policy, self.recovery, self.baseline,
+                               self.targets, capability=cap)["gate_passed"])
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                self.targets, capability={**cap, "mean_structural_score": 80})["gate_passed"])
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                {**self.targets, "min_capability_reference_score": 50})["gate_passed"])
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                {**self.targets, "self_authored_reference_may_claim_agent_skill": True})["gate_passed"])
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                self.targets, capability={**cap, "real_llm_or_seven_agents_invoked": True})["gate_passed"])
 
     def test_missing_human_review_blocks(self):
         bad = {**self.targets, "requires_human_release_review": False}

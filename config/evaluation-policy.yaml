@@ -20,3 +20,19 @@ quality_baseline: evaluations/baselines/v0.1.0-initial.json
 quality_targets: evaluations/quality-targets.json
 manual_release_approval_required: true
 automatic_formal_release: false
+
+agent_development_capability_candidate:
+  tasks: evaluations/capability/public_tasks.json
+  self_authored_reference: evaluations/capability/self_authored_reference.json
+  scorer: src.capability_workbench
+  assignment_generator: src.capability_prompts
+  structural_requirements_to_qa_trace: true
+  architecture_components_and_task_dag_check: true
+  candidate_python_checked_via_ast_only: true
+  code_behavior_trust_reference_unit_tests_only: true
+  seven_roles_structural_handoff_check: true
+  synthetic_public_development_cases: true
+  no_model_or_subagent_executed_in_ci: true
+  human_architecture_review_still_required: true
+  isolated_candidate_code_execution_requires_separate_authorization: true
+  formal_release_approved: false

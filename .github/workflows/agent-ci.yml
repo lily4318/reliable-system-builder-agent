@@ -28,6 +28,10 @@ jobs:
         run: python -m src.agent_eval validate
       - name: Deterministic public policy evaluation
         run: python -m src.agent_eval evaluate --output output/evaluation-report.json
+      - name: Public capability assignment generator (no model invocation)
+        run: python -m src.capability_prompts --task-id B001 --output output/capability-assignment.json
+      - name: Self-authored capability reference structural regression (NOT agent skill)
+        run: python -m src.capability_workbench evaluate --min-structural-score 100 --output output/capability-reference-report.json
       - name: Independent read-only incident recovery acceptance
         run: python -m src.independent_acceptance evaluate --output output/recovery-acceptance.json
       - name: Candidate quality baseline and safety gate
@@ -40,6 +44,8 @@ jobs:
           path: |
             output/evaluation-report.json
             output/recovery-acceptance.json
+            output/capability-assignment.json
+            output/capability-reference-report.json
             output/quality-gate.json
           if-no-files-found: ignore
           retention-days: 14

@@ -9,7 +9,7 @@
 請 AI 先讀 [START_HERE.md](START_HERE.md)、[AGENTS.md](AGENTS.md)、[release/current_release.yaml](release/current_release.yaml)。公開網址只授予**閱讀可能性**，不等於 AI 有任何 GitHub、GAS、Sheets、瀏覽器、部署或背景執行權限。
 
 ## 核心能力
-- 七種專家 Agent：主管、架構、開發、DevOps/SRE、QA/UAT、安全、獨立學習評測。
+- 七種專家 Agent：主管、架構、開發、DevOps/SRE、QA/UAT、安全、獨立學習評測。新增「自主開發能力基準」候選：五種合成陌生需求、架構／計畫／程式／QA／七角色交接可執行結構評測；不把自行撰寫參考答案視為實際 Agent 表現。
 - 開源可攜式入口：`START_HERE.md`、`AGENTS.md`、`.github/agents/`、`.agents/skills/`、`.claude/skills/`。
 - 去識別化事故與回歸測試，可避免重複忽略已發生的失效模式。
 - Python 標準函式庫的**安全政策評測**和 GitHub Actions 週期性唯讀 CI。
@@ -20,6 +20,8 @@
 python -m unittest discover -s tests -v
 python -m src.agent_eval validate
 python -m src.agent_eval evaluate --output output/evaluation-report.json
+python -m src.capability_prompts --task-id B001 --output output/capability-task.json
+python -m src.capability_workbench evaluate --min-structural-score 100 --output output/capability-reference-report.json
 ```
 
 這是**公開安全規則引擎與案例回歸測試**，不是底層 LLM 權重訓練，也不是現場部署、UI 操作或模型的獨立盲測。

@@ -39,3 +39,17 @@ FORMAL_RELEASE_HUMAN_GATE: NOT_CONFIGURED
 OWNER_ACTION: 依 docs/GITHUB_GOVERNANCE_SETUP.md 的 GitHub Settings 步驟配置
 BLOCKERS: GitHub connector 無管理設定寫入權限；需合格第二審核者；Release environment/job 尚未設定
 SYNC_STATUS: 只同步公開 Agent 管理設定操作指引；未設定的 GitHub 平台規則不得標為已生效
+
+## 2026-11-14｜Agent 自主開發能力訓練與評測（新獨立候選）
+TASK_DOMAIN: RELIABLE_AGENT_ENGINEERING_CAPABILITY_TRAINING
+SOURCE_REPO: lily4318/reliable-system-builder-agent
+BASE_MAIN_SHA: c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57
+CANDIDATE_BRANCH: candidate-agent-capability-workbench-20261114
+OTHER_PRS: Draft #4 task-scope; Draft #5 role handoff; Draft #6 real LLM/provenance. All unmerged and independent.
+SOURCE_PATHS: evaluations/capability/public_tasks.json; evaluations/capability/self_authored_reference.json; src/capability_workbench.py; src/capability_prompts.py; src/capability_reference.py; tests/test_capability_workbench.py; tests/test_capability_prompts.py; docs/AGENT_CAPABILITY_TRAINING.md; original CI and quality gate
+COMPLETED_PENDING_CI: designed 5 public synthetic tasks/20 requirements; demand→architecture→plan DAG→Python AST→QA tests→seven role handoffs scoring; trusted tiny program examples with unit tests; manual-agent task packets; explicit self-authored fixture flag; existing safety gate preserved.
+LAST_VERIFIED_STEP: CANDIDATE_COMMIT_PR_AND_CI_PENDING
+BLOCKERS: No real LLM agent runner, no independently observed seven real subagents, no permissioned untrusted Python sandbox, no sealed unseen holdout or human architecture adjudication; structural reference scores cannot imply real skill gains.
+NEXT_ACTION: submit standalone Draft PR, run raw same SHA CI, check no regression, then develop isolated real-agent before/after evaluation and holdout with independent reviewers.
+WRITE_OWNER: only lily4318 Agent candidate branch; no outside repo write, merge, deploy, real data or formal release
+SYNC_STATUS: candidate_only; human_review_required; main_unchanged; no_unverified_skill_claims

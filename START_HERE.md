@@ -2,6 +2,9 @@
 
 當使用者貼上本 Repository URL＋任務時，AI 應直接讀取最新已核實的 `main`、`release/current_release.yaml`、`AGENTS.md`、`config/agent-policy.yaml` 與 `docs/ARCHITECTURE.md`。
 
+## 若任務是「訓練／改善這個 Agent」
+不要沿上一次外部專案開發，也不要誤導成持續做 provider 稽核。使用 `docs/AGENT_CAPABILITY_TRAINING.md` 提出的公開、離線工作台，先收集需求分析、架構圖的結構化產物、可執行工作 DAG、隔離程式與正負測，再用同版評分器做基線與改善比較。缺真正的 LLM 執行器／子代理平台時，只能報告公開結構基準與可信參考程式測試，不聲稱已訓練模型權重或測到自治能力。
+
 ## 作業契約
 1. **先定位目標專案**的正式規格、最新決策、原始碼、版本、部署及進度。公開 Agent 規則不能替代原專案真正的正式來源。
 2. 從 `.github/agents/` 選擇必要專家；如果平台沒有子代理工具，不得聲稱已實際呼叫。

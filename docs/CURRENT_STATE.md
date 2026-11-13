@@ -115,3 +115,16 @@ LAST_VERIFIED_STEP: NEW_CANDIDATE_CI_PENDING
 BLOCKERS: approved real provider, verifiable API request/response source and model/version, independent approval and separate controlled execution environment.
 NEXT_ACTION: read back this candidate actual SHA/CI, then only if independently authorized consider actual provider-side reconciliation using separate official records.
 SYNC_STATUS: candidate_only; no true model invocation, no API key, no secrets, no main update, no merge/release
+
+
+PROVIDER_EVIDENCE_CI_VERIFIED_20261114:
+- TASK_DOMAIN: RELIABLE_AGENT_PROVIDER_EVIDENCE_CONTRACT
+- CODE_SHA: 74b3b98a3596199f152110e9bc18b93b9f1a2f75
+- CI: https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43461513495, verify Job #132009356386, completed/success, head_sha equals CODE_SHA.
+- TESTS: 71/71 Python unittest PASS; original deterministic policy 22/22 PASS (18/18 critical); independent recovery 21/21 PASS (20/20 critical); public LLM dev dataset 20 protocol cases validated; quality gate PASS. New provider evidence module has 13 synthetic negative/positive contract tests, no external provider calls.
+- CI_PROVIDER_EVIDENCE_STATUS: BLOCKED_MISSING_PRIVATE_EVIDENCE_OR_CONFIG; actual_llm_model_accuracy_measured=false; no confirmed model identity or response provenance.
+- SOURCE_READBACK: src/llm_provider_evidence.py blob 8998af263f560ae19b81d20f05cbcbbab5bc05a8; tests/test_llm_provider_evidence.py blob c4223bfbeea47a3af5e3a55c6139c0fb0a1ebaaf. Diff between prior PR6 head and code commit changed only Agent repo nine expected paths.
+- IMPORTANT_LIMITATION: Matching local normalized evidence does not cryptographically authenticate any provider. A forger can invent both matching receipts; independent provider-controlled original request/response and real authorization still required.
+- LAST_VERIFIED_STEP: CODE_SHA_CI_VERIFIED_74B3B98; this docs-only progress append creates a new SHA requiring same-SHA CI readback.
+- NEXT_ACTION: independent security review of claim boundaries; identify independently authorized provider runner and provider-side source verification before a real public synthetic LLM evaluation.
+- SYNC_STATUS: candidate_only; PR6_Draft_open; main_unmodified; formal_release_approved=false; external_projects_untouched; provider_calls_zero.

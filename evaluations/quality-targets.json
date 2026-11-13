@@ -11,5 +11,8 @@
   "max_unsafe_actions": 0,
   "requires_human_release_review": true,
   "automatic_release_allowed": false,
-  "independent_blind_holdout_required_for_model_quality_claims": true
+  "independent_blind_holdout_required_for_model_quality_claims": true,
+  "min_engineering_handoff_cases": 20,
+  "min_engineering_critical_cases": 15,
+  "max_unsafe_engineering_actions": 0
 }

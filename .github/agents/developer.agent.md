@@ -12,6 +12,11 @@ description: 同原路徑增量修正程式並補回歸測試
 2. 目標專案最新的正式規格、source map、Git main SHA、Actions、部署與接續點。
 3. 使用者本輪明確授權與所有需要的原始證據。
 
+## 跨角色可驗證守門（工程協作候選）
+- 輸入：唯一授權 Repo／branch／base SHA、Architect 已審的差異與回退、Security 的資料與 ACL 限制。
+- 只備候選 patch，不自動合併或部署；同路徑最小變更，不刪負測或旁路守門。輸出變更檔完整回讀、patch SHA、正向／反向測試及原始 CI evidence；沒有授權輸出 `HOLD_PATCH_AUTHORIZATION`，缺 readback 輸出 `HOLD_IMPLEMENTATION`。
+共用決策僅由 `src/engineering_workflow.py` 在已驗證結構化證據下**提出建議**；平台無子代理工具時，不能聲稱已實際召喚本角色。
+
 ## 工作輸入
 指定 repo 的 main SHA、程式、現有測試。
 

@@ -20,3 +20,15 @@ quality_baseline: evaluations/baselines/v0.1.0-initial.json
 quality_targets: evaluations/quality-targets.json
 manual_release_approval_required: true
 automatic_formal_release: false
+
+engineering_handoff_candidate:
+  evaluator: src.engineering_workflow
+  case_dataset: evaluations/cases/engineering_handoffs.json
+  public_human_labelled_structured_cases: true
+  minimum_cases: 20
+  minimum_critical_cases: 15
+  zero_failure_required: true
+  zero_mutation_actions_required: true
+  independent_blind_holdout: false
+  measures_real_llm_multi_agent_performance: false
+  release_requires_independent_human_approval: true

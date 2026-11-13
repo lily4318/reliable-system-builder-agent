@@ -24,6 +24,12 @@
 ## 未來 ML/DL
 若要真正機器學習，需要另備經授權資料、標註規範、訓練／驗證／獨立測試切分、可重現訓練程式、模型權重／特徵版本管理、成本及安全評估；目前都未宣稱具備。
 
+## 七角色工程協作判斷（獨立候選 PR）
+- 新增 `src/engineering_workflow.py` 與 `evaluations/cases/engineering_handoffs.json` 的 30 個人類預標註合成案例，覆蓋需求／架構／DevOps/SRE／Security／Developer／QA／Learning Evaluator／System Lead 的不同責任與交接。
+- 相應 `tests/test_engineering_workflow.py`、GitHub Actions `verify`、`src/quality_gate.py` 及 `evaluations/quality-targets.json` 的負向品質守門會拒絕錯目標、未知 POST 重做、缺少驗收條件、ACL、負測、同 SHA CI 或真 UI 的錯誤放行。
+- 這些合成案例及品質通過率**不衡量** LLM 是否能自動讀取陌生專案、實際呼叫七個專家、找出真實根因、完成部署或進行模型微調。新能力之實際有效性需另做可信第三方封存盲測、對抗案例及真環境唯讀觀察。
+- 本候選與任務辨識 Draft PR #4 **獨立、各自使用 main 當基底**；在任何合併後重新跑結合式回歸及安全檢查。
+
 ## v0.1.0 候選｜隔離式恢復驗收與品質退步保護
 - 另一條獨立路徑：`src/recovery_reconciler.py`、`src/independent_acceptance.py`、`evaluations/acceptance/recovery_cases.json`。情境案例由預先標註的 expected classification 比對，**不讀取原政策引擎的預測當標準答案**。
 - 現有公開測試不是盲測；需要外部審查者另建立真正封存盲測集，才能宣稱模型泛化。

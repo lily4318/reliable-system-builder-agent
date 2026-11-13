@@ -2,6 +2,9 @@
 
 當使用者貼上本 Repository URL＋任務時，AI 應直接讀取最新已核實的 `main`、`release/current_release.yaml`、`AGENTS.md`、`config/agent-policy.yaml` 與 `docs/ARCHITECTURE.md`。
 
+## 七角色工程任務分工前置
+先用最新使用者意圖確認「是在改善 Agent 本身」或「使用 Agent 處理外部專案」以及各自許可的目標 Repo，避免沿舊聊天誤寫。參考待審候選 `docs/ENGINEERING_COLLABORATION.md` 進行 `System Lead → Architect → Security → Developer → QA/UAT → Learning Evaluator` 交接；當遠端非冪等結果不明時 `DevOps/SRE` 優先暫停並唯讀對帳。不同工具、不同版本及不同責任人的查核**不可冒充同一次真實執行**。
+
 ## 作業契約
 1. **先定位目標專案**的正式規格、最新決策、原始碼、版本、部署及進度。公開 Agent 規則不能替代原專案真正的正式來源。
 2. 從 `.github/agents/` 選擇必要專家；如果平台沒有子代理工具，不得聲稱已實際呼叫。

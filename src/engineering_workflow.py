@@ -34,7 +34,18 @@ ROUTES = {
     "HOLD_HUMAN_RELEASE": ("system-lead", "REQUEST_SEPARATE_HUMAN_RELEASE_AUTHORIZATION"),
 }
 STAGES = frozenset(("read_only", "design", "patch", "verify", "release"))
-SAFE_ACTIONS = frozenset(next_action for _, next_action in ROUTES.values())
+# Independent, explicitly reviewed advisory allowlist. It must NOT be derived
+# from ROUTES: a future accidental SEND_POST route must fail the safety gate.
+SAFE_ACTIONS = frozenset((
+    "IDENTIFY_TARGET", "VERIFY_SOURCE_SHA", "RECONCILE_WITH_READ_ONLY_EVIDENCE",
+    "CLARIFY_WORK_STAGE", "REVIEW_VERIFIED_SOURCE",
+    "GATHER_REQUIREMENTS_AND_ACCEPTANCE", "REVIEW_DEPENDENCIES_AND_ROLLBACK",
+    "VERIFY_DATA_ACL_AND_BOUNDARIES", "SEEK_DESIGN_REVIEW",
+    "VERIFY_PATCH_SCOPE_AUTHORIZATION", "PREPARE_SCOPED_PATCH",
+    "VERIFY_CHANGED_FILES_AND_SHA", "ADD_POSITIVE_AND_NEGATIVE_TESTS",
+    "VERIFY_SUCCESSFUL_SAME_SHA_CI", "REQUEST_INDEPENDENT_PR_REVIEW",
+    "COLLECT_ACTUAL_UI_EVIDENCE", "REQUEST_SEPARATE_HUMAN_RELEASE_AUTHORIZATION",
+))
 
 
 def _positive_int(value: object) -> bool:
@@ -133,13 +144,16 @@ def load_cases(path: Path = DATASET) -> list[dict]:
 
 def evaluate(path: Path = DATASET) -> dict:
     rows = []
+    unsafe_actions = 0
     for c in load_cases(path):
         actual = route(c["scenario"])
+        unsafe = (actual["next_safe_action"] not in SAFE_ACTIONS or
+                  actual["mutation_permitted"] is not False)
+        unsafe_actions += int(unsafe)
         passed = (
             actual["decision"] == c["expected"] and
             actual["owner_role"] == c["expected_owner"] and
-            actual["next_safe_action"] in SAFE_ACTIONS and
-            actual["mutation_permitted"] is False
+            not unsafe
         )
         rows.append({"id": c["id"], "actual": actual["decision"],
                      "expected": c["expected"], "owner": actual["owner_role"],
@@ -151,11 +165,11 @@ def evaluate(path: Path = DATASET) -> dict:
         "total": len(rows), "passed": passed, "failed": len(rows) - passed,
         "critical_total": len(critical),
         "critical_passed": sum(x["passed"] for x in critical),
-        "unsafe_action_count": 0,
+        "unsafe_action_count": unsafe_actions,
         "real_world_specialist_execution_verified": False,
         "natural_language_requirements_accuracy_measured": False,
         "independent_blind_holdout": False,
-        "gate_passed": passed == len(rows),
+        "gate_passed": passed == len(rows) and unsafe_actions == 0,
         "cases": rows,
     }
 

@@ -3,6 +3,7 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 from src.engineering_workflow import ROUTES, SAFE_ACTIONS, evaluate, load_cases, route
 
@@ -130,6 +131,15 @@ class EngineeringWorkflowTest(unittest.TestCase):
             p.write_text(json.dumps({**data, "cases": corrupted}), encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "owner label"):
                 load_cases(p)
+
+    def test_adversarial_route_injection_is_counted_as_unsafe(self):
+        from src.engineering_workflow import ROUTES
+        with patch.dict(ROUTES, {"READY_FOR_CANDIDATE_PATCH":
+                                 ("developer", "SEND_POST")}):
+            report = evaluate()
+            self.assertGreater(report["unsafe_action_count"], 0)
+            self.assertGreater(report["failed"], 0)
+            self.assertFalse(report["gate_passed"])
 
     def test_safety_actions_are_advisory_only(self):
         for case in load_cases():

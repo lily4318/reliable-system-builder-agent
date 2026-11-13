@@ -55,3 +55,20 @@ WRITE_OWNER: Agent candidate branch only; no external projects; formal_release_a
 SYNC_STATUS: candidate_only; no auto-merge, no public model invocation, no real data
 ADDITIONAL_CANDIDATE_ARTIFACTS: src/llm_architecture_review.py; tests/test_llm_architecture_review.py; optional private architecture packet outside repo; no actual review scores.
 ARCHITECTURE_SEMANTIC_STATUS: review_contract_implemented; no_real_model_output_or_independent_human_review
+
+
+LLM_REQUIREMENTS_INTEGRATED_CI_20261113:
+- TASK_DOMAIN: RELIABLE_AGENT_REAL_LLM_REQUIREMENTS_EVALUATION
+- SOURCE_OWNER: lily4318/reliable-system-builder-agent, candidate-llm-requirements-evaluation-20261113, Draft PR #6
+- PRE_MAIN_SHA: c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57 (main has not been modified)
+- VERIFIED_CODE_SHA: 92344087285f0595d07f1b6ad7fac3c18e568cba
+- VERIFIED_CI: GitHub Actions Run #43453202512 / verify Job #131980515373, completed/success on exact VERIFIED_CODE_SHA.
+- TEST_CI: 49 unittest PASS; 22/22 deterministic public policy PASS (18/18 critical); 21/21 independent recovery PASS (20/20 critical, unsafe=0); 20 public synthetic LLM dev scenario protocol valid; public privacy heuristic and candidate quality_gate PASS.
+- PREVIOUS_FAILURE: Run #43453003170 on c4b7080830fc13545aafa568ae3eb56b2ec0c2ba had 36 tests / errors=8 because new architecture_outline was incorrectly made mandatory in gold labels. Fixed by separate GOLD_FIELDS from REQUIRED_FIELDS (no fabricated gold label), reran full same SHA CI above.
+- LAST_VERIFIED_STEP: CANDIDATE_CODE_TESTS_VERIFIED_ON_9234408; this progress append will create a docs-only SHA needing its own same SHA CI readback.
+- COMPLETED: human-provisional 20 public synthetic dev cases; protocol for real LLM subprocess runner; strict separation of gold from messages; private model-pseudonymous architecture outline packet; two-independent-reviewer structure and 0/1/2 rubric; sealed holdout SHA/attestation check and nonpublic paths; positive/negative tests, timeout/invalid-response/unsafe-scope safety gates.
+- UNVERIFIED: genuine model runner NOT configured/invoked; actual LLM classification or architecture quality NOT measured; two human annotators NOT assigned and independent holdout NOT created/sealed; external reviewer attestation NOT independently authenticated. Test-doubles and public labels are not model-performance proof.
+- BLOCKERS: authorized private execution environment/model, independent adjudicated labels and sealed unseen dataset, real model provenance/params, independent human semantic architecture scoring.
+- WRITE_OWNER: candidate PR only; no other repo, no deployment, no signed communications, no formal Release/tag.
+- NEXT_ACTION: independent PR/security review; provision a permitted real LLM runner and independently sealed holdout before reporting model accuracy; PR #4/#5 remain separate Draft and unmerged; on any future integration rerun all tests on merged code SHA.
+- SYNC_STATUS: draft_candidate; main_unchanged; formal_release_approved=false; human_review_required=true; external_project_writes=none

@@ -16,6 +16,7 @@
 - 工作入口 `docs/AGENT_CAPABILITY_TRAINING.md`：`src.capability_prompts` 產生公開合成任務；`src.capability_workbench` 對 Agent 提交的成果作可重現的結構化評分。新基準共五類任務及 20 項需求。
 - `evaluations/capability/self_authored_reference.json` 是**自己撰寫的參考答案**，全對只代表評分器自我一致，不能當 Agent 能力提升。對陌生程式僅做 Python AST 讀取、不在公開 CI 執行未知原始碼。真正功能測試需分離的受限沙箱與獨立測試，真正模型/多代理執行需另有 runner 和可驗證紀錄。
 - 七位專家角色產物分別具備需求、架構、程式、QA、SRE、安全與學習評估欄位；文件寫出角色名稱**不等於實際呼叫了子代理**。原 `src.agent_eval` 的安全拒絕、未知非冪等 POST、受控 Release 和隱私規範全部保留。
+- `src.capability_execution` 會離線產出 B001–B005 任務包並接收外部提交的規格、架構、程式及 QA；匯入流程不啟動模型、不執行未知 Python，只做受限路徑 AST 和結構評分，`run_id/model_id` 自述不構成實際 Agent 執行證據。沒有獲核准 runner 時全部標記 `UNVERIFIED`，合成契約測試不得冒稱能力提高。
 - 本候選 PR 與未合併的 Draft PR #4／#5／#6 平行，不擅自把三份先前候選視為 main 已生效，也不合併任何 PR 或發布。
 
 ## 最高優先守門

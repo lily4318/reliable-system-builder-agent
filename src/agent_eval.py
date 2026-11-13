@@ -29,6 +29,7 @@ REQUIRED = (
     "docs/INCIDENT_RECOVERY.md", "docs/EVALUATION_AND_LEARNING.md",
     "evaluations/cases/regressions.json", "incidents/sanitized-cases/README.md",
     "src/capability_workbench.py", "src/capability_prompts.py",
+    "src/capability_execution.py", "tests/test_capability_execution.py",
     "src/capability_reference.py", "tests/test_capability_workbench.py",
     "tests/test_capability_prompts.py", "evaluations/capability/public_tasks.json",
     "evaluations/capability/self_authored_reference.json",

@@ -30,6 +30,8 @@ jobs:
         run: python -m src.agent_eval evaluate --output output/evaluation-report.json
       - name: Public capability assignment generator (no model invocation)
         run: python -m src.capability_prompts --task-id B001 --output output/capability-assignment.json
+      - name: Offline B001-B005 execution packet preparation (NO runner invocation)
+        run: python -m src.capability_execution prepare --output-dir output/capability-offline-packets
       - name: Self-authored capability reference structural regression (NOT agent skill)
         run: python -m src.capability_workbench evaluate --min-structural-score 100 --output output/capability-reference-report.json
       - name: Independent read-only incident recovery acceptance

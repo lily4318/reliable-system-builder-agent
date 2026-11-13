@@ -21,6 +21,9 @@ python -m unittest discover -s tests -v
 python -m src.agent_eval validate
 python -m src.agent_eval evaluate --output output/evaluation-report.json
 python -m src.capability_prompts --task-id B001 --output output/capability-task.json
+python -m src.capability_execution prepare --output-dir output/capability-taskpack
+# 收到有權執行的外部 Agent JSON 後，在私人目錄離線匯入；不呼叫模型或執行候選程式：
+# python -m src.capability_execution ingest --packets-dir output/capability-taskpack --bundle /secure/agent-run-bundle.json --output-dir /secure/reviewed-run-001
 python -m src.capability_workbench evaluate --min-structural-score 100 --output output/capability-reference-report.json
 ```
 

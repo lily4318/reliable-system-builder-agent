@@ -71,3 +71,16 @@ CAPABILITY_TRAINING_VERIFIED_CI_20261114:
 - NEXT_ACTION: human review PR #7 against old independent Draft PR #4/#5/#6; use actual Agent on task packets and evaluate its output without leaking public reference into prompt; independently sandbox implementation function behavior and compare before/after on a separate sealed holdout.
 - WRITE_OWNER: Agent candidate branch only; no external project modifications, real API calls, merge or formal release.
 - SYNC_STATUS: candidate_only; main_unchanged; PR4/PR5/PR6 parallel draft; human_review_pending; real_agent_performance_unverified
+
+## 2026-11-14｜PR #7 B001–B005 實際 Agent 執行能力查核與離線介面
+TASK_DOMAIN: RELIABLE_AGENT_CAPABILITY_RUNNER_OFFLINE_IMPORT
+SOURCE_OWNER: lily4318/reliable-system-builder-agent, candidate-agent-capability-workbench-20261114
+SOURCE_MAIN_SHA: c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57
+PR7_PRE_SHA: 71ac93e9b3b7817492b6d3e83e0b183a6a812324
+READ_ONLY_RUNNER_FINDING: The current main and PR7 trees/workflows contain no actual model/Agent execution runner. Repo Actions environment/variables endpoint access is not available for independent confirmation. No verified model provider/version, permission, execution traces, or seven genuine subagent records; do not assert absent in all other private environments.
+CHANGE_PENDING_CI: add src/capability_execution.py public packet preparer and private offline external-result importer; five packets with source digests, isolated candidate Python AST-only assessment; no model/API/secret calls; no candidate Python execution; strict negative tests for tamper, duplicate runs, copied self-authored reference, false claims and path traversal.
+LAST_VERIFIED_STEP: CANDIDATE_CODE_AND_TEST_CI_PENDING
+BLOCKERS: authorized real Agent runner, isolated executable code sandbox, independently verified actual run records, human semantic review and unseen holdout.
+NEXT_ACTION: commit only PR7, read same SHA CI and raw logs, fix failures; only then record evidence in this progress document. Model performance still NOT_RUN.
+WRITE_OWNER: Agent PR7 only; no external repo, no branch main merge, no release, no real model calls.
+SYNC_STATUS: candidate_only; execution_interface_not_real_execution; real_agent_skills_unverified

@@ -2,6 +2,15 @@
 
 當使用者貼上本 Repository URL＋任務時，AI 應直接讀取最新已核實的 `main`、`release/current_release.yaml`、`AGENTS.md`、`config/agent-policy.yaml` 與 `docs/ARCHITECTURE.md`。
 
+## 第 0 步：先辨識這次要改善 Agent 還是使用 Agent
+
+把**使用者本輪最新明確指令**當成目標依據，而非前一個聊天室的施工脈絡。先向自己確認：
+- **改善 Agent（`IMPROVE_AGENT`）**：例如「我要訓練這個 Agent，不是建置剛才的網站」。本輪應**只**讀／改 Agent 的 `lily4318/reliable-system-builder-agent`，以去識別化案例、專家指令、評測與待審查 PR 改善它；不觸碰之前專案的 Repo、GAS、資料或部署。
+- **應用 Agent（`APPLY_AGENT`）**：例如「請用 Agent 去唯讀診斷 X 專案」。必須另外具名 X、來源與權限；看見本 Agent URL 並不等於可以修改 X。
+- **不明確（`UNRESOLVED`）**：可安全唯讀查明，不猜測上一個工作專案就是這次的寫入目標。
+
+將 `TASK_MODE / AGENT_REPO / TARGET_REPO / PROPOSED_WRITE_REPO / AUTHORIZATION` 寫進內部接續記錄，經 `src/task_scope.py` 定義的結構化守門後才考慮寫入；不宣稱此程式能解讀任意自然語言，也不把政策改善稱為底層模型微調。
+
 ## 作業契約
 1. **先定位目標專案**的正式規格、最新決策、原始碼、版本、部署及進度。公開 Agent 規則不能替代原專案真正的正式來源。
 2. 從 `.github/agents/` 選擇必要專家；如果平台沒有子代理工具，不得聲稱已實際呼叫。

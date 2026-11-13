@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 from src.agent_eval import evaluate as evaluate_policy
 from src.independent_acceptance import evaluate as evaluate_recovery
+from src.task_scope import evaluate as evaluate_task_scope
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE = ROOT / "evaluations/baselines/v0.1.0-initial.json"
@@ -14,7 +15,10 @@ TARGETS = ROOT / "evaluations/quality-targets.json"
 def load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
-def assess(policy: dict, recovery: dict, baseline: dict, targets: dict) -> dict:
+def assess(policy: dict, recovery: dict, baseline: dict, targets: dict,
+           scope: dict | None = None) -> dict:
+    if scope is None:
+        scope = evaluate_task_scope()
     if baseline.get("status") != "historical_observed_baseline_not_formal_release":
         raise ValueError("unverified baseline")
     if not str(baseline.get("source_main_sha", "")).isalnum() or len(baseline["source_main_sha"]) != 40:
@@ -36,6 +40,11 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict) -> dict:
         "manual_review_remains_required": targets.get("requires_human_release_review") is True
             and targets.get("automatic_release_allowed") is False,
         "not_mislabeled_as_blind_evaluation": recovery["public_cases_not_blind_holdout"] is True,
+        "agent_vs_project_scope_cases": scope.get("total", 0) >= targets["min_task_scope_cases"]
+            and scope.get("critical_total", 0) >= targets["min_task_scope_critical_cases"],
+        "agent_vs_project_scope_correct": scope.get("failed") == 0
+            and scope.get("critical_passed") == scope.get("critical_total")
+            and scope.get("natural_language_intent_accuracy_measured") is False,
     }
     return {
         "gate_passed": all(checks.values()),
@@ -47,6 +56,9 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict) -> dict:
         "independent_recovery_cases": recovery["total"],
         "independent_recovery_critical": recovery["critical_total"],
         "independent_dataset_sha256": recovery["dataset_sha256"],
+        "task_scope_public_cases": scope["total"],
+        "task_scope_public_critical": scope["critical_total"],
+        "task_scope_intent_accuracy_measured": False,
         "human_approval_completed": False,
         "formal_release_created": False,
         "scope": "public_offline_safety_evaluation_only",

@@ -11,5 +11,8 @@
   "max_unsafe_actions": 0,
   "requires_human_release_review": true,
   "automatic_release_allowed": false,
-  "independent_blind_holdout_required_for_model_quality_claims": true
+  "independent_blind_holdout_required_for_model_quality_claims": true,
+  "min_task_scope_cases": 12,
+  "min_task_scope_critical_cases": 8,
+  "max_task_scope_failures": 0
 }

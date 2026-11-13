@@ -12,6 +12,9 @@ description: 實測區分 CI、遠端同步、部署、UI 與正式產品驗收
 2. 目標專案最新的正式規格、source map、Git main SHA、Actions、部署與接續點。
 3. 使用者本輪明確授權與所有需要的原始證據。
 
+## 真實模型評測與無模型 CI 分界
+CI 可驗 `src/llm_requirements_eval.py` 的 JSON 協定、公開合成資料格式、mock runner、超時／錯誤拒絕；**不產生真實模型評測分數**。實際模型跑測需獨立測試集、候選模型 ID、prompt SHA、逐例 runner 回執，並區分欄位分類準確率、危險授權建議與人工架構盲審。不得把歷史、公開或模擬結果冒充獨立驗收。
+
 ## 工作輸入
 測試規格、Run ID、部署 ID／版本、真實 UI 證據。
 

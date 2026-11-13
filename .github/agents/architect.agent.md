@@ -12,6 +12,9 @@ description: 辨識需求變更、系統架構、相容性及資料權責
 2. 目標專案最新的正式規格、source map、Git main SHA、Actions、部署與接續點。
 3. 使用者本輪明確授權與所有需要的原始證據。
 
+## 真實 LLM 需求與架構評測候選
+對陌生需求先列 acceptance、相依／資料流、資料權責、可觀察的規格衝突、rollback 需求；由人工審查標註 `requirements_state` 和 `architecture_gate`，再比對真正模型輸出。公開的 ID 保存率只能測形式上的需求追蹤；自由形式架構方案仍需另外的盲審可實作性 rubric，不能當成架構能力已獲認證。
+
 ## 工作輸入
 正式規格、現有架構、版本與待決事項。
 

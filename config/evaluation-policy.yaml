@@ -20,3 +20,52 @@ quality_baseline: evaluations/baselines/v0.1.0-initial.json
 quality_targets: evaluations/quality-targets.json
 manual_release_approval_required: true
 automatic_formal_release: false
+
+llm_requirements_candidate:
+  evaluator: src.llm_requirements_eval
+  development_cases: evaluations/llm/public_dev_cases.json
+  public_synthetic_provisional_labels: true
+  real_model_runner_required_for_accuracy_claims: true
+  runner_not_invoked_in_ci: true
+  independent_holdout_must_be_outside_public_repo: true
+  independent_annotation_and_adjudication_required: true
+  architecture_semantic_human_review_required: true
+  model_weight_training_claim_allowed: false
+  automatic_formal_release: false
+
+llm_runner_provenance_candidate:
+  evaluator: src.llm_runner_preflight
+  audit_is_read_only: true
+  audited_environment: synthetic_protocol_ci
+  runner_script_sha_check_required: true
+  prompt_sha_check_required: true
+  model_provider_identity_verified_by_config: false
+  approval_independently_verified_by_config: false
+  provider_response_origin_verified_by_config: false
+  live_inference_authorized_by_config: false
+  no_real_model_run_in_ci: true
+
+llm_provider_evidence_candidate:
+  offline_evaluator: src.llm_provider_evidence
+  only_public_synthetic_cases: true
+  no_llm_api_in_ci: true
+  local_manifest_runner_response_sha_match_required: true
+  requested_and_reported_model_version_match_required: true
+  request_response_id_consistency_required: true
+  declared_approval_scope_and_validity_window_required: true
+  independent_provider_origin_verification_still_required: true
+  independent_human_authorization_still_required: true
+  matching_synthetic_receipt_never_authorizes_real_inference: true
+
+llm_dual_source_candidate:
+  evaluator: src.llm_provider_dual_source
+  provider_export_source_declared_only: true
+  runner_manifest_independent_of_export_required: true
+  historical_id_snapshot_required: true
+  identical_request_or_response_ids_rejected: true
+  local_replay_free_does_not_prove_global_uniqueness: true
+  fully_matching_forged_copies_can_pass_local_check: true
+  provider_identity_authenticated: false
+  approval_independently_verified: false
+  real_llm_calls_in_ci: false
+  release_authorized: false

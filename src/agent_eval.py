@@ -28,6 +28,12 @@ REQUIRED = (
     ".claude/skills/reliable-system-builder/SKILL.md",
     "docs/INCIDENT_RECOVERY.md", "docs/EVALUATION_AND_LEARNING.md",
     "evaluations/cases/regressions.json", "incidents/sanitized-cases/README.md",
+    "src/llm_requirements_eval.py", "tests/test_llm_requirements_eval.py",
+    "src/llm_runner_preflight.py", "tests/test_llm_runner_preflight.py",
+    "src/llm_provider_evidence.py", "tests/test_llm_provider_evidence.py",
+    "src/llm_provider_dual_source.py", "tests/test_llm_provider_dual_source.py",
+    "evaluations/llm/public_dev_cases.json", "docs/LLM_REQUIREMENTS_EVAL.md",
+    "src/llm_architecture_review.py", "tests/test_llm_architecture_review.py",
 )
 
 def decide(s):
@@ -105,7 +111,8 @@ def validate(root=ROOT):
         r"\bAIza[A-Za-z0-9_-]{30,}\b",
         r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b",
     )
-    public = [Path(root) / "evaluations/cases/regressions.json"]
+    public = [Path(root) / "evaluations/cases/regressions.json",
+              Path(root) / "evaluations/llm/public_dev_cases.json"]
     public.extend((Path(root) / "incidents/sanitized-cases").glob("*.md"))
     for file in public:
         content = file.read_text(encoding="utf-8")

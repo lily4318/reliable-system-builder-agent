@@ -28,6 +28,14 @@ jobs:
         run: python -m src.agent_eval validate
       - name: Deterministic public policy evaluation
         run: python -m src.agent_eval evaluate --output output/evaluation-report.json
+      - name: Validate LLM evaluation protocol and public development labels only
+        run: python -m src.llm_requirements_eval validate --output output/llm-protocol-validation.json
+      - name: Audit real-model runner configuration status (no secrets; no inference)
+        run: python -m src.llm_runner_preflight audit --output output/llm-runner-preflight.json
+      - name: Audit provider evidence absence (offline; not a real provider response)
+        run: python -m src.llm_provider_evidence audit --output output/provider-evidence-audit.json
+      - name: Audit independently supplied provider export and replay ledger absence (offline)
+        run: python -m src.llm_provider_dual_source audit --output output/dual-source-evidence-audit.json
       - name: Independent read-only incident recovery acceptance
         run: python -m src.independent_acceptance evaluate --output output/recovery-acceptance.json
       - name: Candidate quality baseline and safety gate
@@ -40,6 +48,10 @@ jobs:
           path: |
             output/evaluation-report.json
             output/recovery-acceptance.json
+            output/llm-protocol-validation.json
+            output/llm-runner-preflight.json
+            output/provider-evidence-audit.json
+            output/dual-source-evidence-audit.json
             output/quality-gate.json
           if-no-files-found: ignore
           retention-days: 14

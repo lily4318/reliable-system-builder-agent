@@ -37,6 +37,19 @@ class QualityGateTest(unittest.TestCase):
         bad = {**self.recovery, "critical_passed": self.recovery["critical_total"] - 1}
         self.assertFalse(assess(self.policy, bad, self.baseline, self.targets)["gate_passed"])
 
+    def test_llm_protocol_without_runner_cannot_claim_model_accuracy(self):
+        result = assess(self.policy, self.recovery, self.baseline, self.targets)
+        self.assertTrue(result["checks"]["llm_eval_protocol_and_dev_labels_valid"])
+        self.assertTrue(result["checks"]["llm_real_model_claims_disabled"])
+        self.assertFalse(result["actual_llm_model_accuracy_measured"])
+        self.assertFalse(result["independent_llm_holdout_executed"])
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                {**self.targets, "min_llm_public_dev_cases": 21})["gate_passed"])
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                {**self.targets, "llm_model_accuracy_without_runner_allowed": True})["gate_passed"])
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                {**self.targets, "llm_public_dev_as_blind_holdout_allowed": True})["gate_passed"])
+
     def test_missing_human_review_blocks(self):
         bad = {**self.targets, "requires_human_release_review": False}
         self.assertFalse(assess(self.policy, self.recovery, self.baseline, bad)["gate_passed"])

@@ -39,3 +39,17 @@ FORMAL_RELEASE_HUMAN_GATE: NOT_CONFIGURED
 OWNER_ACTION: 依 docs/GITHUB_GOVERNANCE_SETUP.md 的 GitHub Settings 步驟配置
 BLOCKERS: GitHub connector 無管理設定寫入權限；需合格第二審核者；Release environment/job 尚未設定
 SYNC_STATUS: 只同步公開 Agent 管理設定操作指引；未設定的 GitHub 平台規則不得標為已生效
+
+## 2026-11-13｜真正 LLM 需求理解與架構規劃評測候選（獨立 PR）
+TASK_DOMAIN: RELIABLE_AGENT_REAL_LLM_REQUIREMENTS_EVALUATION
+SOURCE_REPO: lily4318/reliable-system-builder-agent
+BASE_MAIN_SHA: c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57
+CANDIDATE_BRANCH: candidate-llm-requirements-evaluation-20261113
+PR4_AND_PR5: open Draft, unmerged, independent (must re-evaluate integration SHA if merged)
+SOURCE_PATHS: src/llm_requirements_eval.py, evaluations/llm/public_dev_cases.json, tests/test_llm_requirements_eval.py, docs/LLM_REQUIREMENTS_EVAL.md, original Actions verify and quality gate
+COMPLETED: External actual-model subprocess evaluation protocol, synthetic public developer examples, independent sealed holdout format, label/reviewer contract, unit/CI checks proposed
+LAST_VERIFIED_STEP: NEW_CANDIDATE_PR_CI_PENDING
+NEXT_ACTION: Commit candidate, inspect complete diff, same SHA GitHub Actions; test real LLM only after independent holdout/reviewer and explicit runner become available
+BLOCKERS: no configured/approved real-model runner; no external human-labelled sealed holdout; no true measured natural-language accuracy or architecture semantic human grading
+WRITE_OWNER: Agent candidate branch only; no external projects; formal_release_approved=false
+SYNC_STATUS: candidate_only; no auto-merge, no public model invocation, no real data

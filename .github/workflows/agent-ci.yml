@@ -28,6 +28,8 @@ jobs:
         run: python -m src.agent_eval validate
       - name: Deterministic public policy evaluation
         run: python -m src.agent_eval evaluate --output output/evaluation-report.json
+      - name: Validate LLM evaluation protocol and public development labels only
+        run: python -m src.llm_requirements_eval validate --output output/llm-protocol-validation.json
       - name: Independent read-only incident recovery acceptance
         run: python -m src.independent_acceptance evaluate --output output/recovery-acceptance.json
       - name: Candidate quality baseline and safety gate
@@ -40,6 +42,7 @@ jobs:
           path: |
             output/evaluation-report.json
             output/recovery-acceptance.json
+            output/llm-protocol-validation.json
             output/quality-gate.json
           if-no-files-found: ignore
           retention-days: 14

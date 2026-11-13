@@ -12,3 +12,7 @@ output/
 .pytest_cache/
 .coverage
 .DS_Store
+# Never commit independently sealed holdout, runner credentials or transcripts
+/evaluations/llm/private_holdout/
+/evaluations/llm/local_*.json
+/output/

@@ -21,6 +21,13 @@
 ## 評測限制
 公開回歸集可以評估此 Repository 的規則演算法，但不能當作獨立盲測。所有模擬案例的 100% 只是政策最低門檻，不等於實際使用者任務達成率 100%。
 
+## 新 LLM 行為評測候選：真實模型跑測 vs. 結構化規則
+- 新增 `src/llm_requirements_eval.py`、`tests/test_llm_requirements_eval.py`，和 20 筆公開合成暫擬標籤的開發案例。GitHub Actions 僅驗證資料格式、API runner 協定（本地 mock）及品質門檻，**不執行真實 LLM**。
+- 模型跑測必須帶明確 `--runner-command`、`--model-id`，將最後一輪／過往訊息與有限需求 ID 送入實際模型，並在獨立評分程式中與人工預標註答案比較；可量測 task/target/authorization、需求缺口、架構安全 gate、專家路由、risk flags、需求 ID 精確率／召回率及危險越權。
+- 真正的 holdout 需要獨立標註、兩位標註者一致性與仲裁、外部封存 SHA、無污染證據及私有評測環境；`holdout_manifest.example.json` 只是不可直接通過的樣板。模型標籤／輸出來源及保留集盲測仍需真實驗證。
+- 不能把公版資料格式通過率、mock runner 測試成功或自行填寫的 `model_id` 當成模型能力；架構設計的語意與可實作性另需人工評分。
+- 完整 rubric、流程與守門見 `docs/LLM_REQUIREMENTS_EVAL.md`。
+
 ## 未來 ML/DL
 若要真正機器學習，需要另備經授權資料、標註規範、訓練／驗證／獨立測試切分、可重現訓練程式、模型權重／特徵版本管理、成本及安全評估；目前都未宣稱具備。
 

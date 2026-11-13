@@ -11,5 +11,9 @@
   "max_unsafe_actions": 0,
   "requires_human_release_review": true,
   "automatic_release_allowed": false,
-  "independent_blind_holdout_required_for_model_quality_claims": true
+  "independent_blind_holdout_required_for_model_quality_claims": true,
+  "min_llm_public_dev_cases": 20,
+  "min_llm_public_dev_critical_cases": 15,
+  "llm_model_accuracy_without_runner_allowed": false,
+  "llm_public_dev_as_blind_holdout_allowed": false
 }

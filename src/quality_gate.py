@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 from src.agent_eval import evaluate as evaluate_policy
 from src.independent_acceptance import evaluate as evaluate_recovery
+from src.llm_requirements_eval import load_dataset as validate_llm_protocol
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE = ROOT / "evaluations/baselines/v0.1.0-initial.json"
@@ -21,6 +22,8 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict) -> dict:
         raise ValueError("baseline SHA missing")
     if baseline.get("policy_passed") != 22 or baseline.get("critical_passed") != 18:
         raise ValueError("baseline changed without provenance review")
+    llm_dev, llm_dev_sha = validate_llm_protocol()
+    llm_critical = sum(case["critical"] for case in llm_dev["cases"])
     checks = {
         "policy_no_regression": policy["total"] >= baseline["policy_cases"]
             and policy["critical_total"] >= baseline["critical_cases"],
@@ -36,6 +39,14 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict) -> dict:
         "manual_review_remains_required": targets.get("requires_human_release_review") is True
             and targets.get("automatic_release_allowed") is False,
         "not_mislabeled_as_blind_evaluation": recovery["public_cases_not_blind_holdout"] is True,
+        "llm_eval_protocol_and_dev_labels_valid":
+            len(llm_dev["cases"]) >= targets["min_llm_public_dev_cases"]
+            and llm_critical >= targets["min_llm_public_dev_critical_cases"]
+            and llm_dev["independent_blind_holdout"] is False
+            and llm_dev["label_status"] == "provisional_synthetic_author_labels_pending_independent_review",
+        "llm_real_model_claims_disabled":
+            targets.get("llm_model_accuracy_without_runner_allowed") is False
+            and targets.get("llm_public_dev_as_blind_holdout_allowed") is False,
     }
     return {
         "gate_passed": all(checks.values()),
@@ -47,6 +58,11 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict) -> dict:
         "independent_recovery_cases": recovery["total"],
         "independent_recovery_critical": recovery["critical_total"],
         "independent_dataset_sha256": recovery["dataset_sha256"],
+        "llm_dev_protocol_cases": len(llm_dev["cases"]),
+        "llm_dev_protocol_critical": llm_critical,
+        "llm_dev_dataset_sha256": llm_dev_sha,
+        "actual_llm_model_accuracy_measured": False,
+        "independent_llm_holdout_executed": False,
         "human_approval_completed": False,
         "formal_release_created": False,
         "scope": "public_offline_safety_evaluation_only",

@@ -2,6 +2,9 @@
 
 當使用者貼上本 Repository URL＋任務時，AI 應直接讀取最新已核實的 `main`、`release/current_release.yaml`、`AGENTS.md`、`config/agent-policy.yaml` 與 `docs/ARCHITECTURE.md`。
 
+## 首先區分訓練／評測 Agent 與使用 Agent 施工
+本輪最新明確需求若是「提高 Agent 的需求理解與架構能力」，工作目標是本 Agent Repo 的候選評測與流程，不是前案的網站。模型評測的新入口見 `docs/LLM_REQUIREMENTS_EVAL.md`；它只有在另行提供真實模型執行器、合格人工標註及保留測試後，才可能產生有意義的 LLM 表現數據。GitHub CI 不呼叫模型。
+
 ## 作業契約
 1. **先定位目標專案**的正式規格、最新決策、原始碼、版本、部署及進度。公開 Agent 規則不能替代原專案真正的正式來源。
 2. 從 `.github/agents/` 選擇必要專家；如果平台沒有子代理工具，不得聲稱已實際呼叫。

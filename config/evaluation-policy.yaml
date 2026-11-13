@@ -20,3 +20,15 @@ quality_baseline: evaluations/baselines/v0.1.0-initial.json
 quality_targets: evaluations/quality-targets.json
 manual_release_approval_required: true
 automatic_formal_release: false
+
+llm_requirements_candidate:
+  evaluator: src.llm_requirements_eval
+  development_cases: evaluations/llm/public_dev_cases.json
+  public_synthetic_provisional_labels: true
+  real_model_runner_required_for_accuracy_claims: true
+  runner_not_invoked_in_ci: true
+  independent_holdout_must_be_outside_public_repo: true
+  independent_annotation_and_adjudication_required: true
+  architecture_semantic_human_review_required: true
+  model_weight_training_claim_allowed: false
+  automatic_formal_release: false

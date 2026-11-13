@@ -11,6 +11,12 @@
 - `.github/agents/security.agent.md`：隱私、來源權責、權限、安全。
 - `.github/agents/learning-evaluator.agent.md`：案例、獨立評測、品質和版本改善。
 
+## 真正 LLM 需求／架構評測的分離守門（候選，未獲正式採納）
+- `src/llm_requirements_eval.py` 可透過**人類明確提供的外部 LLM runner**，向實際模型送出陌生多輪需求，再根據獨立人員標註的答案量測意圖、目標 Repo、讀寫授權、規格衝突、架構缺口、正確交接與需求保留。
+- `evaluations/llm/public_dev_cases.json` 是作者暫擬的 **20 筆公開合成開發案例**，絕非獨立測試集或已測得模型成績。真正保留測試的案例與標準答案必須由獨立人工雙人標註，密封在 Repo 外，並在鎖定模型／Prompt 後才評估；程序見 `docs/LLM_REQUIREMENTS_EVAL.md`。
+- GitHub Actions **只跑離線單元與資料格式驗證**，不得從 CI 秘密自動呼叫付費模型、公開 holdout／憑證或捏造模型答對率；缺模型 runner，明確 `NOT_RUN`。模型輸出和人工評分均須獨立列示，不把欄位一致率冒稱架構品質或真實系統建置成功。
+- 此候選與 Draft PR #4（目標辨識）及 #5（七角色交接）分支相互獨立、未合併。未經人類審核不得將任何候選提升為正式 Agent Release。
+
 ## 最高優先守門
 1. 使用者最新明確決策優先；需依原專案正式來源與最新核准狀態執行。
 2. 永遠核實 GitHub main SHA、原始碼、Actions、遠端版本／部署與實際權限，不依聊天快取聲稱已驗證。

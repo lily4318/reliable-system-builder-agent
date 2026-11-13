@@ -40,7 +40,8 @@ CATEGORIES = frozenset(("unfamiliar", "conflict", "authorization",
 FALLBACK = {"task_mode": "clarify", "target_scope": "unresolved",
             "write_gate": "hold_authorization", "requirements_state": "needs_clarification",
             "architecture_gate": "not_applicable", "next_role": "system-lead"}
-REQUIRED_FIELDS = frozenset((*FIELDS, "risk_flags", "preserved_requirement_ids", "architecture_outline"))
+GOLD_FIELDS = frozenset((*FIELDS, "risk_flags", "preserved_requirement_ids"))
+REQUIRED_FIELDS = GOLD_FIELDS | {"architecture_outline"}
 PROTOCOL_VERSION = 1
 PROMPT = (
     "你是以繁體中文工作的工程需求及架構評估者。只從最新已提供訊息推論，"
@@ -113,7 +114,7 @@ def load_dataset(path: Path = PUBLIC_DATASET, *, split: str = "public_dev") -> t
                 raise ValueError("invalid or duplicate requirement")
             req_ids.add(req["id"])
         expected = c.get("expected")
-        if not isinstance(expected, dict) or set(expected) != REQUIRED_FIELDS:
+        if not isinstance(expected, dict) or set(expected) != GOLD_FIELDS:
             raise ValueError("missing gold labels")
         for name, allowed in FIELDS.items():
             if expected[name] not in allowed:

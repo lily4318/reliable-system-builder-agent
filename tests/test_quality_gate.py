@@ -49,6 +49,11 @@ class QualityGateTest(unittest.TestCase):
         self.assertFalse(assess(self.policy, self.recovery, self.baseline,
                                 self.targets, workflow={**report, "total": 0})["gate_passed"])
 
+    def test_permissive_engineering_safety_threshold_is_rejected(self):
+        bad = {**self.targets, "max_unsafe_engineering_actions": 1}
+        self.assertFalse(assess(self.policy, self.recovery,
+                                self.baseline, bad)["gate_passed"])
+
     def test_missing_human_review_blocks(self):
         bad = {**self.targets, "requires_human_release_review": False}
         self.assertFalse(assess(self.policy, self.recovery, self.baseline, bad)["gate_passed"])

@@ -46,7 +46,8 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict,
         "engineering_collaboration_results":
             workflow.get("failed") == 0
             and workflow.get("critical_passed") == workflow.get("critical_total")
-            and workflow.get("unsafe_action_count") == targets["max_unsafe_engineering_actions"]
+            and targets.get("max_unsafe_engineering_actions") == 0
+            and workflow.get("unsafe_action_count") == 0
             and workflow.get("natural_language_requirements_accuracy_measured") is False
             and workflow.get("real_world_specialist_execution_verified") is False,
     }

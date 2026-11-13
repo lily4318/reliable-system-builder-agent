@@ -84,3 +84,19 @@ BLOCKERS: authorized real Agent runner, isolated executable code sandbox, indepe
 NEXT_ACTION: commit only PR7, read same SHA CI and raw logs, fix failures; only then record evidence in this progress document. Model performance still NOT_RUN.
 WRITE_OWNER: Agent PR7 only; no external repo, no branch main merge, no release, no real model calls.
 SYNC_STATUS: candidate_only; execution_interface_not_real_execution; real_agent_skills_unverified
+
+
+OFFLINE_AGENT_IMPORT_CI_VERIFIED_20261114:
+- TASK_DOMAIN: RELIABLE_AGENT_CAPABILITY_RUNNER_OFFLINE_IMPORT
+- VERIFIED_CODE_SHA: 9d6d5ba82fc0d8c4bf29d8c3c12c301e5d9b7911
+- VERIFIED_CI: https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43520863262; verify Job #132214466031; completed/success at exact VERIFIED_CODE_SHA.
+- UNIT_TESTS: 79/79 PASS, including 22 new offline task bundle/ingestion positive/negative tests; policy 22/22 PASS (18 critical); recovery 21/21 PASS (20 critical); capability self-authored reference structural 100/100 (NOT model outcome); quality gate PASS.
+- VERIFIED_CI_PACKET_STATUS: PREPARED_NO_AGENT_INVOKED; task_count=5; actual_autonomous_agent_performance_verified=false.
+- VERIFIED_CODE_BLOBS: src/capability_execution.py SHA 9956b59303c4fc66b2928ee93c59c351a755317b; tests/test_capability_execution.py SHA 53ac95490b604f07fe2ba56f2c2f4291076b04c7.
+- REAL_AGENT_RUNNER: No authorized runnable LLM/Agent backend identified from main, PR7, workflows or accessible metadata. GitHub environment and variable inventory access unsupported; no inference about private systems. Actual five-task Agent executions=0. No true model performance or seven-agent collaboration evidence.
+- COMPLETED: 5 public offline task packets + SHA manifest; private external-result ingestion (optional blocked tasks), duplicate run/task detection, strict claims, copied reference rejection, captured candidate implementation source under fixed output path and AST-only scoring; 22 synthetic tests including executable-looking malicious code never executed; no model/API/provider calls.
+- LAST_VERIFIED_STEP: CODE_TESTS_CI_VERIFIED_AT_9D6D5BA; this progress-only commit needs its own final exact SHA CI.
+- BLOCKERS: human-authorized real Agent executor and model version proof; isolated no-network sandbox for functional code testing; independent reviewer rubric/holdout; actual inter-role execution records. Self-authored reference cannot substitute.
+- NEXT_ACTION: Arrange explicit authorized model/Agent runtime in a controlled private workspace; collect B001-B005 output bundles, ingest offline, perform sandboxed functional testing and separate independent human semantic review, then compare genuine before/after performance.
+- WRITE_OWNER: candidate PR7 only; main and release untouched, no external project modifications or real model calls.
+- SYNC_STATUS: candidate_verified_code; final_doc_sha_ci_pending; real_model_NOT_RUN.

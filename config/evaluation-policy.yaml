@@ -44,3 +44,15 @@ llm_runner_provenance_candidate:
   provider_response_origin_verified_by_config: false
   live_inference_authorized_by_config: false
   no_real_model_run_in_ci: true
+
+llm_provider_evidence_candidate:
+  offline_evaluator: src.llm_provider_evidence
+  only_public_synthetic_cases: true
+  no_llm_api_in_ci: true
+  local_manifest_runner_response_sha_match_required: true
+  requested_and_reported_model_version_match_required: true
+  request_response_id_consistency_required: true
+  declared_approval_scope_and_validity_window_required: true
+  independent_provider_origin_verification_still_required: true
+  independent_human_authorization_still_required: true
+  matching_synthetic_receipt_never_authorizes_real_inference: true

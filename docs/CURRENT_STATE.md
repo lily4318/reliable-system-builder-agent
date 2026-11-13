@@ -99,3 +99,19 @@ RUNNER_PREFLIGHT_VERIFIED_CI_20261113:
 - LAST_VERIFIED_STEP: CANDIDATE_CODE_CI_VERIFIED_ON_B9823369; this docs-only progress append makes a new candidate SHA that must itself be checked against GitHub Actions.
 - NEXT_ACTION: Find and independently authorize a genuine provider/model runner in a controlled environment; validate the exact provider response request ID, model version, entitlement and data handling before any public synthetic trial. Keep holdout private and unused until adjudication.
 - SYNC_STATUS: candidate_only; main_unchanged; draft_PR6_unmerged; formal_release_approved=false; no_other_repo_changes.
+
+
+## 2026-11-14｜PR #6 真實 LLM provider 證據對帳候選
+TASK_DOMAIN: RELIABLE_AGENT_PROVIDER_EVIDENCE_CONTRACT
+SOURCE_REPO: lily4318/reliable-system-builder-agent
+BASE_MAIN_SHA: c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57
+CANDIDATE_PRE_SHA: 0d779218a7651738b09c038b6300f26cc6aee224
+PR: #6, Draft, open, not merged
+SOURCE_PATHS: src/llm_provider_evidence.py; tests/test_llm_provider_evidence.py; src/agent_eval.py; docs/LLM_REQUIREMENTS_EVAL.md; original CI
+SOURCE_OWNER: candidate branch only; no other project repos
+COMPLETED_PENDING_CI: contract for public_dev input fingerprint, local runner/prompt/evaluator integrity, request-response ID, declared model version, file SHA and stated approval validity; synthetic positive/negative cases. Local match is explicitly never actual provider authentication.
+UNVERIFIED: no actual authorized model runner; no independently authenticated provider-side original response or API request; no authorized private holdout, real accuracy or true model version verification.
+LAST_VERIFIED_STEP: NEW_CANDIDATE_CI_PENDING
+BLOCKERS: approved real provider, verifiable API request/response source and model/version, independent approval and separate controlled execution environment.
+NEXT_ACTION: read back this candidate actual SHA/CI, then only if independently authorized consider actual provider-side reconciliation using separate official records.
+SYNC_STATUS: candidate_only; no true model invocation, no API key, no secrets, no main update, no merge/release

@@ -20,3 +20,7 @@ output/
 /evaluations/llm/private_runner/
 /evaluations/llm/runner_config*.json
 /runner-provenance.json
+# Private provider request/response evidence must never enter public git.
+/evaluations/llm/provider_evidence_private/
+/provider-response-*.json
+/provider-call-manifest-*.json

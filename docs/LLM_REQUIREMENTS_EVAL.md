@@ -55,6 +55,25 @@ python -m src.llm_requirements_eval evaluate \
 
 Runner 從 stdin 讀 JSON：`protocol_version`, `instructions`, `messages`, `numbered_requirements`, `output_fields`。**不會傳 `expected`、案例 ID、critical 或 split**。Runner 以唯一 JSON stdout 回傳所有八個欄位（六個分類、`risk_flags`、`preserved_requirement_ids`），不能回傳 Markdown、除錯輸出或其他鍵。程式採 `subprocess.run(..., shell=False, timeout<=120)`；無 model runner 就拒絕產生「實際準確率」，失敗的輸出僅標示錯誤類型，不記錄原始 stderr、prompt、gold、回覆或秘密。
 
+
+### 2026-11-14｜離線請求／回應證據對帳契約（不呼叫模型）
+新增 `src/llm_provider_evidence.py`，讀取兩份**公開 Repo 外**的私有設定與單次呼叫 manifest，並比對已存在的正規化模型回應 JSON；CI 預設不提供 manifest，回傳 `BLOCKED_MISSING_PRIVATE_EVIDENCE_OR_CONFIG`，不嘗試任何 API。以下是**格式說明，不是有效模型回應**。
+
+```bash
+python -m src.llm_provider_evidence audit \
+  --runner-config /secure/private-runner-config.json \
+  --manifest /secure/private-single-call-manifest.json \
+  --output /secure/results/local-evidence-report.json \
+  --require-local-match
+```
+
+- `runner-config` 沿用 `src.llm_runner_preflight` 既有私有 `schema_version=1`，須先通過原始腳本 SHA、Prompt SHA、evaluator SHA、公開開發案例範圍及授權**自述**的核對；本程序不能獨立確認使用者是否真正獲得費用或資料權責授權。
+- 新的單次 `manifest` 僅限 `split=public_dev`，必要欄位為 `schema_version=1, case_id, dataset_sha256, provider, requested_model, requested_model_version, runner_sha256, prompt_sha256, evaluator_sha256, harness_payload_sha256, request_id, response_id, response_path, response_sha256, response_origin, call_started_at_utc, call_finished_at_utc, authorization`。請求 payload SHA 是 canonical JSON 的 **harness→runner** 輸入指紋，不代表供應商的 HTTP request body；如需後者，須在真正 runner 獨立留存供應商側原始證據。
+- `authorization` 必須包含 `scope=public_dev, approval_reference, approved_by_ref, approved_at_utc, expires_at_utc, data_handling_reviewed=true`；允許時間區間須包含 call 起訖及回應時間，approval reference 須與 runner 設定一致。**這僅檢查本地聲明的一致性，仍須獨立查核發文者權責、費用額度、資料類別及核准效力。**
+- `response_origin` 必須寫 `unverified_local_normalized_copy`，不可自稱經供應商認證。當地保存的正規化回應 JSON 必須只有 `provider, model, model_version, request_id, response_id, created_at_utc, status=completed, output`，其真實 bytes SHA 與 manifest `response_sha256` 一致，且 provider／model／version／ID／時間分別對得上 manifest。這個**正規化表示**由受控 runner 轉製，並非特定供應商原封不動的官方 JSON schema。
+- 稽核成功只會得到 `MATCHED_LOCAL_EVIDENCE_PROVIDER_AND_APPROVAL_UNVERIFIED`，其中 `local_integrity_consistent=true`，但 `provider_origin_independently_verified=false`、`model_version_provider_authenticated=false`、`provider_response_id_independently_checked=false`、`authorization_independently_verified=false`、`actual_model_accuracy_measured=false`、`live_inference_authorized_by_this_audit=false`。一組**完全偽造但自洽的檔案仍可能通過本地對帳**；必須由獨立審核者使用供應商所控制的來源再查 request ID／response ID／實際 model/version／時間與權責授權，才能談真正模型來源已認證。
+- 公開 CI 只跑**合成正反例**與無私有證據預設阻擋：腳本／Prompt／評測器 SHA 漂移、資料集／case 對不上、模型版本或 ID 錯誤、回應檔遭修改、過期或不適用授權、假稱供應商已驗證、加入 `api_key` 等額外欄位全部應安全失敗。**不得將私有 manifest、原始回應、Secret、真人資訊、holdout 或敏感 log 發布到 Repository 或 Actions artifact**；報告僅列狀態、SHA、經雜湊的 ID，不列原始回答與密鑰。
+
 ### 獨立 Holdout（僅在人類已完成封存後）
 ```bash
 python -m src.llm_requirements_eval evaluate \

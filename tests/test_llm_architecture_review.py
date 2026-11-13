@@ -12,7 +12,7 @@ class ArchitectureHumanReviewTest(unittest.TestCase):
         root = Path(directory)
         packet = {
             "schema_version": 1, "dataset_sha256": "a" * 64,
-            "model_id_user_supplied": "FAKE_TEST_MODEL",
+            "model_pseudonym": "fake_model_a0bc1",
             "blind_architecture_human_review_pending": True,
             "cases": [
                 {"id": "L001", "architecture_outline": "合成架構方案供評分"},
@@ -21,7 +21,7 @@ class ArchitectureHumanReviewTest(unittest.TestCase):
         }
         review_a = {
             "schema_version": 1, "dataset_sha256": packet["dataset_sha256"],
-            "model_id_user_supplied": packet["model_id_user_supplied"],
+            "model_pseudonym": packet["model_pseudonym"],
             "reviewer_id": "independent_a", "reviewed_without_other_scorer": True,
             "cases": [{"id": x["id"], "scores": {d: 2 for d in DIMENSIONS}}
                       for x in packet["cases"]],

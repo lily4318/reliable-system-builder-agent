@@ -35,7 +35,7 @@ def _private(path: Path) -> dict:
 def _scores(review: dict, case_ids: set[str], sha: str, model: str) -> dict[str, dict]:
     if review.get("schema_version") != 1 or (
         review.get("dataset_sha256") != sha or
-        review.get("model_id_user_supplied") != model or
+        review.get("model_pseudonym") != model or
         review.get("reviewed_without_other_scorer") is not True or
         not isinstance(review.get("reviewer_id"), str) or
         not review["reviewer_id"].strip()
@@ -63,7 +63,7 @@ def aggregate(packet_path: Path, reviewer_a: Path, reviewer_b: Path) -> dict:
     if packet.get("schema_version") != 1 or (
         packet.get("blind_architecture_human_review_pending") is not True or
         not isinstance(packet.get("dataset_sha256"), str) or
-        not isinstance(packet.get("model_id_user_supplied"), str)
+        not isinstance(packet.get("model_pseudonym"), str)
     ):
         raise ValueError("invalid private architecture packet")
     cases = packet.get("cases")
@@ -76,8 +76,8 @@ def aggregate(packet_path: Path, reviewer_a: Path, reviewer_b: Path) -> dict:
     b = _private(reviewer_b)
     if a.get("reviewer_id") == b.get("reviewer_id"):
         raise ValueError("two distinct reviewers are required")
-    rows_a = _scores(a, set(ids), packet["dataset_sha256"], packet["model_id_user_supplied"])
-    rows_b = _scores(b, set(ids), packet["dataset_sha256"], packet["model_id_user_supplied"])
+    rows_a = _scores(a, set(ids), packet["dataset_sha256"], packet["model_pseudonym"])
+    rows_b = _scores(b, set(ids), packet["dataset_sha256"], packet["model_pseudonym"])
     cells, agrees, disputed = len(ids) * len(DIMENSIONS), 0, 0
     dim_means = {}
     for dimension in DIMENSIONS:
@@ -90,7 +90,8 @@ def aggregate(packet_path: Path, reviewer_a: Path, reviewer_b: Path) -> dict:
         dim_means[dimension] = round(sum(grades) / len(grades), 4)
     return {
         "evaluation_type": "private_two_reviewer_architecture_semantic_rating",
-        "model_id_user_supplied": packet["model_id_user_supplied"],
+        "model_pseudonym": packet["model_pseudonym"],
+        "model_identity_blinded_by_pseudonym_not_independently_verified": True,
         "dataset_sha256": packet["dataset_sha256"],
         "reviewer_ids_declared_distinct_not_verified": True,
         "reviewed_case_count": len(ids),

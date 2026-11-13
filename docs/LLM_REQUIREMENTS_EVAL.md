@@ -35,7 +35,7 @@ python -m src.llm_requirements_eval evaluate \
   --model-id "ACTUAL_PROVIDER_MODEL_VERSION" \
   --output output/real-model-public-dev-report.json
 ```
-**真實 runner 程式、模型與存取權未提供，也未被 CI 執行。** 上述只說明介面，不保證已有 `/secure/path/real_llm_runner.py`。模型服務的計費、權限和資料流需另行確認。這裡 `--model-id` 是由執行人填寫，非連線器自動核實，須另外保存模型／Prompt／執行環境證據。
+**真實 runner 程式、模型與存取權未提供，也未被 CI 執行。** 上述只說明介面，不保證已有 `/secure/path/real_llm_runner.py`。模型服務的計費、權限和資料流需另行確認。這裡 `--model-id` 是由執行人填寫，非連線器自動核實；評測報告另外記錄提示詞 SHA-256、runner 協定及評測程式 SHA-256，須另外保存實際模型版本、參數及 API 回執證據。
 
 Runner 從 stdin 讀 JSON：`protocol_version`, `instructions`, `messages`, `numbered_requirements`, `output_fields`。**不會傳 `expected`、案例 ID、critical 或 split**。Runner 以唯一 JSON stdout 回傳所有八個欄位（六個分類、`risk_flags`、`preserved_requirement_ids`），不能回傳 Markdown、除錯輸出或其他鍵。程式採 `subprocess.run(..., shell=False, timeout<=120)`；無 model runner 就拒絕產生「實際準確率」，失敗的輸出僅標示錯誤類型，不記錄原始 stderr、prompt、gold、回覆或秘密。
 
@@ -52,7 +52,7 @@ python -m src.llm_requirements_eval evaluate \
 需檔案在 Repo 外、封存 SHA/筆數、兩名不同的人員代號及人工無污染聲明方通過最低技術檢查；**manifest 是聲明，程式無法證明審查者真的獨立**，須由第三方持續封存與稽核。禁止將保留集／成績報表上傳公開 artifact。
 
 ## V｜分類分數與架構提案人工盲審
-當真正 runner 產出分類 JSON 時，另需包含 `architecture_outline`（簡要架構方案／安全待核；30–2000 字）。評測器**只檢查字串結構，不會自動評定其正確性**，因此請使用明確的私有 `--private-review-packet` 路徑，單獨保存「案例 ID + 模型方案」而**不保存 gold、原始對話或模型密鑰**：
+當真正 runner 產出分類 JSON 時，另需包含 `architecture_outline`（簡要架構方案／安全待核；30–2000 字）。評測器**只檢查字串結構，不會自動評定其正確性**，因此請使用明確的私有 `--private-review-packet` 路徑，單獨保存「案例 ID + 模型方案 + 不揭露原始模型名稱的雜湊代號」而**不保存 gold、原始對話或模型密鑰**：
 ```bash
 python -m src.llm_requirements_eval evaluate \
   --dataset evaluations/llm/public_dev_cases.json \
@@ -71,7 +71,7 @@ python -m src.llm_requirements_eval evaluate \
 {
   "schema_version": 1,
   "dataset_sha256": "PRIVATE_DATASET_SHA256",
-  "model_id_user_supplied": "LOCKED_MODEL_VERSION",
+  "model_pseudonym": "PSEUDONYM_FROM_PRIVATE_PACKET",
   "reviewer_id": "reviewer_a",
   "reviewed_without_other_scorer": true,
   "cases": [{
@@ -86,7 +86,7 @@ python -m src.llm_requirements_eval evaluate \
   }]
 }
 ```
-工具讀入兩份不同審查者代號、同 model/dataset SHA、完整無重複案例，計算逐向度平均分數、評分一致率及需仲裁的分歧格數；**不自動把兩人一致等同標註正確或人類獨立已驗證**。
+工具讀入兩份不同審查者代號、同 model pseudonym/dataset SHA、完整無重複案例，計算逐向度平均分數、評分一致率及需仲裁的分歧格數；**不自動把兩人一致等同標註正確或人類獨立已驗證**。
 ```bash
 python -m src.llm_architecture_review aggregate \
   --packet /secure/results/candidate-architecture-packet.json \

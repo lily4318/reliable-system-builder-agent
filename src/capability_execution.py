@@ -21,7 +21,7 @@ from src.capability_workbench import (
 
 MAX_BUNDLE_BYTES = 1024 * 1024
 MAX_SOURCE_CHARS = 65536
-IDS = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9._:-]{7,127}$")
+IDS = re.compile(r"^[a-zA-Z0-9][a-zA-Z0-9_.:-]{7,127}$")
 BLOCK_CODES = frozenset(("NO_AUTHORIZED_RUNNER", "RUNNER_FAILED", "OUTPUT_WITHHELD"))
 SUBMISSION_FIELDS = frozenset((
     "task_id", "requirements", "architecture", "plan", "implementation",

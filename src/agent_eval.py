@@ -34,6 +34,12 @@ REQUIRED = (
     "tests/test_capability_prompts.py", "evaluations/capability/public_tasks.json",
     "evaluations/capability/self_authored_reference.json",
     "docs/AGENT_CAPABILITY_TRAINING.md",
+    "docs/HUMAN_FIRST_WEBSITE_WORKFLOW.md",
+    "src/website_discovery.py", "src/human_confirmation.py",
+    "src/human_walkthrough.py", "tests/test_human_first_web_rules.py",
+    "evaluations/interaction/website-intake-questions.json",
+    "evaluations/interaction/human-github-walkthroughs.json",
+    "examples/editable-decision-review.html",
 )
 
 def decide(s):

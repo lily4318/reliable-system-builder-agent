@@ -34,6 +34,10 @@ jobs:
         run: python -m src.capability_execution prepare --output-dir output/capability-offline-packets
       - name: Self-authored capability reference structural regression (NOT agent skill)
         run: python -m src.capability_workbench evaluate --min-structural-score 100 --output output/capability-reference-report.json
+      - name: Validate 13-question initial website discovery and editable review protocol
+        run: |
+          python -m src.website_discovery questions --output output/website-discovery-questions.json
+          python -m src.human_walkthrough --task github_repository > output/github-manual-steps.json
       - name: Independent read-only incident recovery acceptance
         run: python -m src.independent_acceptance evaluate --output output/recovery-acceptance.json
       - name: Candidate quality baseline and safety gate
@@ -48,6 +52,8 @@ jobs:
             output/recovery-acceptance.json
             output/capability-assignment.json
             output/capability-reference-report.json
+            output/website-discovery-questions.json
+            output/github-manual-steps.json
             output/quality-gate.json
           if-no-files-found: ignore
           retention-days: 14

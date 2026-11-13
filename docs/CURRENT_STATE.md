@@ -100,3 +100,18 @@ OFFLINE_AGENT_IMPORT_CI_VERIFIED_20261114:
 - NEXT_ACTION: Arrange explicit authorized model/Agent runtime in a controlled private workspace; collect B001-B005 output bundles, ingest offline, perform sandboxed functional testing and separate independent human semantic review, then compare genuine before/after performance.
 - WRITE_OWNER: candidate PR7 only; main and release untouched, no external project modifications or real model calls.
 - SYNC_STATUS: candidate_verified_code; final_doc_sha_ci_pending; real_model_NOT_RUN.
+
+
+HUMAN_FIRST_WEBSITE_RULES_20261114:
+- TASK_DOMAIN: RELIABLE_AGENT_HUMAN_FIRST_WEBSITE_REQUIREMENTS
+- SOURCE_OWNER: lily4318/reliable-system-builder-agent, candidate-agent-capability-workbench-20261114, Draft PR #7
+- BASE_MAIN_SHA: c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57
+- USER_DECISIONS: (1) For every human-assisted GitHub/account/setting task, provide numbered UI actions, expected checks, recovery and no secret disclosure rather than a vague request; (2) for NEW website builds first conduct 10–15 requirement questions (chosen 13), infer omissions from answers, and present COMPLETE DRAFT specification for editable user confirmation; (3) each human decision must offer selectable options that first fill editable text, permit changes/cancel, and require separate explicit confirmation; selection alone NEVER submits, approves or triggers effects.
+- CANDIDATE_SOURCE_PATHS: AGENTS.md; START_HERE.md; config/agent-policy.yaml; README.md; applicable agent role files; docs/HUMAN_FIRST_WEBSITE_WORKFLOW.md; evaluations/interaction/{website-intake-questions.json,human-github-walkthroughs.json}; src/{website_discovery.py,human_confirmation.py,human_walkthrough.py}; examples/editable-decision-review.html; tests/test_human_first_web_rules.py; CI and required-file validator.
+- COVERAGE_PENDING_CI: 13 questions; explicit user answers vs inferred unapproved proposals; complete draft sections/acceptance/approval status; per-inference Accept/Modify/Reject editable options; 3 GitHub step-by-step UI walkthroughs with check-at-each-step; selecting does not send/approve; executable offline tests and HTML demo without network calls.
+- LAST_VERIFIED_STEP: NEW_CANDIDATE_CI_PENDING
+- UNVERIFIED: real LLM applying these prompts to a live user; UI behavior across third-party clients; human satisfaction and real website onboarding. Unit tests prove deterministic contract, not actual model behavior.
+- BLOCKERS: true Agent runner and independent human UX trial; platform differences need step-by-step UI verification when relevant, not guessing.
+- NEXT_ACTION: commit only Draft PR #7 and read same SHA CI / job logs; fix all affected negative tests; then observe real Agent doing a new-site discovery and edited-decision UX with authorized humans.
+- WRITE_OWNER: candidate branch only, no external repository, model/API calls, merge, deployment or formal release
+- SYNC_STATUS: candidate_only; main_unchanged; prior Draft PRs untouched; formal_active_rules_not_yet_merged

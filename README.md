@@ -8,6 +8,12 @@
 
 請 AI 先讀 [START_HERE.md](START_HERE.md)、[AGENTS.md](AGENTS.md)、[release/current_release.yaml](release/current_release.yaml)。公開網址只授予**閱讀可能性**，不等於 AI 有任何 GitHub、GAS、Sheets、瀏覽器、部署或背景執行權限。
 
+## 新版使用者互動規則（Draft PR #7 候選）
+- 人工協助 GitHub／雲端帳號／部署設定：提供有步驟、頁面、欄位、成功查核和卡關處理的教學。
+- 新建網站：先做 13 題（10–15 題上限）需求訪談，提出使用者答案與 Agent 推導需求分開標示的完整未核准規格。
+- 需要使用者確認時：可點選方案，**點選後先進可編輯草稿**；使用者另行確認才送出。若平台不支援，改給可複製可修改的方案文本。
+- 見 [完整規範](docs/HUMAN_FIRST_WEBSITE_WORKFLOW.md)，可跑 `python -m src.website_discovery questions` 及 `python -m src.human_walkthrough --task github_repository`。本規則不代表底層 LLM 權重已訓練，也不賦予新系統寫入權限。
+
 ## 核心能力
 - 七種專家 Agent：主管、架構、開發、DevOps/SRE、QA/UAT、安全、獨立學習評測。新增「自主開發能力基準」候選：五種合成陌生需求、架構／計畫／程式／QA／七角色交接可執行結構評測；不把自行撰寫參考答案視為實際 Agent 表現。
 - 開源可攜式入口：`START_HERE.md`、`AGENTS.md`、`.github/agents/`、`.agents/skills/`、`.claude/skills/`。

@@ -290,9 +290,15 @@ def evaluate(dataset: Path, split: str, runner_command: str, model_id: str,
             json.dump(packet, stream, ensure_ascii=False, indent=2)
     # Source text, prompts, gold answers and raw completions NEVER go to report.
     return {
-        "kind": "actual_runner_invocation_not_deterministic_policy_evaluation",
+        # Any executable (including a fake) can satisfy the JSON protocol.
+        # Its measured consistency with gold is NOT authenticated model accuracy.
+        "kind": "external_subprocess_protocol_metrics_unverified_model",
         "split": split, "dataset_sha256": sha, "case_count": total,
         "model_id_user_supplied": model_id,
+        "actual_llm_model_accuracy_measured": False,
+        "model_version_verified_by_provider": False,
+        "provider_request_and_response_origin_verified": False,
+        "provisional_subprocess_metrics_only": True,
         "prompt_sha256": digest(PROMPT.encode("utf-8")),
         "runner_protocol_schema": PROTOCOL_VERSION,
         "harness_sha256": digest(Path(__file__).read_bytes()),

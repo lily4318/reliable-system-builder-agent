@@ -29,6 +29,7 @@ REQUIRED = (
     "docs/INCIDENT_RECOVERY.md", "docs/EVALUATION_AND_LEARNING.md",
     "evaluations/cases/regressions.json", "incidents/sanitized-cases/README.md",
     "src/llm_requirements_eval.py", "tests/test_llm_requirements_eval.py",
+    "src/llm_runner_preflight.py", "tests/test_llm_runner_preflight.py",
     "evaluations/llm/public_dev_cases.json", "docs/LLM_REQUIREMENTS_EVAL.md",
     "src/llm_architecture_review.py", "tests/test_llm_architecture_review.py",
 )

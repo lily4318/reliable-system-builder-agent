@@ -25,6 +25,20 @@ Agent 是否能從新、陌生而非已標籤的對話辨別**最新任務意圖
 
 ## IV｜真正 LLM runner 協定
 
+### 2026-11-13 Runner 來源與授權實際查核
+本輪核對最新 `main`、候選 PR #6 的完整檔案樹、GitHub Actions、PR 審查與可讀設定：**沒有發現任何已配置、已證明可調用且獲授權的真實模型執行器或有效模型回應來源**。未找到獨立的 `real_llm_runner.py`、供應商型號／版本 API 回執、授權憑據、實際 request ID 與原始回覆證據。GitHub Actions 只跑合成／離線測試；對其他私人環境是否存在模型服務，因沒有存取權及來源證據，狀態為 `UNVERIFIED`，不可武斷宣稱不存在。
+
+**新增純唯讀預檢（不觸發模型）**：
+```bash
+python -m src.llm_runner_preflight audit --output output/llm-runner-preflight.json
+# 僅在受控環境、人類另行提供私人 config 與授權紀錄時：
+python -m src.llm_runner_preflight audit \
+  --config /secure/runner-provenance.json --require-config
+```
+私人 JSON `schema_version=1` 須恰好提供 `provider`、`model_id`、`runner_path`（實體腳本絕對路徑）、`runner_sha256`、`prompt_sha256`、`evaluator_sha256`、`approval_scope=public_dev`、`approval_reference`、`data_handling_reviewed=true`。**不放入 API Key、Token、真正研究資料、holdout 或完整私人日誌**，檔案應留在公開 Repository 外。可用本機安全方式計算腳本與來源 SHA、對照文件版本；預檢程式不執行腳本、不連網、不呼叫模型，也不印出檔案路徑或憑據。
+
+結果若 `CONFIG_HASHES_MATCH_PROVIDER_AND_APPROVAL_STILL_UNVERIFIED`，只表示**本地腳本／Prompt／評測器來源一致**；`model_id_provider_authenticated=false`、`approval_independently_verified=false`、`provider_response_origin_verified=false`、`live_inference_authorized_by_this_audit=false`。另須獨立查核模型供應商 API 的實際 model/version 與 request ID／回應、權責和費用授權，才能聲稱經認證的真實模型跑測。不得使用 ChatGPT 對話自身或 mock script 當成可重現 runner。
+
 ### 待使用者自行授權並在安全環境執行
 ```bash
 python -m src.llm_requirements_eval validate --dataset evaluations/llm/public_dev_cases.json
@@ -35,7 +49,7 @@ python -m src.llm_requirements_eval evaluate \
   --model-id "ACTUAL_PROVIDER_MODEL_VERSION" \
   --output output/real-model-public-dev-report.json
 ```
-**真實 runner 程式、模型與存取權未提供，也未被 CI 執行。** 上述只說明介面，不保證已有 `/secure/path/real_llm_runner.py`。模型服務的計費、權限和資料流需另行確認。這裡 `--model-id` 是由執行人填寫，非連線器自動核實；評測報告另外記錄提示詞 SHA-256、runner 協定及評測程式 SHA-256，須另外保存實際模型版本、參數及 API 回執證據。
+**真實 runner 程式、模型與存取權未提供，也未被 CI 執行。** 即使任意 subprocess 返回格式合法 JSON，所得指標也只標記為 `provisional_subprocess_metrics_only=true`，而不是 provider 已驗證的真實模型準確率。 上述只說明介面，不保證已有 `/secure/path/real_llm_runner.py`。模型服務的計費、權限和資料流需另行確認。這裡 `--model-id` 是由執行人填寫，非連線器自動核實；評測報告另外記錄提示詞 SHA-256、runner 協定及評測程式 SHA-256，須另外保存實際模型版本、參數及 API 回執證據。
 
 Runner 從 stdin 讀 JSON：`protocol_version`, `instructions`, `messages`, `numbered_requirements`, `output_fields`。**不會傳 `expected`、案例 ID、critical 或 split**。Runner 以唯一 JSON stdout 回傳所有八個欄位（六個分類、`risk_flags`、`preserved_requirement_ids`），不能回傳 Markdown、除錯輸出或其他鍵。程式採 `subprocess.run(..., shell=False, timeout<=120)`；無 model runner 就拒絕產生「實際準確率」，失敗的輸出僅標示錯誤類型，不記錄原始 stderr、prompt、gold、回覆或秘密。
 

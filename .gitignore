@@ -16,3 +16,7 @@ output/
 /evaluations/llm/private_holdout/
 /evaluations/llm/local_*.json
 /output/
+# Never commit private runner provenance or provider evidence
+/evaluations/llm/private_runner/
+/evaluations/llm/runner_config*.json
+/runner-provenance.json

@@ -72,3 +72,17 @@ LLM_REQUIREMENTS_INTEGRATED_CI_20261113:
 - WRITE_OWNER: candidate PR only; no other repo, no deployment, no signed communications, no formal Release/tag.
 - NEXT_ACTION: independent PR/security review; provision a permitted real LLM runner and independently sealed holdout before reporting model accuracy; PR #4/#5 remain separate Draft and unmerged; on any future integration rerun all tests on merged code SHA.
 - SYNC_STATUS: draft_candidate; main_unchanged; formal_release_approved=false; human_review_required=true; external_project_writes=none
+
+
+## 2026-11-13｜LLM runner 授權與輸出來源唯讀預檢（仍為 Draft PR #6）
+TASK_DOMAIN: RELIABLE_AGENT_LLM_RUNNER_PROVENANCE_AUDIT
+SOURCE_OWNER: lily4318/reliable-system-builder-agent
+SOURCE_MAIN_SHA: c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57
+CANDIDATE_PR6_BASE_SHA: 0134bfb6a52a6385d96b5c164b37e7e81ecb992b
+READ_ONLY_FINDINGS: PR6 候選樹僅有評測器與公開 mock 測試，無具可驗證實際模型身份、來源與授權的真實 runner、供應商 request 回應證據或私人評測核准。原 PR6 同 SHA CI Run #43453558517 49 unittest PASS，但只執行離線／mock，與模型評測不得混用。PR6 reviews/comments 仍無批准的模型證據。GitHub Actions variables 權限端點未開放，亦不能據此認定私人帳號絕對沒有設定。
+CANDIDATE_CHANGE: 新增 src/llm_runner_preflight.py 及專用否決負測，唯讀確認外部 runner 腳本位元組 SHA、Prompt 與 evaluator SHA，以及公開開發集範圍聲明；即使核對全部相符仍維持 MODEL_PROVIDER_UNVERIFIED、APPROVAL_UNVERIFIED、NO_LIVE_AUTHORIZATION。不把假 runner 的正確輸出自述成真正模型成績，並加入只讀 CI 診斷步驟。
+STATUS: RUNNER_MODEL_VERSION_PROVIDER_VERIFIED=false; APPROVAL_INDEPENDENTLY_VERIFIED=false; PROVIDER_RESPONSE_ORIGIN_VERIFIED=false; ACTUAL_LLM_EVALUATED=false
+LAST_VERIFIED_STEP: NEW_PREFLIGHT_CANDIDATE_CI_PENDING
+BLOCKERS: 尚無受控、可驗證、可授權 runner 環境；實際供應商型號／版本與呼叫回執；人工權限／用量授權；獨立封存 holdout 與雙人標註。
+WRITE_OWNER: Agent PR6 候選分支 only，未修改 main、其他專案、遠端服務、正式 Release。
+NEXT_ACTION: 回讀此候選的 GitHub 實際 CI 與新 SHA；待真正模型供應商及執行權限取得後，才可安排公共合成案例的受控真實試跑。

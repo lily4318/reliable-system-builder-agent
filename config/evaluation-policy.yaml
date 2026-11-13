@@ -32,3 +32,15 @@ llm_requirements_candidate:
   architecture_semantic_human_review_required: true
   model_weight_training_claim_allowed: false
   automatic_formal_release: false
+
+llm_runner_provenance_candidate:
+  evaluator: src.llm_runner_preflight
+  audit_is_read_only: true
+  audited_environment: synthetic_protocol_ci
+  runner_script_sha_check_required: true
+  prompt_sha_check_required: true
+  model_provider_identity_verified_by_config: false
+  approval_independently_verified_by_config: false
+  provider_response_origin_verified_by_config: false
+  live_inference_authorized_by_config: false
+  no_real_model_run_in_ci: true

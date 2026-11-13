@@ -151,6 +151,10 @@ print(json.dumps({
             self.assertEqual(report["architecture_outline_valid_rate"], 1.0)
             self.assertFalse(report["architecture_semantic_accuracy_measured"])
             self.assertFalse(report["model_identity_verified"])
+            self.assertFalse(report["actual_llm_model_accuracy_measured"])
+            self.assertFalse(report["model_version_verified_by_provider"])
+            self.assertFalse(report["provider_request_and_response_origin_verified"])
+            self.assertTrue(report["provisional_subprocess_metrics_only"])
             self.assertEqual(len(report["prompt_sha256"]), 64)
 
     def test_runner_failure_timeout_or_bad_json_counted_as_invalid(self):

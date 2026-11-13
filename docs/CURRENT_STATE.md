@@ -52,3 +52,11 @@ NEXT_ACTION: 審查候選 PR diff／同 SHA Actions verify；人工評閱標註�
 BLOCKERS: 真實自然語言意圖盲測與權重微調均未做；GitHub 平台 PR/Ruleset 狀態須另核
 WRITE_OWNER: lily4318／此 Agent Repo 候選分支；外部專案不得由此任務修改
 SYNC_STATUS: candidate_only; formal_release_approved=false; external_project_writes=none
+
+SCOPE_CANDIDATE_FIRST_CI: 2026-11-13；Draft PR #4 https://github.com/lily4318/reliable-system-builder-agent/pull/4
+SOURCE_CODE_SHA: 9b5044e6c37215a32bb579523f7b8608232572ef
+VERIFIED_JOB: GitHub Actions Run #43436591194／verify Job #131923176520, completed/success（同 SOURCE_CODE_SHA）
+ACTUAL_TEST_EVIDENCE: 38/38 unittest PASS；22/22 deterministic policy PASS（18/18 critical）；21/21 independent recovery PASS（20/20 critical，unsafe actions=0）；18/18 structured task-scope PASS（16/16 critical）；quality gate PASS；public case privacy scan PASS
+LIMITATIONS: 人工標註欄位的 deterministic guard 不是自然語言 LLM 意圖辨識率測試，非真正模型權重微調／獨立盲測；本候選的 formal_release_approved 維持 false。
+LAST_VERIFIED_STEP: 候選程式 SHA/PR/第一輪同 SHA CI 已回讀；本 docs-only 證據增量將產生新分支 SHA，需再次確認 PR verify。
+NEXT_ACTION: 將 Draft PR 留給獨立人類審查，明確辨識尚未做 LLM holdout；無獨立核准不得合併正式 Release。

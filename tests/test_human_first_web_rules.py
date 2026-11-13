@@ -49,7 +49,7 @@ class WebsiteIntakeRulesTest(unittest.TestCase):
                          len(spec["inferred_requirements_unconfirmed"]))
         self.assertTrue(all(
             [c["id"] for c in item["choices"]] == ["accept","modify","reject"]
-            and c["editable_text_on_select"] and not c["auto_submit_on_select"]
+            and item["editable_text_on_select"] and not item["auto_submit_on_select"]
             and item["approval_state"]=="PENDING_USER_REVIEW"
             for item in spec["inferred_requirement_review_items"]))
 

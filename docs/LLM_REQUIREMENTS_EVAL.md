@@ -51,12 +51,57 @@ python -m src.llm_requirements_eval evaluate \
 ```
 需檔案在 Repo 外、封存 SHA/筆數、兩名不同的人員代號及人工無污染聲明方通過最低技術檢查；**manifest 是聲明，程式無法證明審查者真的獨立**，須由第三方持續封存與稽核。禁止將保留集／成績報表上傳公開 artifact。
 
-## V｜指標及架構語意審查
+## V｜分類分數與架構提案人工盲審
+當真正 runner 產出分類 JSON 時，另需包含 `architecture_outline`（簡要架構方案／安全待核；30–2000 字）。評測器**只檢查字串結構，不會自動評定其正確性**，因此請使用明確的私有 `--private-review-packet` 路徑，單獨保存「案例 ID + 模型方案」而**不保存 gold、原始對話或模型密鑰**：
+```bash
+python -m src.llm_requirements_eval evaluate \
+  --dataset evaluations/llm/public_dev_cases.json \
+  --runner-command "python /secure/path/real_llm_runner.py" \
+  --model-id "ACTUAL_PROVIDER_MODEL_VERSION" \
+  --private-review-packet /secure/results/candidate-architecture-packet.json \
+  --output output/real-model-public-dev-report.json
+```
+僅允許新檔案、Repository 外安全資料夾；以限制性檔案權限寫入，不能重用舊檔或上傳 CI artifact。**這個私人方案封存仍不是人類已評分**。
+
+### 兩位人工審查者的 0／1／2 分量尺
+每份模型架構方案依五個維度各評 0＝缺失／不正確、1＝部分有效／需要修改、2＝足以進入人類設計審查：`requirement_coverage`（最新需求與衝突處理）、`components_and_data_flow`（模組界線／相依／資料流）、`security_and_authorization`（個資與 ACL）、`failure_and_rollback`（故障、冪等／回退）、`acceptance_testability`（可測的正反驗收）。
+
+兩名具資格審查者**各自**在私人目錄評分，檔案格式（示意一筆，正式需全部案例）：
+```json
+{
+  "schema_version": 1,
+  "dataset_sha256": "PRIVATE_DATASET_SHA256",
+  "model_id_user_supplied": "LOCKED_MODEL_VERSION",
+  "reviewer_id": "reviewer_a",
+  "reviewed_without_other_scorer": true,
+  "cases": [{
+    "id": "L001",
+    "scores": {
+      "requirement_coverage": 2,
+      "components_and_data_flow": 1,
+      "security_and_authorization": 2,
+      "failure_and_rollback": 1,
+      "acceptance_testability": 2
+    }
+  }]
+}
+```
+工具讀入兩份不同審查者代號、同 model/dataset SHA、完整無重複案例，計算逐向度平均分數、評分一致率及需仲裁的分歧格數；**不自動把兩人一致等同標註正確或人類獨立已驗證**。
+```bash
+python -m src.llm_architecture_review aggregate \
+  --packet /secure/results/candidate-architecture-packet.json \
+  --review-a /secure/reviews/reviewer_a.json \
+  --review-b /secure/reviews/reviewer_b.json \
+  --output /secure/results/architecture-ratings-summary.json
+```
+若有分歧，另由第三位具資格仲裁者回讀需求來源後形成正式評分與理由；目前尚未製作真人評分檔，無真正架構語意成績。
+
+## VI｜可量測的自動分類指標與適用限制
 程式可對真正 runner 輸出計算：六個分類欄位各自 accuracy、整例精確率、critical cases 正確數、risk flags 完全符合率、R 項精確率及召回率、錯誤 JSON 比例和危險越權判斷次數。所有模型輸出應以真正已封存標準答案比較，報表只存匿名案例 ID、聚合指標及錯誤型態。
 
 **這些欄位只量測需求／架構的「關鍵判斷」，不直接等於完整系統架構設計品質。** 若需評估真正架構提案，須另安排相同任務、固定 prompt/模型、由盲態的兩位 Architect／Security 審查者針對「需求覆蓋、資料流與相依、權限／隱私、安全退回、可驗證性」各 0–2 分評分；保留具體缺口和仲裁紀錄。此人工語意審查流程尚未執行，程式也未假設任何通過值。
 
 要正式比較版本，須固定公版開發集及 holdout 原始 SHA、模型與版本（含可能的隨機性參數）、prompt digest、評分版本；建議重跑至少 3 次並列出每次分數與區間，不得在看過 holdout 結果後調整其 gold／挑選最佳結果。
 
-## VI｜CI 能證明什麼／不能證明什麼
-GitHub Actions `verify` 只執行原本的 Python unittest、確定性政策／恢復案例、公開資料／隱私格式驗證、mock subprocess runner 協定／錯誤與 timeout 反例、品質門檻；**不載入任何 LLM API Key、不呼叫模型、不公開 holdout**。因此即使全綠，`actual_llm_model_accuracy_measured=false`、`independent_llm_holdout_executed=false`。本候選 Draft PR 未完成使用者核准，不合併 main／不正式發布。
+## VII｜CI 能證明什麼／不能證明什麼
+GitHub Actions `verify` 只執行原本的 Python unittest、確定性政策／恢復案例、公開資料／隱私格式驗證、mock subprocess runner 協定／錯誤與 timeout 反例、雙 reviewer 合成評分反例、品質門檻；**不載入任何 LLM API Key、不呼叫模型、不公開 holdout**。因此即使全綠，`actual_llm_model_accuracy_measured=false`、`independent_llm_holdout_executed=false`。本候選 Draft PR 未完成使用者核准，不合併 main／不正式發布。

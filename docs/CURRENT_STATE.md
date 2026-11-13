@@ -53,3 +53,5 @@ NEXT_ACTION: Commit candidate, inspect complete diff, same SHA GitHub Actions; t
 BLOCKERS: no configured/approved real-model runner; no external human-labelled sealed holdout; no true measured natural-language accuracy or architecture semantic human grading
 WRITE_OWNER: Agent candidate branch only; no external projects; formal_release_approved=false
 SYNC_STATUS: candidate_only; no auto-merge, no public model invocation, no real data
+ADDITIONAL_CANDIDATE_ARTIFACTS: src/llm_architecture_review.py; tests/test_llm_architecture_review.py; optional private architecture packet outside repo; no actual review scores.
+ARCHITECTURE_SEMANTIC_STATUS: review_contract_implemented; no_real_model_output_or_independent_human_review

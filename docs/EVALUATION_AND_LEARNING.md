@@ -24,6 +24,7 @@
 ## 新 LLM 行為評測候選：真實模型跑測 vs. 結構化規則
 - 新增 `src/llm_requirements_eval.py`、`tests/test_llm_requirements_eval.py`，和 20 筆公開合成暫擬標籤的開發案例。GitHub Actions 僅驗證資料格式、API runner 協定（本地 mock）及品質門檻，**不執行真實 LLM**。
 - 模型跑測必須帶明確 `--runner-command`、`--model-id`，將最後一輪／過往訊息與有限需求 ID 送入實際模型，並在獨立評分程式中與人工預標註答案比較；可量測 task/target/authorization、需求缺口、架構安全 gate、專家路由、risk flags、需求 ID 精確率／召回率及危險越權。
+- 模型回覆需給 `architecture_outline`；其語意品質不靠選項欄位或 JSON 結構自動評分。可明確選擇將模型架構方案儲存在 repo 外的私人 review packet，再由 `src/llm_architecture_review.py` 對兩名盲審者五維 0／1／2 分的評價做一致率與分歧計數，人工仲裁另行進行。
 - 真正的 holdout 需要獨立標註、兩位標註者一致性與仲裁、外部封存 SHA、無污染證據及私有評測環境；`holdout_manifest.example.json` 只是不可直接通過的樣板。模型標籤／輸出來源及保留集盲測仍需真實驗證。
 - 不能把公版資料格式通過率、mock runner 測試成功或自行填寫的 `model_id` 當成模型能力；架構設計的語意與可實作性另需人工評分。
 - 完整 rubric、流程與守門見 `docs/LLM_REQUIREMENTS_EVAL.md`。

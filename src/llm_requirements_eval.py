@@ -90,7 +90,7 @@ def load_dataset(path: Path = PUBLIC_DATASET, *, split: str = "public_dev") -> t
         messages = c.get("messages")
         if not isinstance(messages, list) or not (1 <= len(messages) <= 12):
             raise ValueError("invalid message history")
-        if messages[-1].get("role") != "user":
+        if not isinstance(messages[-1], dict) or messages[-1].get("role") != "user":
             raise ValueError("last message must be current user message")
         for m in messages:
             if not isinstance(m, dict) or set(m) != {"role", "content"} or (

@@ -30,6 +30,7 @@ REQUIRED = (
     "evaluations/cases/regressions.json", "incidents/sanitized-cases/README.md",
     "src/llm_requirements_eval.py", "tests/test_llm_requirements_eval.py",
     "evaluations/llm/public_dev_cases.json", "docs/LLM_REQUIREMENTS_EVAL.md",
+    "src/llm_architecture_review.py", "tests/test_llm_architecture_review.py",
 )
 
 def decide(s):

@@ -95,6 +95,11 @@ class RequirementLLMEvaluationTest(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "invalid label"):
                 load_dataset(p)
             x = json.loads(json.dumps(self.dataset))
+            x["cases"][0]["messages"][-1] = None
+            p.write_text(json.dumps(x), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "last message"):
+                load_dataset(p)
+            x = json.loads(json.dumps(self.dataset))
             x["cases"][0]["messages"][-1]["role"] = "assistant"
             p.write_text(json.dumps(x), encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "last message"):

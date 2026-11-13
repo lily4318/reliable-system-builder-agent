@@ -39,3 +39,17 @@ FORMAL_RELEASE_HUMAN_GATE: NOT_CONFIGURED
 OWNER_ACTION: 依 docs/GITHUB_GOVERNANCE_SETUP.md 的 GitHub Settings 步驟配置
 BLOCKERS: GitHub connector 無管理設定寫入權限；需合格第二審核者；Release environment/job 尚未設定
 SYNC_STATUS: 只同步公開 Agent 管理設定操作指引；未設定的 GitHub 平台規則不得標為已生效
+
+## 2026-11-13｜七角色工程協作可測訓練候選（非外部專案施工）
+TASK_DOMAIN: AGENT_ENGINEERING_ROLE_HANDOFF_CANDIDATE
+SOURCE_REPO: lily4318/reliable-system-builder-agent
+BASE_MAIN_SHA: c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57
+CANDIDATE_BRANCH: candidate-engineering-workflow-20261113
+OTHER_DRAFT: PR #4 task-scope training, separate branch, not merged
+SOURCE_PATHS: src/engineering_workflow.py; evaluations/cases/engineering_handoffs.json; tests/test_engineering_workflow.py; docs/ENGINEERING_COLLABORATION.md; seven original role instructions; same original CI and quality gate
+COMPLETED: structured role-router, synthetic positive/negative handoff cases and QA/CI gates proposed; status remains candidate pending real CI/PR
+LAST_VERIFIED_STEP: CANDIDATE_PR_AND_CI_PENDING
+NEXT_ACTION: submit Draft PR, read actual candidate SHA/verify logs, scrutinize each role handoff; avoid pretending public case testing is real LLM autonomous execution
+BLOCKERS: natural-language benchmark, independent human holdout and live multi-specialist execution unavailable; release human approval not completed
+WRITE_OWNER: lily4318 Agent candidate only; no outside projects, tokens, GAS, private deployment, real data, or formal release
+SYNC_STATUS: candidate_only; human_review_pending; release_unchanged

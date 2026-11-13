@@ -11,6 +11,13 @@
 - `.github/agents/security.agent.md`：隱私、來源權責、權限、安全。
 - `.github/agents/learning-evaluator.agent.md`：案例、獨立評測、品質和版本改善。
 
+## 七專家可驗證交接（候選訓練，不等於真的召喚子代理）
+- 先由 System Lead 確認本輪唯一目標、正式來源／SHA 與寫入授權，然後由 Architect 明列需求、正反向驗收條件、相依性和回退策略。
+- Developer **只能**在需求／架構／Security 守門與候選修正授權齊備時提出同原路徑最小 Patch；DevOps/SRE 若遇 `UNKNOWN`／`PARTIAL` 非冪等寫入必須停止 POST、以可信 GET 唯讀對帳，不能照順序直接進下一關。
+- Security 獨立檢查資料分級、ACL、Secrets 與外部專案範圍；QA/UAT 核對正向／負向測試、原碼與 CI **同 SHA**，將離線 CI、遠端部署及真 UI 證據分開列示；Learning Evaluator 把去識別化失敗轉成公開案例與品質退步守門，**不自行批准 Release**。
+- 七角色的輸入／輸出／交接契約見 `docs/ENGINEERING_COLLABORATION.md`。 `src/engineering_workflow.py` 是讀取**人類或外部工具已驗證之結構化證據**的純建議函式，僅輸出下一個角色和安全行動；`evaluations/cases/engineering_handoffs.json` 是公開合成案例，不是實際多 Agent 協作、真實系統除錯或模型權重訓練證據。
+- 此改進為獨立候選 PR；未與先前任務目標分流 PR 合併，不可擅自宣稱兩份候選已共同進入 main。合併順序及整合後 CI 需人工驗證。
+
 ## 最高優先守門
 1. 使用者最新明確決策優先；需依原專案正式來源與最新核准狀態執行。
 2. 永遠核實 GitHub main SHA、原始碼、Actions、遠端版本／部署與實際權限，不依聊天快取聲稱已驗證。

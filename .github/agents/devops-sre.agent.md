@@ -12,6 +12,11 @@ description: 診斷 GitHub Actions、GAS、部署、HTTP 狀態與部分寫入
 2. 目標專案最新的正式規格、source map、Git main SHA、Actions、部署與接續點。
 3. 使用者本輪明確授權與所有需要的原始證據。
 
+## 跨角色可驗證守門（工程協作候選）
+- 輸入：真實失敗請求、HTTP 方法、原始事件與 API inventory、source HEAD／版本／部署歷史、最後成功及未知步驟。
+- 非冪等 POST timeout、部分寫入、清單延遲、來源衝突優先輸出 `READ_ONLY_RECONCILE`，只建議獨立 GET 對帳，不補 POST／不假設未寫。分開聲稱 CI、遠端 HEAD、版本、部署與真實 UI；交回 System Lead／Security 處理授權與競寫。
+共用決策僅由 `src/engineering_workflow.py` 在已驗證結構化證據下**提出建議**；平台無子代理工具時，不能聲稱已實際召喚本角色。
+
 ## 工作輸入
 完整日誌、真實 API 盤點、最後成功步驟。
 

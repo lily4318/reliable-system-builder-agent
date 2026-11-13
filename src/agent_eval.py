@@ -28,6 +28,8 @@ REQUIRED = (
     ".claude/skills/reliable-system-builder/SKILL.md",
     "docs/INCIDENT_RECOVERY.md", "docs/EVALUATION_AND_LEARNING.md",
     "evaluations/cases/regressions.json", "incidents/sanitized-cases/README.md",
+    "src/engineering_workflow.py", "tests/test_engineering_workflow.py",
+    "evaluations/cases/engineering_handoffs.json", "docs/ENGINEERING_COLLABORATION.md",
 )
 
 def decide(s):
@@ -105,7 +107,8 @@ def validate(root=ROOT):
         r"\bAIza[A-Za-z0-9_-]{30,}\b",
         r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b",
     )
-    public = [Path(root) / "evaluations/cases/regressions.json"]
+    public = [Path(root) / "evaluations/cases/regressions.json",
+              Path(root) / "evaluations/cases/engineering_handoffs.json"]
     public.extend((Path(root) / "incidents/sanitized-cases").glob("*.md"))
     for file in public:
         content = file.read_text(encoding="utf-8")

@@ -142,3 +142,17 @@ NEXT_ACTION: submit branch-only change, read exact SHA CI, review duplicate/vers
 BLOCKERS: verified official provider API/read-only source authenticity, trusted complete replay ledger or atomic lock, independent human approval, real authorized runner and genuine source response.
 WRITE_OWNER: Agent PR6 branch only, no external repo/real model/API/secret/holdout.
 SYNC_STATUS: candidate_only; no_merge; no_release; main_unchanged
+
+
+DUAL_SOURCE_VERIFIED_CI_20261114:
+- TASK_DOMAIN: RELIABLE_AGENT_DUAL_SOURCE_RECONCILIATION
+- VERIFIED_CODE_SHA: 542bc479d72e98745c66fb4bd2e32c6971a78825
+- VERIFIED_RUN: https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43463408874, verify Job #132016049170, completed/success on the exact VERIFIED_CODE_SHA.
+- TEST_EVIDENCE: 90/90 unittest PASS; original deterministic policy 22/22 PASS (18 critical); independent recovery 21/21 PASS (20 critical); 20 synthetic LLM development protocol cases validated, quality gate PASS. Added 19 synthetic two-source tests, including forged matching copies, duplicated ID in export/ledger, request ID/response ID replay, version mismatch, output hash mismatch, non-independent custody, chronology and absent source negative cases.
+- CI_DUAL_SOURCE_STATUS: BLOCKED_DUAL_SOURCE_AND_LEDGER_REQUIRED; no provider export/ledger/approved real runner in public CI; no API, no keys, no genuine LLM responses.
+- SOURCE_READBACK: src/llm_provider_dual_source.py blob e7dfb97c76b6bc89d6a1aff8a7176dc8e9fccd3d; tests/test_llm_provider_dual_source.py blob 39c9ec2807d917d938253c5e43f8c57cb4ec6d95.
+- LIMITS: two locally matching sources may be forged together; source custody/official account/replay ledger are self-declared; no independently verifiable provider signature or authorized API readback; no global non-replay guarantee under concurrency; human approval and API/model origin unverified. No real model accuracy measurements.
+- LAST_VERIFIED_STEP: CODE_CI_VERIFIED_542BC479; docs-only evidence append creates new candidate SHA and requires final same SHA CI.
+- NEXT_ACTION: independent reviewer assess PR#6 source-authentication gap and ledger trust; only with separate lawful authorization and provider-controlled evidence can official request/response verification be attempted.
+- WRITE_OWNER: only Agent repo PR#6 candidate branch; no external repo writes; no model calls; no main merge or Release.
+- SYNC_STATUS: candidate_only; main unchanged; PR4 PR5 PR6 drafts unmerged; official_provider_verified=false; human_authorized=false.

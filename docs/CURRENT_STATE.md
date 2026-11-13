@@ -86,3 +86,16 @@ LAST_VERIFIED_STEP: NEW_PREFLIGHT_CANDIDATE_CI_PENDING
 BLOCKERS: 尚無受控、可驗證、可授權 runner 環境；實際供應商型號／版本與呼叫回執；人工權限／用量授權；獨立封存 holdout 與雙人標註。
 WRITE_OWNER: Agent PR6 候選分支 only，未修改 main、其他專案、遠端服務、正式 Release。
 NEXT_ACTION: 回讀此候選的 GitHub 實際 CI 與新 SHA；待真正模型供應商及執行權限取得後，才可安排公共合成案例的受控真實試跑。
+
+RUNNER_PREFLIGHT_VERIFIED_CI_20261113:
+- VERIFIED_CODE_SHA: b9823369ab7d5079530c91f07174f68f153f64db
+- VERIFIED_GITHUB_ACTIONS: https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43455629399; verify job #131988878059, completed/success with exact VERIFIED_CODE_SHA.
+- TESTS: 58/58 unittest PASS; 22/22 original deterministic policy PASS (18/18 critical); 21/21 independent recovery PASS (20/20 critical); 20 public synthetic LLM dev cases validated; candidate quality gate PASS.
+- ACTUAL_RUNNER_PREFLIGHT_STATUS: BLOCKED_NO_PRIVATE_RUNNER_CONFIG (read directly from matching SHA CI stdout).
+- PUBLIC_SOURCE_PROMPT_SHA256: 599490b5dfb1bcedca38e2b30a79592294470076ecffca50b15107a2d6a8b041
+- PUBLIC_SOURCE_EVALUATOR_SHA256: eb28940213a6d0dc67c4d2cbb9f558b70a31bcfc9705637d7ae9a7391388248d
+- PROVENANCE_CLAIM_BOUNDARY: The two public SHA-256 values are observed source byte checksums only; neither proves that a real provider executed that model/prompt nor that a requested model/version is authenticated. A privately configured runner with matching SHA and approval self-assertion remains PROVIDER_UNVERIFIED and NOT_AUTHORIZED_BY_AUDIT.
+- ACTUAL_LLM_EXECUTED: false; MODEL_VERSION_PROVIDER_AUTHENTICATED: false; PROVIDER_RESPONSE_ORIGIN_VERIFIED: false; APPROVAL_INDEPENDENTLY_VERIFIED: false; HOLDOUT_OR_REAL_MODEL_SCORES: none.
+- LAST_VERIFIED_STEP: CANDIDATE_CODE_CI_VERIFIED_ON_B9823369; this docs-only progress append makes a new candidate SHA that must itself be checked against GitHub Actions.
+- NEXT_ACTION: Find and independently authorize a genuine provider/model runner in a controlled environment; validate the exact provider response request ID, model version, entitlement and data handling before any public synthetic trial. Keep holdout private and unused until adjudication.
+- SYNC_STATUS: candidate_only; main_unchanged; draft_PR6_unmerged; formal_release_approved=false; no_other_repo_changes.

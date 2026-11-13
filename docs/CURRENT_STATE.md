@@ -53,3 +53,17 @@ NEXT_ACTION: submit Draft PR, read actual candidate SHA/verify logs, scrutinize 
 BLOCKERS: natural-language benchmark, independent human holdout and live multi-specialist execution unavailable; release human approval not completed
 WRITE_OWNER: lily4318 Agent candidate only; no outside projects, tokens, GAS, private deployment, real data, or formal release
 SYNC_STATUS: candidate_only; human_review_pending; release_unchanged
+
+
+ENGINEERING_CANDIDATE_CI_EVIDENCE_20261113:
+- TASK_DOMAIN: AGENT_ENGINEERING_ROLE_HANDOFF_CANDIDATE
+- VERIFIED_CODE_SHA: 14c1a3926ef5376548999c7d95cfefc648016f67
+- DRAFT_PR: https://github.com/lily4318/reliable-system-builder-agent/pull/5 (candidate branch only; main not merged)
+- CI_RUN: https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43439466465
+- JOB: verify #131932989674, completed/success, exact VERIFIED_CODE_SHA
+- TEST_EVIDENCE: 46/46 Python unittest PASS; 22/22 original deterministic policy (18/18 critical); 21/21 independent recovery (20/20 critical; unsafe=0); 30/30 new engineering role handoffs (26/26 critical; unsafe=0); privacy heuristic PASS; candidate quality gate PASS
+- NEGATIVE_GATE: independent advisory-action allowlist and test injection of unsafe SEND_POST, and test that weakening max unsafe engineering actions from 0 to 1 fails quality gate. No tests skipped or removed.
+- VERIFIED_SCOPE: proposed engineering role/evidence routing remains synthetic structured advice, not real LLM reasoning or seven spawned agents. No public or external project writes, no deployment or formal release; PR #4 remains separate.
+- LAST_VERIFIED_STEP: CODE_CI_VERIFIED_AT_14C1A39; updating this document creates a new docs-only candidate SHA, which must undergo its own verify readback.
+- NEXT_ACTION: reviewer inspect label expectations, PR #4 conflict/integration order and real blind holdout gap; neither PR merged without independent human review.
+- SYNC_STATUS: candidate_only; external_projects_unchanged; release_formal_approved=false

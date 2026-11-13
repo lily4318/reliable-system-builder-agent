@@ -38,6 +38,9 @@ class RunnerPreflightTest(unittest.TestCase):
         self.assertFalse(result["live_inference_authorized_by_this_audit"])
         self.assertFalse(result["real_llm_executed"])
         self.assertFalse(result["model_accuracy_measured"])
+        self.assertEqual(result["source_prompt_sha256"], digest(PROMPT.encode("utf-8")))
+        self.assertEqual(result["source_evaluator_sha256"],
+                         digest((ROOT / "src/llm_requirements_eval.py").read_bytes()))
 
     def test_matching_local_hashes_never_authenticate_provider_or_human_approval(self):
         with tempfile.TemporaryDirectory() as directory:

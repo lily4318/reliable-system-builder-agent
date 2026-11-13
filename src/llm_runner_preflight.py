@@ -47,6 +47,9 @@ def audit(config_path: Path | None = None) -> dict:
         "real_llm_executed": False,
         "live_inference_authorized_by_this_audit": False,
         "model_accuracy_measured": False,
+        # These public source hashes do NOT authenticate provider execution.
+        "source_prompt_sha256": _sha(PROMPT.encode("utf-8")),
+        "source_evaluator_sha256": _sha((ROOT / "src/llm_requirements_eval.py").read_bytes()),
     }
     if config_path is None:
         return state

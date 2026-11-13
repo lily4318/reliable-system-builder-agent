@@ -37,6 +37,8 @@ python -m src.llm_runner_preflight audit \
 ```
 私人 JSON `schema_version=1` 須恰好提供 `provider`、`model_id`、`runner_path`（實體腳本絕對路徑）、`runner_sha256`、`prompt_sha256`、`evaluator_sha256`、`approval_scope=public_dev`、`approval_reference`、`data_handling_reviewed=true`。**不放入 API Key、Token、真正研究資料、holdout 或完整私人日誌**，檔案應留在公開 Repository 外。可用本機安全方式計算腳本與來源 SHA、對照文件版本；預檢程式不執行腳本、不連網、不呼叫模型，也不印出檔案路徑或憑據。
 
+即使沒有外部 runner 設定，唯讀預檢仍會輸出已讀取的公開 `source_prompt_sha256` 與 `source_evaluator_sha256`，以便追蹤本次候選來源；**這不等於供應商執行時實際使用了該 Prompt**。
+
 結果若 `CONFIG_HASHES_MATCH_PROVIDER_AND_APPROVAL_STILL_UNVERIFIED`，只表示**本地腳本／Prompt／評測器來源一致**；`model_id_provider_authenticated=false`、`approval_independently_verified=false`、`provider_response_origin_verified=false`、`live_inference_authorized_by_this_audit=false`。另須獨立查核模型供應商 API 的實際 model/version 與 request ID／回應、權責和費用授權，才能聲稱經認證的真實模型跑測。不得使用 ChatGPT 對話自身或 mock script 當成可重現 runner。
 
 ### 待使用者自行授權並在安全環境執行

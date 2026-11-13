@@ -115,3 +115,17 @@ HUMAN_FIRST_WEBSITE_RULES_20261114:
 - NEXT_ACTION: commit only Draft PR #7 and read same SHA CI / job logs; fix all affected negative tests; then observe real Agent doing a new-site discovery and edited-decision UX with authorized humans.
 - WRITE_OWNER: candidate branch only, no external repository, model/API calls, merge, deployment or formal release
 - SYNC_STATUS: candidate_only; main_unchanged; prior Draft PRs untouched; formal_active_rules_not_yet_merged
+
+
+HUMAN_FIRST_WEBSITE_VERIFIED_CI_20261114:
+- TASK_DOMAIN: RELIABLE_AGENT_HUMAN_FIRST_WEBSITE_REQUIREMENTS
+- VERIFIED_CODE_SHA: 6c9c691eacb7bf27d1881fc6e48dcdfcd591f1c6
+- VERIFIED_CI: https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43527652001; verify Job #132237286882; completed/success, exact VERIFIED_CODE_SHA.
+- TESTS: 97/97 Python unittest PASS (18 new interaction/website/human walkthrough tests); existing policy 22/22 PASS, critical 18/18; independent recovery 21/21 PASS, critical 20/20; quality gate PASS. CI generated 13-question website interview and GitHub repository setup walkthrough.
+- PREVIOUS_ERRORS_FIXED: Run #43527436112 failed due mismatch of KEYS/build_spec alias with implementation; Run #43527546098 failed because one assertion used undefined variable c instead of item. Both corrected without deleting tests or relaxing safety.
+- VERIFIED_SCOPE: AGENTS.md, START_HERE.md, README, config/agent-policy.yaml, five expert role instructions, new human-first document, 13-question JSON, GitHub manual walkthroughs JSON, offline website spec and per-inference accept/modify/reject editable options, human_confirmation no-send state machine, local HTML example, CI and tests; no other repository.
+- LAST_VERIFIED_STEP: CODE_AND_CI_VERIFIED_AT_6C9C691; progress append is docs-only SHA and requires final CI for strict same SHA verification.
+- NOT_VERIFIED: no real LLM response to a website user, no UI UAT across supported clients, no formal website specification approvals or actual GitHub human setup; deterministic tests do not prove production Agent compliance.
+- NEXT_ACTION: Read latest final candidate SHA and associated CI success; later arrange authorized human UX review of 13-question intake and selection -> edit -> confirm flow, without auto-sending.
+- WRITE_OWNER: only Agent Draft PR #7 candidate branch; formal main, other Draft PRs, Release and external systems unchanged.
+- SYNC_STATUS: candidate_code_ci_pass; final_document_sha_ci_pending; new_rules_not_merged_into_main.

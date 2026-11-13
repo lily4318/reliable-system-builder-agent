@@ -9,6 +9,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PATH = ROOT / "evaluations/interaction/website-intake-questions.json"
 IDS = ("purpose","audience","journey","pages","identity","forms","slots",
        "notice","admin","privacy","integrations","experience","release")
+KEYS = IDS  # Public, stable questionnaire field names.
 SECTIONS = ("目標與成功標準","使用者與角色","核心流程","頁面與內容","登入與權限",
             "資料表單","預約名額與狀態","通知","管理後台","隱私與核准",
             "架構整合與現有系統","介面、語言與無障礙","上線驗收與維護")
@@ -125,6 +126,11 @@ def draft_spec(answers: dict) -> dict:
             "可點選每項建議，先在編輯欄調整文字，不自動送出。",
             "人工確認完整規格書後才可作為設計基準；寫入與部署仍需各自授權。"]
     }
+
+
+def build_spec(answers: dict) -> dict:
+    """Public alias for the unapproved specification-drafting entrypoint."""
+    return draft_spec(answers)
 
 
 def main() -> int:

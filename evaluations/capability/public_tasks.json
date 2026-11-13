@@ -72,7 +72,7 @@
         },
         {
           "id": "R4",
-          "description": "需有失敗與回退驗收",
+          "description": "需有可重現的失敗與回退驗收案例",
           "critical": false
         }
       ],
@@ -102,7 +102,7 @@
       "requirements": [
         {
           "id": "R1",
-          "description": "端點相接不視為重疊",
+          "description": "班次時間端點相接不視為重疊",
           "critical": true
         },
         {
@@ -147,7 +147,7 @@
       "requirements": [
         {
           "id": "R1",
-          "description": "補貨量不得為負數",
+          "description": "建議補貨數量不得小於零",
           "critical": true
         },
         {
@@ -157,7 +157,7 @@
         },
         {
           "id": "R3",
-          "description": "不可自動建立採購單",
+          "description": "不得由建議功能自動建立採購單",
           "critical": true
         },
         {

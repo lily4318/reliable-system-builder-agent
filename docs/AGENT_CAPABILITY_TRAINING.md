@@ -7,13 +7,13 @@
 - TASK_DOMAIN: RELIABLE_AGENT_ENGINEERING_CAPABILITY_TRAINING
 - SOURCE_REPO: lily4318/reliable-system-builder-agent
 - ACTIVE_CANDIDATE: Draft PR #8, candidate-skill-team-integration-20261114；https://github.com/lily4318/reliable-system-builder-agent/pull/8
-- SOURCE_VERSION: P2-1b implementation 912230bb833f3b772a4708eb6fd255f847eeae8b; 10-test baseline 3365297f731afdd7dba2f31508fcb744b6b4c746 CI 43571054944 success; additional 3 regression tests 4f3e8d9602d0b71ac835cbae0cb603375663ebf1 CI 43571651587 exact-SHA CI in_progress/pending. Current PR head authoritative.
-- LAST_VERIFIED_STEP: Candidate 3365297f731afdd7dba2f31508fcb744b6b4c746 CI 43571054944 completed/success (verify job 132375323523, offline unit tests and quality gate success); new regression test blob da0ddb42412a1b991bdf17e7aead81e11ca66c64 read back; CI 43571651587 exact-SHA CI in_progress/pending.
-- COMPLETED: 七專家與12技能、SQLite工作台、P0/P1-1a/b/c/P2-1a CI 過關；P2-1b cancellation/return 基線完整 CI 成功；新增三個可執行回歸（actor/owner token namespace, UNKNOWN after commit, legacy schema fail closed）已提交與回讀；新測試結果尚未核實。
-- BLOCKERS: 瀏覽器 DOM/manual UAT 仍 NOT_VERIFIED (原環境 ERR_BLOCKED_BY_ADMINISTRATOR)；explicit legacy migration 尚未實作；NOT_ACTIVE 負向結果未持久化，依原重播契約存在跨時序差異，需新增重現與修復；revision-aware task pool 跨階段演練待完成；真實 LLM/獨立子代理、holdout/獨立評審未驗證；外部部署/發布未授權。本輪新測試 CI 尚待回讀。
+- SOURCE_VERSION: P2-1b replay/offline migration source 68206d17298303fa414e3742023cb94677f0989d (blob e09024bf973623f0a664012853c2af279fa72685); source+21 equipment tests 64a5f2ed8fe5dff429fe38d8edf191c6532b7c51 (test blob 594e3728837608007c4a92046889c5d679b84a5f); CI 43576453447 completed/success. Current PR head authoritative.
+- LAST_VERIFIED_STEP: Previous exact head b9412a02a6b0ebe8f63eecdcafe160f37fc101d8 CI 43571713215 completed/success. P2-1b old Store excerpt reproduced both denied replay defects; fixed Store excerpt matched remote length 13780 and FNV-1a c555baa8, 6/6 local functional smoke groups PASS; source+tests blob readback verified. New full CI 43576453447 completed/success.
+- COMPLETED: P0/P1-1a/b/c/P2-1a verified CI; P2-1b cancellation/return + prior regression full CI; NOT_ACTIVE durable decisions, actor-scoped readback, atomic stock/decision transaction, explicit offline v0→v1 copy migration for two/three-table synthetic schemas and 8 additional regression tests (21 total). Local Store smoke 6/6 PASS; new full CI success.
+- BLOCKERS: Browser DOM/manual UAT still NOT_VERIFIED (ERR_BLOCKED_BY_ADMINISTRATOR); full cross-stage revision-aware task pool exercise remains; real LLM/independent subagents, private workbench, holdout/blind review not verified; external deployment/release unauthorized. Migration supports only stopped, rollback-journal synthetic v0 schemas and exclusive local filesystem hard-link publication; old NOT_ACTIVE decisions were never stored and cannot be reconstructed; no automatic cutover or post-cutover downgrade, no power-loss or Windows UAT. 
 - WRITE_OWNER: 僅 Agent 候選分支；main/Release、外部專案、真實個資、付費模型或正式部署不在本次授權內。
-- SYNC_STATUS: P2_1B_BASELINE_FULL_CI_PASS; ADDITIONAL_TESTS_READBACK_VERIFIED; ADDITIONAL_TESTS_CI_PENDING; BROWSER_ENV_BLOCKED; REAL_RUNNER_NOT_RUN; NO_RELEASE.
-- NEXT_ACTION: 先回讀 43571651587 同 SHA 完整 CI、必要時修復；重現並修正 NOT_ACTIVE action_token 未保留負向決定造成的重播差異，保留成功操作唯一約束與 actor/owner 隔離；規劃顯式舊 schema 遷移及回退驗收；再用 revision-aware 工作台演練階段交接/需求修訂/重驗，允許環境才進行設備網站 DOM 驗收。P1-2/P2-2 真實 runner/獨立評測待授權。不動 main、Release、外部專案。
+- SYNC_STATUS: P2_1B_PREVIOUS_FULL_CI_PASS; REPLAY_REPRODUCED; STORE_LOCAL_6_OF_6_PASS; SOURCE_TEST_READBACK_VERIFIED; NEW_FULL_CI_PASS; BROWSER_ENV_BLOCKED; REAL_RUNNER_NOT_RUN; NO_RELEASE.
+- NEXT_ACTION: Exercise revision-aware workbench across P2-1 stages (handoff, requirement revision invalidation, recovery/revalidation, actual test evidence and learning case adoption); then equipment browser DOM tests in an authorized environment, plus CLI migration smoke/cutover walkthrough (not an automatic deployment). P1-2/P2-2 real runner and independent evaluation require authorization. Do not change main, release or external projects.
 
 ### 教材比對與改善方向
 
@@ -37,7 +37,7 @@
 | P0-2 | B001 案例記錄、蒸餾，遷移到 B002 公用設備借用 | 相關案例被實際取用；新任務功能測試，對照有/無經驗和適用限制 | CONTROLLED_TRANSFER_PASS / LOCAL_FUNCTIONAL_PASS / FULL_CI_PASS |
 | P1-1 | 主動回饋事件、分層記憶檢索、技能專業深度、技術探索、任務池/覆盤 | 新工作階段重讀、無跨案混用；測試實際檢索與回饋行為 | P1-1a/b FULL_CI_PASS; P1-1c FULL_CI_PASS |
 | P1-2 | 專家獨立協作與交接 | 有授權平台才做真子代理；獨立 QA、交接與整合證據；無平台標單 Agent 分工 | BLOCKED_REAL_RUNNER |
-| P2-1 | 隔離合成完整系統：前後端、資料庫、權限、後台、預約、復原 | 可操作成品、端到端功能及安全測試 | P2-1a HTTP_LOCAL_PASS / FULL_CI_PASS; BROWSER_BLOCKED; P2-1b BASELINE_FULL_CI_PASS; ADDITIONAL_REGRESSIONS_CI_PENDING |
+| P2-1 | 隔離合成完整系統：前後端、資料庫、權限、後台、預約、復原 | 可操作成品、端到端功能及安全測試 | P2-1a HTTP_LOCAL_PASS / FULL_CI_PASS; BROWSER_BLOCKED; P2-1b PREVIOUS_FULL_CI_PASS; REPLAY_MIGRATION_LOCAL_PASS; NEW_FULL_CI_PASS |
 | P2-2 | 未見題獨立前後測、語意蒸餾、必要跨平台同步 | 等模型/工具/資源條件、獨立評審、保留失敗；只有需要且授權才同步 | PROPOSED |
 
 七專家訓練：System Lead 需求與路由/優先排序；Architect 技術比較、資料模型與取捨；Developer 真正實作/除錯；QA/UAT 獨立正反例與瀏覽器；DevOps/SRE CI/CD、部分寫入與復原；Security 最小權限與隱私；Learning Evaluator 記錄、蒸餾、遷移、前後測。
@@ -174,6 +174,17 @@
 - 起點：PR #8 head 3365297f731afdd7dba2f31508fcb744b6b4c746；CI 43571054944 completed/success，已回讀 verify job 132375323523 的 Offline unit tests、品質安全守門及其他步驟。0c0cbc3 的 run 43571017490 cancelled，不作成功證據；後續含同程式/測試的 head CI 成功。
 - 單 Agent 分工（非實際獨立子 Agent），以公開隔離合成程式為實作對象，原 10 個測試保留；tests/test_p21_equipment_site.py commit 4f3e8d9602d0b71ac835cbae0cb603375663ebf1，blob da0ddb42412a1b991bdf17e7aead81e11ca66c64，新增 test_actor_and_owner_token_namespaces（相同 target/action token 的不同 actor/owner 並行、重播及 admin payload conflict）、test_unknown_after_commit_read_only_reconciliation（cancel/return 真交易完成後注入 OperationalError，HTTP 503；GET 對帳無二次 release、庫存零、ledger 唯一且資料庫 bytes 不變）、test_legacy_schema_refuses_lifecycle_without_mutating（舊 schema 避免隱式重建及寫入）。新增測試已遠端回讀，CI 43571651587 exact-SHA CI in_progress/pending。未另聲稱本地執行或瀏覽器 DOM 驗收；故障注入為 synthetic，不是實際網路故障。
 - 新發現（靜態原始碼核對，尚未重現）：release 在找不到 ACTIVE 目標時直接回 NOT_ACTIVE，沒有保存負向 token 決定。若先對不存在的目標操作，之後同 owner/target 被建立，再重送同 token 可能轉為成功，與原「相同 payload 重播原決定」契約不一致。先用新合成回歸重現，後續保留成功操作互斥、拒絕記錄和獨立唯讀對帳；不以新測試代替修復。舊 schema 測試只驗證拒絕保護，不等於顯式遷移完成。尚無真實資料、真人 UAT、外部部署、模型自治評測或正式 Release。 
+
+### 2026-11-14｜P2-1b 第三增量｜拒絕決定重播與顯式舊庫遷移
+
+- 起點：PR #8 b9412a02a6b0ebe8f63eecdcafe160f37fc101d8，CI 43571713215 completed/success，保留原13組設備網站測試。現階段僅 Agent 候選分支及暫存合成資料。
+- RED：將前版 Store initialize/reserve/release 原方法摘錄至本機隔離暫存 SQLite，取消（member）與歸還（admin）各自重現 NOT_ACTIVE → 建立原本不存在的 4 件借用 → 同 token 變成 CANCELLED/RETURNED、reserved=0，而應仍 NOT_ACTIVE、reserved=4。不是遠端失敗 CI，勿冒稱整個舊版測試套件執行。
+- FIX：src/p21_equipment_site.py commit 68206d17298303fa414e3742023cb94677f0989d, blob e09024bf973623f0a664012853c2af279fa72685。選擇獨立 action_attempts (actor,action_token) 的完整合法決定及 payload，保留 lifecycle 成功狀態 (owner,target_token) 唯一約束；同 token 不重新判定、不改原結果，相異 payload 400；庫存、成功 ledger 與新決定同一交易。合法 NOT_ACTIVE 409 也持久化；未授權/非法輸入不當作有效業務決定。dashboard 顯示登入者自身操作決定，UNKNOWN after commit 以唯讀對帳，不自動重送。舊資料庫在正式寫入/生命週期查詢拒絕；原始 basic view 仍可唯讀查看舊庫。
+- Migration：兩種原始 user_version=0 合成 schema（P2-1a 兩表、P2-1b 三表）均支援，先停所有舊 writer，明示離線確認；只讀來源 snapshot、integrity_check、表結構、每列合法性與庫存和有效借用相符；保留 requests/lifecycle 歷史、成功 token 決定，寫入同目的檔系統暫存 v1，再完整回讀對帳，以 os.link 排他建立新路徑，不覆蓋來源/既有目的檔。故障 before publish 不留可用半成品；只新增候選庫，不自動啟動/cutover。原來源檔是切換前的回退依據，切換後若新版已有新寫入必須先對帳，不得直接退回舊檔而丟失資料。拒絕 WAL/SHM/journal、未知版本與非合成格式。舊版從未保存的拒絕決定不可追溯；遷移後勿重送舊未明 token，先依已保存狀態唯讀查核。未測驗 power-loss durability 或 Windows 檔案系統；無真資料、正式服務或資料庫寫入。
+- 合成使用入口（停止來源舊程序後）：python -m src.p21_equipment_site --database NEW.sqlite --migrate-from OLD.sqlite --confirm-source-offline 。成功只輸出版本/筆數；確認新庫完整性/庫存/歷史後另行啟動候選站：python -m src.p21_equipment_site --database NEW.sqlite 。未知發布結果先唯讀確認目的檔及內容，禁止覆寫或重送。CLI 完整進程測試仍待做；僅 local Store methods 已實測。 
+- GREEN 本機：將修復後完整 imports+Store excerpt 從遠端原始碼轉錄，字元/bytes 13780，FNV-1a c555baa8 與遠端一致；本機 py compile 與 6/6 smoke groups PASS：兩種拒絕重播及新 token 正例、8路拒絕競寫/rollback/actor 隔離、兩表遷移、三表歷史成功重播及庫存、offline confirmation/故障回退/no overwrite/invalid inventory/version/sidecar、雙路遷移排他建立。驗證舊庫 bytes 不變、新庫庫存及紀錄；此為 Store 層實測，非整 repo 或 HTTP/瀏覽器完整驗收。
+- tests/test_p21_equipment_site.py source+test commit 64a5f2ed8fe5dff429fe38d8edf191c6532b7c51, blob 594e3728837608007c4a92046889c5d679b84a5f。新增3項 HTTP 拒絕決定/失回應/競寫與5項遷移正反測，共21項，原13項未刪，完整 source/test 遠端 blob readback。CI 43576453447 completed/success；不以舊版成功取代本版。 
+- CASE P21-CASE-003｜observed (Store local): 冪等契約必須包含合法負向決定；分離 terminal state 與 all accepted action decisions，以 actor 級 token/payload 衝突驗證、原子交易、唯讀對帳避免歷史請求在後續狀態變化中重新執行。資料遷移用原始檔保留+明確離線+快照檢查+新庫稽核+排他發布，不能把版本欄位變更當遷移完成。案例為公開合成訓練紀錄，不聲稱自治模型或獨立專家已驗證。下一步跨階段 revision-aware 工作台演練及允許環境的瀏覽器驗收。
 
 ### 每次續作及更新協定
 

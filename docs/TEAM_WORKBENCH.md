@@ -111,9 +111,28 @@ context/history 真正唯讀，不建缺失資料庫，舊工作區未 setup 先
 | resolve | {"decision":"D1","answer":"已確認的實際政策","source":"明確使用者決策來源","confirmed":true} |
 | review | 唯讀取得 task 狀態、依賴、開放與已決問題及來源、running_review、next_ready、驗收次數、失敗次數、完成數與事件 |
 
-依賴必須先存在、不得自循環，優先級 0–99（越低越高）。以 BEGIN IMMEDIATE 防止同任務競寫；RUNNING 不自動逾時接管。「confirmed」是操作者聲明，只有已有真實明確確認與證據才可使用；不等同部署或正式啟用授權。失敗結果保留歷史與證據，返回 PENDING 且不解鎖下游。既有決策不可直接覆蓋；新決策及修改任務關係需另行版本化設計，當前不支援重開 DONE 或動態改 DAG。新程序用 review 讀回後才行動；若任務仍 RUNNING，不盲目接管。例中的 UI 決策沒有真實使用者確認，正式 UI 工作保持 PENDING。
+依賴必須先存在、不得自循環，優先級 0–99（越低越高）。以 BEGIN IMMEDIATE 防止同任務競寫；RUNNING 不自動逾時接管。「confirmed」是操作者聲明，只有已有真實明確確認與證據才可使用；不等同部署或正式啟用授權。失敗結果保留歷史與證據，返回 PENDING 且不解鎖下游。既有決策不可直接覆蓋；新政策應建立新的 decision ID，再使用下節 revise 更換相關 gates，保留舊決策。已支援原子化重開及修改 DAG。新程序用 review 讀回後才行動；若任務仍 RUNNING，不盲目接管。例中的 UI 決策沒有真實使用者確認，正式 UI 工作保持 PENDING。
 
 技術探索示例見 src/b003_shifts.py 與 tests/test_b003_and_tasks.py：線性與排序區間判斷對照離散分鐘集合 oracle，原型 INVALID 不是正式產品錯誤政策。此工具的驗收由操作者提供證據，並不自動執行程式碼或替代獨立 QA；記憶、任務與事件在同一 DB，任務仍不代表逐任務 artifact 版本。未建立正式私人工作區。
+
+## P1-1c｜需求變更、任務重開及中斷復原
+
+**升級前**：停止所有舊版工作台操作程序，確認無競寫，備份原 workbench.sqlite3 至授權私人位置；使用新版 setup 明確遷移同一資料庫。增加 revision 欄位（初始 1）；既有 RUNNING 認定需復原，標 RECOVERY_REQUIRED、revision=2 並保存 MIGRATION_FENCE 事件；已完成及其歷史保留。不得混用升級前後的程式寫入同一庫，不自動修改使用者工作區。review 為真正唯讀，不隱式遷移。
+
+需求確認後先 review 核對任務、revision、依賴、目前持有者及實際成果，再從原規格找出受影響的最上游任務。用同一 CLI 的 revise action，明確提供當前 revision、證據與 confirmed=true。可選填 title、deps、gates、checks 更新任務定義；不提供表示單純重開重驗，不覆寫舊已決政策。任務和所有傳遞下游在同一 SQLite 交易修訂，原驗收及舊定義保存於事件。無循環、未知依賴/決策或空驗收才可提交；競寫後若 revision 不符，應重讀，不強制重送。
+
+| action | JSON 示例（ID/版本須以實際 review 替換） |
+|---|---|
+| revise | {"task":"spec","expected_revision":1,"session":"reviewer-1","evidence":"已確認的需求變更來源及版本","confirmed":true,"checks":["R3-v2"]} |
+| recover | {"task":"core","expected_revision":2,"previous_session":"old-worker","session":"reviewer-2","evidence":"已查證原操作者停止、唯讀對帳及部分操作處理","confirmed":true} |
+| start | {"task":"spec","session":"spec-attempt-2","expected_revision":2} |
+| finish | {"task":"spec","session":"spec-attempt-2","expected_revision":2,"results":{"R3-v2":"PASS"},"evidence":"新版實際驗收結果與來源"} |
+| resume | {"task":"spec","previous_session":"spec-attempt-2","session":"spec-attempt-3","expected_revision":2,"evidence":"已查證前操作者停止、版本仍相同及實際狀態","confirmed":true} |
+
+- DONE/PENDING 下游失效時回 PENDING、revision 加1；舊 PASS 只供歷史，不能解鎖新版本。RUNNING 或已待復原者保留舊 owner、轉 RECOVERY_REQUIRED，該次 revision 失效，禁止 finish/resume；review 的 recovery_review / recovery_blockers 顯示復原優先事項，未解決的失效下游也阻止其上游重新開工。無關獨立分支保持原狀。
+- recover 是確認舊操作者停止、核對部分寫入後釋放至 PENDING，不是恢復舊結果；依賴與未決 gate 仍適用。未失效、同 revision 的 RUNNING 才可 resume，須換唯一 session；所有 start/resume 同一 task 不可重用曾領取的 session。所有新版操作建議明確帶 expected_revision；僅 revision=1 提供舊 API 未帶版本的相容性。
+- 任何 confirm 都是操作者聲明，需要外部實際證據；SQLite 守門只能拒絕舊版 API 提交，不能停止外部程序、撤銷 GitHub/GAS 寫入、區分部署權限，也不自動監聽所有需求文件變更。每次確認需求變更需明確呼叫 revise 並重新保存適用 handoff/原規格，兩個索引不自動聯動；不以任務池狀態代替產物版本或正式核准。若變更依賴關係，還須核對舊工作曾接觸的資源與原依賴，不能只看新 DAG。
+- 新事件 REVISE/INVALIDATE 保存舊/新 revision、狀態、舊 owner 等；新 PASS/FAIL 結果 JSON 包含 revision 與 checks，舊歷史原樣保留、舊 results 可能是平面檢查對應表。review 的 attempts 是歷史總數，completed 是目前有效 DONE 數。驗收證據仍由操作者提供，非獨立 QA。
 
 ## 共用知識與案例
 公開 repo 的 knowledge/ENGINEERING_PATTERNS.md、templates/WORK_ARTIFACTS.md 提供尚需依專案驗證的通用工作方法和格式；真實工作記憶與案例保留私有。去識別化且經人審查的案例才可循原 learning-policy 及獨立 PR 進入公共知識庫。跨專案共用偏好應另設有權限的私人工作區，經明確確認後選取適用條目，不自動混合兩案資料。持久化資料不加密、依賴 OS ACL；憑證不得保存，正規表示式只防部分常見金鑰。

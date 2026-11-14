@@ -72,3 +72,5 @@ if __name__=="__main__":
     p.add_argument("--browser")
     args=p.parse_args()
     print(json.dumps(run(args.browser),ensure_ascii=False))
+    from src.p21_equipment_browser_test import run as run_equipment
+    print('P21-EQUIPMENT-BROWSER: '+json.dumps(run_equipment(args.browser),ensure_ascii=False))

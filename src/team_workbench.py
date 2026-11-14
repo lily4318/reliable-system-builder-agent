@@ -89,21 +89,28 @@ def current_artifacts(db):
     return {k:{**v,"current":valid(v,set())} for k,v in latest.items()}
 
 
-def handoff(path, skill, content, source_ref):
+def _handoff_in_transaction(db, skill, content, source_ref):
+    """Internal helper: caller owns BEGIN IMMEDIATE and commit/rollback."""
+    if not db.in_transaction:
+        raise ValueError("handoff requires an active transaction")
     s=catalog()[skill]
     content=_text(content,"artifact")
     source_ref=_text(source_ref,"source reference",500)
+    latest=current_artifacts(db)
+    missing=[k for k in s["requires"] if k not in latest or not latest[k]["current"]]
+    if missing:
+        raise ValueError("missing or stale prerequisite: "+", ".join(missing))
+    deps={k:latest[k]["id"] for k in s["requires"]}
+    cur=db.execute("INSERT INTO artifacts(kind,skill,source_ref,content,dependencies) VALUES(?,?,?,?,?)",
+          (s["produces"],skill,source_ref,content,json.dumps(deps,sort_keys=True)))
+    return {"artifact_id":cur.lastrowid,"kind":s["produces"],
+            "stored_not_independently_verified":True}
+
+
+def handoff(path, skill, content, source_ref):
     with closing(connect(path)) as db, db:
         db.execute("BEGIN IMMEDIATE")
-        latest=current_artifacts(db)
-        missing=[k for k in s["requires"] if k not in latest or not latest[k]["current"]]
-        if missing:
-            raise ValueError("missing or stale prerequisite: "+", ".join(missing))
-        deps={k:latest[k]["id"] for k in s["requires"]}
-        cur=db.execute("INSERT INTO artifacts(kind,skill,source_ref,content,dependencies) VALUES(?,?,?,?,?)",
-              (s["produces"],skill,source_ref,content,json.dumps(deps,sort_keys=True)))
-        return {"artifact_id":cur.lastrowid,"kind":s["produces"],
-                "stored_not_independently_verified":True}
+        return _handoff_in_transaction(db,skill,content,source_ref)
 
 
 def remember(path, kind, topic, content, evidence, basis):

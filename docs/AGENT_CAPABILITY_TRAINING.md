@@ -7,13 +7,13 @@
 - TASK_DOMAIN: RELIABLE_AGENT_ENGINEERING_CAPABILITY_TRAINING
 - SOURCE_REPO: lily4318/reliable-system-builder-agent
 - ACTIVE_CANDIDATE: Draft PR #8, candidate-skill-team-integration-20261114；https://github.com/lily4318/reliable-system-builder-agent/pull/8
-- SOURCE_VERSION: B002 implementation/test commit 20c4e85bd6572831ac78a33b56d4344b376b8572; B001 verified baseline 0f07a43006857bf915f1ffe70016ab35d899436b (CI 43561661130 success). Current PR head is authoritative.
-- LAST_VERIFIED_STEP: B001 CI 43561619878 and 43561661130 completed/success; B002 retrieved B001-CASE-001 before implementation, local 13/13 behavioral tests PASS, both remote Git blobs match tested bytes. B002 full CI not yet returned at source commit readback.
-- COMPLETED: 七專家、12 項技能＋總控技能、SQLite 私有工作台、13 題訪談、可編輯確認、離線任務包及評測；B001 9 項功能測試和完整 CI；B002 多數量設備保留、原子交易、並行、故障回退、唯讀及缺庫負測 13/13；已驗證 B001-CASE-001 工程原理遷移並新增案例 B002-CASE-001。
+- SOURCE_VERSION: P1-1 learning implementation/test commit 4c104a158a525ed88d340e9f6a8aa61bd205de44; workflow/guide commit 784a87ca86cc6657593bf3975bae2474a33aab78; B002 verified baseline 388bec5a93dd7958956782108895cf577e6d3b3f (CI 43563312827 success). Current PR head is authoritative.
+- LAST_VERIFIED_STEP: B002 CI 43563255803 and 43563312827 completed/success; P1-1 local 11/11 behavioral tests PASS including new synthetic task and actual fresh Python subprocess; source/test blobs match local tested files; AGENTS.md and TEAM_WORKBENCH.md readbacks exact. CI 43564186355 in_progress; guide CI 43564264957 pending at readback.
+- COMPLETED: 七專家、12 項技能＋總控技能、SQLite 私有工作台、13 題訪談、可編輯確認及離線評測；B001/B002 功能與完整 CI，兩張實測案例；P1-1 同庫增量工作台檢索、Context payload 限額、回饋候選記憶與案例引用、跨 Python 程序回讀；11/11 本機功能測試，已接入 AGENTS 工作流程及手冊。
 - BLOCKERS: 真實 LLM runner、獨立子 Agent 實際執行、獨立功能沙箱及未見題/人類評審尚未核驗；私人工作區未替使用者建立；不因此停止可安全進行的合成實作。
 - WRITE_OWNER: 僅 Agent 候選分支；main/Release、外部專案、真實個資、付費模型或正式部署不在本次授權內。
-- SYNC_STATUS: B001_FULL_CI_PASS; B002_SOURCE_AND_TEST_READBACK_VERIFIED; LOCAL_FUNCTIONAL_PASS; CONTROLLED_CASE_TRANSFER_PASS; REMOTE_FULL_CI_PENDING; REAL_RUNNER_NOT_RUN; latest docs SHA CI separate.
-- NEXT_ACTION: 回讀 B002 同 SHA 完整 CI 並修復必要回歸；P1-1：將 B001/B002 案例及適用限制整合進既有技能與 SQLite 工作台，優先實作按任務檢索、精簡 context、回饋事件與案例引用追蹤。用新的合成任務和新開工作階段驗證命中、無關案例排除、過期與跨案隔離；不擴大無關稽核。
+- SYNC_STATUS: B001_B002_FULL_CI_PASS; P1_1_RETRIEVAL_FEEDBACK_CITATION_LOCAL_PASS; SOURCE_AND_GUIDE_READBACK_VERIFIED; REMOTE_FULL_CI_PENDING; REAL_RUNNER_NOT_RUN; persistent task planning and technical research skills pending.
+- NEXT_ACTION: 查 P1-1 同 SHA CI 並修復必要回歸；繼續 P1-1：技術探索/架構取捨專業深度、持久化任務池及覆盤，優先以既有 B003 志工排班未決規則場景與以上案例引用工具實戰，建立可跨階段讀取的任務狀態、依賴與驗收紀錄，不另建競爭資料庫。驗證明確規則和待核假設分離、可操作產物及實際測試；保留獨立多 Agent/真實盲測待授權狀態。
 
 ### 教材比對與改善方向
 
@@ -34,8 +34,8 @@
 | 優先序 | 訓練任務 | 驗收 | 狀態 |
 |---|---|---|---|
 | P0-1 | B001 社區工作坊：需求→規格→架構→DAG→可執行垂直切片→QA；額滿候補、重複報名、需求衝突、未知寫入復原 | 獨立功能正反測、可重現的修復紀錄；公開合成實作與真實 Agent 評測分列 | LOCAL_FUNCTIONAL_PASS / FULL_CI_PASS |
-| P0-2 | B001 案例記錄、蒸餾，遷移到 B002 公用設備借用 | 相關案例被實際取用；新任務功能測試，對照有/無經驗和適用限制 | CONTROLLED_TRANSFER_PASS / LOCAL_FUNCTIONAL_PASS / CI_PENDING |
-| P1-1 | 主動回饋事件、分層記憶檢索、技能專業深度、技術探索、任務池/覆盤 | 新工作階段重讀、無跨案混用；測試實際檢索與回饋行為 | NEXT / CASES_READY |
+| P0-2 | B001 案例記錄、蒸餾，遷移到 B002 公用設備借用 | 相關案例被實際取用；新任務功能測試，對照有/無經驗和適用限制 | CONTROLLED_TRANSFER_PASS / LOCAL_FUNCTIONAL_PASS / FULL_CI_PASS |
+| P1-1 | 主動回饋事件、分層記憶檢索、技能專業深度、技術探索、任務池/覆盤 | 新工作階段重讀、無跨案混用；測試實際檢索與回饋行為 | RETRIEVAL_FEEDBACK_CITATION_LOCAL_PASS / CI_PENDING; TECHNOLOGY_RESEARCH_TASK_POOL_NEXT |
 | P1-2 | 專家獨立協作與交接 | 有授權平台才做真子代理；獨立 QA、交接與整合證據；無平台標單 Agent 分工 | BLOCKED_REAL_RUNNER |
 | P2-1 | 隔離合成完整系統：前後端、資料庫、權限、後台、預約、復原 | 可操作成品、端到端功能及安全測試 | PROPOSED |
 | P2-2 | 未見題獨立前後測、語意蒸餾、必要跨平台同步 | 等模型/工具/資源條件、獨立評審、保留失敗；只有需要且授權才同步 | PROPOSED |
@@ -87,6 +87,24 @@
 - 證據：test_missing_database_never_created_by_read_or_reserve, test_initialization_is_exclusive, test_read_connection_rejects_mutation, test_reproduce_old_readonly_pattern_then_compare, test_concurrent_variable_quantity, test_concurrent_same_token, 三個 failure/unknown 測試。
 - 限制：本機 SQLite/單庫、合成資料、作者測試；故障為刻意注入。初始建立期間若失敗可能留空檔供人工查核，未驗證 process crash/多機/正式遠端服務；拒絕盲目建立或刪除。不取代原 B001 案例，不寫私人工作台或自行發布通用正式知識。
 - 學習狀態：經驗已由目前聊天 Agent 在開發前從主檔檢索並於 B002 實作驗證。沒有自動語意檢索、自動蒸餾或真正多 Agent 學習證據；下輪 P1-1 優先將兩張案例變成可按任務取用的測試化技能與 SQLite 選擇性 context，保留歷史並以新任務檢驗引用及適用。
+
+### 2026-11-14｜P1-1a 任務導向記憶、回饋及案例引用實作
+
+**前置來源與查核：** B002 程式 commit 20c4e85bd6572831ac78a33b56d4344b376b8572 CI 43563255803、文件 commit 388bec5a93dd7958956782108895cf577e6d3b3f CI 43563312827 均 completed/success。main c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57 未變。先讀本檔 B001-CASE-001/B002-CASE-001、src/team_workbench.py、tests/test_team_workbench.py、config/skill-catalog.json、learn-from-feedback/resume-project 等技能、docs/TEAM_WORKBENCH.md。保留舊工作台與原本 12 項技能、共七角色，不另建競爭記憶庫。
+
+**實作與使用方式：**
+- 新增 src/workbench_learning.py (blob 1e93bb77ff3ab052b5cd6711c3bff28e2d74f982)，及 tests/test_workbench_learning.py (blob 692aa96f2ade3aa23c08d0a1a323e99f08ac329e)，程式與測試 commit 4c104a158a525ed88d340e9f6a8aa61bd205de44。兩檔 GitHub 回讀與本地 git hash-object 完全一致；本機原 team_workbench.py blob 4f2362bb3103513002d76176b26ff56bd8f6068d 與 skill-catalog.json blob c099499befb8ab24dfcbcce6dd454164ccca3ddd 亦與原來源一致。
+- setup 原地增量建立 learning_cases/learning_events/learning_uses 三表，經明確授權才執行；原 artifacts/memory/resolutions 保留，兩張公開合成案例進既有 memory 與標籤索引，重跑不重複、不復活退休記憶；同名未登錄舊案例先停查。
+- context: 根據 task/skill/query 及英文詞/中文雙字詞交集排名；預設 8000 字元與最多 5 筆記憶（可調 256–20000 / 1–20）；只傳必要且有效的前置產物正文，其他列索引、過期正文排除，超過配額明示 NEEDS_FULL_READ；候選與同主題未解衝突僅列 review_candidates，保留證據與 Scope。字元配額只限制正文及證據 payload，不含 JSON metadata；舊工作台仍回傳專案層級最新產物，task ID 不代表逐任務產物版本。
+- feedback: test_failure/test_fix/qa_rejection/requirement_change/preference 五類事件均以候選記憶保存；task/session/event_id/來源，重複相同事件去重、同 ID 異內容拒絕；既有 remember/resolve 人審維持不變。此為 Agent 工作流程主動呼叫，非背景自動偵測或自動核准、蒸餾、模型權重更新。
+- cite: 保存 task/session/skill/query/memory_id/decision/evidence，重算可選案例以拒絕無關、退休、候選或衝突案例。區分 applied 與 not_applicable，操作者宣告不是獨立執行證據；history 依 task 讀前後 session 紀錄。context/history mode=ro，不意外建缺庫或隱式遷移。
+- AGENTS.md commit ada4cbe02c54d89cccd8de07663716bcff64ebb6；docs/TEAM_WORKBENCH.md commit 784a87ca86cc6657593bf3975bae2474a33aab78，分別接入全技能工作流程及實際 CLI/JSON 操作範例。兩者全文回讀一致。未改正式 main、正式 Release、外部專案或私有資料。
+
+**實際驗收：** 暫存目錄 /tmp/p11_training，僅含回讀一致的舊工作台與 catalog、本輪可信新程式/測試。命令 python -m unittest discover -s tests -v；初 10/10 PASS (1.489s)，增 SYN-REPORT 實際案例遷移試驗後 11/11 PASS (1.619s)，本輪未觀察到失敗；不是整個 repository CI 或獨立人類 QA。11 項：setup 重跑、查詢排名/無關排除、Context 限額/過期規格、回饋去重/衝突、偏好不自動採用、新 Python 子程序讀回歷史和案例、拒絕無關或退休引用、唯讀與缺庫、專案隔離、限額/未 setup、報表缺庫復原實際應用。原工作台/cases 既有全套回歸待同 SHA CI；程式 CI 43564186355 查核時 in_progress，指南 CI 43564264957 pending。
+
+**新任務及新工作階段證據：** SYN-LAB-3 查詢 SQLite 唯讀 缺庫 transaction inventory concurrency，自動排名 B002-CASE-001、B001-CASE-001；排除 CSS 排版，不相關 astronomy 查詢零命中；使用 subprocess.run 啟動獨立 Python 程序的 CLI，從同一 SQLite 檔讀回前 session 引用及同一案例，第二 session 記錄不適用，另一 task 無紀錄。另 SYN-REPORT 合成報表復原任務由詞彙檢索選 B001，真正以 SQLite mode=ro 開啟不存在的來源，OperationalError 且無新檔；記錄 applied 引用及 test_fix candidate。這是開發者編寫的功能回歸及獨立 Python 程序讀回，不是陌生模型盲測、真實 ChatGPT 新對話自動工作或七 Agent 協作。兩張案例之工程原理已實際應用至工作台唯讀設計，但並未證明模型會自主檢索或判斷語意。
+
+**待辦與限制：** 尚無自動事件監聽、語意/向量檢索、逐任務產物分支、實際跨平台同步、獨立真人審查、真實 LLM runner、持久任務池或技術研究技能完整驗收；僅用臨時合成工作區，未替使用者建立私人工作區。下一優先處理 P1-1 剩餘能力：B003 技術探索與規格未決辨識，追加同庫持久化任務狀態/依賴/驗收及覆盤，使用實際新任務和案例檢索驗證，避免堆疊無關稽核。原 B001/B002 案例正文及歷史狀態保留，最新頂部進度以同版 CI 為準。
 
 ### 每次續作及更新協定
 

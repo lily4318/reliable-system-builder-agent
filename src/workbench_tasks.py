@@ -127,8 +127,8 @@ def _validate_graph(rows):
 
 
 def revise(path, task, expected_revision, session, evidence, confirmed=False,
-           title=None, deps=None, gates=None, checks=None):
-    """Reopen a task and its transitive dependants; fence in-flight work."""
+           title=None, deps=None, gates=None, checks=None, requirement=None):
+    """Reopen a task and its transitive dependants; optionally replace requirements atomically."""
     if confirmed is not True or type(expected_revision) is not int or expected_revision<1:
         raise ValueError('explicit confirmed revision and current revision required')
     task,session = _id(task),_id(session)
@@ -140,6 +140,20 @@ def revise(path, task, expected_revision, session, evidence, confirmed=False,
             raise ValueError('unknown task')
         root = rows[task]
         _revision(root,expected_revision)
+        # Optional explicit combined change of the task DAG and root requirement.
+        # The operator must identify the correct root task and dependency graph.
+        change = None
+        if requirement is not None:
+            if not isinstance(requirement,dict) or set(requirement)!={'expected_artifact_id','content','source_ref'}:
+                raise ValueError('complete requirement change required')
+            expected = requirement['expected_artifact_id']
+            prior = wb.current_artifacts(db).get('requirements')
+            if type(expected) is not int or not prior or not prior['current'] or prior['id']!=expected:
+                raise ValueError('stale requirement artifact; review first')
+            if db.execute("SELECT 1 FROM task_events WHERE session=? AND kind='REVISE'",(session,)).fetchone():
+                raise ValueError('change session already used; review first')
+            change = {'old_artifact_id':expected}
+
         old = {k:root[k] for k in ('title','deps','gates','checks')}
         new = dict(old)
         for k,v in (('deps',deps),('gates',gates),('checks',checks)):
@@ -161,6 +175,10 @@ def revise(path, task, expected_revision, session, evidence, confirmed=False,
             affected |= more
         db.execute('UPDATE task_pool SET title=?,deps=?,gates=?,checks=? WHERE id=?',
                    (new['title'],json.dumps(new['deps']),json.dumps(new['gates']),json.dumps(new['checks']),task))
+        if change is not None:
+            # Single connection, same write transaction: no intermediate commit.
+            item = wb._handoff_in_transaction(db,'project-intake',requirement['content'],requirement['source_ref'])
+            change['artifact_id'] = item['artifact_id']
         for k in sorted(affected):
             row = rows[k]
             state = 'RECOVERY_REQUIRED' if row['state'] in ('RUNNING','RECOVERY_REQUIRED') else 'PENDING'
@@ -170,8 +188,38 @@ def revise(path, task, expected_revision, session, evidence, confirmed=False,
                       'old_state':row['state'],'old_session':row['session'],'state':state}
             if k==task:
                 detail.update({'before':old,'after':new})
+                if change is not None:
+                    detail['requirement_change'] = change
             _event(db,k,session,'REVISE' if k==task else 'INVALIDATE',evidence,detail)
-    return {'task':task,'revision':expected_revision+1,'affected':sorted(affected),'authorization_granted':False}
+    result={'task':task,'revision':expected_revision+1,'affected':sorted(affected),'authorization_granted':False}
+    if change is not None:
+        result['requirement_change']=change
+    return result
+
+
+def revision_status(path, session):
+    """Read a combined revision receipt; no write/replay on unknown outcome."""
+    session=_id(session)
+    with closing(_ro(path)) as db:
+        db.execute('BEGIN')
+        events=db.execute("SELECT task,results FROM task_events WHERE kind='REVISE' AND session=?",(session,)).fetchall()
+        found=[(r['task'],json.loads(r['results'])) for r in events]
+        combined=[(task,detail) for task,detail in found if 'requirement_change' in detail]
+        if not combined:
+            return {'status':'NOT_OBSERVED','session':session,'authorization_granted':False}
+        if len(combined)!=1:
+            raise ValueError('ambiguous revision receipt; reconcile manually')
+        task,detail=combined[0]
+        change=detail['requirement_change']
+        if not db.execute("SELECT 1 FROM artifacts WHERE id=? AND kind='requirements'",(change['artifact_id'],)).fetchone():
+            raise ValueError('revision receipt missing artifact; reconcile manually')
+        latest=wb.current_artifacts(db).get('requirements')
+        root=_pool(db)[task]
+        return {'status':'COMMITTED','session':session,'task':task,'revision':detail['revision'],
+                'requirement_change':change,
+                'still_current':root['revision']==detail['revision'] and latest is not None
+                    and latest['id']==change['artifact_id'] and latest['current'],
+                'authorization_granted':False}
 
 
 def recover(path, task, expected_revision, previous_session, session, evidence, confirmed=False):
@@ -266,13 +314,13 @@ def review(path):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('action',choices=('setup','question','resolve','add','start','resume','finish','review','revise','recover'))
+    p.add_argument('action',choices=('setup','question','resolve','add','start','resume','finish','review','revise','recover','revision-status'))
     p.add_argument('--workspace',required=True,type=Path)
     p.add_argument('--input',type=Path)
     a = p.parse_args()
     try:
         args = json.loads(a.input.read_text(encoding='utf-8-sig')) if a.input else {}
-        fn = {'setup':setup,'question':question,'resolve':resolve_decision,'add':add,'start':start,'resume':resume,'finish':finish,'review':review,'revise':revise,'recover':recover}[a.action]
+        fn = {'setup':setup,'question':question,'resolve':resolve_decision,'add':add,'start':start,'resume':resume,'finish':finish,'review':review,'revise':revise,'recover':recover,'revision-status':revision_status}[a.action]
         print(json.dumps(fn(a.workspace,**args),ensure_ascii=False,indent=2))
     except (ValueError,TypeError,KeyError,OSError,sqlite3.Error) as e:
         p.exit(2,'WORKBENCH_TASKS_BLOCKED: '+str(e)+'\n')

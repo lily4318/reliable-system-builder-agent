@@ -7,13 +7,13 @@
 - TASK_DOMAIN: RELIABLE_AGENT_ENGINEERING_CAPABILITY_TRAINING
 - SOURCE_REPO: lily4318/reliable-system-builder-agent
 - ACTIVE_CANDIDATE: Draft PR #8, candidate-skill-team-integration-20261114；https://github.com/lily4318/reliable-system-builder-agent/pull/8
-- SOURCE_VERSION: P1-1b source/test commit adddfe3bf8c13cbaf7f0ed1d238bb887da5a21f3; skills/guide commit 245848f568b307bca27759c0fcb330c263751229; P1-1a verified head b38f863571bfaae79654f7fd40cc9bb57dd348c4 CI 43564318315 success. Current PR head is authoritative.
-- LAST_VERIFIED_STEP: P1-1a code CI 43564186355 and final head CI 43564318315 completed/success. P1-1b local 21/21 PASS (10 new and 11 learning regressions), two algorithms against 9,261 interval triples; actual synthetic B003 pool rehearsal 2/3 DONE, UI blocked by open policy; new Python process readback and byte integrity verified; source/test blobs and 4 skill/guide edits readback exact. CI 43566849542 in_progress at source readback.
-- COMPLETED: 七專家與12項技能、SQLite 私有工作台、B001/B002 功能與完整 CI、P1-1a 檢索/回饋/引用及完整 CI；P1-1b B003 區間原型、技術方案 PoC、未決決策 gate、同庫任務池/依賴/驗收/覆盤/中斷接續、21 本機回歸與實際三工作階段演練、三技能及操作手冊整合。
-- BLOCKERS: 真實 LLM runner、獨立子 Agent 實際執行、獨立功能沙箱及未見題/人類評審尚未核驗；私人工作區未替使用者建立；不因此停止可安全進行的合成實作。
+- SOURCE_VERSION: P2-1a source/test commit c5accaab8a60ffd1e3b05c0c6f586768896a7198; P1-1b verified head 56e72db9e443c24b8b800e72dceb9abac7266cff CI 43567003958 success. Current PR head is authoritative.
+- LAST_VERIFIED_STEP: P1-1b code CI 43566849542 and final head CI 43567003958 completed/success. P2-1a actual loopback HTTP site, local 6/6 functional/security tests twice (fresh subprocess included), source and test blob readback exact; synthetic workbench 4/6 DONE, browser FAIL due environment policy, external release gated. Code CI 43567839044 pending at readback.
+- COMPLETED: 七專家與12項技能、SQLite 私有工作台、P0與P1-1完整 CI；P2-1a 設備借用本機網站：HTML 表單、HTTP 後端、SQLite 交易/請求紀錄、三個臨時合成帳號、會員及管理員唯讀後台、原子庫存保留、6 項實際 HTTP 正負測；同工作台 9 類交接產物、任務池及兩案例引用。
+- BLOCKERS: P2-1a Chromium loopback navigation ERR_BLOCKED_BY_ADMINISTRATOR; browser DOM and manual UAT NOT_VERIFIED, no bypass. Real LLM/separate subagents, independent holdout/human reviewers not verified; no user private workspace. 外部部署與正式啟用未授權。
 - WRITE_OWNER: 僅 Agent 候選分支；main/Release、外部專案、真實個資、付費模型或正式部署不在本次授權內。
-- SYNC_STATUS: P0_AND_P1_1A_FULL_CI_PASS; P1_1B_LOCAL_FUNCTIONAL_PASS; B003_PRODUCT_UI_BLOCKED_UNDECIDED; SOURCE_TEST_SKILLS_GUIDE_READBACK_VERIFIED; REMOTE_FULL_CI_PENDING; REAL_RUNNER_NOT_RUN.
-- NEXT_ACTION: 查 P1-1b 最新 exact-SHA CI，修復必要回歸；P1-2 真實獨立七 Agent runner 未核驗，不假造或付費調用。優先可安全推進 P2-1 合成完整系統垂直切片，使用同一工作台任務池、案例檢索、正式需求與待核 gate、前後端/資料庫/權限/端到端 QA；選用 B004/B005 或獨立合成需求，逐步實作、覆盤及記錄。保留 P1-2 適用執行環境查核待辦；不以 B003 未決 UI 模擬確認代替真實決策。
+- SYNC_STATUS: P0_P1_1_FULL_CI_PASS; P2_1A_HTTP_LOCAL_PASS; BROWSER_ENV_BLOCKED; SOURCE_TEST_READBACK_VERIFIED; REMOTE_FULL_CI_PENDING; REAL_RUNNER_NOT_RUN; NO_RELEASE.
+- NEXT_ACTION: 查 P2-1a exact-SHA CI，修正必要回歸；P2-1b 在明確允許的本機/既有候選 CI 環境建立可重現瀏覽器 DOM 驗收（不繞過環境政策），驗證會員登入/借用/查詢、其他會員隔離、管理員檢視、登出；增加管理作業垂直切片（合成歸還/取消、狀態轉移、稽核、交易/權限和回退）與持久化任務演練。外部部署 gate 保持未決；不動 main、Release 或外部系統；P1-2 及 P2-2 真實 runner/獨立評測保持待授權。
 
 ### 教材比對與改善方向
 
@@ -35,9 +35,9 @@
 |---|---|---|---|
 | P0-1 | B001 社區工作坊：需求→規格→架構→DAG→可執行垂直切片→QA；額滿候補、重複報名、需求衝突、未知寫入復原 | 獨立功能正反測、可重現的修復紀錄；公開合成實作與真實 Agent 評測分列 | LOCAL_FUNCTIONAL_PASS / FULL_CI_PASS |
 | P0-2 | B001 案例記錄、蒸餾，遷移到 B002 公用設備借用 | 相關案例被實際取用；新任務功能測試，對照有/無經驗和適用限制 | CONTROLLED_TRANSFER_PASS / LOCAL_FUNCTIONAL_PASS / FULL_CI_PASS |
-| P1-1 | 主動回饋事件、分層記憶檢索、技能專業深度、技術探索、任務池/覆盤 | 新工作階段重讀、無跨案混用；測試實際檢索與回饋行為 | P1-1a FULL_CI_PASS; P1-1b LOCAL_FUNCTIONAL_PASS / CI_PENDING |
+| P1-1 | 主動回饋事件、分層記憶檢索、技能專業深度、技術探索、任務池/覆盤 | 新工作階段重讀、無跨案混用；測試實際檢索與回饋行為 | P1-1a FULL_CI_PASS; P1-1b FULL_CI_PASS |
 | P1-2 | 專家獨立協作與交接 | 有授權平台才做真子代理；獨立 QA、交接與整合證據；無平台標單 Agent 分工 | BLOCKED_REAL_RUNNER |
-| P2-1 | 隔離合成完整系統：前後端、資料庫、權限、後台、預約、復原 | 可操作成品、端到端功能及安全測試 | NEXT_SAFE_WHILE_REAL_RUNNER_BLOCKED |
+| P2-1 | 隔離合成完整系統：前後端、資料庫、權限、後台、預約、復原 | 可操作成品、端到端功能及安全測試 | P2-1a HTTP_LOCAL_PASS / CI_PENDING; BROWSER_BLOCKED; P2-1b NEXT |
 | P2-2 | 未見題獨立前後測、語意蒸餾、必要跨平台同步 | 等模型/工具/資源條件、獨立評審、保留失敗；只有需要且授權才同步 | PROPOSED |
 
 七專家訓練：System Lead 需求與路由/優先排序；Architect 技術比較、資料模型與取捨；Developer 真正實作/除錯；QA/UAT 獨立正反例與瀏覽器；DevOps/SRE CI/CD、部分寫入與復原；Security 最小權限與隱私；Learning Evaluator 記錄、蒸餾、遷移、前後測。
@@ -120,6 +120,26 @@
 - 更新 .agents/skills/architecture-design/SKILL.md (aa89182cd3d0496a2fe25d08050597b824459e4c)、task-planning/SKILL.md (af732a79936dfe9ca84904f75aea74f206d2fa4a)、resume-project/SKILL.md (245848f568b307bca27759c0fcb330c263751229)、docs/TEAM_WORKBENCH.md (0460c0dc6e895069d9e8fd17047bc91e0294de9a)，全部全文回讀一致。保留原工作台及七角色/12技能，未改 main、Release 或外部專案。
 
 **案例 B003-CASE-001｜observed｜產品政策未決與可測原型分離：** 已知區間規則可執行測試；對不明確產品錯誤政策，先在持久任務池記問題/依賴，不將內部 INVALID 決策當正式 UI。使用有限域 oracle 比較兩方法，明確記錄適用邊界。前一 session 的未決狀態、實測驗收及決策來源必須隨接續重讀；中斷任務不得因聊天切換自動接管。證據：B003 10 項新測試、21/21 本機回歸、三 stage 2/3 DONE 且 UI 尚 pending；已記本主檔，不自動提升記憶基礎或加入私人工作區種子。限制：合成原型、不含日期/時區、實際排班 UI、真人審核、獨立子 Agent。可於後續完整系統設計採用適用原則。
+
+### 2026-11-14｜P2-1a 設備借用網站整合實戰（第一個切片）
+
+**前置來源及範圍：** PR #8 起始 56e72db9e443c24b8b800e72dceb9abac7266cff，P1-1b code CI 43566849542、最新主檔 CI 43567003958 均 completed/success。main c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57，release/current_release.yaml blob 6babe416f2ed652509b44d90d3eb98637a0886f3 未授權正式升版。以使用者 P2-1 合成訓練指令、B002 實測案例、原工作台為基礎；自訂獨立合成實戰規格，非外部專案或已核准產品規格，不代替新網站真人訪談/正式授權。
+
+**需求與取捨：** Python stdlib HTML/HTTP + 本機 SQLite，減少訓練外部服務依賴；固定10件設備單庫存池，借用1–10件，兩個合成會員與一個合成管理員，會員能看自己的申請及可用庫存；管理員只讀全體申請，不可借用。臨時帳密每次服務啟動隨機產生，記憶體 session 30分鐘、登出刪除；重啟不保留 session。非正式產品，不含註冊、真實帳號、密碼資料庫、歸還/取消、庫存編輯、日期/多設備、正式 HTTPS/限流/生產維運。服務硬綁 127.0.0.1，不允許外網/真實收件。不保存臨時憑證輸出至 repo；只以臨時合成 DB 執行。
+
+**實際可執行成果：** src/p21_equipment_site.py blob 28c38042df6bf60c5dea9c6fca7e2125594f9956、tests/test_p21_equipment_site.py blob 00a54e3a66837d1ff3f332ac2e08ec1f882c614e；均與本機 git hash-object 一致，程式/測試 commit c5accaab8a60ffd1e3b05c0c6f586768896a7198，CI 43567839044 查核時 pending。HTML login/dashboard/reserve/logout/admin；HTTP 依 Host/Origin/session/role/CSRF 檢查，Cookie HttpOnly/SameSite=Strict、CSP、no-store、HTML escape、SQL參數化、限制輸入與長度。資料庫獨立初始化 exclusive xb、查詢 mode=ro、更新 mode=rw；BEGIN IMMEDIATE、條件 UPDATE、(owner,token) 唯一 request ledger 同一交易。相同 payload/token 重播回原決定，變更數量拒絕；未知 SQLite 結果回503並要求先看唯讀 dashboard，拒絕自動重送。管理員只有檢視，不宣稱完整管理 CRUD 或全面安全。
+
+**重現命令（已授權本機合成環境）：**
+- Repo 根目錄執行 `python -m unittest discover -s tests -p test_p21_equipment_site.py -v`。
+- 手動啟動：Windows PowerShell 選獨立、空的合成資料夾，使用新檔路徑，例如 `py -3 -m src.p21_equipment_site --database "$env:TEMP/agent-p21-synthetic-demo.sqlite" --initialize --port 8765`（若檔已存在，不覆蓋；選新的路徑，或明確要續作時才省略 --initialize）。只能在有權允許 loopback 的環境，開啟程式輸出的 127.0.0.1 URL；使用本程序產生的臨時合成憑證，勿貼到公開 repo／日誌，停止用 Ctrl+C。會員登入後 Dashboard → Quantity → Reserve → Dashboard；管理員登入後開啟 /admin，查可用量及全體合成記錄；測登出、另一會員不可見他人 token、會員不可訪問 /admin。不得為了測試修改或繞過環境安全政策。手動操作尚未實測。
+
+**功能與安全驗收（實際）：** 暫存 /tmp/p21_training，Python 3.13.5，`python -m unittest discover -s tests -v` 6/6 PASS（3.080s），後續工作台演練重新以獨立 Python subprocess 跑 6/6 PASS。測試真的啟動 ThreadingHTTPServer 並透過 http.client 實際 HTTP、SQLite 查詢/寫入。六項：會員登入/借用/本人列表/他人隔離/管理員全體唯讀/庫存不足；未登入401、錯密碼401、會員進管理401/403、Origin/Host/CSRF 拒絕、管理員不可借；重複 token 不重扣、變更數量/冒充 owner拒絕；8路並行每次3件，3件申請成功、5件庫存不足，總保留9；注入庫存更新後拋錯回退且 ledger 無殘留，唯讀回查檔案位元組一致，缺庫GET/POST 503且不建檔；無效數量/注入字串拒絕、登出/session到期拒絕。這是作者撰寫實際 HTTP 端到端測試，不是獨立 QA/瀏覽器 DOM UAT。
+- 實際 Chromium/Playwright 測試已嘗試，啟動瀏覽器後首個 Page.goto 到 127.0.0.1 隨機 port 失敗：net::ERR_BLOCKED_BY_ADMINISTRATOR。未繞過政策，未完成任何 DOM 表單步驟。BROWSER_ENV_BLOCKED，不能以 HTTP PASS 取代瀏覽器 PASS。下輪可在明確允許的既有候選 CI/本機測試環境建立可重現瀏覽器驗收；無需付費 API 或外部部署。
+
+**同庫工作台實際演練與七角色產物：** 原 team_workbench.py、workbench_learning.py、workbench_tasks.py 本機 blobs 與 GitHub 前版相同（4f2362bb3103513002d76176b26ff56bd8f6068d、1e93bb77ff3ab052b5cd6711c3bff28e2d74f982、4ff853335f1a84e66f31c7b07c55369ca7fc5ae6）。以 TemporaryDirectory 建獨立合成工作台，明確 setup；handoff 實際保存 requirements、specification、architecture、plan、implementation、qa、security-review、learning-note、deployment-plan 共9類產物，最後以 context 回讀。七角色為當前聊天 Agent 按工作方法切換，沒有實際啟動獨立子 Agent。SRE 只交付到本機限制及停機/發布禁止之計畫，並未部署。
+- 任務池 spec/design/build/qa DONE；browser PENDING（失敗事件記錄環境阻擋），release PENDING blocked_by browser,D1（另行外部部署禁止 gate）。三階段 s1/s2/s3，5次驗收，1次FAIL，4/6 DONE。新 Python CLI review 讀回 next_ready=[browser]，DB bytes 不變；未建立使用者正式私人庫。
+- query SQLite transaction inventory concurrency rollback idempotency ledger recovery reconcile mode=ro → B002-CASE-001、B001-CASE-001（實際檢索）。兩者以 cite applied 記錄 HTTP rollback/readonly/concurrent test 證據並回讀；feedback test_failure 將 Chromium 環境阻擋保存候選記錄。B003 未決 UI/發布 gate 原則取自主檔，未冒稱由 seed 自動找出 B003。
+- P21-CASE-001 候選學習：單機核心交易原先通過不代表整合權限與 UI 已通過；網頁必須在 HTTP 層從 session 決定 owner，不接受表單的角色/owner；ledger 唯一鍵以 owner+token 避免跨帳號讀寫；分開記 HTTP 與瀏覽器驗收，環境阻擋不可視為產品通過或繞過安全。證據上述6測試與1瀏覽器阻擋；本機合成適用，非全面生產資安審計/獨立盲測，未自動升格公共正式規則。以下 P2-1b 優先完成瀏覽器與管理作業切片、追加安全負測和可重複工作台演練，不擴張無關稽核。
 
 ### 每次續作及更新協定
 

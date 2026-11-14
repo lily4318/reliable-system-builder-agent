@@ -131,8 +131,20 @@ context/history 真正唯讀，不建缺失資料庫，舊工作區未 setup 先
 
 - DONE/PENDING 下游失效時回 PENDING、revision 加1；舊 PASS 只供歷史，不能解鎖新版本。RUNNING 或已待復原者保留舊 owner、轉 RECOVERY_REQUIRED，該次 revision 失效，禁止 finish/resume；review 的 recovery_review / recovery_blockers 顯示復原優先事項，未解決的失效下游也阻止其上游重新開工。無關獨立分支保持原狀。
 - recover 是確認舊操作者停止、核對部分寫入後釋放至 PENDING，不是恢復舊結果；依賴與未決 gate 仍適用。未失效、同 revision 的 RUNNING 才可 resume，須換唯一 session；所有 start/resume 同一 task 不可重用曾領取的 session。所有新版操作建議明確帶 expected_revision；僅 revision=1 提供舊 API 未帶版本的相容性。
-- 任何 confirm 都是操作者聲明，需要外部實際證據；SQLite 守門只能拒絕舊版 API 提交，不能停止外部程序、撤銷 GitHub/GAS 寫入、區分部署權限，也不自動監聽所有需求文件變更。每次確認需求變更需明確呼叫 revise 並重新保存適用 handoff/原規格，兩個索引不自動聯動；不以任務池狀態代替產物版本或正式核准。若變更依賴關係，還須核對舊工作曾接觸的資源與原依賴，不能只看新 DAG。
+- 任何 confirm 都是操作者聲明，需要外部實際證據；SQLite 守門只能拒絕舊版 API 提交，不能停止外部程序、撤銷 GitHub/GAS 寫入、區分部署權限，也不自動監聽所有需求文件變更。需求變更若涉及根需求產物，使用下節原子 revise+requirement，不再分開呼叫；其他未連結產物仍需明確核對，兩索引並非全面自動聯動；不以任務池狀態代替產物版本或正式核准。若變更依賴關係，還須核對舊工作曾接觸的資源與原依賴，不能只看新 DAG。
 - 新事件 REVISE/INVALIDATE 保存舊/新 revision、狀態、舊 owner 等；新 PASS/FAIL 結果 JSON 包含 revision 與 checks，舊歷史原樣保留、舊 results 可能是平面檢查對應表。review 的 attempts 是歷史總數，completed 是目前有效 DONE 數。驗收證據仍由操作者提供，非獨立 QA。
+
+## P2-1｜原子需求修訂及未知結果復原
+
+已存在根需求產物、且確認需求改變時，先讀正式需求來源，從 task review 與 artifact context 分別核對當前根任務 revision、requirements artifact ID、DAG 涵蓋及舊 worker；**使用同一個 revise 指令的 requirement 參數，而不是先 revise 再 handoff 或反過來。** 此合成 JSON 示範中的 ID、revision、session、文字與證據必須換成實際已確認值：
+
+  {"task":"intake","expected_revision":1,"session":"change-2","evidence":"已確認的新需求來源","confirmed":true,"requirement":{"expected_artifact_id":1,"content":"完整新需求內容","source_ref":"新需求正式來源"}}
+
+將 JSON 存在已授權工作區，以 `py -3 -m src.workbench_tasks revise --workspace "$work" --input "$work/change.json"` 執行。單一 BEGIN IMMEDIATE 中核對兩個版本、寫入新 requirements、修訂 task DAG、使相關下游與舊 session 失效、保存 REVISE/INVALIDATE 以及 root event 內的 requirement_change (old_artifact_id, artifact_id)。任一錯誤回退整筆。session 用唯一變更 ID；不使用舊 token 重送。僅根 requirements 產物支援此合併路由，task ID 和完整 DAG 必須由操作者核對，不自動推斷。
+
+若 CLI 回應遺失、程序中斷或結果未知，先確證前程序停止，使用唯讀 receipt：另建 JSON `{"session":"change-2"}`，執行 `py -3 -m src.workbench_tasks revision-status --workspace "$work" --input "$work/receipt.json"`。COMMITTED 表示確有該次交易事件與對應需求產物，still_current 只是當前根 revision/需求 ID 比對，不是所有下游已通過。NOT_OBSERVED 不單獨證明以前的外部操作或活躍程序沒有寫入；須先核對完整 review/context、舊程序與正式來源，重新確認必要時使用新 session、當前雙版本執行。過去已發生單邊成功者：保留兩方歷史，先重新確認真正最新需求，再以上述原子路由使用兩邊目前 ID/revision 建立一致的新修訂，不猜測正確值，不回退歷史編號。失效 worker 依原 recover 流程處理，新需求仍需重驗。
+
+適用限制：舊版 standalone revise/handoff 仍保留相容性，可繞過新路由，不能宣稱所有工作台操作已全域強制原子化。不自動修訂外部規格、任務產物逐級提交或撤回實際外部寫入；不得混用舊程式或未核對權限。兩次獨立閱讀也不能當同一交易快照；本 receipt 是單一只讀 snapshot。沒有變更私人工作區或外部專案。
 
 ## 共用知識與案例
 公開 repo 的 knowledge/ENGINEERING_PATTERNS.md、templates/WORK_ARTIFACTS.md 提供尚需依專案驗證的通用工作方法和格式；真實工作記憶與案例保留私有。去識別化且經人審查的案例才可循原 learning-policy 及獨立 PR 進入公共知識庫。跨專案共用偏好應另設有權限的私人工作區，經明確確認後選取適用條目，不自動混合兩案資料。持久化資料不加密、依賴 OS ACL；憑證不得保存，正規表示式只防部分常見金鑰。

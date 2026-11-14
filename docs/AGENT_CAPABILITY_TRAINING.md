@@ -7,13 +7,13 @@
 - TASK_DOMAIN: RELIABLE_AGENT_ENGINEERING_CAPABILITY_TRAINING
 - SOURCE_REPO: lily4318/reliable-system-builder-agent
 - ACTIVE_CANDIDATE: Draft PR #8, candidate-skill-team-integration-20261114；https://github.com/lily4318/reliable-system-builder-agent/pull/8
-- SOURCE_VERSION: P1-1 learning implementation/test commit 4c104a158a525ed88d340e9f6a8aa61bd205de44; workflow/guide commit 784a87ca86cc6657593bf3975bae2474a33aab78; B002 verified baseline 388bec5a93dd7958956782108895cf577e6d3b3f (CI 43563312827 success). Current PR head is authoritative.
-- LAST_VERIFIED_STEP: B002 CI 43563255803 and 43563312827 completed/success; P1-1 local 11/11 behavioral tests PASS including new synthetic task and actual fresh Python subprocess; source/test blobs match local tested files; AGENTS.md and TEAM_WORKBENCH.md readbacks exact. CI 43564186355 in_progress; guide CI 43564264957 pending at readback.
-- COMPLETED: 七專家、12 項技能＋總控技能、SQLite 私有工作台、13 題訪談、可編輯確認及離線評測；B001/B002 功能與完整 CI，兩張實測案例；P1-1 同庫增量工作台檢索、Context payload 限額、回饋候選記憶與案例引用、跨 Python 程序回讀；11/11 本機功能測試，已接入 AGENTS 工作流程及手冊。
+- SOURCE_VERSION: P1-1b source/test commit adddfe3bf8c13cbaf7f0ed1d238bb887da5a21f3; skills/guide commit 245848f568b307bca27759c0fcb330c263751229; P1-1a verified head b38f863571bfaae79654f7fd40cc9bb57dd348c4 CI 43564318315 success. Current PR head is authoritative.
+- LAST_VERIFIED_STEP: P1-1a code CI 43564186355 and final head CI 43564318315 completed/success. P1-1b local 21/21 PASS (10 new and 11 learning regressions), two algorithms against 9,261 interval triples; actual synthetic B003 pool rehearsal 2/3 DONE, UI blocked by open policy; new Python process readback and byte integrity verified; source/test blobs and 4 skill/guide edits readback exact. CI 43566849542 in_progress at source readback.
+- COMPLETED: 七專家與12項技能、SQLite 私有工作台、B001/B002 功能與完整 CI、P1-1a 檢索/回饋/引用及完整 CI；P1-1b B003 區間原型、技術方案 PoC、未決決策 gate、同庫任務池/依賴/驗收/覆盤/中斷接續、21 本機回歸與實際三工作階段演練、三技能及操作手冊整合。
 - BLOCKERS: 真實 LLM runner、獨立子 Agent 實際執行、獨立功能沙箱及未見題/人類評審尚未核驗；私人工作區未替使用者建立；不因此停止可安全進行的合成實作。
 - WRITE_OWNER: 僅 Agent 候選分支；main/Release、外部專案、真實個資、付費模型或正式部署不在本次授權內。
-- SYNC_STATUS: B001_B002_FULL_CI_PASS; P1_1_RETRIEVAL_FEEDBACK_CITATION_LOCAL_PASS; SOURCE_AND_GUIDE_READBACK_VERIFIED; REMOTE_FULL_CI_PENDING; REAL_RUNNER_NOT_RUN; persistent task planning and technical research skills pending.
-- NEXT_ACTION: 查 P1-1 同 SHA CI 並修復必要回歸；繼續 P1-1：技術探索/架構取捨專業深度、持久化任務池及覆盤，優先以既有 B003 志工排班未決規則場景與以上案例引用工具實戰，建立可跨階段讀取的任務狀態、依賴與驗收紀錄，不另建競爭資料庫。驗證明確規則和待核假設分離、可操作產物及實際測試；保留獨立多 Agent/真實盲測待授權狀態。
+- SYNC_STATUS: P0_AND_P1_1A_FULL_CI_PASS; P1_1B_LOCAL_FUNCTIONAL_PASS; B003_PRODUCT_UI_BLOCKED_UNDECIDED; SOURCE_TEST_SKILLS_GUIDE_READBACK_VERIFIED; REMOTE_FULL_CI_PENDING; REAL_RUNNER_NOT_RUN.
+- NEXT_ACTION: 查 P1-1b 最新 exact-SHA CI，修復必要回歸；P1-2 真實獨立七 Agent runner 未核驗，不假造或付費調用。優先可安全推進 P2-1 合成完整系統垂直切片，使用同一工作台任務池、案例檢索、正式需求與待核 gate、前後端/資料庫/權限/端到端 QA；選用 B004/B005 或獨立合成需求，逐步實作、覆盤及記錄。保留 P1-2 適用執行環境查核待辦；不以 B003 未決 UI 模擬確認代替真實決策。
 
 ### 教材比對與改善方向
 
@@ -35,9 +35,9 @@
 |---|---|---|---|
 | P0-1 | B001 社區工作坊：需求→規格→架構→DAG→可執行垂直切片→QA；額滿候補、重複報名、需求衝突、未知寫入復原 | 獨立功能正反測、可重現的修復紀錄；公開合成實作與真實 Agent 評測分列 | LOCAL_FUNCTIONAL_PASS / FULL_CI_PASS |
 | P0-2 | B001 案例記錄、蒸餾，遷移到 B002 公用設備借用 | 相關案例被實際取用；新任務功能測試，對照有/無經驗和適用限制 | CONTROLLED_TRANSFER_PASS / LOCAL_FUNCTIONAL_PASS / FULL_CI_PASS |
-| P1-1 | 主動回饋事件、分層記憶檢索、技能專業深度、技術探索、任務池/覆盤 | 新工作階段重讀、無跨案混用；測試實際檢索與回饋行為 | RETRIEVAL_FEEDBACK_CITATION_LOCAL_PASS / CI_PENDING; TECHNOLOGY_RESEARCH_TASK_POOL_NEXT |
+| P1-1 | 主動回饋事件、分層記憶檢索、技能專業深度、技術探索、任務池/覆盤 | 新工作階段重讀、無跨案混用；測試實際檢索與回饋行為 | P1-1a FULL_CI_PASS; P1-1b LOCAL_FUNCTIONAL_PASS / CI_PENDING |
 | P1-2 | 專家獨立協作與交接 | 有授權平台才做真子代理；獨立 QA、交接與整合證據；無平台標單 Agent 分工 | BLOCKED_REAL_RUNNER |
-| P2-1 | 隔離合成完整系統：前後端、資料庫、權限、後台、預約、復原 | 可操作成品、端到端功能及安全測試 | PROPOSED |
+| P2-1 | 隔離合成完整系統：前後端、資料庫、權限、後台、預約、復原 | 可操作成品、端到端功能及安全測試 | NEXT_SAFE_WHILE_REAL_RUNNER_BLOCKED |
 | P2-2 | 未見題獨立前後測、語意蒸餾、必要跨平台同步 | 等模型/工具/資源條件、獨立評審、保留失敗；只有需要且授權才同步 | PROPOSED |
 
 七專家訓練：System Lead 需求與路由/優先排序；Architect 技術比較、資料模型與取捨；Developer 真正實作/除錯；QA/UAT 獨立正反例與瀏覽器；DevOps/SRE CI/CD、部分寫入與復原；Security 最小權限與隱私；Learning Evaluator 記錄、蒸餾、遷移、前後測。
@@ -105,6 +105,21 @@
 **新任務及新工作階段證據：** SYN-LAB-3 查詢 SQLite 唯讀 缺庫 transaction inventory concurrency，自動排名 B002-CASE-001、B001-CASE-001；排除 CSS 排版，不相關 astronomy 查詢零命中；使用 subprocess.run 啟動獨立 Python 程序的 CLI，從同一 SQLite 檔讀回前 session 引用及同一案例，第二 session 記錄不適用，另一 task 無紀錄。另 SYN-REPORT 合成報表復原任務由詞彙檢索選 B001，真正以 SQLite mode=ro 開啟不存在的來源，OperationalError 且無新檔；記錄 applied 引用及 test_fix candidate。這是開發者編寫的功能回歸及獨立 Python 程序讀回，不是陌生模型盲測、真實 ChatGPT 新對話自動工作或七 Agent 協作。兩張案例之工程原理已實際應用至工作台唯讀設計，但並未證明模型會自主檢索或判斷語意。
 
 **待辦與限制：** 尚無自動事件監聽、語意/向量檢索、逐任務產物分支、實際跨平台同步、獨立真人審查、真實 LLM runner、持久任務池或技術研究技能完整驗收；僅用臨時合成工作區，未替使用者建立私人工作區。下一優先處理 P1-1 剩餘能力：B003 技術探索與規格未決辨識，追加同庫持久化任務狀態/依賴/驗收及覆盤，使用實際新任務和案例檢索驗證，避免堆疊無關稽核。原 B001/B002 案例正文及歷史狀態保留，最新頂部進度以同版 CI 為準。
+
+### 2026-11-14｜P1-1b B003 技術探索、決策 gate 與持久化任務池
+
+**前置查核與來源：** PR #8 起始 b38f863571bfaae79654f7fd40cc9bb57dd348c4；P1-1a code CI 43564186355、最新文件 CI 43564318315 completed/success。main c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57。讀 evaluations/capability/public_tasks.json B003 R1–R4（blob 0e422d8d36cb1697396dc753fb98304a9b914120）、本主檔、task-planning/architecture-design、既有工作台及學習工具。實際本機原 team_workbench.py blob 4f2362bb3103513002d76176b26ff56bd8f6068d、workbench_learning.py blob 1e93bb77ff3ab052b5cd6711c3bff28e2d74f982、catalog blob c099499befb8ab24dfcbcce6dd454164ccca3ddd、既有測試 blob 692aa96f2ade3aa23c08d0a1a323e99f08ac329e。此次單聊天 Agent 角色切換，不是真實獨立多 Agent、未見題或模型訓練。
+
+**需求辨識及技術探索：** R1 半開整數分鐘區間端點相接不重疊；R2 非法時段不可視為有效；R3 先釐清未決政策；R4 正反例。未決 D1 為錯誤輸入的產品/UI 政策；跨日、時間範圍、日期/時區未在原題規定。合成原型假設 list/tuple 二元素、真整數（不接受 bool）、start<end；不限定日期或時區，INVALID 是原型內部狀態，has_overlap 對 INVALID fail-closed，不表示已確認錯誤 UI 文案。任務規劃先保存 D1，不阻塞可隔離驗收的 core，正式 UI gate 持續 OPEN。技術比較：單次線性檢查 O(n)，排序後提前停止 O(n log n) 含每次排序成本；小範圍離散分鐘集合 oracle 僅作驗證，非大範圍正式方案。以 0..6 端點所有21個合法區間的三重組合（9,261）比對兩方法與 oracle；兩種皆一致，採低複雜度線性方案，保留排序 PoC。未調用外部研究來源或做實際大型基準；不宣稱普遍性能優勢。
+
+**實作及實際驗收：**
+- src/b003_shifts.py blob 82a02ed80a1e4286d9c0b26a8ba6106a61802b2b；src/workbench_tasks.py blob 4ff853335f1a84e66f31c7b07c55369ca7fc5ae6；tests/test_b003_and_tasks.py blob 90cac2efa37ec7ba45a1c66cf0daa1cc653b7368。GitHub 三檔與本機 git hash-object 一致。source/test commit adddfe3bf8c13cbaf7f0ed1d238bb887da5a21f3，CI 43566849542 查核時 in_progress。
+- 同一授權 workbench.sqlite3 明確 setup 新增 task_pool/task_decisions/task_events；add 先確認依賴/decision ID 已存在、拒絕循環與無驗收；review 真正 mode=ro 取得依賴、next_ready、running_review、全部決策內容與來源、未決問題、驗收次數、失敗及歷史；start 原子領取，8 路並行只1成功；finish 必須全 checks PASS/FAIL 與證據，失敗退待辦且保留事件，未通過不解鎖下游。resume 需舊 owner readback、明確確認及證據，舊 session 不可再 finish；決策 resolve 需明確確認、答案及來源，不覆蓋歷史、不授權外部操作。任務依賴/已完成狀態目前不可動態修改或重開，尚未實作依賴變更後失效傳遞、完整逐任務 artifact 版本，以及自動排程；resume 的確認是操作者聲明，不會自動驗證舊程序已結束。
+- 本機 /tmp/p11b_training（可信合成源碼，原工作台/學習模組/catalog 雜湊相同）python -m unittest discover -s tests -v；初 20/20 (9新+11既有) PASS 2.500s，審查後補已決政策答案/來源回讀及中斷任務明確 resume，新增負例及回歸後 21/21 (10新+11既有) PASS 2.443s。未觀察到初版測試失敗；上述為審查發現的補強。新測試含端點/重疊、非法 fail-closed、PoC oracle、DAG/未決 gate、驗收失敗及重試/owner、跨程序唯讀重讀、中斷接續/舊 owner 拒絕、8路競寫、原記憶/案例相容及缺庫負測、專案隔離。
+- 另外執行實際合成 B003 三 stage（tempfile.TemporaryDirectory）：session-1 B003-spec R3 PASS（依原題記錄未決 D1）；session-2 B003-core R1/R2/R4 PASS（實際 subprocess 重新執行21個測試）；session-3 獨立 Python CLI review 回讀 completed=2、attempts=2、failed_attempts=0、next_ready=[]、B003-ui PENDING blocked_by=[B003-D1]、D1 answer/source=null。原 DB bytes 完全不變。另以學習工具 query SQLite 唯讀 缺庫 recovery reconcile 取得 B001-CASE-001，於相同暫存工作區保存 applied 引用及證據，history 回讀一致；未建正式私人庫。這驗證新程序與真實功能操作，非真實 ChatGPT 跨對話自主調用。單元測試中模擬 D1 confirmed=true 只驗證機制，從未成為真實產品核准。
+- 更新 .agents/skills/architecture-design/SKILL.md (aa89182cd3d0496a2fe25d08050597b824459e4c)、task-planning/SKILL.md (af732a79936dfe9ca84904f75aea74f206d2fa4a)、resume-project/SKILL.md (245848f568b307bca27759c0fcb330c263751229)、docs/TEAM_WORKBENCH.md (0460c0dc6e895069d9e8fd17047bc91e0294de9a)，全部全文回讀一致。保留原工作台及七角色/12技能，未改 main、Release 或外部專案。
+
+**案例 B003-CASE-001｜observed｜產品政策未決與可測原型分離：** 已知區間規則可執行測試；對不明確產品錯誤政策，先在持久任務池記問題/依賴，不將內部 INVALID 決策當正式 UI。使用有限域 oracle 比較兩方法，明確記錄適用邊界。前一 session 的未決狀態、實測驗收及決策來源必須隨接續重讀；中斷任務不得因聊天切換自動接管。證據：B003 10 項新測試、21/21 本機回歸、三 stage 2/3 DONE 且 UI 尚 pending；已記本主檔，不自動提升記憶基礎或加入私人工作區種子。限制：合成原型、不含日期/時區、實際排班 UI、真人審核、獨立子 Agent。可於後續完整系統設計採用適用原則。
 
 ### 每次續作及更新協定
 

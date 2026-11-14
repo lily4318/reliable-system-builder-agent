@@ -33,6 +33,11 @@
 - 公開合成案例及標準答案**不能**宣稱獨立盲測、真正 LLM 推理或模型變聰明。真正效果仍需有授權的 Agent runner、未曝光題庫、盲態人工語意評審與最終規格書的使用者確認。
 - CLI：`python -m src.website_scenario_eval evaluate`；`python -m src.website_scenario_eval packets` 提供不含預期標籤的公開測試任務包。詳見 `docs/WEBSITE_SCENARIO_TRAINING.md`。
 
+## 2026-11-14｜私人陌生網站需求：真正 Agent 改善前後比較介面（未實跑）
+- `src.website_holdout_compare` 在**私人目錄**對至少五個由獨立審查者建立的未見網站需求只輸出 SHA-256 承諾；再讀兩版同模型／runner／預算的輸出及兩位人工盲態評審的五構面分數。分歧 ≥2 要第三人仲裁，逐題配對平均差才可計算。
+- `blind` 產生只含模糊 ID 和規格全文的私人審查包；公開 Repo 和 CI 不含真正未見題、真實人工標註、私人模型輸出。任何自述 runner/model_id 無法替代供應商執行證據。
+- 公開的合成單元測試即使產生正向分數，也固定標記 `actual_model_or_agent_execution_verified=false`、`sealed_holdout_independence_verified=false`、`model_capability_improvement_verified=false`；功能、語意與編輯 UI 仍需獨立 UAT，不能自我核准。詳見 `docs/WEBSITE_HOLDOUT_EVALUATION.md`。
+
 ## 未來 ML/DL
 若要真正機器學習，需要另備經授權資料、標註規範、訓練／驗證／獨立測試切分、可重現訓練程式、模型權重／特徵版本管理、成本及安全評估；目前都未宣稱具備。
 

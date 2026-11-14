@@ -6,6 +6,7 @@ from src.independent_acceptance import evaluate as evaluate_recovery
 from src.quality_gate import assess, load, BASELINE, TARGETS
 from src.capability_workbench import evaluate as evaluate_capability
 from src.website_scenario_eval import evaluate as evaluate_website
+from src.website_holdout_compare import protocol_contract
 
 
 class QualityGateTest(unittest.TestCase):
@@ -74,6 +75,19 @@ class QualityGateTest(unittest.TestCase):
         weak={**self.targets,"website_synthetic_tests_can_claim_model_skill":True}
         self.assertFalse(assess(self.policy,self.recovery,self.baseline,
                                 weak,website=website)["gate_passed"])
+
+    def test_offline_holdout_protocol_must_not_be_treated_as_model_skill(self):
+        p=protocol_contract()
+        self.assertEqual(p["minimum_private_unseen_case_count"],5)
+        self.assertEqual(p["required_independent_raters_per_artifact"],2)
+        self.assertFalse(p["real_model_or_agent_run_verified"])
+        self.assertFalse(p["case_independence_independently_verified"])
+        self.assertFalse(p["synthetic_tests_measure_real_skill"])
+        self.assertTrue(assess(self.policy,self.recovery,self.baseline,
+                               self.targets)["gate_passed"])
+        weak={**self.targets,"private_holdout_synthetic_tests_can_claim_skill":True}
+        self.assertFalse(assess(self.policy,self.recovery,self.baseline,
+                                weak)["gate_passed"])
 
     def test_missing_human_review_blocks(self):
         bad = {**self.targets, "requires_human_release_review": False}

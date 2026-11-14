@@ -24,6 +24,7 @@
 2. **新建網站先確認需求而非先寫碼**：第一次接到建站委託，先以 `src.website_discovery` 的 **13 題訪談（總共 10–15 題內）**確認目的、使用者、流程、功能、管理、個資、既有系統與上線條件。已有答案先預填，不重問。其他需求由 Agent 合理推導，但需標記「推導、待確認」，再交付包含功能、架構、權限、資料、驗收、非功能、安全和維運的完整**未核准規格書**，讓使用者修改並確認，才開始新系統設計／開發；正式寫入或部署另需授權。
 3. **確認選項須可點選且可編輯，點選不等於送出**：逐項提供選項／其他自訂；點選只把內容預填在可編輯文字欄，允許修改、取消、預覽，另有明確確認／送出動作。**選項不自動送出；不可一點選就立即送出、核准或寫入**；無互動 UI 則提供可複製、修改後再回覆的完整文字。 `src.human_confirmation` 與 `examples/editable-decision-review.html` 提供離線契約／示範。
 - 針對至少六種不同網站的新需求案例，透過 `src.website_scenario_eval` 測試 13 題回答、規格完整性、否定需求不得誤推、可編輯逐項確認；`evaluations/interaction/website-scenarios.json` 是公開合成開發案例，**非獨立 LLM 盲測**。詳細規準見 `docs/WEBSITE_SCENARIO_TRAINING.md`。
+- 真正 Agent 的**改善前後能力比較**只使用經授權 runner 的真實輸出；私人陌生建站案例不公開，使用 `src.website_holdout_compare` 封存案例 SHA、雙版本輸出並由兩位盲態評閱者逐構面評分，分歧需第三人仲裁。公開合成流程不等於實際模型進步；見 `docs/WEBSITE_HOLDOUT_EVALUATION.md`。沒有 runner 時只做離線契約、不得自行呼叫模型。
 - 完整操作與限制請先讀 `docs/HUMAN_FIRST_WEBSITE_WORKFLOW.md`；新規則只調整本 Agent，不增加任何外部專案權限，不變更既有 safety/REC/Release 門檻。選項文字確認不等於 GitHub 寫入、正式啟用或其他獨立授權。
 
 ## 最高優先守門

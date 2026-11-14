@@ -8,6 +8,7 @@ from src.agent_eval import evaluate as evaluate_policy
 from src.independent_acceptance import evaluate as evaluate_recovery
 from src.capability_workbench import evaluate as evaluate_capability
 from src.website_scenario_eval import evaluate as evaluate_website
+from src.website_holdout_compare import protocol_contract
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE = ROOT / "evaluations/baselines/v0.1.0-initial.json"
@@ -61,6 +62,18 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict,
             and website.get("independent_blind_holdout") is False
             and website.get("formal_website_approval_granted") is False
             and targets.get("website_synthetic_tests_can_claim_model_skill") is False,
+        "private_holdout_protocol_no_false_skill_or_release_claim":
+            protocol_contract().get("required_independent_raters_per_artifact")==2
+            and protocol_contract().get("minimum_private_unseen_case_count")>=5
+            and len(protocol_contract().get("dimensions", []))>=5
+            and protocol_contract().get("third_rater_required_if_score_gap_at_least")==2
+            and protocol_contract().get("before_after_same_model_runner_and_budget") is True
+            and protocol_contract().get("case_text_not_in_public_repository") is True
+            and protocol_contract().get("case_independence_independently_verified") is False
+            and protocol_contract().get("real_model_or_agent_run_verified") is False
+            and protocol_contract().get("automatic_release_allowed") is False
+            and protocol_contract().get("synthetic_tests_measure_real_skill") is False
+            and targets.get("private_holdout_synthetic_tests_can_claim_skill") is False,
         "capability_no_false_real_agent_claim":
             capability.get("submission_kind") == "self_authored_reference_fixture_not_agent_result"
             and capability.get("independent_holdout_evaluated") is False
@@ -84,6 +97,8 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict,
         "website_public_scenario_count": website["scenario_count"],
         "website_public_scenarios_passed": website["passed"],
         "website_actual_llm_performance_verified": False,
+        "private_holdout_actual_model_run_verified": False,
+        "private_holdout_real_improvement_verified": False,
         "actual_autonomous_agent_performance_verified": False,
         "human_approval_completed": False,
         "formal_release_created": False,

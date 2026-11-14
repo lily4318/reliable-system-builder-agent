@@ -157,3 +157,18 @@ WEBSITE_SCENARIO_BENCHMARK_CI_VERIFIED_20261114:
 - NEXT_ACTION: independent human evaluate generated specifications for completeness and semantic appropriateness; with separate authorized true Agent runner use unseen website requests, verify real model artifacts, compare before/after without reusing these gold labels in prompts.
 - WRITE_OWNER: only Agent candidate Draft PR #7; no external repo writes, merge, deployment, Secret use, or release.
 - SYNC_STATUS: candidate_code_CI_verified; final_doc_SHA_CI_pending; real_model_NOT_RUN; other PRs/main_unmodified.
+
+
+## 2026-11-14｜陌生網站需求真人 Agent 前後比較協定（本輪候選增量）
+TASK_DOMAIN: RELIABLE_AGENT_WEBSITE_UNSEEN_HOLDOUT_BEFORE_AFTER
+SOURCE_OWNER: lily4318/reliable-system-builder-agent, Draft PR #7 candidate-agent-capability-workbench-20261114
+SOURCE_MAIN_SHA: c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57
+START_CANDIDATE_SHA: c7e9256942a0b0412d492e7c69e96cb9dc642249
+CANDIDATE_SOURCE_PATHS: src/website_holdout_compare.py; tests/test_website_holdout_compare.py; docs/WEBSITE_HOLDOUT_EVALUATION.md; AGENTS.md; START_HERE.md; applicable evaluation role docs; evaluation policy and quality targets; original CI; src/agent_eval.py.
+LAST_VERIFIED_STEP: CANDIDATE_IMPLEMENTED_PENDING_PR_CI
+COMPLETED_PENDING_CI: private unseen case digests, >=5 cases, paired before/after model and runner resource consistency, per-output file SHA validation and path isolation, blinded review packets with opaque IDs, two independent reviewer scores in five semantic dimensions (0-4), >=2 score gap requires distinct third adjudicator, paired per-case changes, no auto approval or one-click submission, synthetic positive and negative tests, public protocol only in CI.
+PROVENANCE: Repo main and PR7 have no authorized real-model runner. GitHub environment/variables endpoints inaccessible via linked tool; do not assume all private systems absent. No actual API/model invocation, genuine independent holdout text, private output, genuine reviewer scoring or proven improvement this turn.
+EVIDENCE_LIMIT: Human ratings in CI are synthetic fixtures that intentionally create +1 arithmetic delta; all reports hardcode actual_model_or_agent_execution_verified=false, sealed_holdout_independence_verified=false and model_capability_improvement_verified=false. SHA checks local bytes, not provider official records.
+NEXT_ACTION: commit only PR7 and read exact SHA CI; fix regressions; then separately authorize runner, have independent author create unseen H cases privately, execute genuinely and obtain independent human grading. No external app or repo changes.
+WRITE_OWNER: Agent candidate only; no PR merge/release and no external project writes.
+SYNC_STATUS: candidate_only; real_agent_runner_NOT_VERIFIED; true_holdout_NOT_YET_CREATED; human_reviews_NOT_RUN; final_ci_pending

@@ -51,3 +51,17 @@ agent_offline_execution_adapter_candidate:
   true_agent_execution_verified: false
   true_agent_capability_gain_measured: false
   formal_release_authorized: false
+
+website_private_holdout_candidate:
+  protocol: src.website_holdout_compare
+  human_rubric: docs/WEBSITE_HOLDOUT_EVALUATION.md
+  min_private_cases: 5
+  paired_same_model_runner_budget: true
+  blind_review_requires_two_independent_humans: true
+  score_gap_two_requires_third_adjudicator: true
+  private_cases_never_in_public_ci: true
+  synthetic_ci_only: true
+  real_agent_runner_authorized_and_executed: false
+  independent_unseen_holdout_verified: false
+  model_skill_improvement_demonstrated: false
+  automatic_release_allowed: false

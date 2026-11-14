@@ -43,6 +43,8 @@ REQUIRED = (
     "src/website_scenario_eval.py", "tests/test_website_scenario_eval.py",
     "evaluations/interaction/website-scenarios.json",
     "docs/WEBSITE_SCENARIO_TRAINING.md",
+    "src/website_holdout_compare.py", "tests/test_website_holdout_compare.py",
+    "docs/WEBSITE_HOLDOUT_EVALUATION.md",
 )
 
 def decide(s):

@@ -12,6 +12,7 @@
 - 人工協助 GitHub／雲端帳號／部署設定：提供有步驟、頁面、欄位、成功查核和卡關處理的教學。
 - 新建網站：先做 13 題（10–15 題上限）需求訪談，提出使用者答案與 Agent 推導需求分開標示的完整未核准規格。
 - 需要使用者確認時：可點選方案，**點選後先進可編輯草稿**；使用者另行確認才送出。若平台不支援，改給可複製可修改的方案文本。
+- 真正 Agent 的改善前後評估流程（**目前僅離線契約、沒有模型試跑**）：`python -m src.website_holdout_compare protocol`，另由獨立審查者把未見案例留在私人環境，雙人盲態評閱且分歧需仲裁；見 [未見題／人工語意評測](docs/WEBSITE_HOLDOUT_EVALUATION.md)。不得將未見題正文或模型輸出放到公開 CI。
 - 額外的六類合成建站訪談與規格推導回歸，可執行 `python -m src.website_scenario_eval evaluate`；測試含否定需求、答案未決、推導缺漏及每項可編輯確認，參見 [評測規範](docs/WEBSITE_SCENARIO_TRAINING.md)。
 - 見 [完整規範](docs/HUMAN_FIRST_WEBSITE_WORKFLOW.md)，可跑 `python -m src.website_discovery questions` 及 `python -m src.human_walkthrough --task github_repository`。本規則不代表底層 LLM 權重已訓練，也不賦予新系統寫入權限。
 

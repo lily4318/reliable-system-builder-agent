@@ -268,3 +268,159 @@ class SiteTests(unittest.TestCase):
             legacy.initialize()
         self.assertEqual(path.read_bytes(),before)
         self.assertEqual(legacy.view(None)[:2],(10,2))
+
+
+    def test_rejected_replay_cannot_release_future_reservation(self):
+        member=self.login('member'); other=self.login('member2'); admin=self.login('admin')
+        for i,(operation,actor,owner) in enumerate([('cancel',member,None),('return',admin,'member')]):
+            target=format(100+i,'032x'); action_id=format(200+i,'032x')
+            data=self.action(actor,target,action_id,owner)
+            self.assertEqual(self.req('POST','/'+operation,actor,data)[0],409)
+            self.assertEqual(self.req('POST','/reserve',member,{**self.form(member,4),'token':target})[0],200)
+            for _ in range(2):
+                status,body,_=self.req('POST','/'+operation,actor,data)
+                self.assertEqual(status,409); self.assertIn('NOT_ACTIVE',body)
+            self.assertEqual(self.req('POST','/'+operation,actor,{**data,'target':'f'*32})[0],400)
+            self.assertEqual(self.store.view(None)[:2],(10,4))
+            dashboard=self.req('GET','/',actor)[1]
+            self.assertIn(action_id,dashboard); self.assertIn('NOT_ACTIVE',dashboard)
+            self.assertNotIn(action_id,self.req('GET','/',other)[1])
+            self.assertEqual(self.req('POST','/'+operation,actor,{**data,'action_token':format(300+i,'032x')})[0],200)
+            self.assertEqual(self.req('POST','/'+operation,actor,data)[0],409)
+            self.assertEqual(self.store.view(None)[:2],(10,0))
+        with self.store.connect('ro') as db:
+            self.assertEqual(db.execute("SELECT count(*) FROM action_attempts WHERE result='NOT_ACTIVE'").fetchone()[0],2)
+            self.assertEqual(db.execute('SELECT count(*) FROM lifecycle').fetchone()[0],2)
+
+    def test_denied_acknowledgement_loss_and_rollback(self):
+        m=self.login('member'); other=self.login('member2')
+        target='7'*32; token='8'*32
+        data=self.action(m,target,token)
+        with self.assertRaises(RuntimeError):
+            self.store.release('member','member',target,token,'cancel',fault=True)
+        self.assertEqual(self.store.view('member',lifecycle=True,actor='member')[3],[])
+        release=self.store.release
+        def committed_then_unknown(*args,**kwargs):
+            self.assertEqual(release(*args,**kwargs),'NOT_ACTIVE')
+            raise sqlite3.OperationalError('synthetic lost acknowledgement')
+        with patch.object(self.store,'release',side_effect=committed_then_unknown) as injected:
+            self.assertEqual(self.req('POST','/cancel',m,data)[0],503)
+            before=self.store.path.read_bytes()
+            body=self.req('GET','/',m)[1]
+            self.assertIn(token,body); self.assertIn('NOT_ACTIVE',body)
+            self.assertNotIn(token,self.req('GET','/',other)[1])
+            self.assertEqual(injected.call_count,1)
+            self.assertEqual(self.store.path.read_bytes(),before)
+        self.assertEqual(self.req('POST','/cancel',m,data)[0],409)
+        self.assertEqual(self.store.view(None)[:2],(10,0))
+
+    def test_racing_rejected_decisions_are_durable(self):
+        m=self.login('member'); data=self.action(m,'9'*32,'a'*32)
+        with ThreadPoolExecutor(max_workers=8) as pool:
+            results=list(pool.map(lambda _:self.req('POST','/cancel',m,data)[0],range(8)))
+        self.assertEqual(results,[409]*8)
+        with self.store.connect('ro') as db:
+            self.assertEqual(db.execute('SELECT count(*) FROM action_attempts').fetchone()[0],1)
+            self.assertEqual(db.execute('SELECT count(*) FROM lifecycle').fetchone()[0],0)
+
+class MigrationTests(unittest.TestCase):
+    def setUp(self):
+        tmp=tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.root=Path(tmp.name)
+        self.old=self.root/'old.sqlite'
+        self.new=Store(self.root/'new.sqlite')
+
+    def legacy(self,with_lifecycle=False):
+        # Original two-table and three-table schemas, both unversioned.
+        with sqlite3.connect(self.old) as db:
+            db.execute('CREATE TABLE inventory(id INTEGER PRIMARY KEY CHECK(id=1), stock INTEGER NOT NULL, reserved INTEGER NOT NULL CHECK(reserved>=0 AND reserved<=stock))')
+            db.execute("CREATE TABLE requests(owner TEXT NOT NULL, token TEXT NOT NULL, qty INTEGER NOT NULL CHECK(qty>0), result TEXT NOT NULL CHECK(result IN ('RESERVED','INSUFFICIENT')), PRIMARY KEY(owner,token))")
+            db.execute('INSERT INTO inventory VALUES(1,10,?)',(3 if with_lifecycle else 7,))
+            db.executemany('INSERT INTO requests VALUES(?,?,?,?)',[
+                ('member','1'*32,4,'RESERVED'),('member2','2'*32,3,'RESERVED'),
+                ('member2','3'*32,8,'INSUFFICIENT')])
+            if with_lifecycle:
+                db.execute("""CREATE TABLE lifecycle(
+                    actor TEXT NOT NULL, action_token TEXT NOT NULL,
+                    owner TEXT NOT NULL, target_token TEXT NOT NULL,
+                    result TEXT NOT NULL CHECK(result IN ('CANCELLED','RETURNED')),
+                    PRIMARY KEY(actor,action_token), UNIQUE(owner,target_token))""")
+                db.execute('INSERT INTO lifecycle VALUES(?,?,?,?,?)',('admin','4'*32,'member','1'*32,'RETURNED'))
+
+    def test_offline_copy_two_table_schema(self):
+        self.legacy()
+        before=self.old.read_bytes()
+        old=Store(self.old)
+        with self.assertRaises(sqlite3.Error):
+            old.reserve('member','e'*32,1)
+        self.assertEqual(self.new.migrate_from(self.old,confirm_offline=True),{'schema_version':1,'requests':3,'lifecycle':0})
+        self.assertEqual(self.old.read_bytes(),before)
+        self.assertEqual(self.new.view(None)[:2],(10,7))
+        self.assertEqual(self.new.view(None)[2],old.view(None)[2])
+        self.assertEqual(self.new.release('member','member','1'*32,'5'*32,'cancel'),'CANCELLED')
+        self.assertEqual(self.new.view(None)[:2],(10,3))
+        self.assertEqual(self.old.read_bytes(),before)
+
+    def test_offline_copy_three_table_preserves_terminal_replay(self):
+        self.legacy(True)
+        before=self.old.read_bytes()
+        self.assertEqual(self.new.migrate_from(self.old,confirm_offline=True)['lifecycle'],1)
+        self.assertEqual(self.new.view(None)[:2],(10,3))
+        self.assertEqual(self.new.release('admin','member','1'*32,'4'*32,'return'),'RETURNED')
+        with self.assertRaises(ValueError):
+            self.new.release('admin','member2','2'*32,'4'*32,'return')
+        self.assertEqual(self.new.release('member','member','1'*32,'5'*32,'cancel'),'NOT_ACTIVE')
+        self.assertEqual(self.new.view(None)[:2],(10,3))
+        self.assertEqual(self.new.release('admin','member2','2'*32,'6'*32,'return'),'RETURNED')
+        self.assertEqual(self.new.view(None)[:2],(10,0))
+        self.assertEqual(self.old.read_bytes(),before)
+        with self.new.connect('ro') as db:
+            self.assertEqual(db.execute('PRAGMA integrity_check').fetchall(),[('ok',)])
+            self.assertEqual(db.execute('SELECT count(*) FROM lifecycle').fetchone()[0],2)
+            self.assertEqual(db.execute('SELECT count(*) FROM action_attempts').fetchone()[0],3)
+
+    def test_migration_failure_and_no_overwrite(self):
+        self.legacy(True)
+        before=self.old.read_bytes()
+        with self.assertRaises(ValueError): self.new.migrate_from(self.old)
+        with self.assertRaises(ValueError): Store(self.old).migrate_from(self.old,confirm_offline=True)
+        with self.assertRaises(RuntimeError): self.new.migrate_from(self.old,confirm_offline=True,fault=True)
+        self.assertFalse(self.new.path.exists())
+        self.assertEqual(list(self.root.iterdir()),[self.old])
+        self.assertEqual(self.old.read_bytes(),before)
+        self.new.path.write_bytes(b'keep existing destination')
+        with self.assertRaises(FileExistsError): self.new.migrate_from(self.old,confirm_offline=True)
+        self.assertEqual(self.new.path.read_bytes(),b'keep existing destination')
+        self.assertEqual(self.old.read_bytes(),before)
+
+    def test_migration_rejects_invalid_version_inventory_and_sidecars(self):
+        self.legacy(True)
+        with sqlite3.connect(self.old) as db:
+            db.execute('UPDATE inventory SET reserved=4')
+        before=self.old.read_bytes()
+        with self.assertRaises(sqlite3.Error): self.new.migrate_from(self.old,confirm_offline=True)
+        self.assertFalse(self.new.path.exists()); self.assertEqual(self.old.read_bytes(),before)
+        with sqlite3.connect(self.old) as db:
+            db.execute('UPDATE inventory SET reserved=3')
+            db.execute('PRAGMA user_version=9')
+        with self.assertRaises(sqlite3.Error): self.new.migrate_from(self.old,confirm_offline=True)
+        with sqlite3.connect(self.old) as db: db.execute('PRAGMA user_version=0')
+        Path(str(self.old)+'-wal').touch()
+        with self.assertRaises(sqlite3.Error): self.new.migrate_from(self.old,confirm_offline=True)
+        self.assertFalse(self.new.path.exists())
+
+    def test_concurrent_destination_publication_is_exclusive(self):
+        self.legacy(True)
+        before=self.old.read_bytes()
+        def migrate(_):
+            try:
+                self.new.migrate_from(self.old,confirm_offline=True)
+                return 'created'
+            except FileExistsError:
+                return 'exists'
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            results=list(pool.map(migrate,range(2)))
+        self.assertEqual(sorted(results),['created','exists'])
+        self.assertEqual(self.new.view(None)[:2],(10,3))
+        self.assertEqual(self.old.read_bytes(),before)

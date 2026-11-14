@@ -247,7 +247,10 @@ class Handler(BaseHTTPRequestHandler):
         self.send_header('Content-Security-Policy',"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'")
         self.send_header('X-Content-Type-Options','nosniff')
         self.send_header('Cache-Control','no-store')
-        self.send_header('Referrer-Policy','no-referrer')
+        # Native POST forms under no-referrer can send Origin: null in Chromium.
+        # Preserve same-origin form Origin while suppressing cross-origin referrers;
+        # do_POST still rejects all nonmatching Origin values and checks CSRF.
+        self.send_header('Referrer-Policy','same-origin')
         if cookie is not None:
             self.send_header('Set-Cookie','sid='+cookie+'; Path=/; HttpOnly; SameSite=Strict'+('' if cookie else '; Max-Age=0'))
         self.send_header('Content-Length',str(len(payload)))

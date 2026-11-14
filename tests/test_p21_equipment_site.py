@@ -73,6 +73,31 @@ class SiteTests(unittest.TestCase):
         self.assertEqual(self.req('POST','/reserve',admin,{**data,'csrf':admin_csrf})[0],403)
         self.assertEqual(self.store.view(None)[:2],(10,0))
 
+    def test_native_form_referrer_policy_and_strict_origin(self):
+        conn=http.client.HTTPConnection('127.0.0.1',self.site.server_port,timeout=5)
+        try:
+            conn.request('GET','/login')
+            response=conn.getresponse()
+            self.assertEqual(response.status,200)
+            self.assertEqual(response.getheader('Referrer-Policy'),'same-origin')
+            response.read()
+        finally: conn.close()
+        member=self.login('member')
+        data=self.form(member,2)
+        for origin in ('null','https://foreign.invalid',None):
+            headers={'Cookie':member,'Content-Type':'application/x-www-form-urlencoded'}
+            if origin is not None: headers['Origin']=origin
+            conn=http.client.HTTPConnection('127.0.0.1',self.site.server_port,timeout=5)
+            try:
+                conn.request('POST','/reserve',urlencode(data),headers)
+                response=conn.getresponse()
+                self.assertEqual(response.status,403)
+                self.assertIn('Invalid origin',response.read().decode())
+            finally: conn.close()
+        self.assertEqual(self.store.view(None)[:2],(10,0))
+        self.assertIn('RESERVED',self.req('POST','/reserve',member,data)[1])
+        self.assertEqual(self.store.view(None)[:2],(10,2))
+
     def test_replay_and_payload_conflict(self):
         m=self.login('member'); data=self.form(m,2)
         for _ in range(2): self.assertIn('RESERVED',self.req('POST','/reserve',m,data)[1])

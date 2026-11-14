@@ -5,6 +5,9 @@
 ## 工作方法：以技能與實際產物為核心（整合候選）
 先定位使用者最新任務、唯一目標與權限。自然語言能理解就直接選擇 config/skill-catalog.json 中的必要技能，讀對應 .agents/skills/<id>/SKILL.md；不要求使用者記指令名稱。遇真正歧義才提出少量可編輯選擇。改善 Agent 不得接續外部專案；先保留 src.task_scope 與 src.engineering_workflow 的必要守門。
 - 用 src.team_workbench 的私人工作區 context 讀實際產物、對應來源、適用經驗；只在另行同意且有存取權的本機私人位置保存，不把公開 repo 當成個人記憶庫。
+- P1-1 任務導向學習：在已獲授權且已初始化的私人工作區，先依 docs/TEAM_WORKBENCH.md 明確執行一次 src.workbench_learning setup（原 SQLite 原地增量、兩個公開合成工程案例；不自動建立私人工作區）。每項新任務或續作先提供 task ID、技能及具體技術/風險詞，用 workbench_learning context 選擇性讀取案例與必要產物；檢查適用條件、來源和未決，不用舊全文傾倒取代正式來源。NEEDS_PREREQUISITES 或 NEEDS_FULL_READ 須先補讀。
+- 架構、實作、除錯、QA 及學習技能完成實際判斷時，以 workbench_learning cite 記錄相關案例 ID、task/session、採用或不適用原因及實測/產物證據。檢索命中不等於採用，引用是操作者聲明，不是系統獨立證明。遇測試失敗、修復、QA 退件、需求修正或偏好事件，主動呼叫 feedback 保存候選記憶及證據，不將一次性決策或推測當長期偏好；使用既有 remember/resolve 人審流程，不自動升格。以 history 回讀本任務跨 session 紀錄；搜尋是詞彙匹配，未啟用模型語意檢索或自動事件監聽。
+- Agent 自身訓練以 docs/AGENT_CAPABILITY_TRAINING.md 頂部最新主檔及實際 PR/CI 為接續入口，避免使用歷史 training 文件作現況。
 - 工作主要順序：需求訪談 → 確認規格 → 架構 → 工作包 → 程式與功能測試 → QA／必要安全與 SRE → 經驗整理。可依任務跳過不適用技能，不能跳過必要依賴與權限。
 - 技能應實際產出規格、可執行程式、測試或修復，而不只寫完成報告。handoff 登錄產物文字及來源；修改上游會使相關下游產物過期。context 的 current 僅表示工作區依賴一致，不證明正式核准或外部 SHA。
 - 只記明確偏好或有證據的經驗；假設標 candidate。distill 預覽相同 topic 的重複／衝突，使用者確認後才 resolve，保留歷史。不可憑記憶覆蓋有效研究規則、權限或安全。

@@ -64,6 +64,38 @@ class RevisionSyncTests(unittest.TestCase):
         self.assertEqual(self.state()['completed'],4)
         print('REVISION-SPLIT-RED: artifact-first interruption leaves old task PASS current',flush=True)
 
+    def test_reconcile_preexisting_task_first_split(self):
+        tasks.revise(self.w,'intake',1,'legacy-partial','synthetic R2',confirmed=True)
+        review=self.state()
+        root=next(row for row in review['tasks'] if row['id']=='intake')
+        old=self.artifact()['requirements']
+        self.assertEqual(root['revision'],2)
+        self.assertEqual(old['content'],'R1')
+        # Fixture independently provides the authoritative R2; do not infer it
+        # from the incremented task revision or the stale artifact.
+        result=tasks.revise(self.w,'intake',root['revision'],'reconcile-3',
+            'Reviewed both indexes; synthetic R2 source independently confirmed',confirmed=True,
+            requirement={'expected_artifact_id':old['id'],'content':'R2','source_ref':'synthetic R2'})
+        self.assertEqual(result['revision'],3)
+        self.assertEqual(self.artifact()['requirements']['content'],'R2')
+        self.assertFalse(self.artifact()['architecture']['current'])
+        self.assertEqual(self.state()['completed'],1)
+        self.assertEqual(tasks.revision_status(self.w,'reconcile-3')['status'],'COMMITTED')
+
+    def test_reconcile_preexisting_artifact_first_split(self):
+        wb.handoff(self.w,'project-intake','R2','synthetic R2')
+        self.assertEqual(self.state()['completed'],4)
+        root=next(row for row in self.state()['tasks'] if row['id']=='intake')
+        current=self.artifact()['requirements']
+        result=tasks.revise(self.w,'intake',root['revision'],'reconcile-2',
+            'Reviewed both indexes; independently confirmed synthetic R2',confirmed=True,
+            requirement={'expected_artifact_id':current['id'],'content':'R2','source_ref':'synthetic R2'})
+        self.assertEqual(result['revision'],2)
+        self.assertEqual(self.state()['completed'],1)
+        self.assertFalse(self.artifact()['architecture']['current'])
+        self.assertEqual(self.artifact()['requirements']['content'],'R2')
+        self.assertEqual(tasks.revision_status(self.w,'reconcile-2')['status'],'COMMITTED')
+
     def test_combined_revision_and_readonly_receipt(self):
         out=self.change()
         self.assertEqual(set(out['affected']),{'intake','spec','arch'})

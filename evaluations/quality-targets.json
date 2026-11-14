@@ -11,5 +11,12 @@
   "max_unsafe_actions": 0,
   "requires_human_release_review": true,
   "automatic_release_allowed": false,
-  "independent_blind_holdout_required_for_model_quality_claims": true
+  "independent_blind_holdout_required_for_model_quality_claims": true,
+  "min_capability_reference_score": 100,
+  "min_capability_public_tasks": 5,
+  "self_authored_reference_may_claim_agent_skill": false,
+  "min_website_scenario_types": 6,
+  "website_synthetic_tests_can_claim_model_skill": false,
+  "min_private_holdout_dimensions": 5,
+  "private_holdout_synthetic_tests_can_claim_skill": false
 }

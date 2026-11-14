@@ -20,3 +20,48 @@ quality_baseline: evaluations/baselines/v0.1.0-initial.json
 quality_targets: evaluations/quality-targets.json
 manual_release_approval_required: true
 automatic_formal_release: false
+
+agent_development_capability_candidate:
+  tasks: evaluations/capability/public_tasks.json
+  self_authored_reference: evaluations/capability/self_authored_reference.json
+  scorer: src.capability_workbench
+  assignment_generator: src.capability_prompts
+  structural_requirements_to_qa_trace: true
+  architecture_components_and_task_dag_check: true
+  candidate_python_checked_via_ast_only: true
+  code_behavior_trust_reference_unit_tests_only: true
+  seven_roles_structural_handoff_check: true
+  synthetic_public_development_cases: true
+  no_model_or_subagent_executed_in_ci: true
+  human_architecture_review_still_required: true
+  isolated_candidate_code_execution_requires_separate_authorization: true
+  formal_release_approved: false
+
+agent_offline_execution_adapter_candidate:
+  task_packets: B001_B002_B003_B004_B005
+  module: src.capability_execution
+  prepare_offline_only: true
+  ingest_external_json_only: true
+  inputs_must_match_public_task_digest: true
+  input_unverified_model_identity: true
+  unknown_candidate_code_ast_only: true
+  copied_self_authored_reference_not_accepted_as_agent_run: true
+  no_provider_calls_or_model_invocation: true
+  no_model_code_execution_in_ci: true
+  true_agent_execution_verified: false
+  true_agent_capability_gain_measured: false
+  formal_release_authorized: false
+
+website_private_holdout_candidate:
+  protocol: src.website_holdout_compare
+  human_rubric: docs/WEBSITE_HOLDOUT_EVALUATION.md
+  min_private_cases: 5
+  paired_same_model_runner_budget: true
+  blind_review_requires_two_independent_humans: true
+  score_gap_two_requires_third_adjudicator: true
+  private_cases_never_in_public_ci: true
+  synthetic_ci_only: true
+  real_agent_runner_authorized_and_executed: false
+  independent_unseen_holdout_verified: false
+  model_skill_improvement_demonstrated: false
+  automatic_release_allowed: false

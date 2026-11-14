@@ -28,6 +28,29 @@ REQUIRED = (
     ".claude/skills/reliable-system-builder/SKILL.md",
     "docs/INCIDENT_RECOVERY.md", "docs/EVALUATION_AND_LEARNING.md",
     "evaluations/cases/regressions.json", "incidents/sanitized-cases/README.md",
+    "src/capability_workbench.py", "src/capability_prompts.py",
+    "src/capability_execution.py", "tests/test_capability_execution.py",
+    "src/capability_reference.py", "tests/test_capability_workbench.py",
+    "tests/test_capability_prompts.py", "evaluations/capability/public_tasks.json",
+    "evaluations/capability/self_authored_reference.json",
+    "docs/AGENT_CAPABILITY_TRAINING.md",
+    "docs/HUMAN_FIRST_WEBSITE_WORKFLOW.md",
+    "src/website_discovery.py", "src/human_confirmation.py",
+    "src/human_walkthrough.py", "tests/test_human_first_web_rules.py",
+    "evaluations/interaction/website-intake-questions.json",
+    "evaluations/interaction/human-github-walkthroughs.json",
+    "examples/editable-decision-review.html",
+    "src/website_scenario_eval.py", "tests/test_website_scenario_eval.py",
+    "evaluations/interaction/website-scenarios.json",
+    "docs/WEBSITE_SCENARIO_TRAINING.md",
+    "src/website_holdout_compare.py", "tests/test_website_holdout_compare.py",
+    "docs/WEBSITE_HOLDOUT_EVALUATION.md",
+    "src/website_holdout_walkthrough.py", "tests/test_website_holdout_walkthrough.py",
+    "docs/WEBSITE_HOLDOUT_WALKTHROUGH.md",
+    "src/website_intake_ui.py", "src/website_intake_browser_test.py",
+    "tests/test_website_intake_ui.py", "docs/WEBSITE_INTAKE_UI.md",
+    "examples/website-intake/index.html", "examples/website-intake/style.css",
+    "examples/website-intake/app.js", "examples/website-intake/browser-test.js",
 )
 
 def decide(s):
@@ -105,7 +128,10 @@ def validate(root=ROOT):
         r"\bAIza[A-Za-z0-9_-]{30,}\b",
         r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b",
     )
-    public = [Path(root) / "evaluations/cases/regressions.json"]
+    public = [Path(root) / "evaluations/cases/regressions.json",
+              Path(root) / "evaluations/capability/public_tasks.json",
+              Path(root) / "evaluations/capability/self_authored_reference.json",
+              Path(root) / "evaluations/interaction/website-scenarios.json"]
     public.extend((Path(root) / "incidents/sanitized-cases").glob("*.md"))
     for file in public:
         content = file.read_text(encoding="utf-8")

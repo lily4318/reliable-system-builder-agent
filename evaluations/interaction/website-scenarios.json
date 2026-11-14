@@ -1,0 +1,209 @@
+{
+  "schema_version": 1,
+  "kind": "public_synthetic_website_discovery_development",
+  "human_authored_expectations": true,
+  "blind_holdout": false,
+  "real_agent_model_executed": false,
+  "requirement_questions": 13,
+  "cases": [
+    {
+      "id": "W101",
+      "family": "research_recruitment",
+      "title": "合成研究參與者資訊與報名網站",
+      "objective": "需把報名、時段、同意及管理員功能拆成未核准規格；不得推定研究倫理已核准",
+      "answers": {
+        "purpose": "建立合成研究活動的資訊與線上報名網站，以報名完成率作為待確認成效指標。",
+        "audience": "有意參與的民眾、研究助理及管理員。",
+        "journey": "瀏覽招募資訊 → 填報名表 → 選場次 → 等候確認。",
+        "pages": "研究資訊、常見問題、報名、查詢與管理頁，所有內容均為測試文本。",
+        "identity": "訪客不需要登入，管理員需帳號登入並按角色授權。",
+        "forms": "需要線上報名表單，需先確認欄位、查詢與修改方式。",
+        "slots": "依合成時段做名額分配，允許候補、取消及改期。",
+        "notice": "透過 Email 通知確認及取消，但不得真的寄信。",
+        "admin": "助理維護場次、審核報名、讀取非敏感測試報表。",
+        "privacy": "涉及研究參與者個資、同意，倫理審核和保存期限尚未核准。",
+        "integrations": "GitHub 已有候選 repo，但沒有真實部署授權。",
+        "experience": "優先手機及繁體中文，鍵盤可操作。",
+        "release": "先有無真人資料的測試 MVP；驗收條件由研究團隊待確認。"
+      },
+      "expected": [
+        "表單與資料生命週期",
+        "時段與競寫",
+        "通知處理",
+        "個資與核准",
+        "權限矩陣",
+        "技術來源"
+      ],
+      "forbidden": [],
+      "expected_missing": [],
+      "note": "all core groups with explicit nonauthorization"
+    },
+    {
+      "id": "W102",
+      "family": "public_museum_info",
+      "title": "公開館舍資訊網站（全明示不需要）",
+      "objective": "所有否定功能必須保持否定，不能主動增建報名或通知",
+      "answers": {
+        "purpose": "展示社區館舍介紹與免費展覽照片，不收件。",
+        "audience": "一般訪客與閱讀障礙者。",
+        "journey": "開首頁→瀏覽展區→查看交通資訊。",
+        "pages": "首頁、展覽介紹、交通、無障礙說明。",
+        "identity": "不需要帳號登入，也沒有會員系統。",
+        "forms": "不需要報名表單，不收集任何個人資料。",
+        "slots": "不需要預約時段，也不提供名額候補。",
+        "notice": "不需要 Email 通知，也不發簡訊。",
+        "admin": "內容由出版人員於部署前更新靜態資料。",
+        "privacy": "不收集個資，僅公開靜態資訊。",
+        "integrations": "沒有 API，不使用 GitHub 或資料庫連線。",
+        "experience": "繁體中文、手機優先與無障礙。",
+        "release": "首版只提供靜態頁面，先人工驗收。"
+      },
+      "expected": [],
+      "forbidden": [
+        "表單與資料生命週期",
+        "時段與競寫",
+        "通知處理",
+        "個資與核准",
+        "權限矩陣",
+        "技術來源"
+      ],
+      "expected_missing": [],
+      "note": "negation traps in every inference group"
+    },
+    {
+      "id": "W103",
+      "family": "volunteer_shift",
+      "title": "社區志工報名、排班及督導網站",
+      "objective": "表單與時段需要，但不能因否定通知/整合而新增功能",
+      "answers": {
+        "purpose": "志工排班與社區活動協作，降低重複排班。",
+        "audience": "志工、志工督導、管理員。",
+        "journey": "志工填報名資料→選擇服務時段→督導確認。",
+        "pages": "服務說明、志工報名、排班狀態、管理頁。",
+        "identity": "志工與督導需帳號登入並有不同權限。",
+        "forms": "志工報名表單，需要聯絡資料欄位。",
+        "slots": "需預約值班時段，處理名額與取消。",
+        "notice": "不需要 Email 通知，也不用簡訊。",
+        "admin": "督導審核排班、查詢服務紀錄。",
+        "privacy": "收集志工個資，保留期間尚未確認。",
+        "integrations": "不使用 API 或外部資料庫整合。",
+        "experience": "手機可用、繁體中文。",
+        "release": "先驗證時段競寫，再決定正式上線。"
+      },
+      "expected": [
+        "表單與資料生命週期",
+        "時段與競寫",
+        "個資與核准",
+        "權限矩陣"
+      ],
+      "forbidden": [
+        "通知處理",
+        "技術來源"
+      ],
+      "expected_missing": [],
+      "note": "positive and negative fields mixed"
+    },
+    {
+      "id": "W104",
+      "family": "sports_class_booking",
+      "title": "少年運動課程預約與候補網站",
+      "objective": "實現課程預約草稿，不能推定已獲兒少個資處理核准",
+      "answers": {
+        "purpose": "少年運動課程介紹與報名。",
+        "audience": "家長、教練及行政人員。",
+        "journey": "家長查看課表→填線上報名表→預約課程→候補。",
+        "pages": "課程列表、行事曆、報名資訊。",
+        "identity": "家長不必登入；管理員帳號登入並管理名單。",
+        "forms": "報名表單收集必要聯絡資料，未同意不得收件。",
+        "slots": "課程名額有限，時段衝突要擋，提供候補與取消。",
+        "notice": "需要簡訊通知，但目前沒有任何發送授權。",
+        "admin": "行政人員確認課程並維護合成名單。",
+        "privacy": "未成年人個資與家長同意屬待核事項。",
+        "integrations": "沒有現有 API；預計以私有資料庫設計，來源待確認。",
+        "experience": "手機第一、繁體中文，需無障礙。",
+        "release": "只做封閉測試，不啟用真人報名。"
+      },
+      "expected": [
+        "表單與資料生命週期",
+        "時段與競寫",
+        "通知處理",
+        "個資與核准",
+        "權限矩陣",
+        "技術來源"
+      ],
+      "forbidden": [],
+      "expected_missing": [],
+      "note": "medical/minor-like consent with no launch approval"
+    },
+    {
+      "id": "W105",
+      "family": "community_directory",
+      "title": "社區互助資源目錄與匿名回饋",
+      "objective": "同一欄同時說不需要報名、但要匿名回饋表單，不能單靠否定詞整欄拒絕",
+      "answers": {
+        "purpose": "公開食物資源、物資取得方式及志工友善地圖。",
+        "audience": "當地居民與內容編輯員。",
+        "journey": "瀏覽目錄→篩選地區→查閱資源。",
+        "pages": "資源搜尋、分類、交通資訊、匿名回饋。",
+        "identity": "訪客免登入，後台編輯員才需要帳號登入。",
+        "forms": "不需要報名表單；但需要匿名回饋表單，不留身份資料。",
+        "slots": "不提供預約名額，也不提供取消或候補。",
+        "notice": "不需要通知服務。",
+        "admin": "內容編輯員更新資源與處理匿名回饋。",
+        "privacy": "不收集個資；匿名留言仍須檢查不當內容及保留方式。",
+        "integrations": "沒有 API 連接需求。",
+        "experience": "繁體中文、手機、適合長者閱讀。",
+        "release": "先上靜態目錄與匿名回饋測試版。"
+      },
+      "expected": [
+        "表單與資料生命週期",
+        "權限矩陣"
+      ],
+      "forbidden": [
+        "時段與競寫",
+        "通知處理",
+        "個資與核准",
+        "技術來源"
+      ],
+      "expected_missing": [],
+      "note": "a negated subclause and a positive subclause"
+    },
+    {
+      "id": "W106",
+      "family": "learning_portal_partial",
+      "title": "企業內部培訓知識平台（答案不完整）",
+      "objective": "不應自動填入未說明的時程、通知或外部資料庫，仍需完整規格欄位與待確認項目",
+      "answers": {
+        "purpose": "提供員工內部教學和課程筆記。",
+        "audience": "員工、部門講師和內容管理員。",
+        "journey": "員工登入→查詢文件→閱讀筆記。",
+        "pages": "文件目錄、搜尋、閱讀頁。",
+        "identity": "需要公司帳號登入，講師和管理員有不同角色權限。",
+        "forms": "不需要線上報名表單或上傳個人資料。",
+        "slots": "不開放時段預約，不需要候補。",
+        "notice": "尚未決定",
+        "admin": "內容管理員審核及更新教學文件。",
+        "privacy": "不確定",
+        "integrations": "使用現有 GitHub 的非敏感文檔，其他整合待確認。",
+        "experience": "內網桌面及平板友善。",
+        "release": "待確認"
+      },
+      "expected": [
+        "權限矩陣",
+        "技術來源"
+      ],
+      "forbidden": [
+        "表單與資料生命週期",
+        "時段與競寫",
+        "通知處理",
+        "個資與核准"
+      ],
+      "expected_missing": [
+        "notice",
+        "privacy",
+        "release"
+      ],
+      "note": "partially unanswered, no fabricated release approval"
+    }
+  ]
+}

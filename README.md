@@ -8,8 +8,16 @@
 
 請 AI 先讀 [START_HERE.md](START_HERE.md)、[AGENTS.md](AGENTS.md)、[release/current_release.yaml](release/current_release.yaml)。公開網址只授予**閱讀可能性**，不等於 AI 有任何 GitHub、GAS、Sheets、瀏覽器、部署或背景執行權限。
 
+## 新版使用者互動規則（Draft PR #7 候選）
+- 人工協助 GitHub／雲端帳號／部署設定：提供有步驟、頁面、欄位、成功查核和卡關處理的教學。
+- 新建網站：先做 13 題（10–15 題上限）需求訪談，提出使用者答案與 Agent 推導需求分開標示的完整未核准規格。
+- 需要使用者確認時：可點選方案，**點選後先進可編輯草稿**；使用者另行確認才送出。若平台不支援，改給可複製可修改的方案文本。
+- 真正 Agent 的改善前後評估流程（**目前僅離線契約、沒有模型試跑**）：`python -m src.website_holdout_compare protocol`，另由獨立審查者把未見案例留在私人環境，雙人盲態評閱且分歧需仲裁；見 [未見題／人工語意評測](docs/WEBSITE_HOLDOUT_EVALUATION.md)。不得將未見題正文或模型輸出放到公開 CI。
+- 額外的六類合成建站訪談與規格推導回歸，可執行 `python -m src.website_scenario_eval evaluate`；測試含否定需求、答案未決、推導缺漏及每項可編輯確認，參見 [評測規範](docs/WEBSITE_SCENARIO_TRAINING.md)。
+- 見 [完整規範](docs/HUMAN_FIRST_WEBSITE_WORKFLOW.md)，可跑 `python -m src.website_discovery questions` 及 `python -m src.human_walkthrough --task github_repository`。本規則不代表底層 LLM 權重已訓練，也不賦予新系統寫入權限。
+
 ## 核心能力
-- 七種專家 Agent：主管、架構、開發、DevOps/SRE、QA/UAT、安全、獨立學習評測。
+- 七種專家 Agent：主管、架構、開發、DevOps/SRE、QA/UAT、安全、獨立學習評測。新增「自主開發能力基準」候選：五種合成陌生需求、架構／計畫／程式／QA／七角色交接可執行結構評測；不把自行撰寫參考答案視為實際 Agent 表現。
 - 開源可攜式入口：`START_HERE.md`、`AGENTS.md`、`.github/agents/`、`.agents/skills/`、`.claude/skills/`。
 - 去識別化事故與回歸測試，可避免重複忽略已發生的失效模式。
 - Python 標準函式庫的**安全政策評測**和 GitHub Actions 週期性唯讀 CI。
@@ -20,6 +28,11 @@
 python -m unittest discover -s tests -v
 python -m src.agent_eval validate
 python -m src.agent_eval evaluate --output output/evaluation-report.json
+python -m src.capability_prompts --task-id B001 --output output/capability-task.json
+python -m src.capability_execution prepare --output-dir output/capability-taskpack
+# 收到有權執行的外部 Agent JSON 後，在私人目錄離線匯入；不呼叫模型或執行候選程式：
+# python -m src.capability_execution ingest --packets-dir output/capability-taskpack --bundle /secure/agent-run-bundle.json --output-dir /secure/reviewed-run-001
+python -m src.capability_workbench evaluate --min-structural-score 100 --output output/capability-reference-report.json
 ```
 
 這是**公開安全規則引擎與案例回歸測試**，不是底層 LLM 權重訓練，也不是現場部署、UI 操作或模型的獨立盲測。

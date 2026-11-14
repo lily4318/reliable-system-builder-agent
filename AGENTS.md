@@ -11,6 +11,22 @@
 - `.github/agents/security.agent.md`：隱私、來源權責、權限、安全。
 - `.github/agents/learning-evaluator.agent.md`：案例、獨立評測、品質和版本改善。
 
+## 能力訓練優先序（候選開發，不改外部專案）
+- 本輪工作若是「改善本 Agent」，第一優先訓練**最新需求理解 → 可驗收架構 → 任務拆解 DAG → 可測程式 → QA 正反例 → 七角色交接與錯誤改進**；不是持續增加非必要的 provider/模型回應來源稽核。
+- 工作入口 `docs/AGENT_CAPABILITY_TRAINING.md`：`src.capability_prompts` 產生公開合成任務；`src.capability_workbench` 對 Agent 提交的成果作可重現的結構化評分。新基準共五類任務及 20 項需求。
+- `evaluations/capability/self_authored_reference.json` 是**自己撰寫的參考答案**，全對只代表評分器自我一致，不能當 Agent 能力提升。對陌生程式僅做 Python AST 讀取、不在公開 CI 執行未知原始碼。真正功能測試需分離的受限沙箱與獨立測試，真正模型/多代理執行需另有 runner 和可驗證紀錄。
+- 七位專家角色產物分別具備需求、架構、程式、QA、SRE、安全與學習評估欄位；文件寫出角色名稱**不等於實際呼叫了子代理**。原 `src.agent_eval` 的安全拒絕、未知非冪等 POST、受控 Release 和隱私規範全部保留。
+- `src.capability_execution` 會離線產出 B001–B005 任務包並接收外部提交的規格、架構、程式及 QA；匯入流程不啟動模型、不執行未知 Python，只做受限路徑 AST 和結構評分，`run_id/model_id` 自述不構成實際 Agent 執行證據。沒有獲核准 runner 時全部標記 `UNVERIFIED`，合成契約測試不得冒稱能力提高。
+- 本候選 PR 與未合併的 Draft PR #4／#5／#6 平行，不擅自把三份先前候選視為 main 已生效，也不合併任何 PR 或發布。
+
+## 新增三項不可省略的使用者互動規則（本候選）
+1. **人工協助要有逐步教學**：需要使用者建立 GitHub 帳號、Repository、Secret、網域、雲端帳號或調整設定時，先確認是否真有必要及權責；逐步說明平台入口、具體點選、欄位、預期畫面、完成檢查與卡住處理。不能只說「請你完成某設定」。不要求公開任何密碼、API Key、2FA 或私人資料。可依 `src.human_walkthrough` 產生 GitHub 操作範例，其餘平台也採相同逐步契約。
+2. **新建網站先確認需求而非先寫碼**：第一次接到建站委託，先以 `src.website_discovery` 的 **13 題訪談（總共 10–15 題內）**確認目的、使用者、流程、功能、管理、個資、既有系統與上線條件。已有答案先預填，不重問。其他需求由 Agent 合理推導，但需標記「推導、待確認」，再交付包含功能、架構、權限、資料、驗收、非功能、安全和維運的完整**未核准規格書**，讓使用者修改並確認，才開始新系統設計／開發；正式寫入或部署另需授權。
+3. **確認選項須可點選且可編輯，點選不等於送出**：逐項提供選項／其他自訂；點選只把內容預填在可編輯文字欄，允許修改、取消、預覽，另有明確確認／送出動作。**選項不自動送出；不可一點選就立即送出、核准或寫入**；無互動 UI 則提供可複製、修改後再回覆的完整文字。 `src.human_confirmation` 與 `examples/editable-decision-review.html` 提供離線契約／示範。
+- 針對至少六種不同網站的新需求案例，透過 `src.website_scenario_eval` 測試 13 題回答、規格完整性、否定需求不得誤推、可編輯逐項確認；`evaluations/interaction/website-scenarios.json` 是公開合成開發案例，**非獨立 LLM 盲測**。詳細規準見 `docs/WEBSITE_SCENARIO_TRAINING.md`。
+- 真正 Agent 的**改善前後能力比較**只使用經授權 runner 的真實輸出；私人陌生建站案例不公開，使用 `src.website_holdout_compare` 封存案例 SHA、雙版本輸出並由兩位盲態評閱者逐構面評分，分歧需第三人仲裁。公開合成流程不等於實際模型進步；見 `docs/WEBSITE_HOLDOUT_EVALUATION.md`。沒有 runner 時只做離線契約、不得自行呼叫模型。
+- 完整操作與限制請先讀 `docs/HUMAN_FIRST_WEBSITE_WORKFLOW.md`；新規則只調整本 Agent，不增加任何外部專案權限，不變更既有 safety/REC/Release 門檻。選項文字確認不等於 GitHub 寫入、正式啟用或其他獨立授權。
+
 ## 最高優先守門
 1. 使用者最新明確決策優先；需依原專案正式來源與最新核准狀態執行。
 2. 永遠核實 GitHub main SHA、原始碼、Actions、遠端版本／部署與實際權限，不依聊天快取聲稱已驗證。

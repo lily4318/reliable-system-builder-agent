@@ -6,6 +6,9 @@ import sys
 from pathlib import Path
 from src.agent_eval import evaluate as evaluate_policy
 from src.independent_acceptance import evaluate as evaluate_recovery
+from src.capability_workbench import evaluate as evaluate_capability
+from src.website_scenario_eval import evaluate as evaluate_website
+from src.website_holdout_compare import protocol_contract
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE = ROOT / "evaluations/baselines/v0.1.0-initial.json"
@@ -14,7 +17,13 @@ TARGETS = ROOT / "evaluations/quality-targets.json"
 def load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
-def assess(policy: dict, recovery: dict, baseline: dict, targets: dict) -> dict:
+def assess(policy: dict, recovery: dict, baseline: dict, targets: dict,
+           capability: dict | None = None,
+           website: dict | None = None) -> dict:
+    if capability is None:
+        capability = evaluate_capability()
+    if website is None:
+        website = evaluate_website()
     if baseline.get("status") != "historical_observed_baseline_not_formal_release":
         raise ValueError("unverified baseline")
     if not str(baseline.get("source_main_sha", "")).isalnum() or len(baseline["source_main_sha"]) != 40:
@@ -36,6 +45,42 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict) -> dict:
         "manual_review_remains_required": targets.get("requires_human_release_review") is True
             and targets.get("automatic_release_allowed") is False,
         "not_mislabeled_as_blind_evaluation": recovery["public_cases_not_blind_holdout"] is True,
+        "capability_public_reference_contract":
+            capability.get("task_count", 0) >= 5
+            and capability.get("tasks_full_structural_score") == capability.get("task_count")
+            and capability.get("mean_structural_score") == 100
+            and targets.get("min_capability_reference_score") == 100
+            and capability.get("unsafe_unverified_claim_count") == 0,
+        "website_public_scenario_accuracy_gate":
+            website.get("scenario_count",0) >= targets.get("min_website_scenario_types",6)
+            and website.get("passed") == website.get("scenario_count")
+            and website.get("failed") == 0
+            and website.get("execution_kind") == "local_deterministic_generator_not_LLM",
+        "website_no_false_model_or_release_claim":
+            website.get("actual_LLM_execution_verified") is False
+            and website.get("model_skill_improvement_demonstrated") is False
+            and website.get("independent_blind_holdout") is False
+            and website.get("formal_website_approval_granted") is False
+            and targets.get("website_synthetic_tests_can_claim_model_skill") is False,
+        "private_holdout_protocol_no_false_skill_or_release_claim":
+            protocol_contract().get("required_independent_raters_per_artifact")==2
+            and protocol_contract().get("minimum_private_unseen_case_count")>=5
+            and len(protocol_contract().get("dimensions", []))>=5
+            and protocol_contract().get("third_rater_required_if_score_gap_at_least")==2
+            and protocol_contract().get("before_after_same_model_runner_and_budget") is True
+            and protocol_contract().get("case_text_not_in_public_repository") is True
+            and protocol_contract().get("case_independence_independently_verified") is False
+            and protocol_contract().get("real_model_or_agent_run_verified") is False
+            and protocol_contract().get("automatic_release_allowed") is False
+            and protocol_contract().get("synthetic_tests_measure_real_skill") is False
+            and targets.get("private_holdout_synthetic_tests_can_claim_skill") is False,
+        "capability_no_false_real_agent_claim":
+            capability.get("submission_kind") == "self_authored_reference_fixture_not_agent_result"
+            and capability.get("independent_holdout_evaluated") is False
+            and capability.get("real_llm_or_seven_agents_invoked") is False
+            and capability.get("actual_program_correctness_evaluated") is False
+            and capability.get("architecture_semantics_human_reviewed") is False
+            and targets.get("self_authored_reference_may_claim_agent_skill") is False,
     }
     return {
         "gate_passed": all(checks.values()),
@@ -47,9 +92,17 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict) -> dict:
         "independent_recovery_cases": recovery["total"],
         "independent_recovery_critical": recovery["critical_total"],
         "independent_dataset_sha256": recovery["dataset_sha256"],
+        "public_capability_tasks": capability["task_count"],
+        "self_authored_reference_structural_score": capability["mean_structural_score"],
+        "website_public_scenario_count": website["scenario_count"],
+        "website_public_scenarios_passed": website["passed"],
+        "website_actual_llm_performance_verified": False,
+        "private_holdout_actual_model_run_verified": False,
+        "private_holdout_real_improvement_verified": False,
+        "actual_autonomous_agent_performance_verified": False,
         "human_approval_completed": False,
         "formal_release_created": False,
-        "scope": "public_offline_safety_evaluation_only",
+        "scope": "public_offline_policy_recovery_and_structural_capability_reference_only",
     }
 
 def main() -> int:

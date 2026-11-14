@@ -21,6 +21,23 @@
 ## 評測限制
 公開回歸集可以評估此 Repository 的規則演算法，但不能當作獨立盲測。所有模擬案例的 100% 只是政策最低門檻，不等於實際使用者任務達成率 100%。
 
+## 2026-11-14 候選｜真正工程能力的可執行基準（非 LLM 訓練完成）
+- `evaluations/capability/public_tasks.json`：5 類合成陌生工程任務與 20 項需求；`src.capability_prompts` 只將題目和提交格式提供給 Agent，不包含參考元件列表或參考程式內容。
+- `src.capability_workbench` 評估需求驗收（20 分）、架構模組（15）、任務 DAG（20）、程式 AST 存在（10）、QA 正負例（20）、七角色交接（10）、基本安全（5）。`self_authored_reference.json` 的滿分為**作者自己撰寫的結構對照組**，不能說明模型真的做對或未見過的任務也能做對。
+- `src/capability_reference.py` 是經人工編寫的可信極小演算法，僅作 repo 單元測試示例。無網路沙箱與真正模型 runner 未設置，公開 CI 不執行未信任候選程式，不聲稱有已完成的端到端系統開發成績。
+- 真實訓練循環是：固定題目／評分器 SHA → 由可核驗的 Agent 執行至少三次 → 用相同模型與資源測前後版本 → 獨立人類審查架構、需求完整性及隔離程式行為 → 在未看過的 holdout 比較。過程不等於底層權重微調。
+- 結構基準的限制、實際試跑步驟與未決問題見 `docs/AGENT_CAPABILITY_TRAINING.md`；原有 policy/recovery gate 不移除。
+
+## 2026-11-14｜六類建站需求推導與人工確認測試（PR #7 候選）
+- `evaluations/interaction/website-scenarios.json` 提供六類公開合成網站、由作者標註的應有／禁止推導項目及未回答欄位。 `src.website_scenario_eval` 比對 `src.website_discovery` 的草稿，測量明示需求保留、完整規格構成、缺漏不得補值、合理的推導與否定功能不誤推、逐項選擇後可編輯且不自動傳送、未核准狀態。
+- 公開合成案例及標準答案**不能**宣稱獨立盲測、真正 LLM 推理或模型變聰明。真正效果仍需有授權的 Agent runner、未曝光題庫、盲態人工語意評審與最終規格書的使用者確認。
+- CLI：`python -m src.website_scenario_eval evaluate`；`python -m src.website_scenario_eval packets` 提供不含預期標籤的公開測試任務包。詳見 `docs/WEBSITE_SCENARIO_TRAINING.md`。
+
+## 2026-11-14｜私人陌生網站需求：真正 Agent 改善前後比較介面（未實跑）
+- `src.website_holdout_compare` 在**私人目錄**對至少五個由獨立審查者建立的未見網站需求只輸出 SHA-256 承諾；再讀兩版同模型／runner／預算的輸出及兩位人工盲態評審的五構面分數。分歧 ≥2 要第三人仲裁，逐題配對平均差才可計算。
+- `blind` 產生只含模糊 ID 和規格全文的私人審查包；公開 Repo 和 CI 不含真正未見題、真實人工標註、私人模型輸出。任何自述 runner/model_id 無法替代供應商執行證據。
+- 公開的合成單元測試即使產生正向分數，也固定標記 `actual_model_or_agent_execution_verified=false`、`sealed_holdout_independence_verified=false`、`model_capability_improvement_verified=false`；功能、語意與編輯 UI 仍需獨立 UAT，不能自我核准。詳見 `docs/WEBSITE_HOLDOUT_EVALUATION.md`。
+
 ## 未來 ML/DL
 若要真正機器學習，需要另備經授權資料、標註規範、訓練／驗證／獨立測試切分、可重現訓練程式、模型權重／特徵版本管理、成本及安全評估；目前都未宣稱具備。
 

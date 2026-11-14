@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>逐項選擇、可編輯後確認｜示範</title>
+<style>body{font:16px/1.55 system-ui,sans-serif;max-width:680px;margin:2rem auto;padding:0 1rem}fieldset{border:1px solid #888;border-radius:8px}label{display:block;margin:.7rem 0;cursor:pointer}textarea{width:100%;min-height:8rem;box-sizing:border-box;font:inherit}button{padding:.5rem 1rem;margin:.7rem .6rem .5rem 0}output{display:block;white-space:pre-wrap;overflow-wrap:anywhere}</style></head>
+<body><main><h1>逐項選擇、編輯與確認（離線示範）</h1>
+<p>點選只會將文字放入下方編輯區，<strong>不會自動傳送或核准</strong>。可修改、取消、重新選擇。</p>
+<fieldset><legend>請選擇一項建議</legend>
+<label><input type="radio" name="decision" value="A" data-draft="接受建議，但請先確認需求規格與驗收條件。">方案 A：採用建議</label>
+<label><input type="radio" name="decision" value="B" data-draft="調整建議：保留必要功能，其餘先列入後續版本。">方案 B：調整範圍</label>
+<label><input type="radio" name="decision" value="C" data-draft="先不要執行；請標記待確認的事項並說明風險。">方案 C：暫不執行</label>
+</fieldset>
+<label for="draft">確認之前可直接修改文字</label>
+<textarea id="draft" aria-label="可編輯回覆" placeholder="先點選上方方案，再自由修改文字" disabled></textarea>
+<div><button type="button" id="confirm" disabled>確認文字（只在本頁預覽）</button><button type="button" id="cancel">取消</button></div>
+<output id="preview" role="status" aria-live="polite">尚未選擇；未傳送。</output>
+<script>
+"use strict";
+const input=document.getElementById("draft");
+const ok=document.getElementById("confirm");
+const preview=document.getElementById("preview");
+document.querySelectorAll('input[name="decision"]').forEach(el=>{
+  el.addEventListener("change",()=>{
+    input.value=el.dataset.draft;input.disabled=false;
+    ok.disabled=false;preview.textContent="已選擇；請檢查並編輯，尚未送出。";
+  });
+});
+ok.addEventListener("click",()=>{
+  if(!input.disabled && input.value.trim())
+    preview.textContent="已確認文字（僅本地預覽，未傳送）：\n"+input.value;
+});
+document.getElementById("cancel").addEventListener("click",()=>{
+  document.querySelectorAll('input[name="decision"]').forEach(el=>{el.checked=false;});
+  input.value="";input.disabled=true;ok.disabled=true;
+  preview.textContent="已取消；未傳送。";
+});
+</script></main></body></html>

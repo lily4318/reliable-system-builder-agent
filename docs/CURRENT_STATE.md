@@ -194,3 +194,15 @@ WEBSITE_HOLDOUT_OFFLINE_CI_VERIFIED_20261114:
 - Starting SHA: 69710aa2b3f1ebfceaf4d2fe62070b66c34b34ef
 - New Windows step-by-step guide, public synthetic local rehearsal, original requirement + anonymous spec reviewer packet, blank editable ratings and two-reviewer combine; six interface tests.
 - Runner unavailable/unverified from current accessible main/PR tree and unsupported environment/variables endpoints. No actual model, private holdout or human ratings. Candidate only; CI pending.
+
+WALKTHROUGH_CI_VERIFIED_20261114:
+- TASK_DOMAIN: Agent private website evaluation operator walkthrough (offline only).
+- VERIFIED_CODE_SHA: 39b530f47ed27a7c25f4f12bc022d7bc469c9a5c
+- VERIFIED_CI: https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43550192512, job 132310647789, completed/success; 152/152 Python unit tests, six new CLI interface tests, 22/22 policy, 21/21 recovery, 6/6 public website scenarios, quality gate PASS.
+- SYNTHETIC_REHEARSAL_ONLY: 5 public development cases W101-W105 reused in local temporary files, 10 identical-version fixture specs, 20 synthetic rating records, paired mean delta 0.0; no actual Agent, independent holdout, or human ratings.
+- SOURCE_PATHS: docs/WEBSITE_HOLDOUT_WALKTHROUGH.md; docs/WEBSITE_HOLDOUT_EVALUATION.md; src/website_holdout_walkthrough.py; tests/test_website_holdout_walkthrough.py; CI and required-file list. Original case answers are added to shuffled anonymous review packet after checking manifest, blank rating templates can be edited locally, combine checks completion and distinct reviewers.
+- LIMITS: no authorized runner found, environment/variables endpoints inaccessible; no API Key requested, no model invocation. CLI tested on CI Linux Python 3.12; Windows UI and real reviewer experience not independently tested; packet content can reveal version implicitly and requires manual inspection.
+- LAST_VERIFIED_STEP: code SHA CI verified; documentation append requires same-SHA CI readback.
+- NEXT_ACTION: optional user local rehearsal; actual runner/holdout only with separate authorization and independent participants. No public/private holdout created this turn.
+- WRITE_OWNER: Agent candidate PR7 only; main and release unchanged; no external project modifications, merges or publication.
+- SYNC_STATUS: candidate code verified; final documentation SHA CI pending; REAL_AGENT_NOT_RUN.

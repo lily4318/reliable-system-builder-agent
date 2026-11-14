@@ -1,0 +1,263 @@
+{
+  "schema_version": 1,
+  "dataset": "public-task-scope-regressions-v0.1",
+  "synthetic_or_sanitized": true,
+  "independent_blind_holdout": false,
+  "description": "Human-labelled intent and repository boundaries; examples are illustrative and never parsed as an LLM test.",
+  "cases": [
+    {
+      "id": "S001",
+      "example_utterance": "請訓練這個 Agent，先改善自己的系統規則。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": true,
+        "intent": "improve_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "lily4318/reliable-system-builder-agent",
+        "proposed_write_repo": "lily4318/reliable-system-builder-agent",
+        "write_authorized": true
+      },
+      "expected": "AGENT_CANDIDATE_PR_ONLY",
+      "critical": true
+    },
+    {
+      "id": "S002",
+      "example_utterance": "我要改進 Agent，不是讓你去修改其他網站。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": true,
+        "intent": "improve_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "lily4318/reliable-system-builder-agent",
+        "proposed_write_repo": "example/sample-project",
+        "write_authorized": true
+      },
+      "expected": "BLOCK_CROSS_PROJECT_WRITE",
+      "critical": true
+    },
+    {
+      "id": "S003",
+      "example_utterance": "前面談過網站，但現在只要改善這個 Agent。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": true,
+        "intent": "improve_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "lily4318/reliable-system-builder-agent",
+        "proposed_write_repo": "example/sample-project",
+        "write_authorized": true
+      },
+      "expected": "BLOCK_CROSS_PROJECT_WRITE",
+      "critical": true
+    },
+    {
+      "id": "S004",
+      "example_utterance": "請先唯讀檢查這個 Agent 有哪些弱點。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": true,
+        "intent": "improve_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "lily4318/reliable-system-builder-agent",
+        "proposed_write_repo": null,
+        "write_authorized": false
+      },
+      "expected": "AGENT_READ_ONLY",
+      "critical": false
+    },
+    {
+      "id": "S005",
+      "example_utterance": "我要訓練 Agent，但你把目標放在上一個專案。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": true,
+        "intent": "improve_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "example/sample-project",
+        "proposed_write_repo": "example/sample-project",
+        "write_authorized": true
+      },
+      "expected": "HOLD_TARGET",
+      "critical": true
+    },
+    {
+      "id": "S006",
+      "example_utterance": "請用這個 Agent 修復指定的新專案程式，已授權修改。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": true,
+        "intent": "apply_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "example/sample-project",
+        "proposed_write_repo": "example/sample-project",
+        "write_authorized": true
+      },
+      "expected": "PROJECT_PATCH_ONLY",
+      "critical": true
+    },
+    {
+      "id": "S007",
+      "example_utterance": "請用 Agent 診斷這個專案的部署失敗，僅唯讀。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": true,
+        "intent": "apply_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "example/sample-project",
+        "proposed_write_repo": null,
+        "write_authorized": false
+      },
+      "expected": "PROJECT_READ_ONLY",
+      "critical": true
+    },
+    {
+      "id": "S008",
+      "example_utterance": "請用 Agent 修改專案，但沒有指出要修改哪個儲存庫。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": true,
+        "intent": "apply_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "",
+        "proposed_write_repo": null,
+        "write_authorized": true
+      },
+      "expected": "HOLD_TARGET",
+      "critical": true
+    },
+    {
+      "id": "S009",
+      "example_utterance": "請繼續。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": false,
+        "intent": "improve_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "lily4318/reliable-system-builder-agent",
+        "proposed_write_repo": null,
+        "write_authorized": true
+      },
+      "expected": "HOLD_INTENT",
+      "critical": true
+    },
+    {
+      "id": "S010",
+      "example_utterance": "只有歷史對話猜測，未經本輪確認任務類型。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": false,
+        "intent": "apply_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "example/sample-project",
+        "proposed_write_repo": "example/sample-project",
+        "write_authorized": true
+      },
+      "expected": "HOLD_INTENT",
+      "critical": true
+    },
+    {
+      "id": "S011",
+      "example_utterance": "幫這個 Agent 真正重訓模型權重。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": true,
+        "intent": "improve_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "lily4318/reliable-system-builder-agent",
+        "proposed_write_repo": "lily4318/reliable-system-builder-agent",
+        "write_authorized": true,
+        "requests_weight_training": true
+      },
+      "expected": "HOLD_WEIGHT_TRAINING",
+      "critical": true
+    },
+    {
+      "id": "S012",
+      "example_utterance": "更正：我要改善 Agent 本身，請準備測試與 PR。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": true,
+        "intent": "improve_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "lily4318/reliable-system-builder-agent",
+        "proposed_write_repo": "lily4318/reliable-system-builder-agent",
+        "write_authorized": true
+      },
+      "expected": "AGENT_CANDIDATE_PR_ONLY",
+      "critical": true
+    },
+    {
+      "id": "S013",
+      "example_utterance": "我貼這個 Agent 網址，你看看。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": true,
+        "intent": "",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "lily4318/reliable-system-builder-agent",
+        "proposed_write_repo": null,
+        "write_authorized": false
+      },
+      "expected": "HOLD_INTENT",
+      "critical": true
+    },
+    {
+      "id": "S014",
+      "example_utterance": "使用 Agent 在專案執行，但建議寫入另一個系統。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": true,
+        "intent": "apply_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "example/sample-project",
+        "proposed_write_repo": "lily4318/reliable-system-builder-agent",
+        "write_authorized": true
+      },
+      "expected": "BLOCK_CROSS_PROJECT_WRITE",
+      "critical": true
+    },
+    {
+      "id": "S015",
+      "example_utterance": "這次要改善 Agent，但沒提供本次寫入目的地。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": true,
+        "intent": "improve_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "lily4318/reliable-system-builder-agent",
+        "proposed_write_repo": null,
+        "write_authorized": true
+      },
+      "expected": "HOLD_TARGET",
+      "critical": true
+    },
+    {
+      "id": "S016",
+      "example_utterance": "已批准修正專案，但目標寫入路徑仍未識別。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": true,
+        "intent": "apply_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "example/sample-project",
+        "proposed_write_repo": null,
+        "write_authorized": true
+      },
+      "expected": "HOLD_TARGET",
+      "critical": true
+    },
+    {
+      "id": "S017",
+      "example_utterance": "Agent 改進僅允許唯讀；不可藉歷史授權寫入另一個 repo。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": true,
+        "intent": "improve_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "lily4318/reliable-system-builder-agent",
+        "proposed_write_repo": "example/sample-project",
+        "write_authorized": false
+      },
+      "expected": "BLOCK_CROSS_PROJECT_WRITE",
+      "critical": true
+    },
+    {
+      "id": "S018",
+      "example_utterance": "訓練 Agent 的流程與測試，不改模型權重。",
+      "scenario": {
+        "intent_confirmed_from_latest_user": true,
+        "intent": "improve_agent",
+        "agent_repo": "lily4318/reliable-system-builder-agent",
+        "target_repo": "lily4318/reliable-system-builder-agent",
+        "proposed_write_repo": "lily4318/reliable-system-builder-agent",
+        "write_authorized": true,
+        "requests_weight_training": false
+      },
+      "expected": "AGENT_CANDIDATE_PR_ONLY",
+      "critical": false
+    }
+  ]
+}

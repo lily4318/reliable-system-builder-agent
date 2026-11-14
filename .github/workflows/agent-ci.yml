@@ -24,10 +24,47 @@ jobs:
           python-version: "3.12"
       - name: Offline unit tests
         run: python -m unittest discover -s tests -v
+      - name: List skill catalog (offline)
+        run: python -m src.team_workbench skills
       - name: Public artifacts and privacy scan
         run: python -m src.agent_eval validate
       - name: Deterministic public policy evaluation
         run: python -m src.agent_eval evaluate --output output/evaluation-report.json
+      - name: Public capability assignment generator (no model invocation)
+        run: python -m src.capability_prompts --task-id B001 --output output/capability-assignment.json
+      - name: Offline B001-B005 execution packet preparation (NO runner invocation)
+        run: python -m src.capability_execution prepare --output-dir output/capability-offline-packets
+      - name: Self-authored capability reference structural regression (NOT agent skill)
+        run: python -m src.capability_workbench evaluate --min-structural-score 100 --output output/capability-reference-report.json
+      - name: Validate 13-question initial website discovery and editable review protocol
+        run: |
+          python -m src.website_discovery questions --output output/website-discovery-questions.json
+          python -m src.human_walkthrough --task github_repository > output/github-manual-steps.json
+      - name: Six synthetic website specification cases and editable confirmations (NOT model runs)
+        run: |
+          python -m src.website_scenario_eval validate
+          python -m src.website_scenario_eval evaluate --output output/website-scenario-evaluation.json
+          python -m src.website_scenario_eval packets --output output/website-scenario-tasks.json
+      - name: Six public synthetic website intake browser workflows (local only)
+        run: python -m src.website_intake_browser_test
+      - name: Public holdout comparison protocol only (NO private cases, model or actual ratings)
+        run: python -m src.website_holdout_compare protocol > output/website-private-holdout-protocol.json
+      - name: Public synthetic walkthrough rehearsal (temporary local files, no model)
+        run: |
+          trial=$(mktemp -d)
+          python -m src.website_holdout_walkthrough rehearse --directory "$trial/rehearsal"
+      - name: Synthetic Agent-vs-project task scope regression
+        run: python -m src.task_scope evaluate --output output/task-scope-evaluation.json
+      - name: Structured engineering handoff regression (all seven roles)
+        run: python -m src.engineering_workflow evaluate --output output/engineering-handoff-report.json
+      - name: Validate LLM evaluation protocol and public development labels only
+        run: python -m src.llm_requirements_eval validate --output output/llm-protocol-validation.json
+      - name: Audit real-model runner configuration status (no secrets; no inference)
+        run: python -m src.llm_runner_preflight audit --output output/llm-runner-preflight.json
+      - name: Audit provider evidence absence (offline; not a real provider response)
+        run: python -m src.llm_provider_evidence audit --output output/provider-evidence-audit.json
+      - name: Audit independently supplied provider export and replay ledger absence (offline)
+        run: python -m src.llm_provider_dual_source audit --output output/dual-source-evidence-audit.json
       - name: Independent read-only incident recovery acceptance
         run: python -m src.independent_acceptance evaluate --output output/recovery-acceptance.json
       - name: Candidate quality baseline and safety gate
@@ -40,6 +77,13 @@ jobs:
           path: |
             output/evaluation-report.json
             output/recovery-acceptance.json
+            output/capability-assignment.json
+            output/capability-reference-report.json
+            output/website-discovery-questions.json
+            output/github-manual-steps.json
+            output/website-scenario-evaluation.json
+            output/website-scenario-tasks.json
+            output/website-private-holdout-protocol.json
             output/quality-gate.json
           if-no-files-found: ignore
           retention-days: 14

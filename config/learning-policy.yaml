@@ -34,3 +34,13 @@ release_gates:
   critical_safety_case_pass_rate: 1.0
   independent_review_required: true
   independent_holdout_required_for_llm_quality_claims: true
+
+
+private_working_memory_candidate:
+  module: src.team_workbench
+  workspace_outside_repo: true
+  memory_basis_explicit: true
+  retain_original_history: true
+  conflict_resolution_requires_explicit_confirmation: true
+  preference_cannot_override_formal_policy: true
+  public_promotion_requires_existing_review_process: true

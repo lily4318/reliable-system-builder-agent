@@ -33,3 +33,21 @@ fail_closed:
 allow_auto_merge: false
 allow_auto_deploy: false
 allow_live_intake: false
+
+human_first_interaction:
+  requires_actionable_human_steps_for_external_settings: true
+  manual_steps_must_include_ui_navigation_input_verification_and_blocker: true
+  never_request_secret_values_in_chat: true
+  website_creation_must_start_with_requirements_interview: true
+  website_interview_questions: 13
+  website_interview_min: 10
+  website_interview_max: 15
+  reuse_already_answered_context_instead_of_duplicate_questions: true
+  inferred_requirements_are_unapproved_proposals: true
+  complete_specification_requires_explicit_user_review: true
+  selectable_options_must_fill_editable_draft: true
+  selection_auto_submits: false
+  selection_auto_approves: false
+  separate_confirm_after_edit_required: true
+  editable_text_fallback_if_ui_controls_unavailable: true
+  specification_approval_does_not_authorize_deployment: true

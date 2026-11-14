@@ -1,0 +1,160 @@
+# 技能化團隊工作台（整合候選）
+
+## 設計機制
+參考使用者提供的 AI 團隊學員包第一天版的指令分流、SKILL 模組、共用資料、案例卡與經驗整理模式；獨立設計工程技能，不複製原始業務內容、措辭或素材。保留主框架與四候選功能：PR4 的 task_scope、PR5 的 engineering_workflow、PR6 的離線 LLM 評測與來源查核模組（保留，不再擴張）、PR7 的需求訪談、能力工作台、人工教學、可編輯確認及瀏覽器測試。重疊的品質閘、測試與設定合併；歷史文件保留在原 PR，整合版以此入口與 PR7 共通文件為準，另讀各功能專用手冊。
+
+## 使用者如何工作
+- 在 AI 可讀取本 repo 的工作區中直接說「建立網站」「整理規格」「繼續」「修好報名功能」「記錄這次修復」「整理學到的事」。AI 需先讀 AGENTS.md、對應 SKILL.md、最新正式來源。
+- 七角色依需要工作；無子代理平台即單 Agent 按角色協作。每次用真實工作產物交接。不因有角色名稱就宣稱已執行。
+- 新網站先訪談並確認規格、必要人工操作有逐步教學、確認選項先可編輯再送出。既有功能沿用 src.website_intake_ui、src.website_discovery、src.human_walkthrough。記憶工具不取代使用者確認。
+
+## 本機工作區逐步操作（Windows）
+1. 下載整合候選 PR 分支的 ZIP，解壓到獨立本機資料夾。打開檔案總管至含 src 的根目錄，輸入 powershell 按 Enter。
+2. 執行 `py -3 --version`，建議 Python 3.12。無 Python 時依 docs/WEBSITE_HOLDOUT_WALKTHROUGH.md 的官方安裝步驟；不需要 API Key。
+3. 選私人、未共享且未同步的位置，核對檔案總管右鍵 → 內容 → 安全性。以下示範合成專案用法，不能選正式研究資料夾或 Git repo：
+
+```powershell
+$work = Join-Path $env:LOCALAPPDATA "SystemBuilder-Synthetic-001"
+py -3 -m src.team_workbench skills
+py -3 -m src.team_workbench init --workspace "$work" --label "合成開發專案"
+py -3 -m src.team_workbench context --workspace "$work" --skill project-intake
+```
+
+應見 12 項技能、專案標籤與空產物。init 拒絕已存在路徑；續作用原 workspace，不重新 init。路徑不得在 Agent repo 或其上層。
+
+4. 由 AI 實際完成訪談紀錄，存於已授權私有位置的 requirements.md（可用記事本 UTF-8），再登錄：
+
+```powershell
+py -3 -m src.team_workbench handoff --workspace "$work" --skill project-intake --file "$work/requirements.md" --source-ref "使用者確認前的需求草稿"
+py -3 -m src.team_workbench context --workspace "$work" --skill requirements-spec
+```
+
+回讀產物內容與依賴。正式確認後再保存規格；依 catalog 的 requires/produces 實際交接。更新需求會標舊下游產物 current=false，不能用來施工。current 並非語意正確、實際授權或正式版本判定。
+
+5. 記錄真實偏好或案例：在私人資料夾用記事本寫 note.md，清楚標記證據／限制，不含憑證或個資。僅明確使用者偏好標 user-stated；有實際觀察紀錄標 observed；推測標 candidate。知識、案例和 lessons 用 kind 分別保存。
+
+```powershell
+py -3 -m src.team_workbench remember --workspace "$work" --kind lesson --topic "booking" --file "$work/note.md" --evidence "實際驗收或測試紀錄位置" --basis candidate
+py -3 -m src.team_workbench distill --workspace "$work"
+```
+
+完全相同內容、依據、類別、主題與狀態的活躍紀錄會去重；同一主題有多條則列待審。這是有界去重及人工整理，不是自動語意蒸餾。若要合併語意相同的內容，可先寫新條目，然後逐項由人確認替代。只有實際獲得同意，才能以真實 ID 執行 `resolve --workspace "$work" --retired 1 --retained 2 --reason "使用者實際確認原因" --confirm`（ID 僅示意）。原始紀錄與決策仍保留。若回報衝突或依據不足，不自動挑最新日期覆蓋。
+
+6. 續作：`py -3 -m src.team_workbench context --workspace "$work" --skill resume-project`。同一私有工作區可於新對話重新讀取，但必須由平台具備檔案讀取權限；無法自動跨平台同步。輸出包含私人內容，只能留在授權環境，不得貼到公開 PR 或 CI 報告。無需現在由你建立私人工作區；可先用合成測試驗證。
+
+## P1-1｜任務導向檢索、回饋與跨工作階段案例引用
+
+保留原 workbench.sqlite3、原本的 artifacts/memory/resolutions 及操作；src.workbench_learning 為同庫增量工具，不另存第二套私人記憶。只有已授權工作區才可執行 setup；先備份私人資料庫並依既有 ACL 規則限制存取。setup 加三個 learning_* 表並匯入 B001/B002 公開合成案例簡要內容、來源與可檢索標籤；重跑不重複、不復活已退休案例，遇同名未登錄舊案例則停止由人審查。不自動寫入任何外部專案。
+
+以下 PowerShell 指令假定已依前節建立 $work，示範合成任務、無個資。以 UTF-8 另存輸入 JSON 於私人工作區，不要往公開 PR 貼上輸出。
+
+```powershell
+py -3 -m src.workbench_learning setup --workspace "$work"
+```
+
+建立 task.json：
+
+```json
+{"skill":"debug-and-repair","task":"SYN-REPORT","query":"SQLite 唯讀 缺庫 report recovery reconcile","budget":8000,"limit":5}
+```
+
+```powershell
+py -3 -m src.workbench_learning context --workspace "$work" --input "$work/task.json"
+```
+
+檢查返回的 matched_terms、case topic、memory ID、證據位置與 Scope；公開兩案例為本機 SQLite 合成經驗，不保證適用遠端、多節點或正式資料。搜尋採英文字詞及中文雙字詞交集排序，不是語意模型、向量檢索或正式權限；必要產物全文和案例正文/證據受字元配額限制，索引僅列 ID、來源及 current。配額不含 JSON metadata；過期產物不傳正文，NEEDS_PREREQUISITES/NEEDS_FULL_READ 必須先補讀原產物（必要時用既有 team_workbench context），不得截斷規格後直接施工。artifact_index 目前仍是同一專案的最新產物類別，不是逐任務版本；確認來源適用當前任務。私有工作區互相隔離，不由 task ID 取代專案隔離。候選與同主題未解衝突的記憶只列 review_candidates，不進入可採用清單。
+
+完成真實操作或判定案例不適用後，建立 cite.json（以下 ID 1 僅為示例，先核對 context 的實際 ID、skill/task/query/budget/limit 一致；evidence 需換成實際可定位證據）：
+
+```json
+{"skill":"debug-and-repair","task":"SYN-REPORT","session":"session-1","query":"SQLite 唯讀 缺庫 report recovery reconcile","memory_id":1,"decision":"applied","evidence":"實際測試檔案、案例及結果"}
+```
+
+```powershell
+py -3 -m src.workbench_learning cite --workspace "$work" --input "$work/cite.json"
+```
+
+引用重算目前可選案例才能保存；decision 可為 applied 或 not_applicable。操作者宣告引用並非獨立執行證明。遇實際測試失敗、修復、QA 退件、需求修正或偏好事件，Agent 主動輸入 feedback.json；這是工作流程觸發，並非背景監聽、模型推論或自動升級規則：
+
+```json
+{"task":"SYN-REPORT","session":"session-1","event_id":"report-fix-001","event_type":"test_fix","topic":"SQLite report","content":"合成報表缺庫時拒絕操作，未建立空檔","evidence":"實際功能驗收位置"}
+```
+
+```powershell
+py -3 -m src.workbench_learning feedback --workspace "$work" --input "$work/feedback.json"
+```
+
+event_type 支援 test_failure、test_fix、qa_rejection、requirement_change、preference。事件 ID 相同且內容一致去重，內容不同則拒絕；均存為 candidate，不能自動改寫正式規格/長期偏好。由既有 remember/resolve 人審流程另存已核驗記憶、處理衝突並保留歷史。新的 Python 程序或對話可用同一授權工作區重跑 context，將 session 改為新 ID，並以 history.json（內容 {"task":"SYN-REPORT"}）回讀：
+
+```powershell
+py -3 -m src.workbench_learning history --workspace "$work" --input "$work/history.json"
+```
+
+context/history 真正唯讀，不建缺失資料庫，舊工作區未 setup 先回報，不隱式遷移。history 保留已引用案例及回饋 ID；檢索不等於實際採用。真實跨對話、跨平台、語意蒸餾及自動事件感知仍待具備授權執行環境後測試。
+
+## P1-1b｜技術探索及持久化任務池
+
+同一已授權的 workbench.sqlite3 使用 src.workbench_tasks；明確備份後執行 setup，新加 task_pool、task_decisions、task_events，不改原有產物和記憶。讀取透過 mode=ro，不自動建立缺庫。以下為合成操作示例，非外部專案或產品核准。
+
+操作命令：`py -3 -m src.workbench_tasks <action> --workspace "$work" --input "$work/task.json"`（setup/review 不需 input），輸入 JSON 為 action 的參數。每步使用當前真實 ID；可先執行 review 回讀。
+
+| action | JSON 示例或用途 |
+|---|---|
+| setup | 建立三張表，可重跑 |
+| question | {"decision":"D1","prompt":"錯誤輸入的 UI 提示？"} |
+| add | {"task":"spec","title":"列明未決政策","priority":0,"deps":[],"gates":[],"checks":["R3"]} |
+| add | {"task":"core","title":"半開區間核心","priority":1,"deps":["spec"],"gates":[],"checks":["R1","R2","R4"]} |
+| add | {"task":"ui","title":"正式錯誤提示","priority":2,"deps":["core"],"gates":["D1"],"checks":["UI"]} |
+| start | {"task":"spec","session":"session-1"} |
+| finish | {"task":"spec","session":"session-1","results":{"R3":"PASS"},"evidence":"實際規格與待核決策紀錄位置"} |
+| resume | {"task":"core","previous_session":"session-1","session":"session-2","evidence":"實際查核前一操作者已停止及目前狀態","confirmed":true} |
+| resolve | {"decision":"D1","answer":"已確認的實際政策","source":"明確使用者決策來源","confirmed":true} |
+| review | 唯讀取得 task 狀態、依賴、開放與已決問題及來源、running_review、next_ready、驗收次數、失敗次數、完成數與事件 |
+
+依賴必須先存在、不得自循環，優先級 0–99（越低越高）。以 BEGIN IMMEDIATE 防止同任務競寫；RUNNING 不自動逾時接管。「confirmed」是操作者聲明，只有已有真實明確確認與證據才可使用；不等同部署或正式啟用授權。失敗結果保留歷史與證據，返回 PENDING 且不解鎖下游。既有決策不可直接覆蓋；新政策應建立新的 decision ID，再使用下節 revise 更換相關 gates，保留舊決策。已支援原子化重開及修改 DAG。新程序用 review 讀回後才行動；若任務仍 RUNNING，不盲目接管。例中的 UI 決策沒有真實使用者確認，正式 UI 工作保持 PENDING。
+
+技術探索示例見 src/b003_shifts.py 與 tests/test_b003_and_tasks.py：線性與排序區間判斷對照離散分鐘集合 oracle，原型 INVALID 不是正式產品錯誤政策。此工具的驗收由操作者提供證據，並不自動執行程式碼或替代獨立 QA；記憶、任務與事件在同一 DB，任務仍不代表逐任務 artifact 版本。未建立正式私人工作區。
+
+## P1-1c｜需求變更、任務重開及中斷復原
+
+**升級前**：停止所有舊版工作台操作程序，確認無競寫，備份原 workbench.sqlite3 至授權私人位置；使用新版 setup 明確遷移同一資料庫。增加 revision 欄位（初始 1）；既有 RUNNING 認定需復原，標 RECOVERY_REQUIRED、revision=2 並保存 MIGRATION_FENCE 事件；已完成及其歷史保留。不得混用升級前後的程式寫入同一庫，不自動修改使用者工作區。review 為真正唯讀，不隱式遷移。
+
+需求確認後先 review 核對任務、revision、依賴、目前持有者及實際成果，再從原規格找出受影響的最上游任務。用同一 CLI 的 revise action，明確提供當前 revision、證據與 confirmed=true。可選填 title、deps、gates、checks 更新任務定義；不提供表示單純重開重驗，不覆寫舊已決政策。任務和所有傳遞下游在同一 SQLite 交易修訂，原驗收及舊定義保存於事件。無循環、未知依賴/決策或空驗收才可提交；競寫後若 revision 不符，應重讀，不強制重送。
+
+| action | JSON 示例（ID/版本須以實際 review 替換） |
+|---|---|
+| revise | {"task":"spec","expected_revision":1,"session":"reviewer-1","evidence":"已確認的需求變更來源及版本","confirmed":true,"checks":["R3-v2"]} |
+| recover | {"task":"core","expected_revision":2,"previous_session":"old-worker","session":"reviewer-2","evidence":"已查證原操作者停止、唯讀對帳及部分操作處理","confirmed":true} |
+| start | {"task":"spec","session":"spec-attempt-2","expected_revision":2} |
+| finish | {"task":"spec","session":"spec-attempt-2","expected_revision":2,"results":{"R3-v2":"PASS"},"evidence":"新版實際驗收結果與來源"} |
+| resume | {"task":"spec","previous_session":"spec-attempt-2","session":"spec-attempt-3","expected_revision":2,"evidence":"已查證前操作者停止、版本仍相同及實際狀態","confirmed":true} |
+
+- DONE/PENDING 下游失效時回 PENDING、revision 加1；舊 PASS 只供歷史，不能解鎖新版本。RUNNING 或已待復原者保留舊 owner、轉 RECOVERY_REQUIRED，該次 revision 失效，禁止 finish/resume；review 的 recovery_review / recovery_blockers 顯示復原優先事項，未解決的失效下游也阻止其上游重新開工。無關獨立分支保持原狀。
+- recover 是確認舊操作者停止、核對部分寫入後釋放至 PENDING，不是恢復舊結果；依賴與未決 gate 仍適用。未失效、同 revision 的 RUNNING 才可 resume，須換唯一 session；所有 start/resume 同一 task 不可重用曾領取的 session。所有新版操作建議明確帶 expected_revision；僅 revision=1 提供舊 API 未帶版本的相容性。
+- 任何 confirm 都是操作者聲明，需要外部實際證據；SQLite 守門只能拒絕舊版 API 提交，不能停止外部程序、撤銷 GitHub/GAS 寫入、區分部署權限，也不自動監聽所有需求文件變更。需求變更若涉及根需求產物，使用下節原子 revise+requirement，不再分開呼叫；其他未連結產物仍需明確核對，兩索引並非全面自動聯動；不以任務池狀態代替產物版本或正式核准。若變更依賴關係，還須核對舊工作曾接觸的資源與原依賴，不能只看新 DAG。
+- 新事件 REVISE/INVALIDATE 保存舊/新 revision、狀態、舊 owner 等；新 PASS/FAIL 結果 JSON 包含 revision 與 checks，舊歷史原樣保留、舊 results 可能是平面檢查對應表。review 的 attempts 是歷史總數，completed 是目前有效 DONE 數。驗收證據仍由操作者提供，非獨立 QA。
+
+## P2-1｜原子需求修訂及未知結果復原
+
+已存在根需求產物、且確認需求改變時，先讀正式需求來源，從 task review 與 artifact context 分別核對當前根任務 revision、requirements artifact ID、DAG 涵蓋及舊 worker；**使用同一個 revise 指令的 requirement 參數，而不是先 revise 再 handoff 或反過來。** 此合成 JSON 示範中的 ID、revision、session、文字與證據必須換成實際已確認值：
+
+  {"task":"intake","expected_revision":1,"session":"change-2","evidence":"已確認的新需求來源","confirmed":true,"requirement":{"expected_artifact_id":1,"content":"完整新需求內容","source_ref":"新需求正式來源"}}
+
+將 JSON 存在已授權工作區，以 `py -3 -m src.workbench_tasks revise --workspace "$work" --input "$work/change.json"` 執行。單一 BEGIN IMMEDIATE 中核對兩個版本、寫入新 requirements、修訂 task DAG、使相關下游與舊 session 失效、保存 REVISE/INVALIDATE 以及 root event 內的 requirement_change (old_artifact_id, artifact_id)。任一錯誤回退整筆。session 用唯一變更 ID；不使用舊 token 重送。僅根 requirements 產物支援此合併路由，task ID 和完整 DAG 必須由操作者核對，不自動推斷。
+
+若 CLI 回應遺失、程序中斷或結果未知，先確證前程序停止，使用唯讀 receipt：另建 JSON `{"session":"change-2"}`，執行 `py -3 -m src.workbench_tasks revision-status --workspace "$work" --input "$work/receipt.json"`。COMMITTED 表示確有該次交易事件與對應需求產物，still_current 只是當前根 revision/需求 ID 比對，不是所有下游已通過。NOT_OBSERVED 不單獨證明以前的外部操作或活躍程序沒有寫入；須先核對完整 review/context、舊程序與正式來源，重新確認必要時使用新 session、當前雙版本執行。過去已發生單邊成功者：保留兩方歷史，先重新確認真正最新需求，再以上述原子路由使用兩邊目前 ID/revision 建立一致的新修訂，不猜測正確值，不回退歷史編號。失效 worker 依原 recover 流程處理，新需求仍需重驗。
+
+適用限制：舊版 standalone revise/handoff 仍保留相容性，可繞過新路由，不能宣稱所有工作台操作已全域強制原子化。不自動修訂外部規格、任務產物逐級提交或撤回實際外部寫入；不得混用舊程式或未核對權限。兩次獨立閱讀也不能當同一交易快照；本 receipt 是單一只讀 snapshot。沒有變更私人工作區或外部專案。
+
+## 共用知識與案例
+公開 repo 的 knowledge/ENGINEERING_PATTERNS.md、templates/WORK_ARTIFACTS.md 提供尚需依專案驗證的通用工作方法和格式；真實工作記憶與案例保留私有。去識別化且經人審查的案例才可循原 learning-policy 及獨立 PR 進入公共知識庫。跨專案共用偏好應另設有權限的私人工作區，經明確確認後選取適用條目，不自動混合兩案資料。持久化資料不加密、依賴 OS ACL；憑證不得保存，正規表示式只防部分常見金鑰。
+
+## 測試與效力
+`python -m unittest discover -s tests -v`；`python -m src.quality_gate check`。新增工作台測試使用臨時 SQLite、合成產物；CI 不是模型自主開發成績。現有安全門檻完整保留，不新增來源稽核功能。本候選不授權實際付費模型、部署、外部專案、merge 或 Release。
+
+
+## P2-1b｜任務與 artifact 明確綁定（候選）
+
+有任務的池不能再用 standalone handoff 覆寫既有 requirements。完整跨階段守門須在備份、停止舊 worker、核對正式來源後明確採用 workbench_tasks bind-artifacts：同一 SQLite，輸入 bindings（每個 task ID 對應唯一 artifact kind；無產物的任務用 null）、expected_revisions（每個當前 task revision）、expected_requirement_id、session、evidence、confirmed=true。先建立初始 requirements 和完整 DAG。必要 artifact producer 必須在任務傳遞上游。採用時原子重開已綁定任務及傳遞下游，保留獨立分支、歷史；拒絕活躍 worker、版本衝突和錯誤 DAG。綁定後的拓撲暫不支援新增任務，需明確擴充遷移。
+
+綁定的 producer 未 DONE 時其 artifact current=false。根需求修訂必須走 revise+requirement；根 PASS 輸入 artifact={expected_artifact_id:新版需求 ID,inputs:{}}；其餘綁定 PASS 提供 artifact={expected_artifact_id:先前同類 ID 或首次 null,inputs:精確當前前置 artifact IDs,content:新產物全文,source_ref:來源}。檢查 revision/owner、前置狀態、兩類 artifact 版本，並單交易新增產物、DONE、PASS event；失敗回退，FAIL 不帶產物。receipt still_current 指根 revision 與最新需求 ID，不等於下游 DONE。此為操作者聲明與版本守門，非語意驗收。未採用的池保留舊 API，除既有根需求 standalone 覆寫禁令。不能防直接 SQL、舊程式混用或外部寫入；未改私人 DB 或外部專案。

@@ -1,0 +1,19 @@
+---
+name: resume-project
+description: "繼續、目前進度。system-lead 角色；交付 resume-note。"
+---
+# resume-project｜工作技能
+
+## 開工
+讀根 AGENTS.md、適用角色指令與正式專案來源。使用私人工作區的 `context` 取得既有產物及有效經驗，不把工作區當成正式來源或額外授權。前置產物：依任務所需。缺件時先完成必要前置或說明阻塞；不假造產物。
+
+## 執行
+讀工作區實際產物索引、前置依賴及最近記錄；檢查正式來源與版本。找最靠前未完成且可安全推進的工作，不靠聊天摘要假定完成；阻塞時說明具體缺件並提供可操作替代路徑。
+
+若授權工作區已配置 src.workbench_tasks，先以 review 唯讀取得 next_ready、running_review、完整決策來源、驗收歷史與阻塞依賴，再選最高優先可執行任務；未初始化不隱式遷移。RUNNING 須先核對當前實際操作者、產物與狀態，只有確證舊操作者停止且取得明確確認才 resume；不能僅因對話更換接管或重送。案例與回饋沿用 workbench_learning history/context；不要將已完成的驗收或舊產物視為新版本的自動核准。
+
+### 修訂後接續
+review 必須同時檢查 task revision、recovery_review、recovery_blockers 與舊事件。不得復用舊 session；已失效的 RUNNING 須先查核舊程序已停止及部分操作，用 recover 回 PENDING 並重新按依賴驗收。只有未失效且同 revision 的 RUNNING 經確認才 resume 到新 session。start/resume/finish 使用所讀當前 expected_revision；競寫、錯版本、未知結果先唯讀對帳，不盲目重送。已完成但因新確認需求重新開啟的任務須用新驗收證據，且同步檢視適用正式來源/產物相依；工作台不能終止外部程式或核准部署。
+
+## 交付與接續
+保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 resume-note；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

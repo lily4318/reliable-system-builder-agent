@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "skills": [
+    {
+      "id": "project-intake",
+      "role": "system-lead",
+      "trigger": "我想建網站、幫我做系統",
+      "requires": [],
+      "produces": "requirements",
+      "path": ".agents/skills/project-intake/SKILL.md"
+    },
+    {
+      "id": "requirements-spec",
+      "role": "architect",
+      "trigger": "整理規格、修改需求",
+      "requires": [
+        "requirements"
+      ],
+      "produces": "specification",
+      "path": ".agents/skills/requirements-spec/SKILL.md"
+    },
+    {
+      "id": "architecture-design",
+      "role": "architect",
+      "trigger": "設計架構、比較方案",
+      "requires": [
+        "specification"
+      ],
+      "produces": "architecture",
+      "path": ".agents/skills/architecture-design/SKILL.md"
+    },
+    {
+      "id": "task-planning",
+      "role": "system-lead",
+      "trigger": "拆解任務、規劃施工",
+      "requires": [
+        "specification",
+        "architecture"
+      ],
+      "produces": "plan",
+      "path": ".agents/skills/task-planning/SKILL.md"
+    },
+    {
+      "id": "implement-feature",
+      "role": "developer",
+      "trigger": "完成某功能、實作網站",
+      "requires": [
+        "specification",
+        "architecture",
+        "plan"
+      ],
+      "produces": "implementation",
+      "path": ".agents/skills/implement-feature/SKILL.md"
+    },
+    {
+      "id": "debug-and-repair",
+      "role": "developer",
+      "trigger": "功能壞了、幫我除錯",
+      "requires": [],
+      "produces": "repair",
+      "path": ".agents/skills/debug-and-repair/SKILL.md"
+    },
+    {
+      "id": "test-and-acceptance",
+      "role": "qa-uat",
+      "trigger": "測試網站、驗收功能",
+      "requires": [
+        "implementation"
+      ],
+      "produces": "qa",
+      "path": ".agents/skills/test-and-acceptance/SKILL.md"
+    },
+    {
+      "id": "deployment",
+      "role": "devops-sre",
+      "trigger": "部署、處理 CI 或版本",
+      "requires": [
+        "implementation",
+        "qa",
+        "security-review"
+      ],
+      "produces": "deployment-plan",
+      "path": ".agents/skills/deployment/SKILL.md"
+    },
+    {
+      "id": "security-review",
+      "role": "security",
+      "trigger": "檢查權限、隱私及安全",
+      "requires": [
+        "architecture"
+      ],
+      "produces": "security-review",
+      "path": ".agents/skills/security-review/SKILL.md"
+    },
+    {
+      "id": "learn-from-feedback",
+      "role": "learning-evaluator",
+      "trigger": "記住這個、記錄成功或失敗案例",
+      "requires": [],
+      "produces": "learning-note",
+      "path": ".agents/skills/learn-from-feedback/SKILL.md"
+    },
+    {
+      "id": "knowledge-distillation",
+      "role": "learning-evaluator",
+      "trigger": "整理學到的事、蒸餾",
+      "requires": [],
+      "produces": "knowledge-review",
+      "path": ".agents/skills/knowledge-distillation/SKILL.md"
+    },
+    {
+      "id": "resume-project",
+      "role": "system-lead",
+      "trigger": "繼續、目前進度",
+      "requires": [],
+      "produces": "resume-note",
+      "path": ".agents/skills/resume-project/SKILL.md"
+    }
+  ]
+}

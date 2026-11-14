@@ -73,7 +73,7 @@
     {
       "id": "W103",
       "family": "volunteer_shift",
-      "title": "社區志工排班管理",
+      "title": "社區志工報名、排班及督導網站",
       "objective": "表單與時段需要，但不能因否定通知/整合而新增功能",
       "answers": {
         "purpose": "志工排班與社區活動協作，降低重複排班。",

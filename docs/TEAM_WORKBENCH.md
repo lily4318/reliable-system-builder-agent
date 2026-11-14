@@ -92,6 +92,29 @@ py -3 -m src.workbench_learning history --workspace "$work" --input "$work/histo
 
 context/history 真正唯讀，不建缺失資料庫，舊工作區未 setup 先回報，不隱式遷移。history 保留已引用案例及回饋 ID；檢索不等於實際採用。真實跨對話、跨平台、語意蒸餾及自動事件感知仍待具備授權執行環境後測試。
 
+## P1-1b｜技術探索及持久化任務池
+
+同一已授權的 workbench.sqlite3 使用 src.workbench_tasks；明確備份後執行 setup，新加 task_pool、task_decisions、task_events，不改原有產物和記憶。讀取透過 mode=ro，不自動建立缺庫。以下為合成操作示例，非外部專案或產品核准。
+
+操作命令：`py -3 -m src.workbench_tasks <action> --workspace "$work" --input "$work/task.json"`（setup/review 不需 input），輸入 JSON 為 action 的參數。每步使用當前真實 ID；可先執行 review 回讀。
+
+| action | JSON 示例或用途 |
+|---|---|
+| setup | 建立三張表，可重跑 |
+| question | {"decision":"D1","prompt":"錯誤輸入的 UI 提示？"} |
+| add | {"task":"spec","title":"列明未決政策","priority":0,"deps":[],"gates":[],"checks":["R3"]} |
+| add | {"task":"core","title":"半開區間核心","priority":1,"deps":["spec"],"gates":[],"checks":["R1","R2","R4"]} |
+| add | {"task":"ui","title":"正式錯誤提示","priority":2,"deps":["core"],"gates":["D1"],"checks":["UI"]} |
+| start | {"task":"spec","session":"session-1"} |
+| finish | {"task":"spec","session":"session-1","results":{"R3":"PASS"},"evidence":"實際規格與待核決策紀錄位置"} |
+| resume | {"task":"core","previous_session":"session-1","session":"session-2","evidence":"實際查核前一操作者已停止及目前狀態","confirmed":true} |
+| resolve | {"decision":"D1","answer":"已確認的實際政策","source":"明確使用者決策來源","confirmed":true} |
+| review | 唯讀取得 task 狀態、依賴、開放與已決問題及來源、running_review、next_ready、驗收次數、失敗次數、完成數與事件 |
+
+依賴必須先存在、不得自循環，優先級 0–99（越低越高）。以 BEGIN IMMEDIATE 防止同任務競寫；RUNNING 不自動逾時接管。「confirmed」是操作者聲明，只有已有真實明確確認與證據才可使用；不等同部署或正式啟用授權。失敗結果保留歷史與證據，返回 PENDING 且不解鎖下游。既有決策不可直接覆蓋；新決策及修改任務關係需另行版本化設計，當前不支援重開 DONE 或動態改 DAG。新程序用 review 讀回後才行動；若任務仍 RUNNING，不盲目接管。例中的 UI 決策沒有真實使用者確認，正式 UI 工作保持 PENDING。
+
+技術探索示例見 src/b003_shifts.py 與 tests/test_b003_and_tasks.py：線性與排序區間判斷對照離散分鐘集合 oracle，原型 INVALID 不是正式產品錯誤政策。此工具的驗收由操作者提供證據，並不自動執行程式碼或替代獨立 QA；記憶、任務與事件在同一 DB，任務仍不代表逐任務 artifact 版本。未建立正式私人工作區。
+
 ## 共用知識與案例
 公開 repo 的 knowledge/ENGINEERING_PATTERNS.md、templates/WORK_ARTIFACTS.md 提供尚需依專案驗證的通用工作方法和格式；真實工作記憶與案例保留私有。去識別化且經人審查的案例才可循原 learning-policy 及獨立 PR 進入公共知識庫。跨專案共用偏好應另設有權限的私人工作區，經明確確認後選取適用條目，不自動混合兩案資料。持久化資料不加密、依賴 OS ACL；憑證不得保存，正規表示式只防部分常見金鑰。
 

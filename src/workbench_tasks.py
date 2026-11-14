@@ -60,6 +60,8 @@ def add(path, task, title, priority, deps, gates, checks):
         raise ValueError('priority or acceptance checks invalid')
     with closing(wb.connect(path)) as db, db:
         db.execute('BEGIN IMMEDIATE')
+        if wb._bindings(db) is not None:
+            raise ValueError('bound pool topology requires explicit extension migration')
         if task in deps or any(not db.execute('SELECT 1 FROM task_pool WHERE id=?',(x,)).fetchone() for x in deps):
             raise ValueError('dependency must already exist; DAG only')
         if any(not db.execute('SELECT 1 FROM task_decisions WHERE id=?',(x,)).fetchone() for x in gates):
@@ -72,8 +74,13 @@ def _pool(db):
     rows = {r['id']:dict(r) for r in db.execute('SELECT * FROM task_pool ORDER BY priority,id')}
     if 'revision' not in {r[1] for r in db.execute('PRAGMA table_info(task_pool)')}:
         raise ValueError('explicit task pool setup/migration required')
+    bindings=wb._bindings(db)
+    if bindings is not None and set(bindings)!=set(rows):
+        raise ValueError('incomplete artifact mapping; reconcile')
     open_gates = {r[0] for r in db.execute('SELECT id FROM task_decisions WHERE answer IS NULL')}
     for r in rows.values():
+        if bindings is not None:
+            r['artifact_kind']=bindings[r['id']]
         for k in ('deps','gates','checks'):
             r[k] = json.loads(r[k])
         if any(x not in rows for x in r['deps']):
@@ -126,6 +133,66 @@ def _validate_graph(rows):
         pending = {k:v-roots for k,v in pending.items() if k not in roots}
 
 
+def _validate_bindings(rows, bindings):
+    if not isinstance(bindings,dict) or set(bindings)!=set(rows):
+        raise ValueError('explicit artifact kind or null required for every task')
+    skills={s['produces']:s for s in wb.catalog().values()}
+    kinds=[v for v in bindings.values() if v is not None]
+    if any(not isinstance(v,str) or v not in skills for v in kinds) or len(kinds)!=len(set(kinds)) or 'requirements' not in kinds:
+        raise ValueError('unique known artifact kinds and one requirements producer required')
+    producers={kind:task for task,kind in bindings.items() if kind is not None}
+    _validate_graph(rows)
+    for task,kind in bindings.items():
+        if kind is None:
+            continue
+        seen,stack=set(),list(rows[task]['deps'])
+        while stack:
+            dep=stack.pop()
+            if dep not in seen:
+                seen.add(dep)
+                stack.extend(rows[dep]['deps'])
+        if any(producers.get(k) not in seen for k in skills[kind]['requires']):
+            raise ValueError('artifact prerequisite missing from task ancestry: '+task)
+
+
+def bind_artifacts(path, bindings, expected_revisions, expected_requirement_id,
+                   session, evidence, confirmed=False):
+    if confirmed is not True:
+        raise ValueError('explicit binding review required')
+    session=_id(session)
+    evidence=wb._text(evidence,'binding review evidence',4000)
+    with closing(wb.connect(path)) as db, db:
+        db.execute('BEGIN IMMEDIATE')
+        rows=_pool(db)
+        if wb._bindings(db) is not None:
+            raise ValueError('already bound')
+        _validate_bindings(rows,bindings)
+        if not isinstance(expected_revisions,dict) or set(expected_revisions)!=set(rows):
+            raise ValueError('all current task revisions required')
+        for k,r in rows.items():
+            if type(expected_revisions[k]) is not int:
+                raise ValueError('explicit revision required')
+            _revision(r,expected_revisions[k])
+            if r['state'] in ('RUNNING','RECOVERY_REQUIRED'):
+                raise ValueError('stop and reconcile active workers before binding')
+        prior=wb.current_artifacts(db).get('requirements')
+        if type(expected_requirement_id) is not int or not prior or not prior['current'] or prior['id']!=expected_requirement_id:
+            raise ValueError('current initial requirement required')
+        affected={k for k,v in bindings.items() if v is not None}
+        while True:
+            more={k for k,r in rows.items() if affected.intersection(r['deps'])}
+            if more<=affected:
+                break
+            affected|=more
+        db.execute('CREATE TABLE task_artifact_bindings (task TEXT PRIMARY KEY REFERENCES task_pool(id), kind TEXT UNIQUE)')
+        db.executemany('INSERT INTO task_artifact_bindings VALUES (?,?)',bindings.items())
+        for k in sorted(affected):
+            row=rows[k]
+            db.execute("UPDATE task_pool SET state='PENDING',session=NULL,revision=revision+1 WHERE id=?",(k,))
+            _event(db,k,session,'BIND_INVALIDATE',evidence,{'old_revision':row['revision'],'revision':row['revision']+1,'old_state':row['state'],'artifact_kind':bindings[k]})
+    return {'bound':True,'affected':sorted(affected),'authorization_granted':False}
+
+
 def revise(path, task, expected_revision, session, evidence, confirmed=False,
            title=None, deps=None, gates=None, checks=None, requirement=None):
     """Reopen a task and its transitive dependants; optionally replace requirements atomically."""
@@ -140,6 +207,9 @@ def revise(path, task, expected_revision, session, evidence, confirmed=False,
             raise ValueError('unknown task')
         root = rows[task]
         _revision(root,expected_revision)
+        bindings=wb._bindings(db)
+        if bindings is not None and ((bindings[task]=='requirements') != (requirement is not None)):
+            raise ValueError('bound requirement producer must use combined revision')
         # Optional explicit combined change of the task DAG and root requirement.
         # The operator must identify the correct root task and dependency graph.
         change = None
@@ -147,8 +217,8 @@ def revise(path, task, expected_revision, session, evidence, confirmed=False,
             if not isinstance(requirement,dict) or set(requirement)!={'expected_artifact_id','content','source_ref'}:
                 raise ValueError('complete requirement change required')
             expected = requirement['expected_artifact_id']
-            prior = wb.current_artifacts(db).get('requirements')
-            if type(expected) is not int or not prior or not prior['current'] or prior['id']!=expected:
+            prior = wb._latest(db).get('requirements') if bindings is not None else wb.current_artifacts(db).get('requirements')
+            if type(expected) is not int or not prior or not prior.get('current',True) or prior['id']!=expected:
                 raise ValueError('stale requirement artifact; review first')
             if db.execute("SELECT 1 FROM task_events WHERE session=? AND kind='REVISE'",(session,)).fetchone():
                 raise ValueError('change session already used; review first')
@@ -167,6 +237,8 @@ def revise(path, task, expected_revision, session, evidence, confirmed=False,
             raise ValueError('unknown decision gate')
         rows[task] = {**root,**new}
         _validate_graph(rows)
+        if bindings is not None:
+            _validate_bindings(rows,bindings)
         affected = {task}
         while True:
             more = {k for k,r in rows.items() if affected.intersection(r['deps'])}
@@ -213,12 +285,12 @@ def revision_status(path, session):
         change=detail['requirement_change']
         if not db.execute("SELECT 1 FROM artifacts WHERE id=? AND kind='requirements'",(change['artifact_id'],)).fetchone():
             raise ValueError('revision receipt missing artifact; reconcile manually')
-        latest=wb.current_artifacts(db).get('requirements')
+        latest=wb._latest(db).get('requirements') if wb._bindings(db) is not None else wb.current_artifacts(db).get('requirements')
         root=_pool(db)[task]
         return {'status':'COMMITTED','session':session,'task':task,'revision':detail['revision'],
                 'requirement_change':change,
                 'still_current':root['revision']==detail['revision'] and latest is not None
-                    and latest['id']==change['artifact_id'] and latest['current'],
+                    and latest['id']==change['artifact_id'] and latest.get('current',True),
                 'authorization_granted':False}
 
 
@@ -276,7 +348,7 @@ def resume(path, task, previous_session, session, evidence, confirmed=False, exp
     return {'task':task,'state':'RUNNING','revision':r['revision'],'authorization_granted':False}
 
 
-def finish(path, task, session, results, evidence, expected_revision=None):
+def finish(path, task, session, results, evidence, expected_revision=None, artifact=None):
     task, session = _id(task), _id(session)
     evidence = wb._text(evidence,'acceptance evidence',4000)
     with closing(wb.connect(path)) as db, db:
@@ -291,9 +363,40 @@ def finish(path, task, session, results, evidence, expected_revision=None):
             raise ValueError('all acceptance check results required')
         passed = all(v=='PASS' for v in results.values())
         status = 'DONE' if passed else 'PENDING'
+        kind=r.get('artifact_kind')
+        detail={'revision':r['revision'],'checks':results}
+        if passed and kind is not None:
+            skill=next(s for s in wb.catalog().values() if s['produces']==kind)
+            fields={'expected_artifact_id','inputs'}
+            if kind!='requirements':
+                fields|={'content','source_ref'}
+            if not isinstance(artifact,dict) or set(artifact)!=fields:
+                raise ValueError('bound PASS requires complete versioned artifact evidence')
+            latest=wb._latest(db).get(kind)
+            expected=artifact['expected_artifact_id']
+            if (expected is not None and type(expected) is not int) or expected!=(latest['id'] if latest else None):
+                raise ValueError('stale artifact version; review first')
+            current=wb.current_artifacts(db)
+            inputs=artifact['inputs']
+            if not isinstance(inputs,dict) or any(type(v) is not int for v in inputs.values()):
+                raise ValueError('exact prerequisite artifact IDs required')
+            if any(k not in current or not current[k]['current'] for k in skill['requires']) or inputs!={k:current[k]['id'] for k in skill['requires']}:
+                raise ValueError('stale or missing prerequisite evidence')
+            if kind=='requirements':
+                if latest is None:
+                    raise ValueError('initial requirement missing')
+                ident=latest['id']
+            else:
+                ident=wb._handoff_in_transaction(db,skill['id'],artifact['content'],artifact['source_ref'])['artifact_id']
+            detail['artifact']={'kind':kind,'artifact_id':ident,'inputs':inputs}
+        elif artifact is not None:
+            raise ValueError('artifact commit requires bound successful task')
         db.execute('UPDATE task_pool SET state=?,session=NULL WHERE id=?',(status,task))
-        _event(db,task,session,'PASS' if passed else 'FAIL',evidence,{'revision':r['revision'],'checks':results})
-    return {'task':task,'state':status,'revision':r['revision'],'operator_declared_evidence':True,'authorization_granted':False}
+        _event(db,task,session,'PASS' if passed else 'FAIL',evidence,detail)
+    result={'task':task,'state':status,'revision':r['revision'],'operator_declared_evidence':True,'authorization_granted':False}
+    if 'artifact' in detail:
+        result['artifact']=detail['artifact']
+    return result
 
 
 def review(path):
@@ -314,13 +417,13 @@ def review(path):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('action',choices=('setup','question','resolve','add','start','resume','finish','review','revise','recover','revision-status'))
+    p.add_argument('action',choices=('setup','question','resolve','add','start','resume','finish','review','revise','recover','revision-status','bind-artifacts'))
     p.add_argument('--workspace',required=True,type=Path)
     p.add_argument('--input',type=Path)
     a = p.parse_args()
     try:
         args = json.loads(a.input.read_text(encoding='utf-8-sig')) if a.input else {}
-        fn = {'setup':setup,'question':question,'resolve':resolve_decision,'add':add,'start':start,'resume':resume,'finish':finish,'review':review,'revise':revise,'recover':recover,'revision-status':revision_status}[a.action]
+        fn = {'setup':setup,'question':question,'resolve':resolve_decision,'add':add,'start':start,'resume':resume,'finish':finish,'review':review,'revise':revise,'recover':recover,'revision-status':revision_status,'bind-artifacts':bind_artifacts}[a.action]
         print(json.dumps(fn(a.workspace,**args),ensure_ascii=False,indent=2))
     except (ValueError,TypeError,KeyError,OSError,sqlite3.Error) as e:
         p.exit(2,'WORKBENCH_TASKS_BLOCKED: '+str(e)+'\n')

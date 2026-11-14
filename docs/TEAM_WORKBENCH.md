@@ -151,3 +151,10 @@ context/history 真正唯讀，不建缺失資料庫，舊工作區未 setup 先
 
 ## 測試與效力
 `python -m unittest discover -s tests -v`；`python -m src.quality_gate check`。新增工作台測試使用臨時 SQLite、合成產物；CI 不是模型自主開發成績。現有安全門檻完整保留，不新增來源稽核功能。本候選不授權實際付費模型、部署、外部專案、merge 或 Release。
+
+
+## P2-1b｜任務與 artifact 明確綁定（候選）
+
+有任務的池不能再用 standalone handoff 覆寫既有 requirements。完整跨階段守門須在備份、停止舊 worker、核對正式來源後明確採用 workbench_tasks bind-artifacts：同一 SQLite，輸入 bindings（每個 task ID 對應唯一 artifact kind；無產物的任務用 null）、expected_revisions（每個當前 task revision）、expected_requirement_id、session、evidence、confirmed=true。先建立初始 requirements 和完整 DAG。必要 artifact producer 必須在任務傳遞上游。採用時原子重開已綁定任務及傳遞下游，保留獨立分支、歷史；拒絕活躍 worker、版本衝突和錯誤 DAG。綁定後的拓撲暫不支援新增任務，需明確擴充遷移。
+
+綁定的 producer 未 DONE 時其 artifact current=false。根需求修訂必須走 revise+requirement；根 PASS 輸入 artifact={expected_artifact_id:新版需求 ID,inputs:{}}；其餘綁定 PASS 提供 artifact={expected_artifact_id:先前同類 ID 或首次 null,inputs:精確當前前置 artifact IDs,content:新產物全文,source_ref:來源}。檢查 revision/owner、前置狀態、兩類 artifact 版本，並單交易新增產物、DONE、PASS event；失敗回退，FAIL 不帶產物。receipt still_current 指根 revision 與最新需求 ID，不等於下游 DONE。此為操作者聲明與版本守門，非語意驗收。未採用的池保留舊 API，除既有根需求 standalone 覆寫禁令。不能防直接 SQL、舊程式混用或外部寫入；未改私人 DB 或外部專案。

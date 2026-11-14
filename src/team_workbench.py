@@ -77,10 +77,19 @@ def _latest(db):
     return {r["kind"]:dict(r) for r in rows}
 
 
+def _bindings(db):
+    if not db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='task_artifact_bindings'").fetchone():
+        return None
+    return {r["task"]:r["kind"] for r in db.execute("SELECT task,kind FROM task_artifact_bindings")}
+
+
 def current_artifacts(db):
     latest=_latest(db)
+    bindings=_bindings(db)
+    producers={} if bindings is None else {kind:task for task,kind in bindings.items() if kind is not None}
+    states={} if bindings is None else {r["id"]:r["state"] for r in db.execute("SELECT id,state FROM task_pool")}
     def valid(row, seen):
-        if row["id"] in seen:
+        if row["id"] in seen or (row["kind"] in producers and states.get(producers[row["kind"]])!="DONE"):
             return False
         deps=json.loads(row["dependencies"])
         return all(k in latest and latest[k]["id"]==ident
@@ -110,6 +119,14 @@ def _handoff_in_transaction(db, skill, content, source_ref):
 def handoff(path, skill, content, source_ref):
     with closing(connect(path)) as db, db:
         db.execute("BEGIN IMMEDIATE")
+        kind=catalog()[skill]["produces"]
+        bindings=_bindings(db)
+        if bindings is not None and kind in bindings.values():
+            raise ValueError("bound artifact requires atomic task finish or requirement revision")
+        if (kind=="requirements" and kind in _latest(db)
+                and db.execute("SELECT 1 FROM sqlite_master WHERE type='table' AND name='task_pool'").fetchone()
+                and db.execute("SELECT 1 FROM task_pool LIMIT 1").fetchone()):
+            raise ValueError("existing task pool: revise requirements atomically")
         return _handoff_in_transaction(db,skill,content,source_ref)
 
 
@@ -171,6 +188,7 @@ def resolve(path, retired, retained, reason):
 def context(path, skill, topic=None):
     s=catalog()[skill]
     with closing(connect(path)) as db:
+        db.execute("BEGIN")
         latest=current_artifacts(db)
         missing=[k for k in s["requires"] if k not in latest or not latest[k]["current"]]
         rows=active_memory(db)

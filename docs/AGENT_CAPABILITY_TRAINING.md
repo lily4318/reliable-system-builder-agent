@@ -207,6 +207,13 @@
 - 操作手冊 docs/TEAM_WORKBENCH.md blob 9650577e9ee463e1065a65a7b0b6b376ca4a7fa1，明確 root requirement revise+requirement、receipt 唯讀回讀、已 split 的人工來源確認流程及限制，readback verified；guide head 433e7ac53421016d0107d3749e16741bbc27eb1e CI 43606430195 in_progress at this read。
 - **P21-CASE-005｜observed｜同資料庫的相依索引變更應原子提交，未知結果先查憑據**：雙版本防競寫，狀態／產物／事件同一交易，使用實際程序退出與錯誤注入驗證，不只測正常路徑；已存在的不一致狀態不能由最新日期或較大 revision 推測正確需求，須獨立確認來源再用新修訂恢復。此為可信合成工程案例，非獨立 Agent 盲測。限根 requirements，standalone API 仍可繞過，尚未全域強制或原子綁定每階段 handoff/finish；未證實跨資料庫、外部服務、舊版混用、Windows/斷電或真正獨立 Agent。下一輪優先設備 UI/CLI 完整實戰及陌生任務經驗遷移，必要時再補 opt-in 強制綁定。
 
+### 2026-11-14｜P2-1b 候選：任務—artifact 版本綁定
+
+- SOURCE_VERSION: PR #8 基準 e3b364ba782c4da52d054c1d0ff9911576b20bbd；保留最新 CLI/瀏覽器工作及 P21-CASE-005 歷史。公開根需求既有 task pool 的 standalone 覆寫拒絕；新增明確 bind-artifacts，核對完整任務 revision、根 ID、catalog 依賴與 DAG；重開受影響 task，保留無關分支及歷史。綁定 PASS 與 artifact CAS/前置 ID 同交易，producer 非 DONE 則產物失效。根修訂只走 combined revise。
+- TEST_PLAN: tests/test_bound_artifacts.py 七項負面及跨階段測試；保留舊版本 split 重現，改用歷史寫入方式模擬。基準後 CI 需以新 SHA 讀回，未確認前不得稱成功。
+- LAST_VERIFIED_STEP: 基準與正式主檔讀取；候選實作、測試尚待新 SHA CI。NEXT_ACTION: 查 CI 原始日誌與安全守門，修正實際失敗；補拓撲擴充及真正 stage PASS 程序退出。
+- BLOCKERS: 綁定須明確採用；受信任新版 API，不防直接 SQL/舊程式混用，不保證語意正確、外部同步或真 Agent 能力。WRITE_OWNER: lily4318；SYNC_STATUS: 原候選分支，不合併 main、不 Release、不改外部專案。
+
 ### 每次續作及更新協定
 
 1. 當使用者說「訓練此 Agent」「繼續訓練」時，定位本 repo；先查 main、目前訓練 PR 的實際 head、最新 CI/PR 討論，再讀本節與直接相關技能、程式和測試。新候選轉移時保留本路徑並更新導航；不得用固定 SHA 當現況。

@@ -58,7 +58,7 @@ class RevisionSyncTests(unittest.TestCase):
         print('REVISION-SPLIT-RED: task-first interruption leaves stale artifacts usable',flush=True)
 
     def test_legacy_artifact_first_interruption_reproduced(self):
-        child=self.child("w.handoff(p,'project-intake','R2','synthetic R2'); os._exit(23)")
+        child=self.child("db=w.connect(p); db.execute('BEGIN IMMEDIATE'); w._handoff_in_transaction(db,'project-intake','R2','synthetic R2'); db.commit(); db.close(); os._exit(23)")
         self.assertEqual(child.returncode,23,child.stderr)
         self.assertFalse(self.artifact()['specification']['current'])
         self.assertEqual(self.state()['completed'],4)
@@ -83,7 +83,10 @@ class RevisionSyncTests(unittest.TestCase):
         self.assertEqual(tasks.revision_status(self.w,'reconcile-3')['status'],'COMMITTED')
 
     def test_reconcile_preexisting_artifact_first_split(self):
-        wb.handoff(self.w,'project-intake','R2','synthetic R2')
+        # Simulate a pre-upgrade database using the legacy write path.
+        with closing(wb.connect(self.w)) as db, db:
+            db.execute('BEGIN IMMEDIATE')
+            wb._handoff_in_transaction(db,'project-intake','R2','synthetic R2')
         self.assertEqual(self.state()['completed'],4)
         root=next(row for row in self.state()['tasks'] if row['id']=='intake')
         current=self.artifact()['requirements']

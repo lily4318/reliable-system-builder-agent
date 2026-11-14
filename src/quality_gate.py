@@ -7,6 +7,7 @@ from pathlib import Path
 from src.agent_eval import evaluate as evaluate_policy
 from src.independent_acceptance import evaluate as evaluate_recovery
 from src.capability_workbench import evaluate as evaluate_capability
+from src.website_scenario_eval import evaluate as evaluate_website
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE = ROOT / "evaluations/baselines/v0.1.0-initial.json"
@@ -16,9 +17,12 @@ def load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 def assess(policy: dict, recovery: dict, baseline: dict, targets: dict,
-           capability: dict | None = None) -> dict:
+           capability: dict | None = None,
+           website: dict | None = None) -> dict:
     if capability is None:
         capability = evaluate_capability()
+    if website is None:
+        website = evaluate_website()
     if baseline.get("status") != "historical_observed_baseline_not_formal_release":
         raise ValueError("unverified baseline")
     if not str(baseline.get("source_main_sha", "")).isalnum() or len(baseline["source_main_sha"]) != 40:
@@ -46,6 +50,17 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict,
             and capability.get("mean_structural_score") == 100
             and targets.get("min_capability_reference_score") == 100
             and capability.get("unsafe_unverified_claim_count") == 0,
+        "website_public_scenario_accuracy_gate":
+            website.get("scenario_count",0) >= targets.get("min_website_scenario_types",6)
+            and website.get("passed") == website.get("scenario_count")
+            and website.get("failed") == 0
+            and website.get("execution_kind") == "local_deterministic_generator_not_LLM",
+        "website_no_false_model_or_release_claim":
+            website.get("actual_LLM_execution_verified") is False
+            and website.get("model_skill_improvement_demonstrated") is False
+            and website.get("independent_blind_holdout") is False
+            and website.get("formal_website_approval_granted") is False
+            and targets.get("website_synthetic_tests_can_claim_model_skill") is False,
         "capability_no_false_real_agent_claim":
             capability.get("submission_kind") == "self_authored_reference_fixture_not_agent_result"
             and capability.get("independent_holdout_evaluated") is False
@@ -66,6 +81,9 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict,
         "independent_dataset_sha256": recovery["dataset_sha256"],
         "public_capability_tasks": capability["task_count"],
         "self_authored_reference_structural_score": capability["mean_structural_score"],
+        "website_public_scenario_count": website["scenario_count"],
+        "website_public_scenarios_passed": website["passed"],
+        "website_actual_llm_performance_verified": False,
         "actual_autonomous_agent_performance_verified": False,
         "human_approval_completed": False,
         "formal_release_created": False,

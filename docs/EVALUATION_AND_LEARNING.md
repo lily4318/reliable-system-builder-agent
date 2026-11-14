@@ -28,6 +28,11 @@
 - 真實訓練循環是：固定題目／評分器 SHA → 由可核驗的 Agent 執行至少三次 → 用相同模型與資源測前後版本 → 獨立人類審查架構、需求完整性及隔離程式行為 → 在未看過的 holdout 比較。過程不等於底層權重微調。
 - 結構基準的限制、實際試跑步驟與未決問題見 `docs/AGENT_CAPABILITY_TRAINING.md`；原有 policy/recovery gate 不移除。
 
+## 2026-11-14｜六類建站需求推導與人工確認測試（PR #7 候選）
+- `evaluations/interaction/website-scenarios.json` 提供六類公開合成網站、由作者標註的應有／禁止推導項目及未回答欄位。 `src.website_scenario_eval` 比對 `src.website_discovery` 的草稿，測量明示需求保留、完整規格構成、缺漏不得補值、合理的推導與否定功能不誤推、逐項選擇後可編輯且不自動傳送、未核准狀態。
+- 公開合成案例及標準答案**不能**宣稱獨立盲測、真正 LLM 推理或模型變聰明。真正效果仍需有授權的 Agent runner、未曝光題庫、盲態人工語意評審與最終規格書的使用者確認。
+- CLI：`python -m src.website_scenario_eval evaluate`；`python -m src.website_scenario_eval packets` 提供不含預期標籤的公開測試任務包。詳見 `docs/WEBSITE_SCENARIO_TRAINING.md`。
+
 ## 未來 ML/DL
 若要真正機器學習，需要另備經授權資料、標註規範、訓練／驗證／獨立測試切分、可重現訓練程式、模型權重／特徵版本管理、成本及安全評估；目前都未宣稱具備。
 

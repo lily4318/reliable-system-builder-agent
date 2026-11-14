@@ -5,6 +5,7 @@ from src.agent_eval import evaluate as evaluate_policy
 from src.independent_acceptance import evaluate as evaluate_recovery
 from src.quality_gate import assess, load, BASELINE, TARGETS
 from src.capability_workbench import evaluate as evaluate_capability
+from src.website_scenario_eval import evaluate as evaluate_website
 
 
 class QualityGateTest(unittest.TestCase):
@@ -50,6 +51,29 @@ class QualityGateTest(unittest.TestCase):
                                 {**self.targets, "self_authored_reference_may_claim_agent_skill": True})["gate_passed"])
         self.assertFalse(assess(self.policy, self.recovery, self.baseline,
                                 self.targets, capability={**cap, "real_llm_or_seven_agents_invoked": True})["gate_passed"])
+
+    def test_website_scenario_gate_rejects_missing_and_failed_cases(self):
+        website=evaluate_website()
+        self.assertTrue(assess(self.policy,self.recovery,self.baseline,
+                               self.targets,website=website)["gate_passed"])
+        for change in ({"failed":1}, {"passed":website["passed"]-1},
+                       {"scenario_count":4},
+                       {"execution_kind":"real_model_proven"}):
+            altered={**website,**change}
+            self.assertFalse(assess(self.policy,self.recovery,self.baseline,
+                                    self.targets,website=altered)["gate_passed"])
+
+    def test_website_synthetic_test_cannot_claim_real_model_skill(self):
+        website=evaluate_website()
+        for key in ("actual_LLM_execution_verified",
+                    "model_skill_improvement_demonstrated",
+                    "formal_website_approval_granted","independent_blind_holdout"):
+            altered={**website,key:True}
+            self.assertFalse(assess(self.policy,self.recovery,self.baseline,
+                                    self.targets,website=altered)["gate_passed"])
+        weak={**self.targets,"website_synthetic_tests_can_claim_model_skill":True}
+        self.assertFalse(assess(self.policy,self.recovery,self.baseline,
+                                weak,website=website)["gate_passed"])
 
     def test_missing_human_review_blocks(self):
         bad = {**self.targets, "requires_human_release_review": False}

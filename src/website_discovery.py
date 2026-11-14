@@ -2,6 +2,7 @@
 from __future__ import annotations
 import argparse
 import json
+import re
 from pathlib import Path
 import sys
 
@@ -35,13 +36,33 @@ def _answer(x):
     if not isinstance(x, str) or len(x) > 2000:
         raise ValueError("answer must be free text, maximum 2000 characters")
     value = x.strip()
-    return None if value in ("", "未定", "不確定", "待確認") else value
+    return None if value in ("", "未定", "不確定", "待確認", "尚未決定", "尚未確認") else value
+
+
+_NEGATORS = re.compile(
+    r"不需要|不需|不用|無需|不提供|不收集|不設|不使用|"
+    r"不開放|不建立|不留|沒有|未提供|暫不|免|禁止|無"
+)
 
 
 def _yes(text, words):
+    """Detect positive requests; do not turn explicitly negated features on.
+
+    Clauses separated by commas, semicolons and contrasts are considered
+    independently. This is a conservative deterministic heuristic, not
+    natural-language semantic understanding; the draft still needs review.
+    """
     if text is None or text in ("沒有", "無", "否", "不適用", "不需要"):
         return False
-    return any(w in text for w in words)
+    clauses = re.split(r"[，,；;。\n]|但是|但|然而|不過", text)
+    for clause in clauses:
+        for word in words:
+            for match in re.finditer(re.escape(word), clause):
+                # A preceding negator scopes over a conjunction such as
+                # "不需要線上報名表單或上傳資料" in the same clause.
+                if _NEGATORS.search(clause[:match.start()]) is None:
+                    return True
+    return False
 
 
 def draft_spec(answers: dict) -> dict:
@@ -116,6 +137,30 @@ def draft_spec(answers: dict) -> dict:
             }
             for i,x in enumerate(inferred)],
         "unanswered_questions":[k for k in IDS if a[k] is None],
+        "requirement_traceability":[
+            {"requirement_id":"REQ-"+str(i),
+             "source_question":key,
+             "explicit_user_answer":a[key] if a[key] is not None else "待確認",
+             "status":"USER_STATED_NOT_APPROVED" if a[key] is not None else "OPEN_UNANSWERED",
+             "acceptance_criteria":"需依已確認的具體功能及異常流程訂定驗收，不自行補數值。"}
+            for i,key in enumerate(IDS,1)],
+        "architecture_design_draft":{
+            "ui_pages_from_user":a["pages"] or "待確認",
+            "user_flow_from_user":a["journey"] or "待確認",
+            "service_modules":"待依已確認的流程和個別功能決定，不推定使用框架。",
+            "data_storage_and_lifecycle":"待核：表單欄位、保存期限、權限、備援及清除。",
+            "existing_infrastructure_from_user":a["integrations"] or "待確認",
+            "design_decision_status":"PENDING_USER_SPEC_REVIEW"},
+        "delivery_plan_draft":{
+            "mvp_priority_from_user":a["release"] or "待確認",
+            "work_packages":[
+                "確認逐項規格與資料／權限範圍",
+                "依正式確認的功能提出架構與資料表",
+                "建立可測候選模組與正反測",
+                "執行隔離整合驗收及人工 UI 驗收",
+                "另行確認部署、資料收件與維運權責"],
+            "deployment_status":"NOT_AUTHORIZED",
+            "live_intake_status":"NOT_AUTHORIZED"},
         "scope_limits":"未核准事項不得擅自寫入、部署或啟用真人資料。",
         "user_review_required":True,
         "specification_approved":False,

@@ -40,6 +40,9 @@ REQUIRED = (
     "evaluations/interaction/website-intake-questions.json",
     "evaluations/interaction/human-github-walkthroughs.json",
     "examples/editable-decision-review.html",
+    "src/website_scenario_eval.py", "tests/test_website_scenario_eval.py",
+    "evaluations/interaction/website-scenarios.json",
+    "docs/WEBSITE_SCENARIO_TRAINING.md",
 )
 
 def decide(s):
@@ -119,7 +122,8 @@ def validate(root=ROOT):
     )
     public = [Path(root) / "evaluations/cases/regressions.json",
               Path(root) / "evaluations/capability/public_tasks.json",
-              Path(root) / "evaluations/capability/self_authored_reference.json"]
+              Path(root) / "evaluations/capability/self_authored_reference.json",
+              Path(root) / "evaluations/interaction/website-scenarios.json"]
     public.extend((Path(root) / "incidents/sanitized-cases").glob("*.md"))
     for file in public:
         content = file.read_text(encoding="utf-8")

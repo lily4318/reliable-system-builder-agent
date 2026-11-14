@@ -38,6 +38,11 @@ jobs:
         run: |
           python -m src.website_discovery questions --output output/website-discovery-questions.json
           python -m src.human_walkthrough --task github_repository > output/github-manual-steps.json
+      - name: Six synthetic website specification cases and editable confirmations (NOT model runs)
+        run: |
+          python -m src.website_scenario_eval validate
+          python -m src.website_scenario_eval evaluate --output output/website-scenario-evaluation.json
+          python -m src.website_scenario_eval packets --output output/website-scenario-tasks.json
       - name: Independent read-only incident recovery acceptance
         run: python -m src.independent_acceptance evaluate --output output/recovery-acceptance.json
       - name: Candidate quality baseline and safety gate
@@ -54,6 +59,8 @@ jobs:
             output/capability-reference-report.json
             output/website-discovery-questions.json
             output/github-manual-steps.json
+            output/website-scenario-evaluation.json
+            output/website-scenario-tasks.json
             output/quality-gate.json
           if-no-files-found: ignore
           retention-days: 14

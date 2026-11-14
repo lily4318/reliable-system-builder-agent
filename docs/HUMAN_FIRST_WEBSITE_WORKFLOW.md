@@ -49,6 +49,9 @@ python -m src.website_discovery draft --answers /secure/website-answers.json \
 
 可查看自含的唯讀示範 `examples/editable-decision-review.html`。Python 契約 `src.human_confirmation` 的 `select`、`edit`、`confirm` 故意**沒有傳送或核准外部動作的能力**，CI 測試選完、編輯、取消流程的拒絕條件。UI 示範僅在本地預覽，不連網。
 
+### 六種公開合成建站需求的自動回歸
+使用 `python -m src.website_scenario_eval evaluate --output output/website-scenario-evaluation.json` 進行六種不同網站的需求保留、應推導／不應推導、完整規格結構、個別編輯確認與無授權狀態驗證。否定句例如「不需要報名表單」不能被簡單關鍵字誤判；有「不需要報名，但需要匿名回饋」時需保留後一項需求。規格另生成 13 項需求來源追溯、架構與工作計畫待核草稿。案例屬人工撰寫且公開的**確定性邏輯回歸**；真正 LLM 的理解程度、適用介面與使用者體驗仍須獨立測試。詳見 `docs/WEBSITE_SCENARIO_TRAINING.md`。
+
 ## 與能力訓練及授權的關係
 
 這三項是對話和工程需求品質規則，必須與 Agent 的既有能力基準、政策負測及正式發布守門一起驗證。合成單元測試 PASS 只表示本地契約有效；**尚未在真實 LLM、不同 UI 平台或真人網站專案完成使用者體驗測試**。下一輪可在獨立、取得允許的模型環境用陌生建站需求做真人評估，不得將這些文件誤稱已訓練底層模型權重。

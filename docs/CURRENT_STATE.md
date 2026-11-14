@@ -129,3 +129,16 @@ HUMAN_FIRST_WEBSITE_VERIFIED_CI_20261114:
 - NEXT_ACTION: Read latest final candidate SHA and associated CI success; later arrange authorized human UX review of 13-question intake and selection -> edit -> confirm flow, without auto-sending.
 - WRITE_OWNER: only Agent Draft PR #7 candidate branch; formal main, other Draft PRs, Release and external systems unchanged.
 - SYNC_STATUS: candidate_code_ci_pass; final_document_sha_ci_pending; new_rules_not_merged_into_main.
+
+## 2026-11-14｜六類新網站合成需求訓練與規格回歸（PR #7 增量）
+TASK_DOMAIN: RELIABLE_AGENT_WEBSITE_SCENARIO_REQUIREMENT_BENCHMARK
+SOURCE_OWNER: lily4318/reliable-system-builder-agent; Draft PR #7 candidate-agent-capability-workbench-20261114 only
+BASE_MAIN_SHA: c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57
+PRE_CANDIDATE_SHA: 7895b78943759caa8e7daed6ebcd82249a247242
+SOURCE_PATHS: evaluations/interaction/website-scenarios.json; src/website_discovery.py; src/website_scenario_eval.py; tests/test_website_scenario_eval.py; src/quality_gate.py; tests/test_quality_gate.py; original CI and docs.
+COMPLETED_PENDING_CI: six human-authored public synthetic website types (research recruitment, static museum, volunteer shifts, youth sports lessons, community directory and partial internal learning portal), expected/forbidden inference labels, unanswered keys, spec traceability/architecture/work draft, review items accept/modify/reject and selection/edit/confirm flow, robust negative feature requests, evaluation and CI quality gate.
+LAST_VERIFIED_STEP: CANDIDATE_CODE_AND_SAME_SHA_CI_PENDING
+EVIDENCE_LIMITS: Tests exercise a deterministic local generator against public authored annotations; do not measure actual model reasoning, holdout generalization, actual UI control or real seven-agent handoffs. Site build, live data and deployments not authorized.
+NEXT_ACTION: commit only PR7; run exact SHA CI including old policy/recovery benchmarks, six scenario positives and negatives; correct errors without deleting tests, log final verified code SHA.
+WRITE_OWNER: agent repo candidate only; main and PR4/PR5/PR6 unmodified.
+SYNC_STATUS: candidate_only; real_model_NOT_RUN; real_website_UAT_NOT_RUN; no_merge_no_release

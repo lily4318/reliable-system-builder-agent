@@ -28,13 +28,23 @@ class Store:
             db.execute('BEGIN IMMEDIATE')
             db.execute('CREATE TABLE inventory(id INTEGER PRIMARY KEY CHECK(id=1), stock INTEGER NOT NULL, reserved INTEGER NOT NULL CHECK(reserved>=0 AND reserved<=stock))')
             db.execute('CREATE TABLE requests(owner TEXT NOT NULL, token TEXT NOT NULL, qty INTEGER NOT NULL CHECK(qty>0), result TEXT NOT NULL CHECK(result IN (\'RESERVED\',\'INSUFFICIENT\')), PRIMARY KEY(owner,token))')
+            db.execute("""CREATE TABLE lifecycle(
+                actor TEXT NOT NULL, action_token TEXT NOT NULL,
+                owner TEXT NOT NULL, target_token TEXT NOT NULL,
+                result TEXT NOT NULL CHECK(result IN ('CANCELLED','RETURNED')),
+                PRIMARY KEY(actor,action_token), UNIQUE(owner,target_token))""")
             db.execute('INSERT INTO inventory VALUES(1,10,0)')
 
-    def view(self, owner):
+    def view(self, owner, lifecycle=False):
         with closing(self.connect('ro')) as db:
             db.execute('BEGIN')
             stock,reserved = db.execute('SELECT stock,reserved FROM inventory').fetchone()
             rows = db.execute('SELECT owner,token,qty,result FROM requests WHERE owner=? ORDER BY token',(owner,)).fetchall() if owner is not None else db.execute('SELECT owner,token,qty,result FROM requests ORDER BY owner,token').fetchall()
+            if lifecycle:
+                query = """SELECT r.owner,r.token,r.qty,r.result,
+                    COALESCE(a.result,r.result),COALESCE(a.actor,''),COALESCE(a.action_token,'')
+                    FROM requests r LEFT JOIN lifecycle a ON r.owner=a.owner AND r.token=a.target_token"""
+                rows = db.execute(query + ' WHERE r.owner=? ORDER BY r.token',(owner,)).fetchall() if owner is not None else db.execute(query+' ORDER BY r.owner,r.token').fetchall()
         return stock,reserved,rows
 
     def reserve(self, owner, token, qty, fault=False):
@@ -52,6 +62,33 @@ class Store:
             if fault:
                 raise RuntimeError('synthetic interruption')
             db.execute('INSERT INTO requests VALUES(?,?,?,?)',(owner,token,qty,result))
+            return result
+
+    def release(self, actor, owner, target, action_token, operation, fault=False):
+        if operation == 'cancel' and actor in ('member','member2') and actor == owner:
+            result = 'CANCELLED'
+        elif operation == 'return' and actor == 'admin' and owner in ('member','member2'):
+            result = 'RETURNED'
+        else:
+            raise PermissionError('not permitted')
+        if not all(isinstance(x,str) and re.fullmatch(r'[a-f0-9]{32}',x) for x in (target,action_token)):
+            raise ValueError('invalid token')
+        with closing(self.connect('rw')) as db, db:
+            db.execute('BEGIN IMMEDIATE')
+            prior=db.execute('SELECT owner,target_token,result FROM lifecycle WHERE actor=? AND action_token=?',(actor,action_token)).fetchone()
+            if prior:
+                if prior != (owner,target,result):
+                    raise ValueError('action token conflict')
+                return result
+            req=db.execute('SELECT qty,result FROM requests WHERE owner=? AND token=?',(owner,target)).fetchone()
+            if req is None or req[1] != 'RESERVED' or db.execute('SELECT 1 FROM lifecycle WHERE owner=? AND target_token=?',(owner,target)).fetchone():
+                return 'NOT_ACTIVE'
+            changed=db.execute('UPDATE inventory SET reserved=reserved-? WHERE id=1 AND reserved>=?',(req[0],req[0])).rowcount
+            if changed != 1:
+                raise sqlite3.DatabaseError('inventory invariant')
+            if fault:
+                raise RuntimeError('synthetic interruption')
+            db.execute('INSERT INTO lifecycle VALUES(?,?,?,?,?)',(actor,action_token,owner,target,result))
             return result
 
 
@@ -114,10 +151,17 @@ class Handler(BaseHTTPRequestHandler):
         if self.path=='/admin' and user!='admin':
             return self.page(403,'Admin only')
         try:
-            stock,reserved,rows=self.server.store.view(None if user=='admin' else user)
+            stock,reserved,rows=self.server.store.view(None if user=='admin' else user,lifecycle=True)
         except sqlite3.Error:
             return self.page(503,'Unavailable; review database, do not recreate')
-        table='<table><thead><tr><th>Account</th><th>Request</th><th>Quantity</th><th>Result</th></tr></thead><tbody>'+''.join('<tr>'+''.join('<td>'+html.escape(str(x))+'</td>' for x in r)+'</tr>' for r in rows)+'</tbody></table>'
+        def action(row):
+            owner,target,_,_,state,_,_=row
+            if state!='RESERVED':
+                return ''
+            operation='return' if user=='admin' else 'cancel'
+            owner_field='<input type="hidden" name="owner" value="'+html.escape(owner,quote=True)+'">' if user=='admin' else ''
+            return '<form method="post" action="/'+operation+'"><input type="hidden" name="csrf" value="'+csrf+'">'+owner_field+'<input type="hidden" name="target" value="'+html.escape(target,quote=True)+'"><input type="hidden" name="action_token" value="'+secrets.token_hex(16)+'"><button>'+operation.title()+'</button></form>'
+        table='<table><thead><tr><th>Account</th><th>Request</th><th>Quantity</th><th>Original decision</th><th>Current state</th><th>Action actor</th><th>Action ID</th><th>Action</th></tr></thead><tbody>'+''.join('<tr>'+''.join('<td>'+html.escape(str(x))+'</td>' for x in r)+'<td>'+action(r)+'</td></tr>' for r in rows)+'</tbody></table>'
         form='' if user=='admin' else '<form method="post" action="/reserve"><input type="hidden" name="csrf" value="'+csrf+'"><input type="hidden" name="token" value="'+secrets.token_hex(16)+'"><label>Quantity <input name="qty" type="number" min="1" max="10" required></label><button>Reserve</button></form>'
         self.page(200,'<p>Signed in: '+user+'</p><p id="available">Available: '+str(stock-reserved)+'</p>'+form+table+'<form method="post" action="/logout"><input type="hidden" name="csrf" value="'+csrf+'"><button>Sign out</button></form>')
 
@@ -158,6 +202,22 @@ class Handler(BaseHTTPRequestHandler):
             with self.server.lock:
                 self.server.sessions.pop(sid,None)
             return self.page(200,'<a href="/login">Signed out</a>','')
+        if self.path in ('/cancel','/return'):
+            operation=self.path[1:]
+            if (operation=='return' and user!='admin') or (operation=='cancel' and user=='admin'):
+                return self.page(403,'Not permitted')
+            expected={'csrf','target','action_token'} | ({'owner'} if operation=='return' else set())
+            if set(data)!=expected:
+                return self.page(400,'Invalid action')
+            try:
+                result=self.server.store.release(user,data.get('owner',user),data['target'],data['action_token'],operation)
+            except PermissionError:
+                return self.page(403,'Not permitted')
+            except ValueError:
+                return self.page(400,'Invalid action or conflicting token')
+            except sqlite3.Error:
+                return self.page(503,'Unknown result; open dashboard to reconcile, do not retry automatically')
+            return self.page(409 if result=='NOT_ACTIVE' else 200,'<p id="result">'+result+'</p><a href="/">Dashboard / read-only reconciliation</a>')
         if self.path!='/reserve':
             return self.page(404,'Not found')
         if user=='admin':
@@ -182,7 +242,7 @@ def main():
     store=Store(a.database)
     if a.initialize:
         store.initialize()
-    store.view('member')
+    store.view('member',lifecycle=True)
     with Site(store,a.port) as server:
         print(server.origin,flush=True)
         print('Temporary synthetic credentials:',server.credentials,flush=True)

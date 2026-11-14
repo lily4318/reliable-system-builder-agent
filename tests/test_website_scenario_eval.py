@@ -97,6 +97,8 @@ class WebsiteScenarioTest(unittest.TestCase):
             ("不提供時段預約或候補",("時段","預約","候補")),
             ("不使用 GitHub 或 API",("GitHub","API")),
             ("沒有 Email 通知",("Email","通知")),
+            ("不需要 Email 通知，也不發簡訊",("Email","通知","簡訊")),
+            ("不寄電子郵件、不發簡訊",("郵件","簡訊")),
             ("不收集任何個人資料",("資料",)),
         ]
         for text,terms in positives:

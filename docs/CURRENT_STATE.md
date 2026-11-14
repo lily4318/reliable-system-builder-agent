@@ -213,3 +213,15 @@ WALKTHROUGH_CI_VERIFIED_20261114:
 - Local loopback-only Python app uses original build_spec; 13 editable fields, prefill JSON and six synthetic cases, per-inference choice/edit/cancel/confirm, full spec preview and review-only export. Answer edits invalidate old drafts. No model/network service; no real data/authorization.
 - New HTTP tests and actual headless browser DOM acceptance; same-SHA CI pending. Windows manual UAT and download to disk not verified. Original inference logic unchanged.
 - WRITE_OWNER: PR #7 candidate only; no external project changes, merge or release.
+
+WEBSITE_INTAKE_BROWSER_VERIFIED_20261114:
+- TASK_DOMAIN: local website discovery and editable human review, Agent only.
+- VERIFIED_CODE_SHA: dd5f270dbde8aeec67213f108fe4ce0c4b320e30
+- VERIFIED_CI: https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43552072179; job 132316572154; completed/success at exact code SHA.
+- TESTS: 160/160 Python unit tests, eight new local HTTP tests, six actual headless browser DOM workflows W101-W106 (review item counts 6,0,4,6,2,2); import preview/confirmation and malformed input rejection, item selection/edit/cancel/confirm, invalidation on edits, full spec preview, explicit final confirmation and JSON export payload tested. Existing policy 22/22 and recovery 21/21; quality gate PASS.
+- SOURCE: src/website_intake_ui.py; examples/website-intake/; src/website_intake_browser_test.py; tests/test_website_intake_ui.py; docs/WEBSITE_INTAKE_UI.md; workflow and required-file list. Existing deterministic generator reused unchanged; no LLM calls.
+- LIMITS: no authorized runner confirmed; actual model or seven-agent collaboration not run; synthetic headless Linux DOM events are not Windows/manual UAT, actual disk download intercepted and not verified. Export contains original unapproved proposals plus user-reviewed decisions, not automatically merged approved specification. No external network service or formal deployment. No private data used.
+- LAST_VERIFIED_STEP: same-SHA code and browser CI PASS; progress append requires final CI readback.
+- NEXT_ACTION: optional Windows local UAT per guide; then integrate reviewed decisions into a proposed revised spec with independent user approval, or real authorized Agent evaluation. No API Key or new account required for local UI.
+- WRITE_OWNER: PR #7 candidate only; no main merge, release or external project writes.
+- SYNC_STATUS: candidate code verified; final documentation SHA CI pending; REAL_AGENT_NOT_RUN.

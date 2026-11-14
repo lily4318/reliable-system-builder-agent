@@ -7,13 +7,13 @@
 - TASK_DOMAIN: RELIABLE_AGENT_ENGINEERING_CAPABILITY_TRAINING
 - SOURCE_REPO: lily4318/reliable-system-builder-agent
 - ACTIVE_CANDIDATE: Draft PR #8, candidate-skill-team-integration-20261114；https://github.com/lily4318/reliable-system-builder-agent/pull/8
-- SOURCE_VERSION: 實質程式基準 49b5f55bbb5531d43e5b2fe75ba3c93d0c9d98ac；後續以 PR 實際 head 為準。
-- LAST_VERIFIED_STEP: PR #8 2026-11-14 11:56 台灣時間進度回報，CI run 43554020559（對應上述程式 SHA）；251/251 unit tests、22/22 policy、21/21 recovery、18/18 scope、30/30 handoffs、6/6 website scenarios；本次為文件增量，不將舊 CI 當新 SHA CI。
-- COMPLETED: 七專家、12 項技能＋總控技能、SQLite 私有成果交接/相依失效/偏好與案例/知識/去重與人工衝突解決；13 題訪談、可編輯確認、人工操作逐步教學、公開 B001–B005 題庫與離線成果接收/結構評測。
+- SOURCE_VERSION: B001 implementation/test commit d531eb09798e69003280cc981a20094969d4f381; integrated baseline 94014b1234298b92d607bcec41737abe8770d86e CI 43560882129 success; current PR head is authoritative.
+- LAST_VERIFIED_STEP: B001 local functional tests 9/9 PASS; actual negative failure reproduced and repaired (8 PASS/1 FAIL → 9 PASS); both remote Git blobs identical to local tested files; full candidate CI 43561619878 in progress at readback.
+- COMPLETED: 七專家、12 項技能＋總控技能、SQLite 私有工作台、13 題訪談、可編輯確認、離線任務包及評測；B001 實際合成 SQLite 報名垂直切片、並行、回退與唯讀對帳功能、9 項實測及案例記錄。
 - BLOCKERS: 真實 LLM runner、獨立子 Agent 實際執行、獨立功能沙箱及未見題/人類評審尚未核驗；私人工作區未替使用者建立；不因此停止可安全進行的合成實作。
 - WRITE_OWNER: 僅 Agent 候選分支；main/Release、外部專案、真實個資、付費模型或正式部署不在本次授權內。
-- SYNC_STATUS: 本文件為訓練建議與接續紀錄，程式基準 CI 已有證據；本次文件 commit 的 CI 另行查核。
-- NEXT_ACTION: P0 B001 實際垂直切片與功能正反測、失敗修復、案例記錄；再以 B002 檢驗經驗遷移。不要重做已完成架構或擴大無關來源稽核。
+- SYNC_STATUS: B001_SOURCE_AND_TEST_READBACK_VERIFIED; LOCAL_FUNCTIONAL_PASS; REMOTE_FULL_CI_PENDING; REAL_RUNNER_NOT_RUN; 文件新 SHA 的 CI 另查。
+- NEXT_ACTION: 查 B001 同 SHA CI 結果，修正必要回歸；P0-2 將下列 B001 實測案例主動檢索並應用於 B002 設備借用，執行庫存/保留量、並行交易、故障回退及唯讀缺庫負測。比較有無經驗的測試與修復差異；不以公開事先知道的案例稱獨立盲測。
 
 ### 教材比對與改善方向
 
@@ -33,8 +33,8 @@
 
 | 優先序 | 訓練任務 | 驗收 | 狀態 |
 |---|---|---|---|
-| P0-1 | B001 社區工作坊：需求→規格→架構→DAG→可執行垂直切片→QA；額滿候補、重複報名、需求衝突、未知寫入復原 | 獨立功能正反測、可重現的修復紀錄；公開合成實作與真實 Agent 評測分列 | NEXT / NOT_RUN |
-| P0-2 | B001 案例記錄、蒸餾，遷移到 B002 公用設備借用 | 相關案例被實際取用；新任務功能測試，對照有/無經驗和適用限制 | NOT_RUN |
+| P0-1 | B001 社區工作坊：需求→規格→架構→DAG→可執行垂直切片→QA；額滿候補、重複報名、需求衝突、未知寫入復原 | 獨立功能正反測、可重現的修復紀錄；公開合成實作與真實 Agent 評測分列 | LOCAL_FUNCTIONAL_PASS / CI_PENDING |
+| P0-2 | B001 案例記錄、蒸餾，遷移到 B002 公用設備借用 | 相關案例被實際取用；新任務功能測試，對照有/無經驗和適用限制 | NEXT / B001_CASE_READY |
 | P1-1 | 主動回饋事件、分層記憶檢索、技能專業深度、技術探索、任務池/覆盤 | 新工作階段重讀、無跨案混用；測試實際檢索與回饋行為 | PROPOSED |
 | P1-2 | 專家獨立協作與交接 | 有授權平台才做真子代理；獨立 QA、交接與整合證據；無平台標單 Agent 分工 | BLOCKED_REAL_RUNNER |
 | P2-1 | 隔離合成完整系統：前後端、資料庫、權限、後台、預約、復原 | 可操作成品、端到端功能及安全測試 | PROPOSED |
@@ -43,6 +43,30 @@
 七專家訓練：System Lead 需求與路由/優先排序；Architect 技術比較、資料模型與取捨；Developer 真正實作/除錯；QA/UAT 獨立正反例與瀏覽器；DevOps/SRE CI/CD、部分寫入與復原；Security 最小權限與隱私；Learning Evaluator 記錄、蒸餾、遷移、前後測。
 
 建議獨立實戰評分（尚未核准為正式門檻）：功能25、需求15、除錯15、架構10、自主規劃10、協作10、經驗遷移10、效率5。重大安全/未授權寫入 0 為必要門檻而非可抵銷分數。核心需求覆蓋/核心功能/必要交接目標100%；已有明確偏好不重問；追蹤復發率、修復輪次、成本時間和遷移正確率，先建立真實基準再比較。保留既有正式安全和品質閘。
+
+### 2026-11-14｜P0-1 B001 實際工程訓練紀錄（可供下一輪檢索）
+
+**資料來源：** evaluations/capability/public_tasks.json B001 R1–R4 (blob 0e422d8d36cb1697396dc753fb98304a9b914120)。範圍只限公開合成代號、本機暫存 SQLite；無真人報名、外網、部署或私有資料。當前聊天 Agent 單角色切換開發、QA 與學習分析；未啟動獨立七專家或 repo LLM runner，不是模型權重訓練或獨立評測。
+
+**需求與架構交接（本輪產物）：** R1 最新額滿候補規則優先，R2 同一 applicant 唯一紀錄，R3 未知寫入先唯讀對帳且不自動重送，R4 正反及競寫邊界。SQLite config → capacity-policy + enrollment 唯一約束/依 seq 候補 → request 唯一 token 與結果同交易 → read-only audit。DAG：需求→交易及識別鍵設計→實作→並行及故障測試→缺陷修復→案例記錄。合成設計假設：SYN-* 格式、單工作坊、固定容量，變更需明確遷移；候補依成功提交順序，不含取消、遞補、HTTP/UI、實際 API 或多節點資料庫。相同 token 已知重播回傳原結果；未知結果不得自動呼叫 register；未找到仍須審查。
+
+**實際程式及驗收：**
+- src/b001_workshop.py（Git blob 33452b04c431e23bd6ec3eafb1b9d9cdc5242fbf）
+- tests/test_b001_workshop.py（Git blob e187b3c71f0672a8cfef57a2b7d32971c6328050）
+- 本機命令：python -m unittest discover -s tests -v（隔離暫存目錄僅含此輪兩檔）；初 8/8 PASS；新增缺庫負測後 8 PASS/1 FAIL；修正後 9/9 PASS（0.233 秒）。此為開發者撰寫、實際執行的功能回歸，非獨立人類 QA。
+- R1：1 席、8 併行申請→1 ACCEPT / 7 WAITLIST；零容量及無效容量；順序與持久化。
+- R2：8 併行同一人→1 ACCEPT / 7 ALREADY；候補重複、token 重播與衝突。
+- R3：before_commit 失敗回退；after_commit 回應遺失後唯讀查得 COMMITTED；NOT_FOUND_REVIEW 仍 retry_allowed=false。
+- R4：上述正反測與缺庫負測，9 項共通；未測真正 HTTP/遠端故障。
+- 兩檔本機 git hash-object 與 GitHub 回讀一致；程式與測試 commit d531eb09798e69003280cc981a20094969d4f381，完整 CI Run 43561619878 查核時 in_progress，不提前宣告成功。
+
+**案例卡 B001-CASE-001｜observed｜SQLite 唯讀復原不應建立檔案**
+- 情境：既有 DB 遺失後，執行 reconcile 唯讀查詢。
+- 原始錯誤：sqlite3.connect(path) 先建立空檔，即使隨後 PRAGMA query_only=ON；新增 test_readonly_reconcile_missing_database_does_not_create_file 實際 FAIL，assertFalse(self.path.exists()) 得 True。
+- 修復：讀取使用 Path.resolve().as_uri()+ "?mode=ro"，uri=True，在連線時禁止建立 DB；保留 query_only 第二層防護。再次測試 9/9 PASS。
+- 可遷移知識：在讀取資源前就限制唯讀權限；不要將「讀取操作沒有顯式寫 SQL」視為無副作用。對交易相關狀態及 request ledger 在同一原子交易寫入；以唯一約束及 BEGIN IMMEDIATE 維持單一 SQLite 庫一致性。
+- 適用限制：本機 SQLite 案例，不保證其他引擎、遠端 API 或跨機鎖；B002 應重用原理而非盲目複製報名 schema。下一輪優先驗證缺庫唯讀、原子保留/回退、可用量與併發。
+- 學習狀態：已保存公開合成案例，未建立使用者私人記憶、未實際執行自動語意蒸餾、未公開宣稱學習遷移成功；B002 尚未實作。此案例依訓練主檔檢索，不冒稱私人 workbench 已執行。
 
 ### 每次續作及更新協定
 

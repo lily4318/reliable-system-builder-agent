@@ -2,16 +2,22 @@
 import argparse
 import hmac
 import html
+import os
 import re
 import secrets
 import sqlite3
 import threading
+import tempfile
 import time
 from contextlib import closing
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs
+
+
+SCHEMA_VERSION = 1
+MEMBERS = ('member', 'member2')
 
 
 class Store:
@@ -33,18 +39,142 @@ class Store:
                 owner TEXT NOT NULL, target_token TEXT NOT NULL,
                 result TEXT NOT NULL CHECK(result IN ('CANCELLED','RETURNED')),
                 PRIMARY KEY(actor,action_token), UNIQUE(owner,target_token))""")
+            db.execute("""CREATE TABLE action_attempts(
+                actor TEXT NOT NULL, action_token TEXT NOT NULL,
+                owner TEXT NOT NULL, target_token TEXT NOT NULL,
+                operation TEXT NOT NULL CHECK(operation IN ('cancel','return')),
+                result TEXT NOT NULL CHECK(result IN ('CANCELLED','RETURNED','NOT_ACTIVE')),
+                PRIMARY KEY(actor,action_token),
+                CHECK(result='NOT_ACTIVE' OR (operation='cancel' AND result='CANCELLED')
+                    OR (operation='return' AND result='RETURNED')))""")
             db.execute('INSERT INTO inventory VALUES(1,10,0)')
+            db.execute('PRAGMA user_version='+str(SCHEMA_VERSION))
 
-    def view(self, owner, lifecycle=False):
+    @staticmethod
+    def require_current(db):
+        if db.execute('PRAGMA user_version').fetchone()[0] != SCHEMA_VERSION:
+            raise sqlite3.DatabaseError('schema mismatch; explicit offline migration required')
+        tables = {r[0] for r in db.execute(
+            "SELECT name FROM sqlite_master WHERE type='table'")}
+        if tables != {'inventory','requests','lifecycle','action_attempts'}:
+            raise sqlite3.DatabaseError('schema mismatch')
+
+    @staticmethod
+    def legacy_snapshot(db):
+        # Only the two known unversioned synthetic formats, never arbitrary data.
+        if db.execute('PRAGMA user_version').fetchone()[0] != 0:
+            raise sqlite3.DatabaseError('unsupported legacy version')
+        if db.execute('PRAGMA integrity_check').fetchall() != [('ok',)]:
+            raise sqlite3.DatabaseError('legacy integrity failure')
+        objects = db.execute("SELECT type,name FROM sqlite_master WHERE name NOT LIKE 'sqlite_%'").fetchall()
+        names = {n for t,n in objects if t=='table'}
+        if any(t != 'table' for t,n in objects) or names not in (
+                {'inventory','requests'}, {'inventory','requests','lifecycle'}):
+            raise sqlite3.DatabaseError('unsupported legacy schema')
+        columns = {'inventory':['id','stock','reserved'],
+                   'requests':['owner','token','qty','result'],
+                   'lifecycle':['actor','action_token','owner','target_token','result']}
+        for name in names:
+            if [row[1] for row in db.execute('PRAGMA table_info('+name+')')] != columns[name]:
+                raise sqlite3.DatabaseError('unsupported legacy columns')
+        inventory = db.execute('SELECT id,stock,reserved FROM inventory').fetchall()
+        if (len(inventory)!=1 or any(type(x) is not int for x in inventory[0])
+                or inventory[0][:2]!=(1,10) or not 0<=inventory[0][2]<=10):
+            raise sqlite3.DatabaseError('invalid legacy inventory')
+        requests = db.execute('SELECT owner,token,qty,result FROM requests ORDER BY owner,token').fetchall()
+        lifecycle = db.execute('SELECT actor,action_token,owner,target_token,result FROM lifecycle ORDER BY actor,action_token').fetchall() if 'lifecycle' in names else []
+        def token(value):
+            return isinstance(value,str) and re.fullmatch(r'[a-f0-9]{32}',value)
+        by_target = {}
+        for owner,key,qty,result in requests:
+            if (owner not in MEMBERS or not token(key) or type(qty) is not int
+                    or not 1<=qty<=10 or result not in ('RESERVED','INSUFFICIENT')
+                    or (owner,key) in by_target):
+                raise sqlite3.DatabaseError('invalid legacy request')
+            by_target[owner,key]=(qty,result)
+        terminal = set()
+        attempt_keys = set()
+        attempts = []
+        for actor,key,owner,target,result in lifecycle:
+            operation = 'cancel' if result=='CANCELLED' else 'return'
+            allowed = ((result=='CANCELLED' and actor==owner and owner in MEMBERS)
+                       or (result=='RETURNED' and actor=='admin' and owner in MEMBERS))
+            if (not allowed or not token(key) or not token(target)
+                    or (actor,key) in attempt_keys or (owner,target) in terminal
+                    or by_target.get((owner,target),(0,None))[1]!='RESERVED'):
+                raise sqlite3.DatabaseError('invalid legacy lifecycle')
+            attempt_keys.add((actor,key))
+            terminal.add((owner,target))
+            attempts.append((actor,key,owner,target,operation,result))
+        expected = sum(qty for key,(qty,result) in by_target.items()
+                       if result=='RESERVED' and key not in terminal)
+        if expected!=inventory[0][2]:
+            raise sqlite3.DatabaseError('legacy stock mismatch')
+        return inventory,requests,lifecycle,attempts
+
+    def migrate_from(self, source, *, confirm_offline=False, fault=False):
+        """Create a new synthetic DB only; original is the rollback copy.
+        Operator must stop old writers and keep them stopped through cutover.
+        Publish via exclusive hard link on the same filesystem, never replace.
+        """
+        source=Store(source)
+        if confirm_offline is not True or source.path==self.path:
+            raise ValueError('distinct target and offline confirmation required')
+        if self.path.exists():
+            raise FileExistsError(self.path)
+        def sidecars(store):
+            return any(Path(str(store.path)+suffix).exists()
+                       for suffix in ('-wal','-shm','-journal'))
+        if sidecars(source) or sidecars(self):
+            raise sqlite3.DatabaseError('sidecar files require offline reconciliation')
+        with closing(source.connect('ro')) as old:
+            old.execute('BEGIN')
+            if old.execute('PRAGMA journal_mode').fetchone()[0]!='delete':
+                raise sqlite3.DatabaseError('only offline rollback-journal source supported')
+            inventory,requests,lifecycle,attempts=self.legacy_snapshot(old)
+            # Staging is private and on the destination filesystem.
+            with tempfile.TemporaryDirectory(prefix='.p21-migrate-',dir=self.path.parent) as directory:
+                staged=Store(Path(directory)/'candidate.sqlite')
+                staged.initialize()
+                with closing(staged.connect('rw')) as db, db:
+                    db.execute('BEGIN IMMEDIATE')
+                    db.execute('UPDATE inventory SET stock=?,reserved=? WHERE id=1',inventory[0][1:])
+                    db.executemany('INSERT INTO requests VALUES(?,?,?,?)',requests)
+                    db.executemany('INSERT INTO lifecycle VALUES(?,?,?,?,?)',lifecycle)
+                    db.executemany('INSERT INTO action_attempts VALUES(?,?,?,?,?,?)',attempts)
+                    if fault:
+                        raise RuntimeError('synthetic migration interruption')
+                with closing(staged.connect('ro')) as db:
+                    staged.require_current(db)
+                    actual=(db.execute('SELECT id,stock,reserved FROM inventory').fetchall(),
+                            db.execute('SELECT owner,token,qty,result FROM requests ORDER BY owner,token').fetchall(),
+                            db.execute('SELECT actor,action_token,owner,target_token,result FROM lifecycle ORDER BY actor,action_token').fetchall(),
+                            db.execute('SELECT actor,action_token,owner,target_token,operation,result FROM action_attempts ORDER BY actor,action_token').fetchall())
+                    if db.execute('PRAGMA integrity_check').fetchall()!=[('ok',)] or actual!=(inventory,requests,lifecycle,attempts):
+                        raise sqlite3.DatabaseError('migration verification failed')
+                if sidecars(source) or sidecars(self):
+                    raise sqlite3.DatabaseError('sidecars appeared; reconcile before publication')
+                os.link(staged.path,self.path)
+        return {'schema_version':SCHEMA_VERSION,'requests':len(requests),'lifecycle':len(lifecycle)}
+
+
+    def view(self, owner, lifecycle=False, actor=None):
         with closing(self.connect('ro')) as db:
             db.execute('BEGIN')
             stock,reserved = db.execute('SELECT stock,reserved FROM inventory').fetchone()
             rows = db.execute('SELECT owner,token,qty,result FROM requests WHERE owner=? ORDER BY token',(owner,)).fetchall() if owner is not None else db.execute('SELECT owner,token,qty,result FROM requests ORDER BY owner,token').fetchall()
             if lifecycle:
+                self.require_current(db)
                 query = """SELECT r.owner,r.token,r.qty,r.result,
                     COALESCE(a.result,r.result),COALESCE(a.actor,''),COALESCE(a.action_token,'')
                     FROM requests r LEFT JOIN lifecycle a ON r.owner=a.owner AND r.token=a.target_token"""
                 rows = db.execute(query + ' WHERE r.owner=? ORDER BY r.token',(owner,)).fetchall() if owner is not None else db.execute(query+' ORDER BY r.owner,r.token').fetchall()
+            if actor is not None:
+                self.require_current(db)
+                if not ((actor=='admin' and owner is None) or actor==owner and actor in MEMBERS):
+                    raise PermissionError('invalid audit scope')
+                attempts=db.execute('SELECT action_token,owner,target_token,operation,result FROM action_attempts WHERE actor=? ORDER BY action_token',(actor,)).fetchall()
+                return stock,reserved,rows,attempts
         return stock,reserved,rows
 
     def reserve(self, owner, token, qty, fault=False):
@@ -52,6 +182,7 @@ class Store:
             raise ValueError('invalid reservation')
         with closing(self.connect('rw')) as db, db:
             db.execute('BEGIN IMMEDIATE')
+            self.require_current(db)
             prior = db.execute('SELECT qty,result FROM requests WHERE owner=? AND token=?',(owner,token)).fetchone()
             if prior:
                 if prior[0]!=qty:
@@ -75,20 +206,23 @@ class Store:
             raise ValueError('invalid token')
         with closing(self.connect('rw')) as db, db:
             db.execute('BEGIN IMMEDIATE')
-            prior=db.execute('SELECT owner,target_token,result FROM lifecycle WHERE actor=? AND action_token=?',(actor,action_token)).fetchone()
+            self.require_current(db)
+            prior=db.execute('SELECT owner,target_token,operation,result FROM action_attempts WHERE actor=? AND action_token=?',(actor,action_token)).fetchone()
             if prior:
-                if prior != (owner,target,result):
+                if prior[:3] != (owner,target,operation):
                     raise ValueError('action token conflict')
-                return result
+                return prior[3]
             req=db.execute('SELECT qty,result FROM requests WHERE owner=? AND token=?',(owner,target)).fetchone()
             if req is None or req[1] != 'RESERVED' or db.execute('SELECT 1 FROM lifecycle WHERE owner=? AND target_token=?',(owner,target)).fetchone():
-                return 'NOT_ACTIVE'
-            changed=db.execute('UPDATE inventory SET reserved=reserved-? WHERE id=1 AND reserved>=?',(req[0],req[0])).rowcount
-            if changed != 1:
-                raise sqlite3.DatabaseError('inventory invariant')
+                result='NOT_ACTIVE'
+            else:
+                changed=db.execute('UPDATE inventory SET reserved=reserved-? WHERE id=1 AND reserved>=?',(req[0],req[0])).rowcount
+                if changed != 1:
+                    raise sqlite3.DatabaseError('inventory invariant')
+                db.execute('INSERT INTO lifecycle VALUES(?,?,?,?,?)',(actor,action_token,owner,target,result))
+            db.execute('INSERT INTO action_attempts VALUES(?,?,?,?,?,?)',(actor,action_token,owner,target,operation,result))
             if fault:
                 raise RuntimeError('synthetic interruption')
-            db.execute('INSERT INTO lifecycle VALUES(?,?,?,?,?)',(actor,action_token,owner,target,result))
             return result
 
 
@@ -151,7 +285,7 @@ class Handler(BaseHTTPRequestHandler):
         if self.path=='/admin' and user!='admin':
             return self.page(403,'Admin only')
         try:
-            stock,reserved,rows=self.server.store.view(None if user=='admin' else user,lifecycle=True)
+            stock,reserved,rows,attempts=self.server.store.view(None if user=='admin' else user,lifecycle=True,actor=user)
         except sqlite3.Error:
             return self.page(503,'Unavailable; review database, do not recreate')
         def action(row):
@@ -163,7 +297,8 @@ class Handler(BaseHTTPRequestHandler):
             return '<form method="post" action="/'+operation+'"><input type="hidden" name="csrf" value="'+csrf+'">'+owner_field+'<input type="hidden" name="target" value="'+html.escape(target,quote=True)+'"><input type="hidden" name="action_token" value="'+secrets.token_hex(16)+'"><button>'+operation.title()+'</button></form>'
         table='<table><thead><tr><th>Account</th><th>Request</th><th>Quantity</th><th>Original decision</th><th>Current state</th><th>Action actor</th><th>Action ID</th><th>Action</th></tr></thead><tbody>'+''.join('<tr>'+''.join('<td>'+html.escape(str(x))+'</td>' for x in r)+'<td>'+action(r)+'</td></tr>' for r in rows)+'</tbody></table>'
         form='' if user=='admin' else '<form method="post" action="/reserve"><input type="hidden" name="csrf" value="'+csrf+'"><input type="hidden" name="token" value="'+secrets.token_hex(16)+'"><label>Quantity <input name="qty" type="number" min="1" max="10" required></label><button>Reserve</button></form>'
-        self.page(200,'<p>Signed in: '+user+'</p><p id="available">Available: '+str(stock-reserved)+'</p>'+form+table+'<form method="post" action="/logout"><input type="hidden" name="csrf" value="'+csrf+'"><button>Sign out</button></form>')
+        decisions='<h2>Your operation decisions</h2><table><thead><tr><th>Action ID</th><th>Account</th><th>Request</th><th>Operation</th><th>Decision</th></tr></thead><tbody>'+''.join('<tr>'+''.join('<td>'+html.escape(str(x))+'</td>' for x in row)+'</tr>' for row in attempts)+'</tbody></table>'
+        self.page(200,'<p>Signed in: '+user+'</p><p id="available">Available: '+str(stock-reserved)+'</p>'+form+table+decisions+'<form method="post" action="/logout"><input type="hidden" name="csrf" value="'+csrf+'"><button>Sign out</button></form>')
 
     def do_POST(self):
         if not self.host_ok() or self.headers.get_all('Origin')!=[self.server.origin]:
@@ -236,10 +371,20 @@ class Handler(BaseHTTPRequestHandler):
 def main():
     p=argparse.ArgumentParser(description=__doc__)
     p.add_argument('--database',type=Path,required=True)
-    p.add_argument('--initialize',action='store_true')
+    modes=p.add_mutually_exclusive_group()
+    modes.add_argument('--initialize',action='store_true')
+    modes.add_argument('--migrate-from',type=Path)
+    p.add_argument('--confirm-source-offline',action='store_true')
     p.add_argument('--port',type=int,default=8765)
     a=p.parse_args()
     store=Store(a.database)
+    if a.confirm_source_offline and a.migrate_from is None:
+        p.error('--confirm-source-offline requires --migrate-from')
+    if a.migrate_from is not None:
+        if not a.confirm_source_offline:
+            p.error('stop all source writers and confirm --confirm-source-offline')
+        print(store.migrate_from(a.migrate_from,confirm_offline=True),flush=True)
+        return  # No automatic start/cutover.
     if a.initialize:
         store.initialize()
     store.view('member',lifecycle=True)

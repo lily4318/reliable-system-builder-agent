@@ -7,13 +7,13 @@
 - TASK_DOMAIN: RELIABLE_AGENT_ENGINEERING_CAPABILITY_TRAINING
 - SOURCE_REPO: lily4318/reliable-system-builder-agent
 - ACTIVE_CANDIDATE: Draft PR #8, candidate-skill-team-integration-20261114；https://github.com/lily4318/reliable-system-builder-agent/pull/8
-- SOURCE_VERSION: B001 implementation/test commit d531eb09798e69003280cc981a20094969d4f381; integrated baseline 94014b1234298b92d607bcec41737abe8770d86e CI 43560882129 success; current PR head is authoritative.
-- LAST_VERIFIED_STEP: B001 local functional tests 9/9 PASS; actual negative failure reproduced and repaired (8 PASS/1 FAIL → 9 PASS); both remote Git blobs identical to local tested files; full candidate CI 43561619878 in progress at readback.
-- COMPLETED: 七專家、12 項技能＋總控技能、SQLite 私有工作台、13 題訪談、可編輯確認、離線任務包及評測；B001 實際合成 SQLite 報名垂直切片、並行、回退與唯讀對帳功能、9 項實測及案例記錄。
+- SOURCE_VERSION: B002 implementation/test commit 20c4e85bd6572831ac78a33b56d4344b376b8572; B001 verified baseline 0f07a43006857bf915f1ffe70016ab35d899436b (CI 43561661130 success). Current PR head is authoritative.
+- LAST_VERIFIED_STEP: B001 CI 43561619878 and 43561661130 completed/success; B002 retrieved B001-CASE-001 before implementation, local 13/13 behavioral tests PASS, both remote Git blobs match tested bytes. B002 full CI not yet returned at source commit readback.
+- COMPLETED: 七專家、12 項技能＋總控技能、SQLite 私有工作台、13 題訪談、可編輯確認、離線任務包及評測；B001 9 項功能測試和完整 CI；B002 多數量設備保留、原子交易、並行、故障回退、唯讀及缺庫負測 13/13；已驗證 B001-CASE-001 工程原理遷移並新增案例 B002-CASE-001。
 - BLOCKERS: 真實 LLM runner、獨立子 Agent 實際執行、獨立功能沙箱及未見題/人類評審尚未核驗；私人工作區未替使用者建立；不因此停止可安全進行的合成實作。
 - WRITE_OWNER: 僅 Agent 候選分支；main/Release、外部專案、真實個資、付費模型或正式部署不在本次授權內。
-- SYNC_STATUS: B001_SOURCE_AND_TEST_READBACK_VERIFIED; LOCAL_FUNCTIONAL_PASS; REMOTE_FULL_CI_PENDING; REAL_RUNNER_NOT_RUN; 文件新 SHA 的 CI 另查。
-- NEXT_ACTION: 查 B001 同 SHA CI 結果，修正必要回歸；P0-2 將下列 B001 實測案例主動檢索並應用於 B002 設備借用，執行庫存/保留量、並行交易、故障回退及唯讀缺庫負測。比較有無經驗的測試與修復差異；不以公開事先知道的案例稱獨立盲測。
+- SYNC_STATUS: B001_FULL_CI_PASS; B002_SOURCE_AND_TEST_READBACK_VERIFIED; LOCAL_FUNCTIONAL_PASS; CONTROLLED_CASE_TRANSFER_PASS; REMOTE_FULL_CI_PENDING; REAL_RUNNER_NOT_RUN; latest docs SHA CI separate.
+- NEXT_ACTION: 回讀 B002 同 SHA 完整 CI 並修復必要回歸；P1-1：將 B001/B002 案例及適用限制整合進既有技能與 SQLite 工作台，優先實作按任務檢索、精簡 context、回饋事件與案例引用追蹤。用新的合成任務和新開工作階段驗證命中、無關案例排除、過期與跨案隔離；不擴大無關稽核。
 
 ### 教材比對與改善方向
 
@@ -33,9 +33,9 @@
 
 | 優先序 | 訓練任務 | 驗收 | 狀態 |
 |---|---|---|---|
-| P0-1 | B001 社區工作坊：需求→規格→架構→DAG→可執行垂直切片→QA；額滿候補、重複報名、需求衝突、未知寫入復原 | 獨立功能正反測、可重現的修復紀錄；公開合成實作與真實 Agent 評測分列 | LOCAL_FUNCTIONAL_PASS / CI_PENDING |
-| P0-2 | B001 案例記錄、蒸餾，遷移到 B002 公用設備借用 | 相關案例被實際取用；新任務功能測試，對照有/無經驗和適用限制 | NEXT / B001_CASE_READY |
-| P1-1 | 主動回饋事件、分層記憶檢索、技能專業深度、技術探索、任務池/覆盤 | 新工作階段重讀、無跨案混用；測試實際檢索與回饋行為 | PROPOSED |
+| P0-1 | B001 社區工作坊：需求→規格→架構→DAG→可執行垂直切片→QA；額滿候補、重複報名、需求衝突、未知寫入復原 | 獨立功能正反測、可重現的修復紀錄；公開合成實作與真實 Agent 評測分列 | LOCAL_FUNCTIONAL_PASS / FULL_CI_PASS |
+| P0-2 | B001 案例記錄、蒸餾，遷移到 B002 公用設備借用 | 相關案例被實際取用；新任務功能測試，對照有/無經驗和適用限制 | CONTROLLED_TRANSFER_PASS / LOCAL_FUNCTIONAL_PASS / CI_PENDING |
+| P1-1 | 主動回饋事件、分層記憶檢索、技能專業深度、技術探索、任務池/覆盤 | 新工作階段重讀、無跨案混用；測試實際檢索與回饋行為 | NEXT / CASES_READY |
 | P1-2 | 專家獨立協作與交接 | 有授權平台才做真子代理；獨立 QA、交接與整合證據；無平台標單 Agent 分工 | BLOCKED_REAL_RUNNER |
 | P2-1 | 隔離合成完整系統：前後端、資料庫、權限、後台、預約、復原 | 可操作成品、端到端功能及安全測試 | PROPOSED |
 | P2-2 | 未見題獨立前後測、語意蒸餾、必要跨平台同步 | 等模型/工具/資源條件、獨立評審、保留失敗；只有需要且授權才同步 | PROPOSED |
@@ -67,6 +67,26 @@
 - 可遷移知識：在讀取資源前就限制唯讀權限；不要將「讀取操作沒有顯式寫 SQL」視為無副作用。對交易相關狀態及 request ledger 在同一原子交易寫入；以唯一約束及 BEGIN IMMEDIATE 維持單一 SQLite 庫一致性。
 - 適用限制：本機 SQLite 案例，不保證其他引擎、遠端 API 或跨機鎖；B002 應重用原理而非盲目複製報名 schema。下一輪優先驗證缺庫唯讀、原子保留/回退、可用量與併發。
 - 學習狀態：已保存公開合成案例，未建立使用者私人記憶、未實際執行自動語意蒸餾、未公開宣稱學習遷移成功；B002 尚未實作。此案例依訓練主檔檢索，不冒稱私人 workbench 已執行。
+
+### 2026-11-14｜P0-2 B002 實際工程及案例遷移紀錄
+
+**來源與前置查核：** evaluations/capability/public_tasks.json B002 R1–R4 (blob 0e422d8d36cb1697396dc753fb98304a9b914120)；先讀本檔 B001-CASE-001、B001 實作及測試、architecture-design、implement-feature、test-and-acceptance、knowledge-distillation 技能。B001 程式 commit d531eb09798e69003280cc981a20094969d4f381 CI 43561619878 與文件 commit 0f07a43006857bf915f1ffe70016ab35d899436b CI 43561661130 均 completed/success。main c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57 未變。此輪為聊天 Agent 單角色切換實際工程練習，不冒稱獨立子代理/額外模型 runner 或人類盲測。
+
+**需求、方案取捨及交接：** R1 以 stock-reserved 算可用量，R2 整數正量且 SQLite 64-bit 範圍內，R3 並行不超額，R4 失敗/回退可重現。方案比較：先讀取庫存再於另一交易寫入有競爭窗口；單庫 BEGIN IMMEDIATE + 條件式 UPDATE + 唯一 request token 在同交易管理庫存與紀錄，適合此本機合成需求；正式多節點服務需要另行選擇伺服器資料庫或分散式一致性，不假定目前 SQLite 模式能處理跨機網路。元件：availability-service (can_checkout) → reservation-lock (BEGIN IMMEDIATE/guarded UPDATE) → inventory-view (mode=ro) → rollback-log (原子 request ledger；回退後未留部分紀錄)。DAG：需求→設計→取用 B001 案例→實作→正反/並行/故障測試→案例整理。合成假設：單設備庫存池，固定初始庫存及已保留量，SYN-* token 是請求識別而非真人身分，重播相同 token/quantity 回原結果，拒絕結果亦可記錄為已提交請求，但不占庫存；無歸還、取消、多設備種類、日期區間、HTTP/UI 或部署。不是正式產品核准。
+
+**實際遷移與功能驗收：**
+- src/b002_equipment.py blob 843a88dd061ab90b165176a5836bfa4bc0f632d5；tests/test_b002_equipment.py blob e714721b4cf40b0fadfd1331022d511a4667897c；兩檔與本機 git hash-object 一致。
+- 本機暫存工作目錄 /tmp/b002_training（僅本輪可信合成原始碼與測試），命令 python -m unittest discover -s tests -v，13/13 PASS，0.144 秒；不是完整 repo 測試或獨立人類 QA。B002 兩檔 commit 20c4e85bd6572831ac78a33b56d4344b376b8572，查核時 CI 尚無 run 回傳。後續依實際 PR head 重新查。
+- 初始 stock=10, reserved=3, available=7；借 7 成功，追加 1 拒絕；不合法數量（負、零、bool、小數、字串、None、超 64-bit）不得變更資料；8 路不同數量並行，已保留增量不超過 7，ledger 與庫存一致；8 路相同 token 只保留一次 2 件；相同 token 不同數量拒絕。
+- 故障注入：after_inventory（更新後、寫 ledger 前）與 before_commit（ledger 後、提交前）均回復 reserved=3，沒有已提交 request；after_commit（回應遺失）唯讀回讀 COMMITTED/RESERVED，資料庫原始位元組一致。NOT_FOUND_REVIEW 不自動重送。
+- 直接套用 B001-CASE-001：mode=ro + query_only；進一步讓 reserve 使用 mode=rw（缺庫不自建），create 使用 exclusive xb（拒絕既有資料庫）。缺庫 snapshot/reconcile/reserve 都實際拋出 OperationalError 且不建檔；mode=ro 寫入拒絕。受控 comparator test_reproduce_old_readonly_pattern_then_compare 將連線暫換為舊 sqlite3.connect(path)，實際重現 read-only 路徑意外建檔，再切回修正模式確認不建檔。這是同一測試中的機制比較，不是未看案例的獨立 Agent 或盲態前後測；沒有聲稱 B002 本輪出現未修復失敗或模型整體增分。
+
+**案例卡 B002-CASE-001｜observed｜讀寫與初始化分離，交易中同時保存決定及資源狀態**
+- 來源：B001-CASE-001 + B002 13 個本機功能回歸及受控 comparator。
+- 萃取：讀取 mode=ro，既有資源修改 mode=rw，初始化獨立且拒絕既有路徑；避免在復原或修改時意外重新建立資源。先將庫存檢查與保留置於同一交易內，使用資源不變量/條件式更新、唯一請求鍵及 ledger，未知結果先查驗不盲目重送。COMMITTED 僅表示請求決定已保存，需檢查 result 區分 RESERVED 與 INSUFFICIENT。
+- 證據：test_missing_database_never_created_by_read_or_reserve, test_initialization_is_exclusive, test_read_connection_rejects_mutation, test_reproduce_old_readonly_pattern_then_compare, test_concurrent_variable_quantity, test_concurrent_same_token, 三個 failure/unknown 測試。
+- 限制：本機 SQLite/單庫、合成資料、作者測試；故障為刻意注入。初始建立期間若失敗可能留空檔供人工查核，未驗證 process crash/多機/正式遠端服務；拒絕盲目建立或刪除。不取代原 B001 案例，不寫私人工作台或自行發布通用正式知識。
+- 學習狀態：經驗已由目前聊天 Agent 在開發前從主檔檢索並於 B002 實作驗證。沒有自動語意檢索、自動蒸餾或真正多 Agent 學習證據；下輪 P1-1 優先將兩張案例變成可按任務取用的測試化技能與 SQLite 選擇性 context，保留歷史並以新任務檢驗引用及適用。
 
 ### 每次續作及更新協定
 

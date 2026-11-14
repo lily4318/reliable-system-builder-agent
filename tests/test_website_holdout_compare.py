@@ -78,7 +78,10 @@ class WebsitePrivateHoldoutContractTest(unittest.TestCase):
             self.assertEqual(len(validate_manifest(manifest)),5)
             text=json.dumps(manifest,ensure_ascii=False)
             self.assertNotIn("brief",text)
-            self.assertNotIn("answers",text)
+            self.assertFalse(manifest["case_text_or_answers_embedded"])
+            self.assertTrue(all(set(x)=={"id","case_sha256"} for x in manifest["commitments"]))
+            self.assertNotIn('"brief":',text)
+            self.assertNotIn('"answers":',text)
             self.assertFalse(manifest["case_independence_independently_verified"])
             self.assertFalse(manifest["actual_agent_runner_executed"])
 
@@ -127,7 +130,10 @@ class WebsitePrivateHoldoutContractTest(unittest.TestCase):
 
     def test_sealing_requires_five_cases(self):
         with tempfile.TemporaryDirectory() as d:
-            _,_,_,_,source=self.fixture(d,4)
+            _,_,_,_,source=self.fixture(d)
+            data=json.loads(source.read_text(encoding="utf-8"))
+            data["cases"]=data["cases"][:4]
+            source.write_text(json.dumps(data,ensure_ascii=False),encoding="utf-8")
             with self.assertRaisesRegex(ValueError,"five"):
                 seal_private_cases(source)
 

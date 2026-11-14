@@ -7,13 +7,13 @@
 - TASK_DOMAIN: RELIABLE_AGENT_ENGINEERING_CAPABILITY_TRAINING
 - SOURCE_REPO: lily4318/reliable-system-builder-agent
 - ACTIVE_CANDIDATE: Draft PR #8, candidate-skill-team-integration-20261114；https://github.com/lily4318/reliable-system-builder-agent/pull/8
-- SOURCE_VERSION: P1-1c revision-aware task pool source/test commit 19d11e2d5b82e4a66ca87c4b4b9034d1496f6acc; guide/skill commit d8ea3eb3425ae7dcf93e3f3c40551d62579cadce; P2-1a verified baseline df58c6613cafaeddfdfb79a08f1508166ddb0622 CI 43567913525 success. Current PR head is authoritative.
-- LAST_VERIFIED_STEP: P1-1b CI 43566849542/43567003958 and P2-1a CI 43567839044/43567913525 completed/success. P1-1c reproduced legacy session reuse failure, local 35/35 PASS (14 new + 21 regressions), actual cross-process contention, atomic cascade rollback and old-version-to-new migration verified; code/test/guide/skills readbacks exact. Full code CI 43568659877 in_progress at readback.
-- COMPLETED: 七專家與12項技能、SQLite 私有工作台、P0與P1-1a/b完整 CI；P2-1a 本機設備網站 HTTP/安全驗收與完整 CI（瀏覽器仍阻塞）；P1-1c 原任務池 revision、原子下游失效、DONE重開、禁止同任務session重用、RECOVERY_REQUIRED/復原、DAG修訂、舊庫遷移及14項新增功能負測。
-- BLOCKERS: P2-1a Chromium loopback navigation ERR_BLOCKED_BY_ADMINISTRATOR; browser DOM and manual UAT NOT_VERIFIED, no bypass. Real LLM/separate subagents, independent holdout/human reviewers not verified; no user private workspace. 外部部署與正式啟用未授權。
+- SOURCE_VERSION: P2-1b cancellation/return source 912230bb833f3b772a4708eb6fd255f847eeae8b; source + new tests 0c0cbc3a93e05b2d5b014c8bb92d9933089af4a1; P1-1c 19d11e2d5b82e4a66ca87c4b4b9034d1496f6acc CI 43568659877 success. Current PR head is authoritative.
+- LAST_VERIFIED_STEP: P1-1c full code CI 43568659877 and prior candidate 04bbf07e015bf16f431eb5d8e5e16db48bdb6cd1 CI 43568793377 completed/success. P2-1b source and regression test text read back exactly at respective commits; new test execution not yet verified.
+- COMPLETED: 七專家與12項技能、SQLite 工作台、P0/P1-1a/b/c/P2-1a CI 過關；P2-1b 已加入會員本人取消、管理員歸還、原子庫存與獨立 terminal-action ledger、狀態/actor/action ID 顯示、四項新功能與負測（待執行結果）。
+- BLOCKERS: P2-1b exact-SHA CI 未確認；P2-1a Chromium loopback ERR_BLOCKED_BY_ADMINISTRATOR，browser DOM/manual UAT 仍 NOT_VERIFIED，不繞過環境。真實 LLM/獨立子代理、獨立 holdout/人類評審及私人工作台未驗證。外部部署/正式發布未授權。
 - WRITE_OWNER: 僅 Agent 候選分支；main/Release、外部專案、真實個資、付費模型或正式部署不在本次授權內。
-- SYNC_STATUS: P0_P1_1A_B_P2_1A_FULL_CI_PASS; P1_1C_LOCAL_FUNCTIONAL_PASS; SOURCE_TEST_GUIDE_SKILLS_READBACK_VERIFIED; REMOTE_FULL_CI_PENDING; BROWSER_ENV_BLOCKED; REAL_RUNNER_NOT_RUN; NO_RELEASE.
-- NEXT_ACTION: 回讀 P1-1c exact-SHA 完整 CI，修復必要回歸；續原 P2-1b 方向：在明確允許的環境實際瀏覽器 DOM 驗收及設備歸還/取消/後台作業、狀態轉移/稽核/權限與交易回退，使用 revision-aware 任務池驗收與跨階段接續。外部部署 gate 保持未決；不動 main、Release、外部專案；P1-2/P2-2 真實 runner 與獨立評測待授權。
+- SYNC_STATUS: P0_P1_1A_B_C_P2_1A_FULL_CI_PASS; P2_1B_SOURCE_TEST_READBACK_VERIFIED; P2_1B_TEST_EXECUTION_PENDING; BROWSER_ENV_BLOCKED; REAL_RUNNER_NOT_RUN; NO_RELEASE.
+- NEXT_ACTION: 先回讀 P2-1b source+test exact SHA CI，讀完整失敗日誌並修復必要回歸；補 revision-aware 工作台跨階段實際演練及允許環境的瀏覽器 DOM 正反測，另檢驗同 owner/不同 actor 並行、舊 schema 顯式遷移與 UNKNOWN after-commit 復原。P1-2/P2-2 真實 runner/獨立評測待授權。不動 main、Release、外部專案。
 
 ### 教材比對與改善方向
 
@@ -35,9 +35,9 @@
 |---|---|---|---|
 | P0-1 | B001 社區工作坊：需求→規格→架構→DAG→可執行垂直切片→QA；額滿候補、重複報名、需求衝突、未知寫入復原 | 獨立功能正反測、可重現的修復紀錄；公開合成實作與真實 Agent 評測分列 | LOCAL_FUNCTIONAL_PASS / FULL_CI_PASS |
 | P0-2 | B001 案例記錄、蒸餾，遷移到 B002 公用設備借用 | 相關案例被實際取用；新任務功能測試，對照有/無經驗和適用限制 | CONTROLLED_TRANSFER_PASS / LOCAL_FUNCTIONAL_PASS / FULL_CI_PASS |
-| P1-1 | 主動回饋事件、分層記憶檢索、技能專業深度、技術探索、任務池/覆盤 | 新工作階段重讀、無跨案混用；測試實際檢索與回饋行為 | P1-1a/b FULL_CI_PASS; P1-1c REVISION_RECOVERY_LOCAL_PASS / CI_PENDING |
+| P1-1 | 主動回饋事件、分層記憶檢索、技能專業深度、技術探索、任務池/覆盤 | 新工作階段重讀、無跨案混用；測試實際檢索與回饋行為 | P1-1a/b FULL_CI_PASS; P1-1c FULL_CI_PASS |
 | P1-2 | 專家獨立協作與交接 | 有授權平台才做真子代理；獨立 QA、交接與整合證據；無平台標單 Agent 分工 | BLOCKED_REAL_RUNNER |
-| P2-1 | 隔離合成完整系統：前後端、資料庫、權限、後台、預約、復原 | 可操作成品、端到端功能及安全測試 | P2-1a HTTP_LOCAL_PASS / FULL_CI_PASS; BROWSER_BLOCKED; P2-1b NEXT |
+| P2-1 | 隔離合成完整系統：前後端、資料庫、權限、後台、預約、復原 | 可操作成品、端到端功能及安全測試 | P2-1a HTTP_LOCAL_PASS / FULL_CI_PASS; BROWSER_BLOCKED; P2-1b SOURCE_TEST_READBACK / CI_PENDING |
 | P2-2 | 未見題獨立前後測、語意蒸餾、必要跨平台同步 | 等模型/工具/資源條件、獨立評審、保留失敗；只有需要且授權才同步 | PROPOSED |
 
 七專家訓練：System Lead 需求與路由/優先排序；Architect 技術比較、資料模型與取捨；Developer 真正實作/除錯；QA/UAT 獨立正反例與瀏覽器；DevOps/SRE CI/CD、部分寫入與復原；Security 最小權限與隱私；Learning Evaluator 記錄、蒸餾、遷移、前後測。
@@ -157,6 +157,17 @@
 - 操作手冊 docs/TEAM_WORKBENCH.md commit 64ae53ec0cb23f5cc63d46060a2897e7c5232aee；task-planning SKILL commit 18577d8b11a987fc59bc83fd6cc1a88c95012faf；resume-project SKILL commit d8ea3eb3425ae7dcf93e3f3c40551d62579cadce；全文回讀一致。code CI 43568659877 查核時 in_progress，最終以實際最新 SHA 重新查核。
 
 **案例 TASK-CASE-001｜observed｜需求修訂必須使舊驗收與舊寫入者失效：** 用當前 revision + 單次任務 session + transaction 守門，而非只用 session 字串；留存先前結果，不把歷史 PASS 當目前版本合格。失效執行者不可直接復活；先停止/對帳並 recover 後從正確前置依賴重驗。適用證據為上述14項本機功能負向測試與真實跨版本演練。這是候選訓練案例，不自動升級為正式 Release/私人記憶。**限制：** 修改需求文件或 handoff 不會自動觸發 revise；操作者須依正式來源明確呼叫並同步適用產物。SQLite 狀態守門不會終止 OS/外部 GitHub/GAS 或已執行寫入；停止及部分操作證據需外部查核，不得盲目重送。修訂 DAG 時仍需查核舊工作接觸資源及原依賴，不只新圖。未實作分散式租約或混版本保護、逐 task artifact 分支；沒有獨立 Agent/盲測或真實私人庫。P2-1a 瀏覽器阻塞未解除，續作仍按 P2-1b 原方向。
+
+
+### 2026-11-14｜P2-1b 設備借用生命週期（第一增量，測試結果待核）
+
+**已核前置：** Draft PR #8 起始 04bbf07e015bf16f431eb5d8e5e16db48bdb6cd1；CI 43568793377 completed/success；P1-1c source CI 43568659877 completed/success。延續 B002/P2-1a 與 TASK-CASE-001；不變更外部研究網站、正式 Release 或 main。
+
+**本輪合成規格假設（非正式產品決策）：** 保留原 RESERVE=保留/借出合成語意；會員僅能取消本人 ACTIVE(RESERVED) 項目，管理員僅能標記歸還，整筆釋放、不可部分歸還、不新增實際交付狀態。兩個 terminal 狀態互斥且不可重開。原請求與決定保持不變，另存 lifecycle actor/action_token/owner/target_token/result；交易內依唯一目標約束只釋放一次。相同 actor/action token 及相同 payload 重播原決定，不同 payload 拒絕；已終止/查無/原始不足回 NOT_ACTIVE。本人從 session 決定 owner，不接受會員指定他人；管理員明確目標 owner，不能代取消或借用。原 Host/Origin/CSRF/session guard 保留，頁面顯示原決定、現況、成功操作者與 action ID，僅 ACTIVE 顯示對應操作。未知 SQLite 結果 503 要求唯讀核對，不自動重送。
+- src/p21_equipment_site.py：commit 912230bb833f3b772a4708eb6fd255f847eeae8b，blob 78113d8b4b6791dc1c114b1cfc210dc159c382ad，已完整回讀比對。
+- tests/test_p21_equipment_site.py：commit 0c0cbc3a93e05b2d5b014c8bb92d9933089af4a1，blob fd39c090affcfbe4094d3cc6d14b88656e487a06，已完整回讀比對。保留原六個測試，附加四個測試：取消/歸還/稽核隔離與重播、未登入/越權/CSRF/跨來源/原不足與 token 衝突、8路 cancel/return 競爭預期只一成功、故障注入回退與缺庫唯讀/不自建。這些是已提交的測試條件，尚非實測 PASS。
+- 原有資料庫不做隱式遷移。此候選僅新建獨立合成 DB；舊 schema 啟動/生命週期讀取拒絕，禁止覆蓋舊檔。稽核目前只有成功操作 ledger，尚無時間戳、失敗審計、完整生產稽核政策；沒有實際出入庫、部分歸還、外部部署或真實個資。
+- 檢核命令：python -m unittest discover -s tests -p test_p21_equipment_site.py -v；本輪尚無本機執行證據，CI source-only 43570995375 先前 in_progress，新增測試版本 exact CI 待取，禁止用舊版測試或歷史 PASS 替代。瀏覽器政策阻擋未解除；revision-aware 任務池完整演練、真實獨立 Agent 未執行。下一輪先查最新同版本 CI、修復再處理上述缺口。
 
 ### 每次續作及更新協定
 

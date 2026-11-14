@@ -1,8 +1,10 @@
 import http.client
 import re
+import sqlite3
 import tempfile
 import threading
 import unittest
+from unittest.mock import patch
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from urllib.parse import urlencode
@@ -192,3 +194,77 @@ class SiteTests(unittest.TestCase):
         self.store.path.unlink()
         self.assertEqual(self.req('POST','/cancel',m,action)[0],503)
         self.assertFalse(self.store.path.exists())
+
+    def test_actor_and_owner_token_namespaces(self):
+        m=self.login('member'); other=self.login('member2'); admin=self.login('admin')
+        shared='1'*32; action_id='2'*32
+        first={**self.form(m,4),'token':shared}
+        second={**self.form(other,3),'token':shared}
+        self.assertIn('RESERVED',self.req('POST','/reserve',m,first)[1])
+        self.assertIn('RESERVED',self.req('POST','/reserve',other,second)[1])
+        self.assertEqual(self.store.view(None)[:2],(10,7))
+        # Identical target and action IDs in different actor/owner namespaces
+        # are independent; neither may release the other's inventory.
+        cancel=self.action(m,shared,action_id)
+        returned=self.action(admin,shared,action_id,'member2')
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            a=pool.submit(self.req,'POST','/cancel',m,cancel)
+            b=pool.submit(self.req,'POST','/return',admin,returned)
+            self.assertEqual((a.result()[0],b.result()[0]),(200,200))
+        self.assertEqual(self.store.view(None)[:2],(10,0))
+        own=self.store.view('member',lifecycle=True)[2]
+        foreign=self.store.view('member2',lifecycle=True)[2]
+        self.assertEqual(own,[('member',shared,4,'RESERVED','CANCELLED','member',action_id)])
+        self.assertEqual(foreign,[('member2',shared,3,'RESERVED','RETURNED','admin',action_id)])
+        self.assertEqual(self.req('POST','/return',admin,{**returned,'owner':'member'})[0],400)
+        for _ in range(2):
+            self.assertEqual(self.req('POST','/cancel',m,cancel)[0],200)
+            self.assertEqual(self.req('POST','/return',admin,returned)[0],200)
+        self.assertEqual(self.store.view(None)[:2],(10,0))
+
+    def test_unknown_after_commit_read_only_reconciliation(self):
+        m=self.login('member'); admin=self.login('admin')
+        for operation,actor,owner,qty in [('cancel',m,None,4),('return',admin,'member',3)]:
+            req=self.form(m,qty)
+            self.assertEqual(self.req('POST','/reserve',m,req)[0],200)
+            token='3'*32 if operation=='cancel' else '4'*32
+            data=self.action(actor,req['token'],token,owner)
+            release=self.store.release
+            # Inject a failure only AFTER the real transaction commits.
+            def committed_then_unknown(*args,**kwargs):
+                release(*args,**kwargs)
+                raise sqlite3.OperationalError('synthetic acknowledgement lost after commit')
+            with patch.object(self.store,'release',side_effect=committed_then_unknown) as injected:
+                status,body,_=self.req('POST','/'+operation,actor,data)
+                self.assertEqual(status,503)
+                self.assertIn('do not retry automatically',body)
+                self.assertEqual(injected.call_count,1)
+                before=self.store.path.read_bytes()
+                status,dashboard,_=self.req('GET','/admin' if operation=='return' else '/',actor)
+                self.assertEqual(status,200)
+                self.assertIn(token,dashboard)
+                self.assertIn('RETURNED' if operation=='return' else 'CANCELLED',dashboard)
+                self.assertEqual(injected.call_count,1)
+                self.assertEqual(self.store.path.read_bytes(),before)
+                self.assertEqual(self.store.view(None)[:2],(10,0))
+            with self.store.connect('ro') as db:
+                self.assertEqual(db.execute('SELECT count(*) FROM lifecycle WHERE action_token=?',(token,)).fetchone()[0],1)
+
+    def test_legacy_schema_refuses_lifecycle_without_mutating(self):
+        # Represent the former two-table schema in a separate synthetic file.
+        path=self.store.path.with_name('legacy.sqlite')
+        with sqlite3.connect(path) as db:
+            db.execute('CREATE TABLE inventory(id INTEGER PRIMARY KEY,stock INTEGER,reserved INTEGER)')
+            db.execute('INSERT INTO inventory VALUES(1,10,2)')
+            db.execute('CREATE TABLE requests(owner TEXT,token TEXT,qty INTEGER,result TEXT,PRIMARY KEY(owner,token))')
+            db.execute('INSERT INTO requests VALUES(?,?,?,?)',('member','5'*32,2,'RESERVED'))
+        legacy=Store(path)
+        before=path.read_bytes()
+        with self.assertRaises(sqlite3.Error):
+            legacy.view('member',lifecycle=True)
+        with self.assertRaises(sqlite3.Error):
+            legacy.release('member','member','5'*32,'6'*32,'cancel')
+        with self.assertRaises(FileExistsError):
+            legacy.initialize()
+        self.assertEqual(path.read_bytes(),before)
+        self.assertEqual(legacy.view(None)[:2],(10,2))

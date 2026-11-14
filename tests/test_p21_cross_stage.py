@@ -116,12 +116,18 @@ class CrossStageTests(unittest.TestCase):
         self.assertEqual(child.returncode,0)
         self.assertEqual(json.loads(pending.read_text()),{'implementation':old_impl,'qa':old_qa})
         self.assertEqual(self.state('deploy-plan')['state'],'RUNNING')
-        # Synthetic confirmed revision; explicitly update both dependency indexes.
-        change=tasks.revise(w,'intake',1,'change-r2',source2,confirmed=True)
+        # Synthetic confirmed revision; update both dependency indexes atomically.
+        old_requirement=wb.context(w,'requirements-spec')['artifacts']['requirements']['id']
+        change=tasks.revise(w,'intake',1,'change-r2',source2,confirmed=True,
+            requirement={'expected_artifact_id':old_requirement,
+                'content':'R2: add active/cancelled/returned/insufficient quantities, own denied count; admin-only inventory.',
+                'source_ref':source2})
         affected={name for name,_,_ in definitions}-{'inventory-audit'}
         self.assertEqual(set(change['affected']),affected)
-        new_requirement=wb.handoff(w,'project-intake',
-            'R2: add active/cancelled/returned/insufficient quantities, own denied count; admin-only inventory.',source2)
+        new_requirement=change['requirement_change']
+        receipt=tasks.revision_status(w,'change-r2')
+        self.assertEqual(receipt['status'],'COMMITTED')
+        self.assertTrue(receipt['still_current'])
         stale=wb.context(w,'deployment')
         for kind in ('specification','architecture','plan','implementation','qa','security-review'):
             self.assertFalse(stale['artifacts'][kind]['current'],kind)

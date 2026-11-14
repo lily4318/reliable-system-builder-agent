@@ -172,3 +172,19 @@ EVIDENCE_LIMIT: Human ratings in CI are synthetic fixtures that intentionally cr
 NEXT_ACTION: commit only PR7 and read exact SHA CI; fix regressions; then separately authorize runner, have independent author create unseen H cases privately, execute genuinely and obtain independent human grading. No external app or repo changes.
 WRITE_OWNER: Agent candidate only; no PR merge/release and no external project writes.
 SYNC_STATUS: candidate_only; real_agent_runner_NOT_VERIFIED; true_holdout_NOT_YET_CREATED; human_reviews_NOT_RUN; final_ci_pending
+
+
+WEBSITE_HOLDOUT_OFFLINE_CI_VERIFIED_20261114:
+- TASK_DOMAIN: RELIABLE_AGENT_WEBSITE_UNSEEN_HOLDOUT_BEFORE_AFTER
+- CODE_AND_TEST_SHA: abcba3da9027f0223cea6dd9bcc8e947e1316edb
+- VERIFIED_CI: https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43548046588, verify Job #132303841741, completed/success at exact CODE_AND_TEST_SHA.
+- TEST_RESULTS: 146/146 Python unittest PASS; 22/22 baseline policy PASS (18 critical), 21/21 independent recovery PASS (20 critical), 6/6 public synthetic website scenarios PASS, candidate quality gate PASS, public holdout protocol generated without any private question, real model run or real reviewer data.
+- NEGATIVE_TEST_EVIDENCE: 25 new tests in tests/test_website_holdout_compare.py protect minimum case count, local case SHA, pair completeness, before/after Agent versions, matched model/runner/budget, outside-repo private paths, unblinded IDs, tampered SHA, fake official model verification, independent double review, reviewer scores/evidence, third-party adjudication, and unsafe auto-send/spec structure. Public synthetic demonstration of positive paired delta remains explicitly NOT actual model progress.
+- FIRST_FAILED_RUN: https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43547957053 had two tests with incorrect fixtures: prematurely sealing four cases and checking a metadata key containing the word "answers" rather than its value; corrected test construction and check without weakening holdout controls.
+- VERIFIED_FILES: src/website_holdout_compare.py; tests/test_website_holdout_compare.py; docs/WEBSITE_HOLDOUT_EVALUATION.md; policy/quality gate; role instructions; docs and offline-only CI.
+- RUNNER_STATUS: no authorized or verifiable actual Agent runner found in accessible repository and Actions workflow; GitHub environments/variables listing endpoints unsupported, thus other private settings unknown. No model/API/Secret calls, true holdout data or actual independent humans used.
+- CLAIM_LIMIT: output hashes prove only local file bytes, no official provider authenticity; human ratings in CI synthetic; a positive synthetic delta does not mean real Agent improved. Keep actual_model_or_agent_execution_verified=false and model_capability_improvement_verified=false.
+- NEXT_ACTION: with separately confirmed model/Agent authorization, have independent reviewer privately create >=5 unseen website cases, execute both Agent versions under equal constraints, independently blind-rate outputs and perform separate runner provenance/UAT verification.
+- LAST_VERIFIED_STEP: CANDIDATE_CODE_CI_PASS_ABCBA3; this documentation append requires final exact SHA CI verification.
+- WRITE_OWNER: Agent Repo PR #7 only. Main unchanged; Draft PR #4/#5/#6 untouched; no merge, external project, release or deployment.
+- SYNC_STATUS: candidate_code_verified; final_progress_SHA_CI_pending; REAL_AGENT_NOT_RUN; HOLDOUT_NOT_CREATED; HUMAN_SEMANTIC_RATING_NOT_RUN.

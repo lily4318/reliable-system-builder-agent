@@ -188,3 +188,9 @@ WEBSITE_HOLDOUT_OFFLINE_CI_VERIFIED_20261114:
 - LAST_VERIFIED_STEP: CANDIDATE_CODE_CI_PASS_ABCBA3; this documentation append requires final exact SHA CI verification.
 - WRITE_OWNER: Agent Repo PR #7 only. Main unchanged; Draft PR #4/#5/#6 untouched; no merge, external project, release or deployment.
 - SYNC_STATUS: candidate_code_verified; final_progress_SHA_CI_pending; REAL_AGENT_NOT_RUN; HOLDOUT_NOT_CREATED; HUMAN_SEMANTIC_RATING_NOT_RUN.
+
+
+## Website holdout operator walkthrough candidate
+- Starting SHA: 69710aa2b3f1ebfceaf4d2fe62070b66c34b34ef
+- New Windows step-by-step guide, public synthetic local rehearsal, original requirement + anonymous spec reviewer packet, blank editable ratings and two-reviewer combine; six interface tests.
+- Runner unavailable/unverified from current accessible main/PR tree and unsupported environment/variables endpoints. No actual model, private holdout or human ratings. Candidate only; CI pending.

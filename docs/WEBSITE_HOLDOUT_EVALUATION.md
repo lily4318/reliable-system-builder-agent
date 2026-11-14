@@ -26,6 +26,8 @@
 
 ## 人工作業 Step by Step（不用建立 GitHub Secret）
 
+Windows 初學者先讀 [完整逐步操作手冊](WEBSITE_HOLDOUT_WALKTHROUGH.md)。新輔助工具 prepare-review 會把經封存核對的原始 13 題需求與匿名規格配對並打散順序；rating-template 產生兩份空白可編輯評分表，combine 合併獨立完成的評分。舊 blind 僅有規格全文，不足以單獨評估需求保留。
+
 1. 確認私人工作目錄，例如個人電腦的 `/secure/research-agent-eval/`（僅**示意路徑**；請選有適當存取控制的位置）。**不要**在本 Agent Repo 或公開 Actions artifact 中建立這個資料夾。確認沒有被 Git、同步或公開分享。
 2. 請未參與 Agent Prompt 開發的案例作者，把 5 項以上新案例輸入 `cases.json`，結構如下。所有 13 題欄位必須出現；尚無答案填 `null`，不得推定：
    ```json

@@ -45,6 +45,8 @@ REQUIRED = (
     "docs/WEBSITE_SCENARIO_TRAINING.md",
     "src/website_holdout_compare.py", "tests/test_website_holdout_compare.py",
     "docs/WEBSITE_HOLDOUT_EVALUATION.md",
+    "src/website_holdout_walkthrough.py", "tests/test_website_holdout_walkthrough.py",
+    "docs/WEBSITE_HOLDOUT_WALKTHROUGH.md",
 )
 
 def decide(s):

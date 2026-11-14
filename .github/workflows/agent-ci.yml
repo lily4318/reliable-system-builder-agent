@@ -45,6 +45,10 @@ jobs:
           python -m src.website_scenario_eval packets --output output/website-scenario-tasks.json
       - name: Public holdout comparison protocol only (NO private cases, model or actual ratings)
         run: python -m src.website_holdout_compare protocol > output/website-private-holdout-protocol.json
+      - name: Public synthetic walkthrough rehearsal (temporary local files, no model)
+        run: |
+          trial=$(mktemp -d)
+          python -m src.website_holdout_walkthrough rehearse --directory "$trial/rehearsal"
       - name: Independent read-only incident recovery acceptance
         run: python -m src.independent_acceptance evaluate --output output/recovery-acceptance.json
       - name: Candidate quality baseline and safety gate

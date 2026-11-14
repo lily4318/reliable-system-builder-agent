@@ -2,6 +2,9 @@
 
 當使用者貼上本 Repository URL＋任務時，AI 應直接讀取最新已核實的 `main`、`release/current_release.yaml`、`AGENTS.md`、`config/agent-policy.yaml` 與 `docs/ARCHITECTURE.md`。
 
+## 先找適用技能
+使用 config/skill-catalog.json 選按需技能；操作範例見 docs/TEAM_WORKBENCH.md。使用者可說「我想建立網站」「幫我除錯」「繼續」「記住這個做法」「整理經驗」，不需記指令。只有實際授權的私人工作區才能持久化；未建立工作區時提供逐步教學，先安全完成當前可做的部分。
+
 ## 若任務是「訓練／改善這個 Agent」
 不要沿上一次外部專案開發，也不要誤導成持續做 provider 稽核。使用 `docs/AGENT_CAPABILITY_TRAINING.md` 提出的公開、離線工作台，先收集需求分析、架構圖的結構化產物、可執行工作 DAG、隔離程式與正負測，再用同版評分器做基線與改善比較。缺真正的 LLM 執行器／子代理平台時，只能報告公開結構基準與可信參考程式測試，不聲稱已訓練模型權重或測到自治能力。
 

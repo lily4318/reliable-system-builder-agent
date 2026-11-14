@@ -225,3 +225,13 @@ WEBSITE_INTAKE_BROWSER_VERIFIED_20261114:
 - NEXT_ACTION: optional Windows local UAT per guide; then integrate reviewed decisions into a proposed revised spec with independent user approval, or real authorized Agent evaluation. No API Key or new account required for local UI.
 - WRITE_OWNER: PR #7 candidate only; no main merge, release or external project writes.
 - SYNC_STATUS: candidate code verified; final documentation SHA CI pending; REAL_AGENT_NOT_RUN.
+
+
+## 2026-11-14｜技能化整合候選
+TASK_DOMAIN: AGENT_SKILL_TEAM_REDESIGN
+SOURCE_VERSION: main c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57; PR4 d7c71d9b53bab2bb2770d61e3a972b19dd30dd3b; PR5 2422e36bf46b4423fa7e9f7d06b501d2f3e80aa6; PR6 09c9f9d852ec7ab6a468dd241af72b87a40237cb; PR7 67fb81de61716183431db0c1892ed9fa540d782c.
+COMPLETED_PENDING_CI: integrate earlier unique source/test/docs and preserve PR7 code; unify quality gates and CI; 12 new skills and seven roles; private workspace with artifact revisions, lessons, cases, knowledge, explicit conflict resolution. No course business materials or private data copied. No formal merge/release.
+LIMITS: single-model role workflow, no verified real runner or independent subagent execution. Local memory not automatic cross-platform synchronization. Workbench validates dependency currency not factual accuracy, approval or formal source. Shared documents use PR7 base plus integrated guidance rather than copying historical text wholesale.
+NEXT_ACTION: verify candidate CI, then use skills on B001 real functional development in isolated synthetic workspace.
+WRITE_OWNER: independent Agent integration candidate only.
+SYNC_STATUS: candidate_pending_ci.

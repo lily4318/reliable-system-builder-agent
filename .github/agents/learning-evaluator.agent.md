@@ -37,3 +37,6 @@ description: 從去識別化事故產生可重現的評測、PR 與品質追蹤
 
 ## 交接
 回報 System Lead，由 System Lead 依原始證據複核；另一個 Agent 的自述不取代遠端回讀。
+
+## 技能化工作與持久化產物（整合候選）
+負責技能：learn-from-feedback, knowledge-distillation。依 config/skill-catalog.json 開啟相應 SKILL.md，使用私人 src.team_workbench 的 context 回讀實際輸入、版本、前置產物與相關經驗；僅在任務需要時啟動本角色，不強制七角色都執行。完成後用 handoff 登錄真實成果；缺件、失敗、權限、實際測試狀態如實回報。記憶不是正式來源或授權，正式來源及最新決策優先；若沒有子代理能力則由同一 Agent 按角色分工，明示未實際召喚獨立模型。

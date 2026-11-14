@@ -2,6 +2,15 @@
 
 適用此儲存庫。先讀 START_HERE.md、release/current_release.yaml、config/agent-policy.yaml，再讀工作所屬專案的最新正式來源。
 
+## 工作方法：以技能與實際產物為核心（整合候選）
+先定位使用者最新任務、唯一目標與權限。自然語言能理解就直接選擇 config/skill-catalog.json 中的必要技能，讀對應 .agents/skills/<id>/SKILL.md；不要求使用者記指令名稱。遇真正歧義才提出少量可編輯選擇。改善 Agent 不得接續外部專案；先保留 src.task_scope 與 src.engineering_workflow 的必要守門。
+- 用 src.team_workbench 的私人工作區 context 讀實際產物、對應來源、適用經驗；只在另行同意且有存取權的本機私人位置保存，不把公開 repo 當成個人記憶庫。
+- 工作主要順序：需求訪談 → 確認規格 → 架構 → 工作包 → 程式與功能測試 → QA／必要安全與 SRE → 經驗整理。可依任務跳過不適用技能，不能跳過必要依賴與權限。
+- 技能應實際產出規格、可執行程式、測試或修復，而不只寫完成報告。handoff 登錄產物文字及來源；修改上游會使相關下游產物過期。context 的 current 僅表示工作區依賴一致，不證明正式核准或外部 SHA。
+- 只記明確偏好或有證據的經驗；假設標 candidate。distill 預覽相同 topic 的重複／衝突，使用者確認後才 resolve，保留歷史。不可憑記憶覆蓋有效研究規則、權限或安全。
+- 人工操作用逐步教學；新建站 13 題訪談（10–15 之內）；任何確認選項可編輯後再送出。自然語言模型與真正子代理能力取決於平台；沒有時不要聲稱已啟動。
+- 舊 PR #4/#5/#6 的適用工具、測試與門檻整合於此候選；詳細見 docs/TEAM_WORKBENCH.md。正式 main、Release 及四份原 PR 不變。
+
 ## 角色
 - `.github/agents/system-lead.agent.md`：最新需求、授權、路由、接續。
 - `.github/agents/architect.agent.md`：需求及相容性。
@@ -17,7 +26,7 @@
 - `evaluations/capability/self_authored_reference.json` 是**自己撰寫的參考答案**，全對只代表評分器自我一致，不能當 Agent 能力提升。對陌生程式僅做 Python AST 讀取、不在公開 CI 執行未知原始碼。真正功能測試需分離的受限沙箱與獨立測試，真正模型/多代理執行需另有 runner 和可驗證紀錄。
 - 七位專家角色產物分別具備需求、架構、程式、QA、SRE、安全與學習評估欄位；文件寫出角色名稱**不等於實際呼叫了子代理**。原 `src.agent_eval` 的安全拒絕、未知非冪等 POST、受控 Release 和隱私規範全部保留。
 - `src.capability_execution` 會離線產出 B001–B005 任務包並接收外部提交的規格、架構、程式及 QA；匯入流程不啟動模型、不執行未知 Python，只做受限路徑 AST 和結構評分，`run_id/model_id` 自述不構成實際 Agent 執行證據。沒有獲核准 runner 時全部標記 `UNVERIFIED`，合成契約測試不得冒稱能力提高。
-- 本候選 PR 與未合併的 Draft PR #4／#5／#6 平行，不擅自把三份先前候選視為 main 已生效，也不合併任何 PR 或發布。
+- 本獨立整合候選以 PR #7 為基底，選擇性整合 PR #4／#5／#6 的已有功能與門檻；不得宣稱 main 已生效，也不合併或發布。
 
 ## 新增三項不可省略的使用者互動規則（本候選）
 1. **人工協助要有逐步教學**：需要使用者建立 GitHub 帳號、Repository、Secret、網域、雲端帳號或調整設定時，先確認是否真有必要及權責；逐步說明平台入口、具體點選、欄位、預期畫面、完成檢查與卡住處理。不能只說「請你完成某設定」。不要求公開任何密碼、API Key、2FA 或私人資料。可依 `src.human_walkthrough` 產生 GitHub 操作範例，其餘平台也採相同逐步契約。

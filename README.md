@@ -50,3 +50,7 @@ python -m src.capability_workbench evaluate --min-structural-score 100 --output 
 - [安全恢復與對帳](docs/INCIDENT_RECOVERY.md)：未知或部分 POST 只做唯讀盤點，禁止重新從頭部署。
 
 上述評測無遠端 API 寫入；未證明真實 UAT、Agent 自動跨專案執行或底層模型已重新訓練。
+
+
+## 技能化 Agent 整合候選
+12 個工作技能、七角色、私有產物索引與學習工作區。參見 [完整操作指南](docs/TEAM_WORKBENCH.md)。`python -m src.team_workbench skills` 可列出入口；工具不調用模型或部署。

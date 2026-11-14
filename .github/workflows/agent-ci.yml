@@ -24,6 +24,8 @@ jobs:
           python-version: "3.12"
       - name: Offline unit tests
         run: python -m unittest discover -s tests -v
+      - name: List skill catalog (offline)
+        run: python -m src.team_workbench skills
       - name: Public artifacts and privacy scan
         run: python -m src.agent_eval validate
       - name: Deterministic public policy evaluation
@@ -51,6 +53,18 @@ jobs:
         run: |
           trial=$(mktemp -d)
           python -m src.website_holdout_walkthrough rehearse --directory "$trial/rehearsal"
+      - name: Synthetic Agent-vs-project task scope regression
+        run: python -m src.task_scope evaluate --output output/task-scope-evaluation.json
+      - name: Structured engineering handoff regression (all seven roles)
+        run: python -m src.engineering_workflow evaluate --output output/engineering-handoff-report.json
+      - name: Validate LLM evaluation protocol and public development labels only
+        run: python -m src.llm_requirements_eval validate --output output/llm-protocol-validation.json
+      - name: Audit real-model runner configuration status (no secrets; no inference)
+        run: python -m src.llm_runner_preflight audit --output output/llm-runner-preflight.json
+      - name: Audit provider evidence absence (offline; not a real provider response)
+        run: python -m src.llm_provider_evidence audit --output output/provider-evidence-audit.json
+      - name: Audit independently supplied provider export and replay ledger absence (offline)
+        run: python -m src.llm_provider_dual_source audit --output output/dual-source-evidence-audit.json
       - name: Independent read-only incident recovery acceptance
         run: python -m src.independent_acceptance evaluate --output output/recovery-acceptance.json
       - name: Candidate quality baseline and safety gate

@@ -7,6 +7,8 @@ from src.quality_gate import assess, load, BASELINE, TARGETS
 from src.capability_workbench import evaluate as evaluate_capability
 from src.website_scenario_eval import evaluate as evaluate_website
 from src.website_holdout_compare import protocol_contract
+from src.task_scope import evaluate as evaluate_task_scope
+from src.engineering_workflow import evaluate as evaluate_workflow
 
 
 class QualityGateTest(unittest.TestCase):
@@ -98,6 +100,47 @@ class QualityGateTest(unittest.TestCase):
         self.assertIsNone(self.baseline["independent_recovery_cases"])
         self.assertEqual(self.baseline["status"], "historical_observed_baseline_not_formal_release")
 
+
+    def test_new_task_scope_training_gate_cannot_be_skipped(self):
+        scope = evaluate_task_scope()
+        bad = {**scope, "failed": 1}
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                self.targets, scope=bad)["gate_passed"])
+        unsafe = {**scope, "critical_passed": scope["critical_total"] - 1}
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                self.targets, scope=unsafe)["gate_passed"])
+        absent = {**scope, "total": 0, "critical_total": 0}
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                self.targets, scope=absent)["gate_passed"])
+
+    def test_engineering_handoff_regression_blocks_candidate(self):
+        report = evaluate_workflow()
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                self.targets, workflow={**report, "failed": 1})["gate_passed"])
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                self.targets, workflow={**report, "critical_passed": 0})["gate_passed"])
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                self.targets, workflow={**report, "unsafe_action_count": 1})["gate_passed"])
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                self.targets, workflow={**report, "total": 0})["gate_passed"])
+
+    def test_permissive_engineering_safety_threshold_is_rejected(self):
+        bad = {**self.targets, "max_unsafe_engineering_actions": 1}
+        self.assertFalse(assess(self.policy, self.recovery,
+                                self.baseline, bad)["gate_passed"])
+
+    def test_llm_protocol_without_runner_cannot_claim_model_accuracy(self):
+        result = assess(self.policy, self.recovery, self.baseline, self.targets)
+        self.assertTrue(result["checks"]["llm_eval_protocol_and_dev_labels_valid"])
+        self.assertTrue(result["checks"]["llm_real_model_claims_disabled"])
+        self.assertFalse(result["actual_llm_model_accuracy_measured"])
+        self.assertFalse(result["independent_llm_holdout_executed"])
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                {**self.targets, "min_llm_public_dev_cases": 21})["gate_passed"])
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                {**self.targets, "llm_model_accuracy_without_runner_allowed": True})["gate_passed"])
+        self.assertFalse(assess(self.policy, self.recovery, self.baseline,
+                                {**self.targets, "llm_public_dev_as_blind_holdout_allowed": True})["gate_passed"])
 
 if __name__ == "__main__":
     unittest.main()

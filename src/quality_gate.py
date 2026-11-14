@@ -9,6 +9,9 @@ from src.independent_acceptance import evaluate as evaluate_recovery
 from src.capability_workbench import evaluate as evaluate_capability
 from src.website_scenario_eval import evaluate as evaluate_website
 from src.website_holdout_compare import protocol_contract
+from src.task_scope import evaluate as evaluate_task_scope
+from src.engineering_workflow import evaluate as evaluate_workflow
+from src.llm_requirements_eval import load_dataset as validate_llm_protocol
 
 ROOT = Path(__file__).resolve().parents[1]
 BASELINE = ROOT / "evaluations/baselines/v0.1.0-initial.json"
@@ -19,7 +22,14 @@ def load(path: Path) -> dict:
 
 def assess(policy: dict, recovery: dict, baseline: dict, targets: dict,
            capability: dict | None = None,
-           website: dict | None = None) -> dict:
+           website: dict | None = None, scope: dict | None = None,
+           workflow: dict | None = None) -> dict:
+    if scope is None:
+        scope = evaluate_task_scope()
+    if workflow is None:
+        workflow = evaluate_workflow()
+    llm_dev, llm_dev_sha = validate_llm_protocol()
+    llm_critical = sum(case['critical'] for case in llm_dev['cases'])
     if capability is None:
         capability = evaluate_capability()
     if website is None:
@@ -45,6 +55,29 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict,
         "manual_review_remains_required": targets.get("requires_human_release_review") is True
             and targets.get("automatic_release_allowed") is False,
         "not_mislabeled_as_blind_evaluation": recovery["public_cases_not_blind_holdout"] is True,
+        "agent_vs_project_scope_cases": scope.get("total", 0) >= targets["min_task_scope_cases"]
+            and scope.get("critical_total", 0) >= targets["min_task_scope_critical_cases"],
+        "agent_vs_project_scope_correct": scope.get("failed") == 0
+            and scope.get("critical_passed") == scope.get("critical_total")
+            and scope.get("natural_language_intent_accuracy_measured") is False,
+        "engineering_collaboration_coverage":
+            workflow.get("total", 0) >= targets["min_engineering_handoff_cases"]
+            and workflow.get("critical_total", 0) >= targets["min_engineering_critical_cases"],
+        "engineering_collaboration_results":
+            workflow.get("failed") == 0
+            and workflow.get("critical_passed") == workflow.get("critical_total")
+            and targets.get("max_unsafe_engineering_actions") == 0
+            and workflow.get("unsafe_action_count") == 0
+            and workflow.get("natural_language_requirements_accuracy_measured") is False
+            and workflow.get("real_world_specialist_execution_verified") is False,
+        "llm_eval_protocol_and_dev_labels_valid":
+            len(llm_dev["cases"]) >= targets["min_llm_public_dev_cases"]
+            and llm_critical >= targets["min_llm_public_dev_critical_cases"]
+            and llm_dev["independent_blind_holdout"] is False
+            and llm_dev["label_status"] == "provisional_synthetic_author_labels_pending_independent_review",
+        "llm_real_model_claims_disabled":
+            targets.get("llm_model_accuracy_without_runner_allowed") is False
+            and targets.get("llm_public_dev_as_blind_holdout_allowed") is False,
         "capability_public_reference_contract":
             capability.get("task_count", 0) >= 5
             and capability.get("tasks_full_structural_score") == capability.get("task_count")
@@ -100,6 +133,17 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict,
         "private_holdout_actual_model_run_verified": False,
         "private_holdout_real_improvement_verified": False,
         "actual_autonomous_agent_performance_verified": False,
+        "task_scope_public_cases": scope["total"],
+        "task_scope_public_critical": scope["critical_total"],
+        "task_scope_intent_accuracy_measured": False,
+        "engineering_handoff_public_cases": workflow["total"],
+        "engineering_handoff_critical": workflow["critical_total"],
+        "engineering_real_execution_verified": False,
+        "llm_dev_protocol_cases": len(llm_dev["cases"]),
+        "llm_dev_protocol_critical": llm_critical,
+        "llm_dev_dataset_sha256": llm_dev_sha,
+        "actual_llm_model_accuracy_measured": False,
+        "independent_llm_holdout_executed": False,
         "human_approval_completed": False,
         "formal_release_created": False,
         "scope": "public_offline_policy_recovery_and_structural_capability_reference_only",

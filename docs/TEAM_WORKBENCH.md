@@ -42,6 +42,56 @@ py -3 -m src.team_workbench distill --workspace "$work"
 
 6. 續作：`py -3 -m src.team_workbench context --workspace "$work" --skill resume-project`。同一私有工作區可於新對話重新讀取，但必須由平台具備檔案讀取權限；無法自動跨平台同步。輸出包含私人內容，只能留在授權環境，不得貼到公開 PR 或 CI 報告。無需現在由你建立私人工作區；可先用合成測試驗證。
 
+## P1-1｜任務導向檢索、回饋與跨工作階段案例引用
+
+保留原 workbench.sqlite3、原本的 artifacts/memory/resolutions 及操作；src.workbench_learning 為同庫增量工具，不另存第二套私人記憶。只有已授權工作區才可執行 setup；先備份私人資料庫並依既有 ACL 規則限制存取。setup 加三個 learning_* 表並匯入 B001/B002 公開合成案例簡要內容、來源與可檢索標籤；重跑不重複、不復活已退休案例，遇同名未登錄舊案例則停止由人審查。不自動寫入任何外部專案。
+
+以下 PowerShell 指令假定已依前節建立 $work，示範合成任務、無個資。以 UTF-8 另存輸入 JSON 於私人工作區，不要往公開 PR 貼上輸出。
+
+```powershell
+py -3 -m src.workbench_learning setup --workspace "$work"
+```
+
+建立 task.json：
+
+```json
+{"skill":"debug-and-repair","task":"SYN-REPORT","query":"SQLite 唯讀 缺庫 report recovery reconcile","budget":8000,"limit":5}
+```
+
+```powershell
+py -3 -m src.workbench_learning context --workspace "$work" --input "$work/task.json"
+```
+
+檢查返回的 matched_terms、case topic、memory ID、證據位置與 Scope；公開兩案例為本機 SQLite 合成經驗，不保證適用遠端、多節點或正式資料。搜尋採英文字詞及中文雙字詞交集排序，不是語意模型、向量檢索或正式權限；必要產物全文和案例正文/證據受字元配額限制，索引僅列 ID、來源及 current。配額不含 JSON metadata；過期產物不傳正文，NEEDS_PREREQUISITES/NEEDS_FULL_READ 必須先補讀原產物（必要時用既有 team_workbench context），不得截斷規格後直接施工。artifact_index 目前仍是同一專案的最新產物類別，不是逐任務版本；確認來源適用當前任務。私有工作區互相隔離，不由 task ID 取代專案隔離。候選與同主題未解衝突的記憶只列 review_candidates，不進入可採用清單。
+
+完成真實操作或判定案例不適用後，建立 cite.json（以下 ID 1 僅為示例，先核對 context 的實際 ID、skill/task/query/budget/limit 一致；evidence 需換成實際可定位證據）：
+
+```json
+{"skill":"debug-and-repair","task":"SYN-REPORT","session":"session-1","query":"SQLite 唯讀 缺庫 report recovery reconcile","memory_id":1,"decision":"applied","evidence":"實際測試檔案、案例及結果"}
+```
+
+```powershell
+py -3 -m src.workbench_learning cite --workspace "$work" --input "$work/cite.json"
+```
+
+引用重算目前可選案例才能保存；decision 可為 applied 或 not_applicable。操作者宣告引用並非獨立執行證明。遇實際測試失敗、修復、QA 退件、需求修正或偏好事件，Agent 主動輸入 feedback.json；這是工作流程觸發，並非背景監聽、模型推論或自動升級規則：
+
+```json
+{"task":"SYN-REPORT","session":"session-1","event_id":"report-fix-001","event_type":"test_fix","topic":"SQLite report","content":"合成報表缺庫時拒絕操作，未建立空檔","evidence":"實際功能驗收位置"}
+```
+
+```powershell
+py -3 -m src.workbench_learning feedback --workspace "$work" --input "$work/feedback.json"
+```
+
+event_type 支援 test_failure、test_fix、qa_rejection、requirement_change、preference。事件 ID 相同且內容一致去重，內容不同則拒絕；均存為 candidate，不能自動改寫正式規格/長期偏好。由既有 remember/resolve 人審流程另存已核驗記憶、處理衝突並保留歷史。新的 Python 程序或對話可用同一授權工作區重跑 context，將 session 改為新 ID，並以 history.json（內容 {"task":"SYN-REPORT"}）回讀：
+
+```powershell
+py -3 -m src.workbench_learning history --workspace "$work" --input "$work/history.json"
+```
+
+context/history 真正唯讀，不建缺失資料庫，舊工作區未 setup 先回報，不隱式遷移。history 保留已引用案例及回饋 ID；檢索不等於實際採用。真實跨對話、跨平台、語意蒸餾及自動事件感知仍待具備授權執行環境後測試。
+
 ## 共用知識與案例
 公開 repo 的 knowledge/ENGINEERING_PATTERNS.md、templates/WORK_ARTIFACTS.md 提供尚需依專案驗證的通用工作方法和格式；真實工作記憶與案例保留私有。去識別化且經人審查的案例才可循原 learning-policy 及獨立 PR 進入公共知識庫。跨專案共用偏好應另設有權限的私人工作區，經明確確認後選取適用條目，不自動混合兩案資料。持久化資料不加密、依賴 OS ACL；憑證不得保存，正規表示式只防部分常見金鑰。
 

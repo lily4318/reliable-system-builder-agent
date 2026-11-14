@@ -206,3 +206,10 @@ WALKTHROUGH_CI_VERIFIED_20261114:
 - NEXT_ACTION: optional user local rehearsal; actual runner/holdout only with separate authorization and independent participants. No public/private holdout created this turn.
 - WRITE_OWNER: Agent candidate PR7 only; main and release unchanged; no external project modifications, merges or publication.
 - SYNC_STATUS: candidate code verified; final documentation SHA CI pending; REAL_AGENT_NOT_RUN.
+
+
+## Local website intake UI candidate
+- TASK_DOMAIN: Agent capability and user interaction; starting SHA 4ce443492d0e99968b588ddcc69119d2ee53401b
+- Local loopback-only Python app uses original build_spec; 13 editable fields, prefill JSON and six synthetic cases, per-inference choice/edit/cancel/confirm, full spec preview and review-only export. Answer edits invalidate old drafts. No model/network service; no real data/authorization.
+- New HTTP tests and actual headless browser DOM acceptance; same-SHA CI pending. Windows manual UAT and download to disk not verified. Original inference logic unchanged.
+- WRITE_OWNER: PR #7 candidate only; no external project changes, merge or release.

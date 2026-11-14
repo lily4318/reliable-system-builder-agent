@@ -49,6 +49,9 @@ python -m src.website_discovery draft --answers /secure/website-answers.json \
 
 可查看自含的唯讀示範 `examples/editable-decision-review.html`。Python 契約 `src.human_confirmation` 的 `select`、`edit`、`confirm` 故意**沒有傳送或核准外部動作的能力**，CI 測試選完、編輯、取消流程的拒絕條件。UI 示範僅在本地預覽，不連網。
 
+### 可操作本機訪談介面
+執行 python -m src.website_intake_ui，使用本機 Chrome 開啟顯示的 127.0.0.1 網址。可預填已有回答、逐項編輯及確認推導，完整預覽後明確確認才可匯出；修改回答會清除舊確認。詳細步驟與限制見 [13 題訪談介面](WEBSITE_INTAKE_UI.md)。此工具不使用 LLM 或外部服務。
+
 ### 六種公開合成建站需求的自動回歸
 使用 `python -m src.website_scenario_eval evaluate --output output/website-scenario-evaluation.json` 進行六種不同網站的需求保留、應推導／不應推導、完整規格結構、個別編輯確認與無授權狀態驗證。否定句例如「不需要報名表單」不能被簡單關鍵字誤判；有「不需要報名，但需要匿名回饋」時需保留後一項需求。規格另生成 13 項需求來源追溯、架構與工作計畫待核草稿。案例屬人工撰寫且公開的**確定性邏輯回歸**；真正 LLM 的理解程度、適用介面與使用者體驗仍須獨立測試。詳見 `docs/WEBSITE_SCENARIO_TRAINING.md`。
 

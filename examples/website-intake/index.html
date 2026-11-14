@@ -1,0 +1,13 @@
+<!doctype html>
+<html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>網站需求訪談工作台</title><link rel="stylesheet" href="/style.css"><script src="/app.js" defer></script></head>
+<body><main>
+<header><p class="eyebrow">RELIABLE SYSTEM BUILDER · 本機離線候選</p><h1>網站需求訪談工作台</h1><p>先確認需求，再設計。回答、推導和選擇僅留在此頁；不呼叫模型、不部署、不寄送、不自動儲存。</p></header>
+<nav aria-label="流程階段"><span>01 需求訪談</span><span>02 推導確認</span><span>03 規格預覽</span></nav>
+<p id="status" role="status" aria-live="polite">載入中…</p>
+<section><h2>01　需求訪談</h2><label for="example">預填合成案例（非真實資料）</label><div class="actions"><select id="example"></select><button id="load-example" disabled>載入並取代目前答案</button></div>
+<label for="import-file">或選取已有的本機回答 JSON（先預覽，再載入）</label><input id="import-file" type="file" accept=".json,application/json"><button id="apply-import" disabled>確認載入預填答案</button><pre id="import-preview" hidden></pre>
+<p id="progress"></p><div id="questions"></div><button id="generate" class="primary" disabled>產生規格草稿並檢視推導</button></section>
+<section><h2>02　逐項確認推導需求</h2><p>選擇只是預填文字。可修改、取消，再逐項確認。修改訪談答案會清除舊確認。</p><div id="reviews"></div></section>
+<section><h2>03　完整規格書預覽</h2><p>確認只代表本機文字審閱，不構成任何實際寫入、部署或收件授權。</p><div id="preview" class="preview"></div><button id="finalize" class="primary" disabled>確認整份本機草稿</button> <button id="export" disabled>匯出已確認草稿 JSON</button><p id="final-status" role="status"></p></section>
+</main></body></html>

@@ -47,6 +47,10 @@ REQUIRED = (
     "docs/WEBSITE_HOLDOUT_EVALUATION.md",
     "src/website_holdout_walkthrough.py", "tests/test_website_holdout_walkthrough.py",
     "docs/WEBSITE_HOLDOUT_WALKTHROUGH.md",
+    "src/website_intake_ui.py", "src/website_intake_browser_test.py",
+    "tests/test_website_intake_ui.py", "docs/WEBSITE_INTAKE_UI.md",
+    "examples/website-intake/index.html", "examples/website-intake/style.css",
+    "examples/website-intake/app.js", "examples/website-intake/browser-test.js",
 )
 
 def decide(s):

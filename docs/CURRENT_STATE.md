@@ -142,3 +142,18 @@ EVIDENCE_LIMITS: Tests exercise a deterministic local generator against public a
 NEXT_ACTION: commit only PR7; run exact SHA CI including old policy/recovery benchmarks, six scenario positives and negatives; correct errors without deleting tests, log final verified code SHA.
 WRITE_OWNER: agent repo candidate only; main and PR4/PR5/PR6 unmodified.
 SYNC_STATUS: candidate_only; real_model_NOT_RUN; real_website_UAT_NOT_RUN; no_merge_no_release
+
+
+WEBSITE_SCENARIO_BENCHMARK_CI_VERIFIED_20261114:
+- TASK_DOMAIN: RELIABLE_AGENT_WEBSITE_SCENARIO_REQUIREMENT_BENCHMARK
+- VERIFIED_CODE_SHA: 66a99d60fc52a30751422605006bd5c0ec3f539b
+- VERIFIED_CI: https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43532223367, verify Job #132252478201, completed/success at exact VERIFIED_CODE_SHA.
+- TESTS: Python unittest 120/120 PASS, including 21 new synthetic website scenario regressions and 2 additional quality gate regressions; six website development scenarios 6/6 PASS; policy 22/22 PASS (18 critical), recovery 21/21 PASS (20 critical), quality gate PASS.
+- CHANGES: six separate public synthetic website families with authored expected/forbidden inference labels; revised negation/clause-aware feature inference; 13-source traceability, architecture and delivery-plan DRAFT sections; per-inference accept/modify/reject editable decisions; CLI validates/evaluates and creates public scenario packets without gold labels; old and new negatives enforced by same SHA CI.
+- FAILED_CI_RECONCILIATION: initial Run #43531952415 failed due short title of case W103 (fixed with explicit title, validator unchanged). Run #43532060530 revealed W102 false-positive notification inference from "不發簡訊" (fixed negation logic, tests retained). Full CI then passed at VERIFIED_CODE_SHA.
+- SOURCE_READBACK: evaluations/interaction/website-scenarios.json blob 7edd7a2bf37568e3fa8cdd74545e3284b03754af; src/website_discovery.py blob 5308c0e033a12a92401fce5f00fa72f5eddd4567; src/website_scenario_eval.py blob 38cbfd7e93a75529c507439ff7fe6d5430e004db; tests/test_website_scenario_eval.py blob 85229161cef74728aa652cda87a54314c9147d7f.
+- VALIDITY_LIMIT: 6/6 is developer-authored public deterministic scenario regression, not actual LLM/Agent unfamiliar website reasoning or independent human blind holdout. No real model calls, seven-agent actions, real website or individual data. Current Agent runner and independent UX studies remain unverified.
+- LAST_VERIFIED_STEP: WEBSITE_CODE_CI_VERIFIED_66A99D; this docs-only evidence write yields a NEW final SHA requiring exact SHA CI readback.
+- NEXT_ACTION: independent human evaluate generated specifications for completeness and semantic appropriateness; with separate authorized true Agent runner use unseen website requests, verify real model artifacts, compare before/after without reusing these gold labels in prompts.
+- WRITE_OWNER: only Agent candidate Draft PR #7; no external repo writes, merge, deployment, Secret use, or release.
+- SYNC_STATUS: candidate_code_CI_verified; final_doc_SHA_CI_pending; real_model_NOT_RUN; other PRs/main_unmodified.

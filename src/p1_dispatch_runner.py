@@ -12,6 +12,7 @@ from pathlib import Path
 import sys
 from . import p1_local_role_runner as local, p1_skill_case_selection as select
 from . import team_workbench as wb, workbench_tasks as tasks
+from . import p1_restricted_functional as functional
 
 MAX_DISPATCH=12
 MAX_REPAIRS=2
@@ -57,10 +58,14 @@ def _verdict(answer):
     return v
 
 
-def run(task,model,digest,output,*,confirm_offline=False,case_mode='curated',transport=local._http):
+def run(task,model,digest,output,*,confirm_offline=False,case_mode='curated',transport=local._http,functional_pilot=False):
+    if type(functional_pilot) is not bool or (functional_pilot and task!='B003'):
+        raise ValueError('restricted functional pilot only supports B003')
     if confirm_offline is not True or case_mode not in select.MODES:
         raise ValueError('explicit local-only confirmation and case mode required')
     packet=local.task_prompt(task)
+    if functional_pilot:
+        packet={**packet,'restricted_functional_contract':functional.CONTRACT}
     local._model(model,digest,transport)
     version=json.loads(transport('GET','/api/version')).get('version')
     if not isinstance(version,str) or not version:
@@ -74,13 +79,15 @@ def run(task,model,digest,output,*,confirm_offline=False,case_mode='curated',tra
     put('run',{'task_id':task,'model':model,'model_digest':digest,'server_version':version,
         'case_mode':case_mode,'options':local.OPTIONS,'packet_sha256':local._sha(local._json(packet)),
         'runner_sha256':local._sha(Path(__file__).read_bytes()),'operator_declared_offline':True,
-        'max_dispatch':MAX_DISPATCH,'max_repairs':MAX_REPAIRS,'public_dev_not_holdout':True})
+        'max_dispatch':MAX_DISPATCH,'max_repairs':MAX_REPAIRS,'public_dev_not_holdout':True,
+        'functional_pilot':functional_pilot,'functional_oracle_sha256':functional.oracle_digest() if functional_pilot else None})
     work=select.initialize(root,case_mode)
     tasks.setup(work)
     for key,(role,deps,assignment) in NODES.items():
         tasks.add(work,key,assignment,10,list(deps),[],[CHECK])
     refs={}
     feedback=[]
+    functional_runs=[]
     calls=0
     repairs=0
     dispatches=0
@@ -147,6 +154,8 @@ def run(task,model,digest,output,*,confirm_offline=False,case_mode='curated',tra
         context={'public_task':packet,'task':key,'assignment':assignment,
                  'upstream_candidates':inputs,
                  'repair_findings':feedback if key in ('implementation','qa-review') else []}
+        if functional_pilot and key=='implementation':
+            context['assignment']+=' Return ONLY the plain restricted has_overlap function as the artifact, no Markdown fences or prose.'
         route=select.plan(ask(session+'.route',role,
             'Choose one allowed skill and search query, return JSON skill, query, reason.',
             {**context,'allowed_skills':select.menu(role)}),role)
@@ -161,14 +170,24 @@ def run(task,model,digest,output,*,confirm_offline=False,case_mode='curated',tra
         local._write(root/filename,encoded)
         evidence='Candidate only; '+filename+' sha256='+local._sha(encoded)
         if key=='qa-review':
+            tool_report=None
+            if functional_pilot:
+                tool_report=functional.evaluate(inputs['implementation']['candidate'])
+                tool_report.update(candidate_revision=inputs['implementation']['revision'],
+                    candidate_sha256=inputs['implementation']['sha256'])
+                put(session+'.functional',tool_report)
+                functional_runs.append({'file':session+'.functional.json',
+                    'sha256':local._sha(local._json(tool_report)),
+                    'status':tool_report['status'],'revision':tool_report['candidate_revision']})
             verdict=_verdict(ask(session+'.verdict',role,
                 'Return JSON verdict REJECT or REVIEW_READY, findings list. REJECT requires concrete findings; REVIEW_READY is not test PASS.',
-                {**context,'review_candidate':candidate['artifact']}))
+                {**context,'review_candidate':candidate['artifact'],**({'host_functional_report':tool_report} if tool_report is not None else {})}))
             put(session+'.decision',verdict)
-            if verdict['verdict']=='REJECT':
-                tasks.finish(work,key,session,{CHECK:'FAIL'},evidence+'; model review rejected',revision)
+            tool_rejected=tool_report is not None and tool_report['status']!='PUBLIC_SLICE_PASS'
+            if verdict['verdict']=='REJECT' or tool_rejected:
+                tasks.finish(work,key,session,{CHECK:'FAIL'},evidence+'; model review or host functional gate rejected',revision)
                 feedback.append({'candidate_revision':inputs['implementation']['revision'],
-                    'candidate_sha256':inputs['implementation']['sha256'],'findings':verdict['findings']})
+                    'candidate_sha256':inputs['implementation']['sha256'],'findings':verdict['findings']+(['Host tool: '+x for x in tool_report['findings']] if tool_rejected else [])})
                 put(session+'.rejection',feedback[-1])
                 if repairs>=MAX_REPAIRS:
                     status='QA_REPAIR_BUDGET_EXHAUSTED'
@@ -193,7 +212,11 @@ def run(task,model,digest,output,*,confirm_offline=False,case_mode='curated',tra
             'current_candidate_refs':refs,'role_dispatch_model_selected':True,
             'safety_dependencies_fixed':True,'candidate_code_executed':False,
             'program_correctness_verified':False,'independent_qa_verified':False,
-            'holdout_used':False,'release_authorized':False,'provider_authenticated':False}
+            'holdout_used':False,'release_authorized':False,'provider_authenticated':False,
+            'functional_pilot':functional_pilot,'functional_runs':functional_runs,
+            'public_slice_pass':bool(functional_runs and functional_runs[-1]['status']=='PUBLIC_SLICE_PASS' and
+                'implementation' in refs and functional_runs[-1]['revision']==refs['implementation']['revision']),
+            'general_sandbox_verified':False}
     put('summary',result)
     return result
 
@@ -206,9 +229,10 @@ def main():
     p.add_argument('--output',type=Path,required=True)
     p.add_argument('--case-mode',choices=select.MODES,default='curated')
     p.add_argument('--confirm-offline-local-model',action='store_true')
+    p.add_argument('--functional-b003',action='store_true',help='Interpret only the bounded B003 candidate; no native code execution')
     a=p.parse_args()
     try:
-        result=run(a.task,a.model,a.digest,a.output,confirm_offline=a.confirm_offline_local_model,case_mode=a.case_mode)
+        result=run(a.task,a.model,a.digest,a.output,confirm_offline=a.confirm_offline_local_model,case_mode=a.case_mode,functional_pilot=a.functional_b003)
         print(json.dumps({k:v for k,v in result.items() if k not in ('task_capture_status','current_candidate_refs')},indent=2))
         return 0
     except (OSError,ValueError,KeyError,TypeError,http.client.HTTPException):

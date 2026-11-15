@@ -73,7 +73,12 @@ def _text(value, name, limit=MAX_TEXT):
 
 
 def _latest(db):
-    rows=db.execute("SELECT * FROM artifacts ORDER BY id").fetchall()
+    # Keep the append-only history, but materialize only each kind's head.
+    # MIN(id) preserves the first-appearance order of the old dict reduction.
+    rows=db.execute("""SELECT a.* FROM artifacts AS a JOIN
+        (SELECT kind, MAX(id) AS latest_id, MIN(id) AS first_id
+         FROM artifacts GROUP BY kind) AS heads
+        ON a.id=heads.latest_id ORDER BY heads.first_id""").fetchall()
     return {r["kind"]:dict(r) for r in rows}
 
 

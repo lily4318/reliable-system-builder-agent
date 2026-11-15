@@ -8,7 +8,39 @@
 - 七角色依需要工作；無子代理平台即單 Agent 按角色協作。每次用真實工作產物交接。不因有角色名稱就宣稱已執行。
 - 新網站先訪談並確認規格、必要人工操作有逐步教學、確認選項先可編輯再送出。既有功能沿用 src.website_intake_ui、src.website_discovery、src.human_walkthrough。記憶工具不取代使用者確認。
 
-## 本機工作區逐步操作（Windows）
+## 平台原生工作模式（TD-001；不依賴本地模型或使用者電腦）
+
+先讀 AGENTS.md 的執行模式與工作空間。本機 SQLite 是完整私人工作台的選項，並不是角色或 SKILL 的必要前提。使用者只需自然語言提出任務；Agent 自己依 catalog 選擇適用角色和技能、釐清前置產物及授權。三種模式：
+
+| 模式 | 必要條件 | 交付與回讀 |
+|---|---|---|
+| PRIVATE_WORKBENCH | 已授權、已初始化且可實際存取私人工作區 | 原 context/handoff/learning/tasks；不繞過 current、revision、審查及私有資料隔離 |
+| REPO_NATIVE | 授權 GitHub 或等效版本化 repo 存取，沒有可用私人工作區 | 在指定 repo 原檔／原 PR／原進度紀錄工作；讀確切 SHA、驗證依賴、diff、寫後回讀及 exact CI；只保存可公開的工程證據 |
+| READ_ONLY | 只有讀取或對話工具 | 可完成唯讀分析及可編輯方案，不能宣稱寫入、執行測試或持久保存 |
+
+### REPO_NATIVE：只具 GitHub 讀寫工具時的實際步驟
+
+1. 先釐清工作屬於通用 Agent 自身還是外部專案（不得自動跨案），以最新正式來源、分支、授權及必要前置資料為準。選擇 catalog 的必要 role/skill，讀實際文件，若有缺前置就補讀或阻塞受影響步驟。沒有獨立子代理工具時明示 SINGLE_AGENT_ROLE_WORK。
+2. 需工程案例時，從同版 src/workbench_learning.py 直接讀 CASES（預設兩個公開案例）；需要擴充時明示 opt-in TRAINING_CASES。依任務具體技術／風險詞取用，不假定全部適用。核對案例的來源、實際測試與 Scope；原案例不可代表私人記憶、私人退休／衝突狀態或核准。若有 Python，可在 Agent checkout 用下面的 public-context。若只有 GitHub 工具，直接讀常數及原證據，標 SOURCE_READ，不能聲稱實際執行 public-context、context、cite 或 SQLite 檢索。
+3. 在獲授權原 repo 做實際工作。重要交接以原需求、架構、程式、commit、CI、原接續文件作 source ref，不另建立扮演 SQLite 的假狀態。更新前核對當前 head／blob／操作者與 revision；前置不再適用必須重驗，未知寫入先唯讀對帳。
+4. 在原進度／決策紀錄增量記下 task、模式、實際選用 role/skill 及理由、source SHA、前置證據、案例 key/source 和 applied/not_applicable 的理由、實際產物、驗收、失敗根因、下一步。只在獲授權且去識別化、允許公開時才寫入公開 repo。此為操作者聲明及可追溯 Git 證據，並非 SQLite citation receipt、完整交易任務池或獨立評審。不得保存私人偏好、私人資料、私有日誌、憑證或未獲授權外部內容。
+5. 完成寫後回讀與 CI；只有實際測試通過才可稱驗收。重要候選經驗及其適用限制保存於原決策／review 或原案例來源，依原審核規則確認後才升格；不自動修改其他專案。沒有合適私人保存位置時明示未持久化，仍可完成其餘授權工作。
+
+### 可選：無需私人工作區的公開案例檢索
+
+在可用 Python 的 Agent 程式 checkout 中，建立只含公開任務資訊的輸入 JSON，例如：
+
+```json
+{"skill":"debug-and-repair","task":"REPO-AUDIT","query":"revision stale worker acceptance reconciliation","budget":6000,"limit":4,"include_training_cases":true}
+```
+
+```bash
+python -m src.workbench_learning public-context --input public-query.json
+```
+
+public-context 不接受 --workspace，不建立、遷移、讀取或改寫私人 SQLite；預設不讀擴充案例，include_training_cases 必須明確布林 true。返回 PUBLIC_CASE_REVIEW_ONLY、case_key、matched_terms、證據與 required_artifact_types；prerequisites_verified=false、private_resolution_state_checked=false、authority_granted=false、citation_persisted=false。按內容與證據字元預算排序，非語意檢索。不將 public-context 與已有私有工作區的 context/cite/feedback 混用或藉此復活已退休私人案例。其他 CLI actions 仍需 workspace。
+
+## 本機工作區逐步操作（Windows；有需要且授權時才使用）
 1. 下載整合候選 PR 分支的 ZIP，解壓到獨立本機資料夾。打開檔案總管至含 src 的根目錄，輸入 powershell 按 Enter。
 2. 執行 `py -3 --version`，建議 Python 3.12。無 Python 時依 docs/WEBSITE_HOLDOUT_WALKTHROUGH.md 的官方安裝步驟；不需要 API Key。
 3. 選私人、未共享且未同步的位置，核對檔案總管右鍵 → 內容 → 安全性。以下示範合成專案用法，不能選正式研究資料夾或 Git repo：

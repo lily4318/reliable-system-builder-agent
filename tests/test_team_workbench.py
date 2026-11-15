@@ -38,6 +38,39 @@ class TeamWorkbenchTest(unittest.TestCase):
         self.assertFalse(context(self.root,"resume-project")["artifacts"]["architecture"]["current"])
         with self.assertRaises(ValueError):
             handoff(self.root,"task-planning","stale plan","fixture")
+    def test_latest_only_materializes_current_heads_preserving_history(self):
+        import sqlite3
+        from src.team_workbench import _latest
+        with closing(connect(self.root)) as db, db:
+            # Seed history directly in the original schema, not a new application.
+            kinds=["requirements","specification","architecture"]
+            db.executemany(
+                "INSERT INTO artifacts(kind,skill,source_ref,content,dependencies) VALUES(?,?,?,?,?)",
+                [(kinds[i%3],"fixture","source-"+str(i),"x"*2048+str(i),"{}")
+                 for i in range(300)])
+            # Uneven latest revisions: first appearance order must not change.
+            db.execute("INSERT INTO artifacts(kind,skill,source_ref,content,dependencies) VALUES(?,?,?,?,?)",
+                       ("requirements","fixture","edited","newest","{}"))
+            old_rows=db.execute("SELECT * FROM artifacts ORDER BY id").fetchall()
+            expected={r["kind"]:dict(r) for r in old_rows}
+            materialized=[]
+            def count_rows(cursor,row):
+                materialized.append(row[0])
+                return sqlite3.Row(cursor,row)
+            db.row_factory=count_rows
+            actual=_latest(db)
+            db.row_factory=sqlite3.Row
+            self.assertEqual(actual,expected)
+            self.assertEqual(list(actual),list(expected))
+            self.assertEqual(len(materialized),len(kinds),
+                             "current-head lookup must not materialize history")
+            self.assertEqual(db.execute("SELECT count(*) FROM artifacts").fetchone()[0],301)
+
+    def test_latest_empty_original_schema(self):
+        from src.team_workbench import _latest
+        with closing(connect(self.root)) as db:
+            self.assertEqual(_latest(db),{})
+
     def test_learning_dedup_conflict_review_and_history(self):
         a=remember(self.root,"preference","UI","Editable choices","explicit fixture","user-stated")
         b=remember(self.root,"preference","UI","Editable choices","explicit fixture","user-stated")

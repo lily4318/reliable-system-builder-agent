@@ -2,6 +2,7 @@
 from __future__ import annotations
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 from src.agent_eval import evaluate as evaluate_policy
@@ -20,6 +21,27 @@ TARGETS = ROOT / "evaluations/quality-targets.json"
 def load(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
+def _summary_consistent(report: dict) -> bool:
+    # Recompute from actual per-case rows, not just self-described counters.
+    keys = ("total", "passed", "failed", "critical_total", "critical_passed")
+    if any(type(report.get(key)) is not int or report[key] < 0 for key in keys):
+        return False
+    rows = report.get("cases")
+    if not isinstance(rows, list):
+        return False
+    if any(not isinstance(row, dict) or type(row.get("passed")) is not bool
+           or type(row.get("critical")) is not bool
+           or not isinstance(row.get("id"), str) or not row["id"] for row in rows):
+        return False
+    if len({row["id"] for row in rows}) != len(rows):
+        return False
+    critical = [row for row in rows if row["critical"]]
+    passed = sum(row["passed"] for row in rows)
+    return tuple(report[key] for key in keys) == (
+        len(rows), passed, len(rows)-passed, len(critical),
+        sum(row["passed"] for row in critical))
+
+
 def assess(policy: dict, recovery: dict, baseline: dict, targets: dict,
            capability: dict | None = None,
            website: dict | None = None, scope: dict | None = None,
@@ -36,11 +58,18 @@ def assess(policy: dict, recovery: dict, baseline: dict, targets: dict,
         website = evaluate_website()
     if baseline.get("status") != "historical_observed_baseline_not_formal_release":
         raise ValueError("unverified baseline")
-    if not str(baseline.get("source_main_sha", "")).isalnum() or len(baseline["source_main_sha"]) != 40:
+    if not isinstance(baseline.get("source_main_sha"), str) or not re.fullmatch(r"[0-9a-f]{40}", baseline["source_main_sha"]):
         raise ValueError("baseline SHA missing")
     if baseline.get("policy_passed") != 22 or baseline.get("critical_passed") != 18:
         raise ValueError("baseline changed without provenance review")
+    # Fail closed before using malformed counters in numeric comparisons.
+    summaries_valid = all(_summary_consistent(report) for report in (policy,recovery,scope,workflow))
+    if not summaries_valid:
+        return {"gate_passed": False, "checks": {"case_summary_integrity": False},
+                "human_approval_completed": False, "formal_release_created": False,
+                "scope": "invalid_offline_evidence_summary"}
     checks = {
+        "case_summary_integrity": True,
         "policy_no_regression": policy["total"] >= baseline["policy_cases"]
             and policy["critical_total"] >= baseline["critical_cases"],
         "policy_golden_cases": policy["failed"] <= targets["max_policy_failures"]

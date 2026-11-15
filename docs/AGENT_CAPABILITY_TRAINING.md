@@ -7,13 +7,20 @@
 - TASK_DOMAIN: RELIABLE_AGENT_ENGINEERING_CAPABILITY_TRAINING
 - SOURCE_REPO: lily4318/reliable-system-builder-agent
 - ACTIVE_CANDIDATE: Draft PR #8, candidate-skill-team-integration-20261114；https://github.com/lily4318/reliable-system-builder-agent/pull/8
-- SOURCE_VERSION: NATIVE-MATURITY-012-REVIEW-HANDOFF exact code/test 560d143bd9db245f263906bc478ad5379b9eab23 / CI 43705735689 success; latest Draft PR #8 HEAD authoritative; evidence-docs CI separate.
-- LAST_VERIFIED_STEP: Prior snapshot docs exact 9384651b6f4243706ff9bfbf19df5afe7c71b29d / CI 43705370942 418/418. Website review handoff 560d143bd9db245f263906bc478ad5379b9eab23 / CI 43705735689 job 132786283387 424/424, 6 new methods and W101–106 real browser handoff 6/6.
-- COMPLETED: 7 roles/12 catalog skills/11 EP audited against website delivery; TD-001 user-requested maturity focus. Implemented read-only reviewed export → source/decision-bound design review packet with exclusions, unresolved answers, digest and local UI/CLI; exact 424/424 and six browser cases; prior capabilities intact.
-- BLOCKERS: Evidence-docs CI separate. Local review statement and digest are not identity or formal approval. Full approved specification with concrete acceptance, real target/version/authority, unfamiliar website vertical slice, cross-dialogue/platform validation, real user UAT/deployment/independent model/holdout remain unverified. No automatic release, external project writes, private data or case promotion.
+- SOURCE_VERSION: NATIVE-MATURITY-013-EDITORIAL-SPEC WEB-EDITORIAL-01/v0.1 PROPOSED, source review training/reviews/2026-11-15-editorial-website-spec.md; latest Draft PR #8 HEAD authoritative.
+- LAST_VERIFIED_STEP: Prior maturity docs exact a8d392d2ded5386b44613246567df5953f8bfdce / CI 43705942761 job 132786914468 success 424/424; actual browser 6/6 handoff. New editorial proposal only; no implementation/tests run for website.
+- COMPLETED: Selected a distinct public synthetic editorial website and drafted 13 source-linked requirements, data/roles/state model, 7 acceptance gates and 6 decisions for editable user review; previous 7 roles/12 skills/11 EP retained.
+- BLOCKERS: Specification and independent candidate-write scope not yet explicitly confirmed. No site implementation/acceptance, actual user review, deployment or cross-platform evidence. New docs CI separate. Do not use proposal as authorization.
 - WRITE_OWNER: 僅 Agent 候選分支；main/Release、外部專案、真實個資、付費模型或正式部署不在本次授權內。
-- SYNC_STATUS: MATURITY_AUDIT_7_12_11; EP01_EP02_EP09_SOURCE_READ_TRANSFER; HANDOFF_GREEN424_BROWSER6; ORIGINAL_TRAINING_AND_SKILL_SYNC; DOCUMENT_READBACK_AND_CI_SEPARATE; NO_RELEASE.
-- NEXT_ACTION: Verify latest docs CI; seek editable user review of a specific synthetic/controlled unfamiliar website specification and independent scope authorization, then actual end-to-end slice from integrated spec to architecture, implementation, QA/security and deployment plan with resumable evidence. No external deployment or autonomous promotion. Do not repeat handoff or earlier narrow fixes.
+- SYNC_STATUS: EDITORIAL_SPEC_PROPOSED; EP01_EP02_EP07_SOURCE_READ; ORIGINAL_MASTER_DECISION_REVIEW_UPDATE; DOCUMENT_READBACK_AND_CI_SEPARATE; NO_IMPLEMENTATION_OR_RELEASE.
+- NEXT_ACTION: Obtain user's editable review and explicit confirmation of WEB-EDITORIAL-01/v0.1 R01–R13/A01–A07 plus separate bounded candidate-write D6. Record actual decision/revision; then architecture/plan and working website with actual tests. No external deployment or private data.
+
+### 2026-11-15｜NATIVE-MATURITY-013-EDITORIAL-SPEC：完整網站工程實戰，規格提案（TD-001）
+
+- 本輪使用者明示選不同設備/報名/報表的完整網站實戰，設計需求/資料/權限/功能驗收，先可編輯規格審閱確認後才實作。原 Draft PR #8 HEAD a8d392d2ded5386b44613246567df5953f8bfdce / CI 43705942761 job 132786914468 completed/success，raw 232218 chars，424 tests in 41.433s，六案例 actual DOM handoff 全過；不重做成熟度盤點或原功能。
+- 選定公開合成委託 WEB-EDITORIAL-01/v0.1 線上編輯與文章發布管理平台，非既有 W101–106 的完整網站類型。比較付款商城（額外付款授權及範圍）、另一預約/目錄（重疊）、編審發布（採為待確認提案，驗證文章版本、角色、狀態、公開內容隔離、持久化、安全與瀏覽器）。原 P22 文件審閱經驗可用但不等同此完整網站。詳 [完整可編輯規格](training/reviews/2026-11-15-editorial-website-spec.md) R01–R13 / A01–A07 / D1–D6；皆 PROPOSED 非使用者實際答覆。單 Agent 模式 REPO_NATIVE / SINGLE_AGENT_ROLE_WORK，讀 System Lead/project-intake、Architect/requirements-spec、原 13 題/6網站案例、EP-01/02/07 SOURCE_READ。未取得真正 review export，未執行交接 CLI、不製造批准旗標。
+- 建議網站限定公開合成資料、localhost、匿名讀者/兩作者/編輯，草稿→送審→退回/核准→另行發布→修訂/下架；舊公開版不隨私稿變更。資料模型/交易/權限/驗收及技術取捨先提案。只更新原訓練主檔/決策與 review 規格文件，不寫網站程式、不自動部署或升格案例，不改正式 main/Release 或外部專案。
+- NEXT_ACTION: 等使用者真實逐項編輯或確認整份 WEB-EDITORIAL-01/v0.1（R01–R13/A01–A07）及獨立候選程式寫入授權 D6；有修改先保存 v0.2 或後續版本與決策證據，核對實際 source/範圍。再 architecture-design/ADR、task-planning、implement-feature、QA/security、部署準備及真實驗收。不把按選項、hash、local review 當授權。未確認不進入施工；無付費模型或本地模型前置。
 
 ### 2026-11-15｜NATIVE-MATURITY-012-REVIEW-HANDOFF：整體網站工程成熟度與規格交接（TD-001）
 

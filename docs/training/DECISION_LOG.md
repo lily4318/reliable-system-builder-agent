@@ -186,3 +186,12 @@
 - 覆盤：EP-01/02/09 在真實 UI→規格交接接口遷移。改善唯一共通施工前置，不宣稱已完成從需求到產品的所有階段；缺真實語意審查、目標/來源綁定的完整已確認施工規格、實際陌生網站 vertical slice、跨對話只靠原正式產物續作與獨立實際平台/部署驗收。原11 EP、2 DEFAULT+6 OPT_IN、既有 schema/任務池/QA 功能保留。不得拿 hash 或 local flag 當確認；原主檔、決策、EP-01/02、requirements-spec 與入口指南增量更新。
 - NEXT_ACTION: 先核對文件 exact CI；使用明示為公開合成/受控的不同完整網站委託，依已確認規格、目標/版本和使用者實際授權做可運作 vertical slice 及實際功能/權限/UI QA、接續證據；先向使用者提出可編輯的具體規格，未確認不開工於新網站。實際外部整合、正式上線、私人資料與平台獨立評測仍另行授權。不重做本次交接或舊缺陷。
 
+
+
+## TD-001｜2026-11-15 NATIVE-MATURITY-013-EDITORIAL-SPEC：網站實戰委託規格提案
+
+- 本輪使用者明示選不同設備/報名/報表的完整網站實戰，設計需求/資料/權限/功能驗收，先可編輯規格審閱確認後才實作。原 Draft PR #8 HEAD a8d392d2ded5386b44613246567df5953f8bfdce / CI 43705942761 job 132786914468 completed/success，raw 232218 chars，424 tests in 41.433s，六案例 actual DOM handoff 全過；不重做成熟度盤點或原功能。
+- 選定公開合成委託 WEB-EDITORIAL-01/v0.1 線上編輯與文章發布管理平台，非既有 W101–106 的完整網站類型。比較付款商城（額外付款授權及範圍）、另一預約/目錄（重疊）、編審發布（採為待確認提案，驗證文章版本、角色、狀態、公開內容隔離、持久化、安全與瀏覽器）。原 P22 文件審閱經驗可用但不等同此完整網站。詳 [完整可編輯規格](training/reviews/2026-11-15-editorial-website-spec.md) R01–R13 / A01–A07 / D1–D6；皆 PROPOSED 非使用者實際答覆。單 Agent 模式 REPO_NATIVE / SINGLE_AGENT_ROLE_WORK，讀 System Lead/project-intake、Architect/requirements-spec、原 13 題/6網站案例、EP-01/02/07 SOURCE_READ。未取得真正 review export，未執行交接 CLI、不製造批准旗標。
+- 建議網站限定公開合成資料、localhost、匿名讀者/兩作者/編輯，草稿→送審→退回/核准→另行發布→修訂/下架；舊公開版不隨私稿變更。資料模型/交易/權限/驗收及技術取捨先提案。只更新原訓練主檔/決策與 review 規格文件，不寫網站程式、不自動部署或升格案例，不改正式 main/Release 或外部專案。
+- NEXT_ACTION: 等使用者真實逐項編輯或確認整份 WEB-EDITORIAL-01/v0.1（R01–R13/A01–A07）及獨立候選程式寫入授權 D6；有修改先保存 v0.2 或後續版本與決策證據，核對實際 source/範圍。再 architecture-design/ADR、task-planning、implement-feature、QA/security、部署準備及真實驗收。不把按選項、hash、local review 當授權。未確認不進入施工；無付費模型或本地模型前置。
+

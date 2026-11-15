@@ -23,3 +23,26 @@
 | W6 | Learning Evaluator / learn-from-feedback, knowledge-distillation; System Lead/resume-project | W4/W5 | A07 | original training master/decision, evidence+limitations, later fresh conversation resume |
 
 Status W0/W1 document implementation; W2–W6 planned, not PASS. Prior CI is not website evidence. Use exact source and scoped writes, no formal release.
+
+
+## 實作與驗收補記（W2–W6）
+依原確認未改產品需求。最終 code/test ca030a15af00d3dd4459a3c9829636385c37378b / CI 43708288874 job 132794093170 success 434/434，45.381s，實際 Chromium 2x29。原架構草稿保留；schema 2 加每修訂 counter 及 audit 退回理由；UI 按已核准規格處理 lost ACK、同分頁原 actor 重新登入恢復 receipt；非跨設備保障。詳 [原主檔](../AGENT_CAPABILITY_TRAINING.md) NATIVE-WEB-014-EDITORIAL 完整工程驗收及 [本機操作指南](../../EDITORIAL_SITE.md)。W0–W5 實作及受控驗收完成；W6 已完成覆盤、原文檔與證據同步，A07 獨立新對話實際接續仍未完成。正式部署/真人 UAT/跨平台/人審升格皆未做。
+
+## Requirement→實作→驗收 trace
+| R | 實作及 observables | A |
+|---|---|---|
+| R01 | public_list/detail, workspace, true browser full lifecycle, CLI second process | A01/A05 |
+| R02 | server session actor, role/owner, author-b/anonymous/editor negative | A02 |
+| R03 | Store._change, state/public pointer, old public until publish, withdrawal/republish | A01/A04 |
+| R04 | /api/articles?q/category/page, public detail, DOM 21 records 20+1 | A01/A06 |
+| R05 | login/logout/session expiry/rotation, PBKDF2, local Host/Origin/CSRF; direct HTTP | A02 |
+| R06 | bounded_text/content, enum, JSON cap, literal script text and parameterized SQL negative | A03 |
+| R07 | one_open, expected version, actor/token payload receipt, two writers, actual cut and dropped ACK | A04 |
+| R08 | local work status/reason, no outgoing integration | A01/A02 |
+| R09 | role/owner/visibility, audit history incl reason/counter, direct endpoint denial | A02/A04 |
+| R10 | only synthetic, backup/restore exclusive/old sessions revoked, no public hidden content | A02/A05 |
+| R11 | stdlib/SQLite isolated paths; init/verify/serve and actual process relaunch | A05/A07 |
+| R12 | DOM 375/1280, actual Tab, labels, no overflow, visible errors | A06 |
+| R13 | source/CI, guide, backup/restore/rollback plan, no external launch | A07 partial: fresh-dialogue continuation pending |
+
+All local gates are limited to tested contract/environment; no manual UAT or deployment. Do not count as independent blinded Agent ability scores.

@@ -16,5 +16,7 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 ### 驗收器本身的負向驗收（NATIVE-EP-010-ORACLE-BOUNDARY）
 先核對合法輸入域、最大工作量、數值端點、空/滿載、短路/最壞分支與資源預算；對公開 oracle 以已知錯誤候選測「能否拒絕」，不是只有正確參考程式 PASS。必要時在受限解譯器直接獨立跑合法邊界，對照整合 host QA 退件、修復及精確版本。保留原固定預期值/安全白名單/資源限制；不要為通過放寬限制或執行任意候選 native code。測試契約變更需新 oracle version/hash，歷史 PASS 不替代新版。原 EP-11、CI 43704461951 red / 43704563695 green：12→18公開樣本仍非全域、獨立盲測或正式產品驗收。
 
+### 同一網站的多層實際驗收（NATIVE-WEB-014-EDITORIAL）
+功能完整度依確切 R/A 追溯；把資料交易/角色/HTTP/DOM/CLI 啟動及復原分層，不能用某一層 PASS 代替其他層。對版本公開切換、原 actor token replay、未知寫入分別測未提交 subprocess cut 與已提交但回應丟失、直接 API 越權及重新登入唯讀查 receipt；真 DOM 在 exact viewport 驗分頁、鍵盤、稿件與公開視圖狀態。不得為 runner 放寬 Origin/CSRF/ACL 或加入日常 test route。CI 43708288874 434/434 +375/1280 each29；受控本機，不等於真使用者 UAT、完整 accessibility/security audit 或正式部署。
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 qa；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

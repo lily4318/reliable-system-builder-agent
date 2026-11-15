@@ -40,12 +40,14 @@
 - 證據：NATIVE-TRANSFER-002 的 `test_human_confirmation.py` 核心兩方法現仍通過；NATIVE-UI-003 真 DOM 固定檢查 9/12→12/12（另一組 10/13→13/13 重疊不加總），[CI 43692897287](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43692897287) exact 2563e54ad5779042e575bae94b9fd7d84f2c5fd1，最新整合 [CI 43702633084](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43702633084) 核心及 DOM 再驗。P22-CASE-001 [CI 43666793523](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43666793523)，exact 36c03547b84a43c5c41c9aa93388c31839f56041，同 10 項 oracle 受控前後 6→10，原 `test_p22_document_review.py`。詳主檔及兩 NATIVE 決策。
 - 限制：literal True 不證明人類身分、操作真實性；合成文件 actor 不是登入認證；受控 DOM 不等於真人 UAT、送件、對外發布或 Agent 增益。
 - NATIVE-MATURITY-012-REVIEW-HANDOFF（同 EP-01 實測）：審閱原 export 及整併 handoff 各自 canonical hash；CLI 可比對已知可信 pin，變動需重新審閱；local UI 編輯/取消/修改答案失效，epoch/captured export 防延遲回應顯示舊內容。所有權限 false，hash 不證明真人或正式核准；CI 43705735689。
+- WEB-EDITORIAL-01（NATIVE-WEB-014-EDITORIAL）已確認完整規格後實作全站：審核綁同稿及內容鎖定、核准不等於發布、修訂期舊 public pointer 不變、另行原子發布及下架；真 DOM 375/1280 各29 checks 驗證。CI [43708288874](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43708288874) 434/434，非正式發布或真人 UAT。與 EP-03/06 共用同一證據，不重複計算。
 - 狀態：EVIDENCE_VERIFIED / INDEX_CANDIDATE；核心與 UI 已入 debug-and-repair / test-and-acceptance，P22-CASE-001 仍主檔候選。
 
 ### EP-03 資源交易、冪等決定及未知寫入復原
 - 採用：多人名額/庫存需狀態、唯一鍵、容量與 ledger 同交易，不能先讀後無鎖寫；區分 exclusive create、mode=ro 與 mode=rw，query_only 不足以避免缺庫被建立。actor/token 必須綁定 payload，成功與合法否定結果均持久化；同請求重播回原決定，不明結果先查狀態/憑據，不盲重送。遠端依專用 `recovery_reconciler` 與實際來源、交易能力另驗。
 - 證據：原 [workbench_learning.py](../src/workbench_learning.py) DEFAULT B001-CASE-001、B002-CASE-001；OPT_IN P21-CASE-003（原 CI 43576453447）；主檔 P22-CASE-001 的失敗 stale_approval/denied_replay/future_revision_replay/fault_atomic 經同 oracle 修復；原 tests/test_b001_workshop.py、tests/test_b002_equipment.py、tests/test_p22_document_review.py。
 - 限制：本地 SQLite 交易證據不移植為跨庫、分散式、HTTP POST exactly-once、外部 API 或正式容量/權限核准；COMMITTED 不等於業務成功。真實遠端不明狀態維持唯讀核對。
+- WEB-EDITORIAL-01（NATIVE-WEB-014-EDITORIAL）：同一 SQLite 交易核對 auth/owner/version/state，public pointer/audit/receipt 同次 commit。異 payload token 拒絕、合法 denial 可回原 receipt。實測兩連線、subprocess cut after audit before receipt/commit、browser dropped ACK after real server response，原 POST 一次且跨帳號不得查收據；原帳號重新登入唯讀觀測結果；NOT_OBSERVED 不代表 writer stopped。CI 43708288874 434/434；同一受控本機，不宣稱分散式 exactly-once 或通用安全性。
 - 狀態：EVIDENCE_VERIFIED / 原 DEFAULT 2、OPT_IN 1；P22-CASE-001 作交叉證據而非複製案例。
 
 ### EP-04 版本失效、跨階段驗收與安全拓撲
@@ -66,6 +68,7 @@
 - 採用：HTTP、真 DOM、真人 UAT、正式部署、資料遷移與復原分開；使用真正 browser form/Origin 行為，不為測試通過放寬 CSRF 或 actor 隔離。遷移先停止舊 writer、保留來源與歷史、核對目標；已有新版寫入不能直接回退舊快照。UI 內容確認採 EP-02。
 - 證據：OPT_IN P21-CASE-006 / exact 0f4f536d4c3daf05304add614d24e2563b42b1ef / [CI 43607088233](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43607088233) 351/351，native browser 3 roles、CLI migration 及 strict Origin。最新 406-test CI 仍有 P21-EQUIPMENT-BROWSER PASS、EDITABLE-DECISION-BROWSER 12/12。原 src/p21_equipment_site.py、src/p21_equipment_browser_test.py、tests/test_p21_equipment_cli.py，主檔 P2-1d。
 - 限制：本機合成 Chromium/CLI 非真人驗收、正式服務/資安審計或斷電耐久；不是解除實際權限、安全配置的授權。
+- WEB-EDITORIAL-01（NATIVE-WEB-014-EDITORIAL）新完整網站真實 HTTP 正負測、真 Chromium exact CSS 375/1280 each29（含 CDP native Tab, 21 rows pagination、三角色流程、失去 ACK 後原帳號重登入查收據），CLI init/verify/serve subprocess restart twice、exclusive backup/restore。CI 43708288874 同 SHA 434/434。不得把 DOM 或 test-only proxy/drop-ACK 冒充外部部署、真人 UAT、WCAG 或 production browser security；原安全守門未放寬。
 - 狀態：EVIDENCE_VERIFIED / 原 OPT_IN 1，已有 QA 技能相關原則。
 
 ### EP-07 未決產品政策與可測原型分離

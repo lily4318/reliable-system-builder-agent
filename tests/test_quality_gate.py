@@ -25,6 +25,27 @@ class QualityGateTest(unittest.TestCase):
         self.assertFalse(result["human_approval_completed"])
         self.assertFalse(result["formal_release_created"])
 
+
+    def test_invalid_baseline_hex_sha_rejected(self):
+        with self.assertRaises(ValueError):
+            assess(self.policy,self.recovery,{**self.baseline,"source_main_sha":"z"*40},self.targets)
+
+    def test_malformed_or_inconsistent_summary_cannot_pass(self):
+        for origin, source in (("policy",self.policy),("recovery",self.recovery)):
+            for patch in ({"failed":-1},{"passed":0},{"passed":True},
+                          {"failed":False},{"critical_passed":True},
+                          {"critical_total":source["total"]+1,
+                           "critical_passed":source["total"]+1}):
+                with self.subTest(origin=origin,patch=patch):
+                    altered={**source,**patch}
+                    policy=altered if origin=="policy" else self.policy
+                    recovery=altered if origin=="recovery" else self.recovery
+                    try:
+                        result=assess(policy,recovery,self.baseline,self.targets)
+                    except ValueError:
+                        continue
+                    self.assertFalse(result["gate_passed"])
+
     def test_fewer_regression_cases_blocks(self):
         weak = copy.deepcopy(self.policy)
         weak["total"] = self.baseline["policy_cases"] - 1

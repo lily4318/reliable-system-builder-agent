@@ -19,6 +19,8 @@
 
 - TD004-OFFICIAL-03 / NATIVE-DEVOPS-025：quality gate null/negative/mismatched summary 與 SHA、CI diagnostic report bytes/run attempt 綁定，DEVOPS_REPORT_BINDING_FULL_CI_VERIFIED，詳 [深度覆盤](training/reviews/2026-11-15-ci-artifact-integrity.md) / EP-14。
 
+- **專案管理方向待確認（TP-009，DISCUSSION / PROPOSED）**：使用者希望避免過度工程、範圍膨脹與交付延宕，提議專案經理協助與使用者協商內容及時程；詳[原決策紀錄 TP-009](training/DECISION_LOG.md)。本輪僅蒸餾核心與比較方案，不新增角色或技能、不改正式訓練優先序，需先確認共識。
+
 - **方向對焦待確認（TP-008，DISCUSSION / PROPOSED）**：使用者表示不易理解最近訓練；詳 [原決策紀錄 TP-008](training/DECISION_LOG.md#tp-0082026-11-15-訓練方向對焦與使用者可理解的建站能力discussion--proposed)。本輪僅檢討及提出建站成果導向的優先序，未改 TD-001–004 或原 NEXT_ACTION；在本次方向協商中先取得使用者共識，不把提議當已核准。
 
 - TD-004 已正式確認（原 TP-007）：詳 [原決策紀錄](training/DECISION_LOG.md) TD-004 與 [共同規則](../AGENTS.md)。完整教材仍待取得，本輪不是章節實際學習。

@@ -21,5 +21,9 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 ### HTTP framing 跨解析器與無副作用驗收（EP-12）
 以本機真連線對同一舊版建立 red 測試，正確內容前綴但未收足宣告 bytes、異常標頭、逾時等負例；具權限的操作也不能因解析成功執行。驗收 oracle 包含狀態碼及所有相關業務表（包含負向決策 ledger）與可行時原檔 bytes；單用 4xx 或庫存不變不足。正向保留合法編碼及原冪等語意，固定 red/green SHA。實例 NATIVE-HTTP-020/021 詳 [原覆盤](../../../docs/training/reviews/2026-11-15-http-framing.md)；不把 loopback 或其他網站 DOM 當真設備 UAT。
 
+
+### 動態資料跨模組與匯出驗收（TD-005 Developer/QA）
+正反測追溯字典、版本、批次、缺失值與匯出格式；拒絕時核對所有相關紀錄、revision 及事件。使用獨立解析器路徑讀回 CSV 並比預期值/欄序/資料版本，非只看行數。以真第二連線在讀版本與讀 rows 間提交，核對兩者同一快照及下一版正確，重複匯出 bytes 必須一致。對危險文字前綴、逗號、引號、CR/LF 和 Unicode 測完整可逆性；不把 CSV quoting 或合成 prefix 檢查當 Excel/其他試算表的完整安全證明。詳 docs/training/reviews/2026-11-16-research-data.md（10/10；對照 8 failures；非獨立盲測、真人UAT）。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 qa；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

@@ -137,3 +137,84 @@ class FileIntakeTests(unittest.TestCase):
                          {'P21-CASE-005':'applied', 'P21-CASE-003':'not_applicable', 'P21-CASE-006':'not_applicable'})
         self.assertEqual(wb.context(workspace, 'deployment')['status'], 'READY_TO_REVIEW_INPUTS')
         print('P22B-LEARNING: 3 cases considered; 1 principle transferred; 2 not applicable; feedback candidate', flush=True)
+
+    def test_different_source_race(self):
+        other = self.root/'different.csv'
+        other.write_bytes(DATA.replace(b'paper,3', b'paper,4'))
+        import threading
+        barrier = threading.Barrier(2)
+        def attempt(path):
+            barrier.wait(timeout=10)
+            try:
+                return intake.publish(path, self.output)
+            except FileExistsError:
+                return 'EXISTS'
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            statuses = list(pool.map(attempt, (self.source, other)))
+        self.assertCountEqual(statuses, ['PUBLISHED', 'EXISTS'])
+        before = self.output.read_bytes()
+        outcomes = [intake.reconcile(p, self.output) for p in (self.source, other)]
+        self.assertCountEqual(outcomes, ['COMMITTED', 'CONFLICT'])
+        self.assertEqual(outcomes[statuses.index('PUBLISHED')], 'COMMITTED')
+        self.assertEqual(self.output.read_bytes(), before)
+
+    def test_process_exit_at_publication_boundary(self):
+        code = """import os,sys
+from src import p22_file_intake as intake
+real_link = intake.os.link
+def cut(src,dst):
+    if sys.argv[3] == 'after':
+        real_link(src,dst)
+    os._exit(23)
+intake.os.link = cut
+intake.publish(sys.argv[1],sys.argv[2])
+"""
+        for stage, expected in [('before','NOT_OBSERVED'), ('after','COMMITTED')]:
+            with self.subTest(stage=stage):
+                dest = self.root/(stage+'.json')
+                child = subprocess.run([sys.executable,'-c',code,str(self.source),str(dest),stage],
+                                       capture_output=True,timeout=20)
+                self.assertEqual(child.returncode,23)
+                leftovers = list(self.root.glob('.p22-intake-*'))
+                self.assertEqual(len(leftovers),1)
+                prior = leftovers[0].read_bytes()
+                self.assertEqual(prior,intake.transform(DATA))
+                self.assertEqual(intake.reconcile(self.source,dest),expected)
+                self.assertEqual(leftovers[0].read_bytes(),prior)
+                self.assertEqual(dest.exists(),stage=='after')
+                if dest.exists():
+                    self.assertEqual(dest.read_bytes(),prior)
+                # Only remove the known test-owned staging file after reconciliation.
+                leftovers[0].unlink()
+        print('P22B-CUTOVER: before link NOT_OBSERVED; after link COMMITTED; retained staging bytes verified',flush=True)
+
+    def test_curated_file_case_opt_in_and_retrieval(self):
+        from unittest.mock import patch
+        work = wb.initialize(self.root/'casework','Synthetic file report')
+        learn.setup(work)
+        query = 'CSV deterministic JSON file bundle hash exclusive publication hard link'
+        def retrieve():
+            return learn.task_context(work,'debug-and-repair','SYN-REPORT',query,limit=10)['memory']
+        self.assertNotIn('P22-CASE-002',{r['topic'] for r in retrieve()})
+        # Simulate an existing workspace created with the previous curated corpus.
+        prior_cases = tuple(c for c in learn.TRAINING_CASES if c[0]!='P22-CASE-002')
+        with patch.object(learn,'TRAINING_CASES',prior_cases):
+            learn.setup(work,include_training_cases=True)
+        before = {r['topic']:r for r in wb.context(work,'resume-project')['memory']}
+        self.assertEqual(len(before),5)
+        learn.setup(work,include_training_cases=True)
+        after = {r['topic']:r for r in wb.context(work,'resume-project')['memory']}
+        self.assertEqual(len(after),6)
+        self.assertEqual({k:after[k] for k in before},before)
+        hit = next(r for r in retrieve() if r['topic']=='P22-CASE-002')
+        self.assertEqual(hit['basis'],'observed')
+        self.assertIn('43667714699',hit['evidence'])
+        self.assertIn('power-loss',hit['content'])
+        learn.setup(work,include_training_cases=True)
+        self.assertEqual(next(r for r in retrieve() if r['topic']=='P22-CASE-002')['id'],hit['id'])
+        args = self.root/'case-query.json'
+        args.write_text(json.dumps({'skill':'debug-and-repair','task':'SYN-REPORT','query':query,'limit':10}),encoding='utf-8')
+        child = subprocess.run([sys.executable,'-m','src.workbench_learning','context','--workspace',str(work),'--input',str(args)],
+                               capture_output=True,text=True,check=True,timeout=20)
+        self.assertEqual(next(r for r in json.loads(child.stdout)['memory'] if r['topic']=='P22-CASE-002')['id'],hit['id'])
+        print('P22B-DISTILL: existing 5-case library upgraded to 6; old cases preserved; new process retrieval verified',flush=True)

@@ -5,8 +5,12 @@
 
 ## 使用者如何工作
 - 在 AI 可讀取本 repo 的工作區中直接說「建立網站」「整理規格」「繼續」「修好報名功能」「記錄這次修復」「整理學到的事」。AI 需先讀 AGENTS.md、對應 SKILL.md、最新正式來源。
-- 七角色依需要工作；無子代理平台即單 Agent 按角色協作。每次用真實工作產物交接。不因有角色名稱就宣稱已執行。
+- 八角色依需要工作（TD-005 新增 PM）；無子代理平台即單 Agent 按角色協作。每次用真實工作產物交接。不因有角色名稱就宣稱已執行。
 - 新網站先訪談並確認規格、必要人工操作有逐步教學、確認選項先可編輯再送出。既有功能沿用 src.website_intake_ui、src.website_discovery、src.human_walkthrough。記憶工具不取代使用者確認。
+
+
+## TD-005 專案管理（按需、同一工作空間）
+PM 的 project-scope（前置 specification）→ project-control → delivery-review 可利用既有 handoff/context 存原 delivery-scope、delivery-progress、delivery-review；需求或 scope 改動依現有依賴使舊產物失效。REPO_NATIVE 寫入原授權規格/決策/進度即可；不要求初始化 SQLite、不建立第二任務池。狀態與文字不證明獨立驗收，不授予寫入或部署；原十二技能的程式依賴保留以相容現有工作區，PM 的必要協商/停止為候選角色契約，非新的強制 runtime 授權機制。八角色不是八個已召喚模型；歷史七角色評測不變。
 
 ## 平台原生工作模式（TD-001；不依賴本地模型或使用者電腦）
 
@@ -52,7 +56,7 @@ py -3 -m src.team_workbench init --workspace "$work" --label "合成開發專案
 py -3 -m src.team_workbench context --workspace "$work" --skill project-intake
 ```
 
-應見 12 項技能、專案標籤與空產物。init 拒絕已存在路徑；續作用原 workspace，不重新 init。路徑不得在 Agent repo 或其上層。
+應見 15 項技能、專案標籤與空產物。init 拒絕已存在路徑；續作用原 workspace，不重新 init。路徑不得在 Agent repo 或其上層。
 
 4. 由 AI 實際完成訪談紀錄，存於已授權私有位置的 requirements.md（可用記事本 UTF-8），再登錄：
 

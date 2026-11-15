@@ -115,6 +115,37 @@
       "requires": [],
       "produces": "resume-note",
       "path": ".agents/skills/resume-project/SKILL.md"
+    },
+    {
+      "id": "project-scope",
+      "role": "project-manager",
+      "trigger": "確認範圍、時程、投入上限、最小可用版本",
+      "requires": [
+        "specification"
+      ],
+      "produces": "delivery-scope",
+      "path": ".agents/skills/project-scope/SKILL.md"
+    },
+    {
+      "id": "project-control",
+      "role": "project-manager",
+      "trigger": "追蹤進度、管理延期、控制變更、避免過度工程",
+      "requires": [
+        "delivery-scope"
+      ],
+      "produces": "delivery-progress",
+      "path": ".agents/skills/project-control/SKILL.md"
+    },
+    {
+      "id": "delivery-review",
+      "role": "project-manager",
+      "trigger": "階段交付、完成標準、停止開發",
+      "requires": [
+        "delivery-scope",
+        "delivery-progress"
+      ],
+      "produces": "delivery-review",
+      "path": ".agents/skills/delivery-review/SKILL.md"
     }
   ]
 }

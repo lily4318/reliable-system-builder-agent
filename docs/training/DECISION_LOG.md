@@ -227,3 +227,11 @@
 - 接續導覽實查：以目前 Git tree 解析 START_HERE、主檔最新段、決策最新段、確認規格、ADR 與本機指南共15個相對連結出現次數；14個可解析，1處 ADR 的 ../AGENT_CAPABILITY_TRAINING.md 實際指向不存在的 docs/training/AGENT_CAPABILITY_TRAINING.md。修成 ../../AGENT_CAPABILITY_TRAINING.md（原 docs/AGENT_CAPABILITY_TRAINING.md），不改實作。另以原檔與實際 evidence 判斷 W0–W5 完成、W6 覆盤已交，A01–A06 受控驗收保持；A07 工程交付已備、正式來源重建通過，但另一獨立新對話仍是最高前置缺口。禁止用舊批准自動做外部寫入、部署、人審或主檔宣稱全 PASS。
 - NEXT_ACTION: 使用者在真正另一個新對話（不把本輪結果或前次進度貼入，若平台允許則不用舊聊天記憶）送出最短自足指令：「https://github.com/lily4318/reliable-system-builder-agent 請依 TD-001/TD-002 及 Draft PR #8 正式來源，接續 WEB-EDITORIAL-01，實際核對目前狀態、版本、授權、原始驗收與下一項安全工作，保存可查核 A07 接續證據；不要使用舊聊天內容、重做已驗收工作、部署或跨專案寫入。」新對話應報實際讀取的 head/blob、CI job/log、已完與待辦、授權、最小真實接續動作與回讀，並誠實說明對話隔離可驗程度。若仍是同一對話，不能關閉獨立 gate。真人 UAT、正式發布/HTTPS/跨平台等各自另驗，無需先安裝模型。文件 commit 自動 CI 另核，不將自動回歸視為本輪重做驗收。
 
+
+
+## TP-006｜免費線上部署與資料庫能力方向（待確認）
+
+- 使用者明確澄清長期目標：「我希望這個agent是可以直接協助完成線上部署，但我不確定有哪些資源目前是可以免費架設網站和資料庫且足夠安全的」。此為能力目標及方案討論，不是 WEB-EDITORIAL-01 外部部署、建立資源、帳號、付費、真個資、正式發布或跨專案寫入授權。原 v0.1 明示不授權外部部署；本機驗收保留，非長期交付終點。
+- 核對原 Draft PR #8 head cadf390f2c43d7dee9e66882f5fe440ea437cccf / CI 43709560256 job 132797945225 completed/success，434 tests in 47.906s，原 Editorial browser PASS；A01–A06 受控驗收、A07 SOURCE_RESUME_VERIFIED / FRESH_DIALOGUE_PENDING 均保留。未再跑測試或修改網站。
+- 方案及官方當日查核 [免費雲端部署比較與安全方案](training/reviews/2026-11-15-online-deployment-options.md)。優先建議 Workers + Static Assets + D1（免費配額內、合成資料、隔離 staging）；Workers + Supabase Postgres/Auth 作第二路徑；GAS/Sheets 適行政整合而非通用交易 DB；Render 免費 DB 30日到期，GitHub Pages 無原生後端且用途受限，Vercel Hobby 需核適用條款。原 Python sqlite3 長交易/本機 Host/Origin/cookie 不可直接移植至公開 URL，需獨立新增雲端 adapter/transaction contract、auth/secure cookie、rate/abuse/cost/backup/deployment rollback gate；現有 Cloudflare connector 有 docs/API discovery/execute 介面，但未核個人帳號、權限或資源，不宣稱可部署。無資源建立及雲端測試。
+- 使用者意圖確認的是目標，供應商與方案、實際部署範圍尚待個別確認；保留 TD-001/002 及 A07 未完成 gate，不將建議取代主線。可在 A07 新對話獨立驗收之外平行做已獲授權的部署規格/技術前置；後續提出可編輯的雲端規格及零付費/帳號/資源作用域授權，取得後再建立隔離測試環境及真 HTTPS/遠端版本/持久化/安全/復原證據。不得直接上線真研究或醫療資料或從免費推論合規。

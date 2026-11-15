@@ -8,12 +8,18 @@
 - SOURCE_REPO: lily4318/reliable-system-builder-agent
 - ACTIVE_CANDIDATE: Draft PR #8, candidate-skill-team-integration-20261114；https://github.com/lily4318/reliable-system-builder-agent/pull/8
 - SOURCE_VERSION: NATIVE-WEB-015-A07-SOURCE-RESUME SOURCE_RESUME_VERIFIED / FRESH_DIALOGUE_PENDING; verified editorial code ca030a15af00d3dd4459a3c9829636385c37378b and evidence-doc 1258dc33a5d569721237464294ff1cb88cb9273b; current Draft PR #8 HEAD authoritative.
-- LAST_VERIFIED_STEP: Exact evidence-doc 1258dc33a5d569721237464294ff1cb88cb9273b / CI 43708546444 job 132794858407 434/434 in 49.976s, Chromium 2x29; prior code CI 43708288874 same tests; exact 11 implementation/test/workflow/guide blobs unchanged; spec 13R/7A unchanged, link audit actual.
+- LAST_VERIFIED_STEP: Exact cadf390f2c43d7dee9e66882f5fe440ea437cccf / CI 43709560256 job 132797945225 success 434/434 in 47.906s; prior editorial code and A07 source resume retained. TP-006 official cloud options researched only.
 - COMPLETED: W0–W5 implemented and controlled tested, W6 evidence/distillation; A01–A06 retained; A07 engineering deliverables and source reconstruction verified from GitHub exact spec, decisions, trees/blobs, raw CI and guide. Fixed broken ADR→master relative link. No repeat of A01–A06.
-- BLOCKERS: A07 truly independent new-dialogue continuation still pending: current conversation contains prior task; no isolated new ChatGPT context execution evidence. New documentation commit CI separate. Real UAT/production security/remote deployment/other platform/independent model/human promotion unverified; no release/external project/private data authorized.
+- BLOCKERS: A07 independent fresh dialogue still pending; TP-006 actual cloud provider/account/plan/scope approval, cloud implementation and remote verification pending. Real UAT, production/security/scale and formal release separate. New docs CI separate.
 - WRITE_OWNER: 僅 Agent 候選分支；main/Release、外部專案、真實個資、付費模型或正式部署不在本次授權內。
 - SYNC_STATUS: A07_SOURCE_RESUME_VERIFIED; FRESH_DIALOGUE_PENDING; PRIOR_A01_A06_PASS_RETAINED; DOC_LINK_REPAIR; DOCUMENT_READBACK_AND_CI_SEPARATE; NO_RELEASE.
 - NEXT_ACTION: Actual new dialogue from minimal repo+task prompt, no pasted prior results; read latest master/decisions/spec/ADR/guide/code/CI, reconstruct current state and carry out smallest relevant authorized evidence action, record source/actual isolation limitations and verify readback. Do not mark independent A07 from same thread; no repeat A01–A06 or deployment.
+
+### 2026-11-15｜TP-006：免費雲端部署能力（DISCUSSION / PROPOSED）
+- 使用者明確澄清長期目標：「我希望這個agent是可以直接協助完成線上部署，但我不確定有哪些資源目前是可以免費架設網站和資料庫且足夠安全的」。此為能力目標及方案討論，不是 WEB-EDITORIAL-01 外部部署、建立資源、帳號、付費、真個資、正式發布或跨專案寫入授權。原 v0.1 明示不授權外部部署；本機驗收保留，非長期交付終點。
+- 核對原 Draft PR #8 head cadf390f2c43d7dee9e66882f5fe440ea437cccf / CI 43709560256 job 132797945225 completed/success，434 tests in 47.906s，原 Editorial browser PASS；A01–A06 受控驗收、A07 SOURCE_RESUME_VERIFIED / FRESH_DIALOGUE_PENDING 均保留。未再跑測試或修改網站。
+- 方案及官方當日查核 [免費雲端部署比較與安全方案](training/reviews/2026-11-15-online-deployment-options.md)。優先建議 Workers + Static Assets + D1（免費配額內、合成資料、隔離 staging）；Workers + Supabase Postgres/Auth 作第二路徑；GAS/Sheets 適行政整合而非通用交易 DB；Render 免費 DB 30日到期，GitHub Pages 無原生後端且用途受限，Vercel Hobby 需核適用條款。原 Python sqlite3 長交易/本機 Host/Origin/cookie 不可直接移植至公開 URL，需獨立新增雲端 adapter/transaction contract、auth/secure cookie、rate/abuse/cost/backup/deployment rollback gate；現有 Cloudflare connector 有 docs/API discovery/execute 介面，但未核個人帳號、權限或資源，不宣稱可部署。無資源建立及雲端測試。
+- 使用者意圖確認的是目標，供應商與方案、實際部署範圍尚待個別確認；保留 TD-001/002 及 A07 未完成 gate，不將建議取代主線。可在 A07 新對話獨立驗收之外平行做已獲授權的部署規格/技術前置；後續提出可編輯的雲端規格及零付費/帳號/資源作用域授權，取得後再建立隔離測試環境及真 HTTPS/遠端版本/持久化/安全/復原證據。不得直接上線真研究或醫療資料或從免費推論合規。
 
 ### 2026-11-15｜NATIVE-WEB-015-A07-SOURCE-RESUME：A07 正式來源接續查核（獨立新對話尚待）
 

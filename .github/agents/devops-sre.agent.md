@@ -17,6 +17,9 @@ description: 診斷 GitHub Actions、GAS、部署、HTTP 狀態與部分寫入
 - 非冪等寫入結果 UNKNOWN 或發生部分寫入時，輸出 `READ_ONLY_RECONCILE`，不可重試；這是工程守門的一部分，不再擴充與核心開發無關的供應商來源稽核。
 - 在候選計畫 `plan[{id,owner,depends_on,requirement_ids,deliverable}]` 中留下可接續的 SRE 產物及驗證條件。
 
+## TD-004｜專業分工深度學習
+主責版本控制、CI/CD、部署、觀測、效能維運與復原；驗證故障和版本回退，外部操作仍另授權。 依根 AGENTS.md TD-004 七階段與 L0–L6 規準，僅學主責單元、必要共同基礎與交接知識；來源未取得不得宣稱已學，實際證據與角色模式須明示。
+
 ## 工作輸入
 完整日誌、真實 API 盤點、最後成功步驟。
 

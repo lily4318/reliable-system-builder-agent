@@ -316,3 +316,9 @@
 - 學習循環提案：完整來源盤點（章節/連結/版本/依賴/讀取狀態）→ 原理與因果分析、適用和不適用條件、優劣及例外、官方資料查核 → 專屬技能／決策規則／可重用案例 → 自行實作與故障反例、實際測試 → 跨角色交接與陌生任務遷移 → 反思改進、可追溯證據與持久化。教材全部單元都需在覆蓋矩陣有歸屬及狀態；過時/不適用的內容亦需理解、標示理由，不強制採用。閱讀完成、技能落地、實測及陌生情境應用分開；不得用摘要或自製測試成績宣稱真正模型能力提升。
 - 選項：A 各角色均讀全套（重複、模糊分工，不建議）；B 主責深入+必要共通層+跨角色交接並驗收（建議）；C 每角色完全隔離、無交接知識（整合風險，不建議）。未獲使用者確認，不改正式主線。後續先取得教材、完整盤點，再按依賴及真實能力缺口逐步訓練；不得只產出筆記，也不為追逐完整閱讀而阻塞可行工程。保留原 repository 技能/知識/案例與回歸；外部專案、付費 API、部署及正式 release 仍另行授權。無獨立子代理工具時標 SINGLE_AGENT_ROLE_WORK，不宣稱實際呼叫七模型或修改權重。
 - 基準：原 PR #8 exact 3632ce94d86808d813da4761b4451425bda4aad5，CI 43716254661 completed/success（run metadata；未讀該次 raw log）；main c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57 未改。原已驗收 466 tests 證據仍有效。此為待確認討論，不是教材閱讀、能力訓練或正式方向已完成。
+
+## TD-004｜TP-007 正式確認：專業分工式深度能力習得（CONFIRMED / CANDIDATE INSTRUCTIONS IMPLEMENTED）
+- 使用者明確確認：「我同意你的整理結果，請依據以上整理更新agent學習方向」。採原 TP-007 B 方案、七階段循環及 L0–L6 驗收。歷史 TP-007 保留為提案記錄，本節取代其待確認狀態；與 TD-001/002/003、TP-006 互補，不替代已有工程或獨立盲測/部署門檻。
+- 影響：主檔、啟動入口、共同規則、七角色及原 learn-from-feedback/knowledge-distillation 技能增量整合；維持原七角色十二技能 catalog、既有程式及安全 policy，未加入新模型/角色或改 release。指南以原 AGENTS.md 為統一規範，避免平行主檔。成熟度為可追溯作業驗收，不是已得分或已證明底層模型進步。
+- 教材仍未取得：本輪另提供 https://hackmd.io/@johnsonnote/webdesigncore/https%3A%2F%2Fhackmd.io%2F%40johnsonnote%2Freport_design ，當次實際網頁工具查詢原網址、直接 https://hackmd.io/@johnsonnote/report_design 、/download 與原 outline_cross_platform_v2，均回不可存取/DisabledError。非教材不存在證據；不宣稱已讀。建議使用者在有權限的瀏覽器匯出 Markdown/HTML/PDF，整套目錄與章節 ZIP 優先，附件及合法程式範例隨附。無需帳號密碼、不改公開權限、不繞過限制。教材盤點及真正專家學習未開始；下一步取得可讀來源後建立唯一覆蓋矩陣並按依賴與缺口開始深度單元，實測後才調整成熟度。
+- 原 PR #8 基準 2d6d6a06d0938b4917b9f906005a7a93c5f60c39，CI 43716539210 completed/success（run metadata）；原 466 tests 已驗收證據保留，最新方向文件另核 exact CI。main c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57、正式 release 不改；未外部部署/付費/修改模型權重。WRITE_OWNER 原候選分支。

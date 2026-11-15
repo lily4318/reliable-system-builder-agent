@@ -13,5 +13,8 @@ description: "整理學到的事、蒸餾。learning-evaluator 角色；交付 k
 ### 公開工程知識整併（TD-001 / TD-002）
 在 REPO_NATIVE 或有授權的公開候選工作中，先讀原 [工程知識索引](../../../knowledge/ENGINEERING_PATTERNS.md)、訓練主檔、決策及 CASES/TRAINING_CASES；查原始驗收證據與精確 SHA，而非重新跑已驗收工作。以共同工程原理合併導航，保留原 case key、失敗、例外、來源與適用限制；每卡有任務/風險詞、catalog skills、實測證據、限制與獨立審查狀態。區分 EVIDENCE_VERIFIED、INDEX_CANDIDATE 與既有 DEFAULT/OPT_IN 檢索案例；不將索引候選編入 runtime seed 或私人記憶，不自動升格。以最小原檔增量、CAS、讀回與獨立文件 CI 記錄覆盤。沒有可用私人工作區只做 SOURCE_READ，不製造私人 citation；人審與原 learning-policy 保留。
 
+### TD-004｜外部教材深度學習與專家分派
+依根 AGENTS.md TD-004 建立唯一章節覆蓋矩陣，來源/版本、前置、單一主責、必要協作者、skill、狀態與 L0–L6 證據逐欄可追溯。先匹配既有知識，按依賴及缺口分派；主責深入閱讀、原理反思、蒸餾、實作、修復、遷移與交接，Evaluator 檢驗而非代學。教材不可讀就記 BLOCKED_SOURCE，無目錄不能報完成比例；過時與不採用保留理由。避免公開轉載或未審查執行，保留原審核流程。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 knowledge-review；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

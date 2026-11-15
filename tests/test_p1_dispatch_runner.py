@@ -107,3 +107,87 @@ class DispatchContract(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     run.run('B001',MODEL,D,out,confirm_offline=True,transport=t)
                 self.assertEqual(len(t.calls),count)
+
+GOOD_SOURCE = """def has_overlap(existing, proposed):
+    for item in existing:
+        if item[0] < proposed[1] and proposed[0] < item[1]:
+            return True
+    return False
+"""
+BAD_SOURCE = """def has_overlap(existing, proposed):
+    return False
+"""
+
+
+class FunctionalTransport(Transport):
+    def __init__(self):
+        super().__init__(rejections=0)
+
+    def __call__(self,method,path,body=None):
+        raw=super().__call__(method,path,body)
+        if path=='/api/chat':
+            ctx=json.loads(json.loads(body)['messages'][1]['content'])
+            if ctx.get('task')=='implementation' and 'selected_skill_and_retrieved_cases' in ctx:
+                value=json.loads(raw)
+                answer=json.loads(value['message']['content'])
+                answer['artifact']=BAD_SOURCE if len(self.impl)==1 else GOOD_SOURCE
+                value['message']['content']=json.dumps(answer)
+                return local._json(value)
+        return raw
+
+
+class FunctionalGateContract(unittest.TestCase):
+    def test_public_oracle_runs_actual_bounded_semantics(self):
+        from src import p1_restricted_functional as f
+        good=f.evaluate(GOOD_SOURCE)
+        bad=f.evaluate(BAD_SOURCE)
+        self.assertEqual(good['status'],'PUBLIC_SLICE_PASS')
+        self.assertEqual(len(good['cases']),12)
+        self.assertTrue(all(x['pass'] for x in good['cases']))
+        self.assertEqual(bad['status'],'PUBLIC_SLICE_FAIL')
+        self.assertGreater(len(bad['findings']),0)
+        self.assertEqual(good['oracle_sha256'],bad['oracle_sha256'])
+        self.assertNotEqual(good['source_sha256'],bad['source_sha256'])
+        self.assertFalse(good['candidate_native_code_executed'])
+        self.assertFalse(good['independent_human_review'])
+        print('P12-FUNCTIONAL: bounded interpreter ran 12 public fixed cases; correct and incorrect sources distinguished',flush=True)
+
+    def test_host_rejects_unsafe_syntax_invalid_data_and_excess_work(self):
+        from src import p1_restricted_functional as f
+        for src in ('import os\n'+GOOD_SOURCE,
+                    'def has_overlap(existing, proposed):\n    if False:\n        return open("x")\n    return False\n',
+                    'def has_overlap(existing, proposed):\n    return proposed.__class__\n',
+                    'def has_overlap(existing, proposed):\n    while True:\n        return False\n'):
+            self.assertEqual(f.evaluate(src)['status'],'BLOCKED_SYNTAX')
+            self.assertFalse(f.evaluate(src)['cases'])
+        fn=f._parse(GOOD_SOURCE)
+        for invalid in ((True,4),(5,2),(1,1),('1',4)):
+            with self.assertRaisesRegex(f.Blocked,'INVALID_INPUT_HOST_REJECTED'):
+                f._interpret(fn,(),invalid)
+        nested=f._parse('def has_overlap(existing, proposed):\n    for a in existing:\n        for b in existing:\n            for c in existing:\n                if c[0] < proposed[0]:\n                    return True\n    return False\n')
+        with self.assertRaisesRegex(f.Blocked,'STEP_BUDGET'):
+            f._interpret(nested,((10,11),)*32,(0,1))
+
+    def test_host_failure_overrides_model_ready_and_repairs_exact_revision(self):
+        from src import p1_restricted_functional as f
+        with tempfile.TemporaryDirectory() as tmp:
+            out=Path(tmp)/'pilot'
+            t=FunctionalTransport()
+            result=run.run('B003',MODEL,D,out,confirm_offline=True,transport=t,functional_pilot=True)
+            self.assertEqual(result['status'],'CANDIDATES_CAPTURED_INDEPENDENT_REVIEW_REQUIRED')
+            self.assertEqual(result['qa_rejections'],1)
+            self.assertEqual(result['repair_rounds'],1)
+            self.assertEqual(t.verdicts,2)
+            self.assertEqual([r['status'] for r in result['functional_runs']],['PUBLIC_SLICE_FAIL','PUBLIC_SLICE_PASS'])
+            self.assertEqual([r['revision'] for r in result['functional_runs']],[1,2])
+            for r in result['functional_runs']:
+                evidence=(out/r['file']).read_bytes()
+                self.assertEqual(local._sha(evidence),r['sha256'])
+                self.assertEqual(json.loads(evidence)['oracle_sha256'],f.oracle_digest())
+            self.assertTrue(any(x.startswith('Host tool: ') for x in t.impl[1]['repair_findings'][0]['findings']))
+            self.assertTrue(result['public_slice_pass'])
+            self.assertFalse(result['program_correctness_verified'])
+            self.assertFalse(result['candidate_code_executed'])
+            self.assertFalse(result['general_sandbox_verified'])
+            self.assertFalse(result['release_authorized'])
+            print('P12-HOST-QA: model REVIEW_READY overridden by actual bounded tool failure; revision 2 passed fixed public slice; no inference',flush=True)

@@ -13,5 +13,8 @@ description: "檢查權限、隱私及安全。security 角色；交付 security
 ### GitHub 專案身分與授權（EP-09 / EP-10）
 以正式 repo 及實際唯讀 API 證據核對資源身分，區分名稱表示、不可變資源 ID、來源版本與操作授權。對 GitHub 已驗 ASCII owner/repo 名稱做大小寫等價判斷，不因 case alias 繞過 Agent/外部專案隔離；未知 rename/transfer、URL、redirect 不自動當同一資源。維持原意圖與明確權限 gate，只有候選建議不等於寫入許可。實作及 red/green 證據見 [工程知識索引](../../../knowledge/ENGINEERING_PATTERNS.md) EP-09/10 與 NATIVE-EP-008 原決策；未測其他 provider，不宣稱普遍識別或 ACL 驗證。
 
+### 雲端架構專屬安全（TP-006 / NATIVE-CLOUD-016-STACK-SELECTION）
+讀 [多平台選型及實戰指南](../../../docs/CLOUD_ARCHITECTURE_SELECTION.md)：Pages public artifact allowlist、GAS 真 visitor identity/原試算表不公開/single script writer/RAW/atomic batch、D1 條件命中與交易/receipt/secure cookie、Supabase RLS/grants/auth JWT/service-key isolation/RPC/storage。真資料治理獨立審查；缺 evidence 不因免費、官方功能或 selector 而通過。給各平台負測、backup restore 與安全範圍；同 SHA CI 不替代遠端實測。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 security-review；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

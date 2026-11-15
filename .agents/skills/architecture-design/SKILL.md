@@ -34,5 +34,8 @@ description: "設計架構、比較方案。architect 角色；交付 architectu
 - 本 repo `src.engineering_workflow.route` 先核目標、來源、寫入結果，才驗 stage；在集合查詢前檢查字串。回歸須覆蓋 JSON 陣列／物件／null／數字／布林、合法階段、多個同時錯誤時的優先順序、最小唯讀輸入及既有案例。保留所有輸出 mutation_permitted=false；此判定器只產生建議，不驗證外部證據或執行操作。
 - 回歸入口 `python -m unittest discover -s tests -p test_engineering_workflow.py -v`；原型比較與 red/green 證據見決策紀錄 NATIVE-ARCH-006。局部修補僅針對已觀測 JSON stage 錯誤，不等同通用 schema 驗證、惡意 Python 物件防禦、資料來源真實性或其他判定器的安全證明。原 write_outcome 缺欄預設維持不變，若要改成強制明示須盤點呼叫端及另行決策。
 
+### 多平台免費選型（TP-006 / NATIVE-CLOUD-016-STACK-SELECTION）
+依 confirmed requirement ID 提取 [多平台選型及實戰指南](../../../docs/CLOUD_ARCHITECTURE_SELECTION.md) 的 typed profile；用 src.cloud_architecture_selection 離線比對 Pages、GAS/Sheets、Workers/D1、Supabase+前端（可選混合架構），未知明示 null；先排硬限制與資料治理，再比較用量、帳號、維護與部署途徑。保留來源日期、估算範圍、理由與替代；preferred 不代表授權、真實費用或適配驗收。既有架構不符需 ADR/使用者確認，不盲目遷移。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 architecture；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

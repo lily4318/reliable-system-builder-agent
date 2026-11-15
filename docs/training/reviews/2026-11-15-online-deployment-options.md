@@ -43,3 +43,7 @@
 - 交易工程：同一 script 的 getScriptLock + lock 內回讀/expected version/actor-token-payload receipt、單次 Sheets API batchUpdate 原子寫入同一工作簿；不宣稱跨 script、人工修改、跨工作簿/Drive/Gmail 等交易隔離，document lock 在 Web App 可能 null。控制唯一 writer 或明確外部寫入契約，禁止盲重送不明 POST，讀原 actor receipt、對帳、處理逾時與未觀測結果；防公式注入（RAW 或明確 stringValue）、批次讀寫、保護原資料、備份與 restore 到獨立工作簿、quota/abuse gate。對需要嚴格併發、DB 約束、複雜 join、RLS 或大量交易的系統優先評估 SQL。
 - 部署：Apps Script API 可 getContent/updateContent、versions.create、deployments get/list/update/create；或經授權 clasp / GitHub Actions。先確認 scriptId、spreadsheetId、部署者/訪客身份、版本、OAuth scope 與帳號政策；完整檔案更新前備份及讀回，immutable version → 更新既有 deploymentId（維持 /exec URL）→ 實際網站與資料驗收；/dev 非正式使用。正式回退到舊 version 不回退資料本身，先驗相容性。可用工具名稱查核未見專用 Apps Script API/部署 connector，不能把 Google Drive/Sheets 權限當成 GAS 更新/發布授權；實際 OAuth/部署途徑未驗收，需要個別授權與能力查核。
 - 原 head 64fccdec341595c2ca3d2cd478feaa29eaeb2004 / CI 43711227932 job 132802997034 completed/success，raw 236523 chars、434 tests in 49.896s、EDITORIAL_BROWSER_PASS；A01–A06 受控驗收及 A07 FRESH_DIALOGUE_PENDING 保留，未重跑原測試或改程式。新增 GAS 比較屬 TP-006 建議，不更改主線或自動啟用雲端服務。下一階段建議以適用性、可操作授權、免費限額、身分及資料邊界判斷平台；先設計合成獨立 staging 規格、使用者確認後才建立資源與真 /exec 驗收。
+
+
+## 使用者確認多平台能力方向
+本輪採用四平台選型能力與訓練路徑；原歷史方案保留。候選選型器與 [統一選型及實戰驗收指南](../../CLOUD_ARCHITECTURE_SELECTION.md) 為新的執行入口。NATIVE-CLOUD-016-STACK-SELECTION；外部資源/部署另授權；非真雲端驗收，A07 仍 pending。

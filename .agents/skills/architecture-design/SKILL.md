@@ -42,5 +42,7 @@ description: "設計架構、比較方案。architect 角色；交付 architectu
 
 - 進階 migration / 同 token 競寫（NATIVE-PG-023）：先列 RLS/ACL/constraint/view/function/資料全快照，真實阻擋 DDL、晚期衝突、失敗後檢查與合法修正才續作；lock_timeout 非整體期限。舊長連線明示投影與 wildcard prepared 0A000 分開，不承諾所有舊客戶端相容。以 pg_blocking_pids 真實競寫和 SQLSTATE 檢查不同 isolation；新 denial receipt 也是決策狀態變更，若不更新協調 row version，RR 可能得到 23505 而非預期 40001。原 v3 採同 transaction no-op logical update；保留 replay/owner ACL，評估 MVCC/WAL/trigger 成本。只在確定 abort 後重跑整筆交易；unknown commit 不盲重送。以 append-only migration 保留原已驗版並測帶歷史 receipts 之升版，不混同正式遠端資料遷移。見 EP-13 / 原覆盤。
 
+- 共享名額與生命週期（NATIVE-PG-024 / EP-13）：先定共享 invariant 與鎖順序（pool before ledger/booking）、actor/token 的 operation/target/qty binding、拒絕決策持久化、取消 transition exactly-once；歷史 receipt 不等於當前狀態，恢復名額不重判舊 token。避免直接 client stock DML；若採 SECURITY DEFINER 需專屬 NOLOGIN 非 owner/非 BYPASSRLS、可信登入身分而非 caller owner、固定安全 search_path、全限定 schema、同 transaction 撤 PUBLIC/grant、own-row policy；自主共享查詢可見性列入資料責任，Supabase JWT 另驗。測試真 lock wait、不同 actor/相同 token、取消競寫、回復、歷史 migration 及舊明示 projection，核 pool+active booking 守恆與 ledger/version；單資源成功不代表多資源死鎖、零停機或正式資安。參見原 PG 覆盤及實際 CI。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 architecture；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

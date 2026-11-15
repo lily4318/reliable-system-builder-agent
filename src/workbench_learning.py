@@ -30,6 +30,9 @@ TRAINING_CASES = (
     ('P21-CASE-006','browser native form origin policy Chromium DOM CLI migration rollback boundary',
      'HTTP success does not prove real browser form compatibility. Reproduce actual DOM flow, preserve strict Origin/CSRF guards and run negative tests. Validate migration, process restart and rollback separately; old snapshots cannot replace new committed writes. Scope: synthetic local Chromium/CLI, not manual UAT, external deployment or power-loss recovery.',
      'docs/AGENT_CAPABILITY_TRAINING.md P21-CASE-006; 0f4f536d4c3daf05304add614d24e2563b42b1ef; CI 43607088233'),
+    ('P22-CASE-002','CSV file intake schema validation deterministic JSON bundle hash exclusive publication hard link reconcile interruption',
+     'Validate all rows before publication; bind canonical output to exact input bytes with hashes in one bundle. Use exclusive publication rather than overwrite; after unknown outcome recompute and compare exact bytes read-only. Distinguish NOT_OBSERVED from CONFLICT; a leftover temporary file does not prove the final output failed. Scope: trusted stable local directory, compatible filesystem, synthetic data; not hostile paths, changing source, power-loss durability, distributed transactions or automatic cleanup.',
+     'docs/AGENT_CAPABILITY_TRAINING.md P22-CASE-002; 088c8264d4e622ba3bb09e8212e220c91ed05caf; CI 43667714699/job 132670734319'),
 )
 EVENTS = {'test_failure':'case', 'test_fix':'case', 'qa_rejection':'lesson',
           'requirement_change':'lesson', 'preference':'preference'}

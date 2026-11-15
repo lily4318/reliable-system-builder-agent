@@ -80,6 +80,7 @@ class PostgresArchitectureTests(unittest.TestCase):
 
     def migrate(self):
         self.sql((SQL/"02-rls-transaction.sql").read_text())
+        self.sql((SQL/"03-decision-version.sql").read_text())
 
     def test_unprotected_grant_negative_control_and_rls_isolation(self):
         # Deliberately weaken ONLY this ephemeral fixture, then apply candidate.
@@ -321,3 +322,23 @@ class PostgresArchitectureTests(unittest.TestCase):
         self.assertEqual(self.sql("SELECT lab.reserve('lab_alice','rr-denied',1)","lab_writer"),"INSUFFICIENT")
         self.assertEqual(self.sql("SELECT count(*) FROM lab.receipts WHERE token='rr-denied'"),"1")
         self.assertEqual(self.sql("SELECT remaining FROM lab.stock WHERE owner='lab_alice'"),"0")
+
+    def test_pg_advanced_v2_to_v3_preserves_receipts_and_acl(self):
+        self.sql((SQL/"02-rls-transaction.sql").read_text())
+        self.assertEqual(self.sql("SELECT lab.reserve('lab_alice','existing',9)","lab_writer"),"RESERVED")
+        self.assertEqual(self.sql("SELECT lab.reserve('lab_alice','old-denial',2)","lab_writer"),"INSUFFICIENT")
+        before=self.sql("""SELECT jsonb_build_array(
+          (SELECT jsonb_agg(to_jsonb(s) ORDER BY owner) FROM lab.stock s),
+          (SELECT jsonb_agg(to_jsonb(r) ORDER BY owner,token) FROM lab.receipts r),
+          (SELECT proacl FROM pg_proc WHERE oid='lab.reserve(name,text,integer)'::regprocedure));""")
+        self.sql((SQL/"03-decision-version.sql").read_text())
+        after=self.sql("""SELECT jsonb_build_array(
+          (SELECT jsonb_agg(to_jsonb(s) ORDER BY owner) FROM lab.stock s),
+          (SELECT jsonb_agg(to_jsonb(r) ORDER BY owner,token) FROM lab.receipts r),
+          (SELECT proacl FROM pg_proc WHERE oid='lab.reserve(name,text,integer)'::regprocedure));""")
+        self.assertEqual(after,before)
+        self.assertEqual(self.sql("SELECT lab.reserve('lab_alice','existing',9)","lab_writer"),"RESERVED")
+        self.assertEqual(self.sql("SELECT lab.reserve('lab_alice','old-denial',2)","lab_writer"),"INSUFFICIENT")
+        self.assertIn("permission denied",self.sql("SELECT lab.reserve('lab_alice','x',1)","lab_alice",fail=True))
+        self.assertEqual(self.sql("SELECT remaining FROM lab.stock WHERE owner='lab_alice'"),"1")
+        self.assertEqual(self.sql("SELECT count(*) FROM lab.receipts;"),"2")

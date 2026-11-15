@@ -69,6 +69,21 @@ class LocalIntakeTest(unittest.TestCase):
             self.assertIn("connect-src 'self'",resp.headers["Content-Security-Policy"])
             self.assertEqual(resp.headers["Cache-Control"],"no-store")
             self.assertNotIn(b"browser-test.js",resp.read())
+    def test_review_handoff_endpoint_and_local_guard(self):
+        from test_website_review_handoff import fixture
+        reviewed=fixture({"forms":"需要報名表單"})
+        packet=self.post(reviewed,path="/review-handoff")
+        self.assertEqual(packet["kind"],"website_design_review_handoff")
+        self.assertFalse(packet["construction_permitted"])
+        for kwargs in ({"origin":"https://invalid.example"},{"token":"wrong"}):
+            with self.assertRaises(HTTPError) as e:
+                self.post(reviewed,path="/review-handoff",**kwargs)
+            self.assertEqual(e.exception.code,403)
+        reviewed["answers"]["purpose"]="stale"
+        with self.assertRaises(HTTPError) as e:
+            self.post(reviewed,path="/review-handoff")
+        self.assertEqual(e.exception.code,400)
+
     def test_invalid_prefill(self):
         with self.assertRaises(ValueError):
             create_server(0,["bad"])

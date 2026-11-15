@@ -40,9 +40,18 @@
       check(output.local_decisions.every((d,i)=>d.choice===["accept","modify","reject"][i%3]&&d.text==="合成測試自訂文字 "+d.choice),"edited decisions preserved");
       check(!output.specification_approved&&!output.write_authorized&&!output.deployment_authorized&&!output.real_agent_executed,"no authorization or model claim");
       check(output.specification_draft.sections.length===13,"source sections");
+      check(!$("handoff").disabled,"handoff follows final review");
+      $("handoff").click();
+      await until(()=>$("handoff-status").textContent.startsWith("交接預覽已產生"));
+      const packet=JSON.parse($("handoff-preview").textContent);
+      check(packet.explicit_requirements.length===13&&!packet.construction_permitted&&!packet.specification_approved,"handoff boundaries");
+      check(packet.reviewed_inferences.every(d=>output.local_decisions.some(x=>x.id===d.id&&x.choice!=="reject"&&x.text===d.text)),"reviewed text migrated");
+      check(packet.excluded_inferences.every(d=>output.local_decisions.some(x=>x.id===d.id&&x.choice==="reject"&&x.text===d.reason)),"rejected text excluded");
+      check(packet.reviewed_inferences.length+packet.excluded_inferences.length===cards.length,"handoff coverage");
       if(cards.length){
         edit(cards[0].querySelector("textarea"),"重新修改本項文字");
         check($("export").disabled&&$("finalize").disabled,"edit invalidates final and item");
+        check($("handoff").disabled&&$("handoff-preview").hidden,"edit invalidates handoff");
         cards[0].querySelector(".cancel-item").click();
         check(cards[0].querySelector("textarea").disabled,"cancel clears selection");
         cards[0].querySelector('input[value="reject"]').click();
@@ -61,6 +70,7 @@
       finally{URL.createObjectURL=oldURL;HTMLAnchorElement.prototype.click=oldClick;}
       edit($("answer-purpose"),"本案例修改後的目的");
       check($("preview").textContent===""&&$("export").disabled&&$("finalize").disabled,"stale confirmation removed");
+      check($("handoff").disabled&&$("handoff-preview").hidden,"answer edit invalidates handoff");
       $("generate").click();await until(()=>$("status").textContent.startsWith("草稿已產生"));
       check($("preview").textContent.includes("本案例修改後的目的"),"updated preview");
       cases.push({id:c.id,review_count:cards.length,pass:true});
@@ -81,6 +91,6 @@
     const select=document.querySelector(".question select");choose(select,"待確認");
     check($("answer-purpose").value==="待確認","common answer selection");
     edit($("answer-purpose"),"自由修改常用答案");check($("answer-purpose").value==="自由修改常用答案","free text edit");
-    await api.report({status:"PASS",cases,import_test:true,export_payload_test:true,model_executed:false});
+    await api.report({status:"PASS",cases,import_test:true,export_payload_test:true,handoff_test:true,model_executed:false});
   }catch(e){if(window.intakeTest)await window.intakeTest.report({status:"FAIL",cases,error:String(e.message).slice(0,200)});}
 })();

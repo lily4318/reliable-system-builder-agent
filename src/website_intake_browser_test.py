@@ -49,10 +49,11 @@ def run(browser=None):
             if (result.get("status")!="PASS" or actual!=expected or
                 len(result.get("cases",[]))!=len(expected) or
                 not result.get("import_test") or not result.get("export_payload_test")
+                or result.get("handoff_test") is not True
                 or result.get("model_executed") is not False):
                 raise RuntimeError("Browser acceptance failed: "+json.dumps(result,ensure_ascii=False))
             return {"status":"SYNTHETIC_BROWSER_ACCEPTANCE_PASS","cases":result["cases"],
-                    "case_count":len(actual),"import_test":True,"export_payload_test":True,
+                    "case_count":len(actual),"import_test":True,"export_payload_test":True,"handoff_test":True,
                     "actual_browser_dom_events":True,"real_agent_executed":False,
                     "manual_uat_completed":False,"actual_download_verified":False}
         finally:

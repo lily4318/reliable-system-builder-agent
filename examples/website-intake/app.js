@@ -2,10 +2,11 @@
 const $=id=>document.getElementById(id);
 const el=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n};
 let boot, spec=null, revision=0, confirmed=false, pendingImport=null, importRevision=0;
-let decisions=new Map(), fields=new Map();
+let decisions=new Map(), fields=new Map(), handoffEpoch=0;
+function clearHandoff(){handoffEpoch++;$("handoff").disabled=true;$("handoff-preview").hidden=true;$("handoff-preview").textContent="";$("handoff-status").textContent="";}
 const status=text=>{$("status").textContent=text};
 const reset=()=>{
-  revision++;spec=null;confirmed=false;decisions.clear();
+  revision++;spec=null;confirmed=false;decisions.clear();clearHandoff();
   $("reviews").replaceChildren();$("preview").replaceChildren();
   $("finalize").disabled=true;$("export").disabled=true;$("final-status").textContent="";
 };
@@ -25,7 +26,7 @@ function load(a){
   invalidate();
 }
 function currentAnswers(){return Object.fromEntries([...fields].map(([k,n])=>[k,n.value]));}
-function cancelFinal(){confirmed=false;$("export").disabled=true;$("final-status").textContent="尚未確認整份草稿。";}
+function cancelFinal(){clearHandoff();confirmed=false;$("export").disabled=true;$("final-status").textContent="尚未確認整份草稿。";}
 function createReview(item){
   const state={choice:null,text:"",confirmed:false};
   decisions.set(item.id,state);
@@ -113,7 +114,21 @@ async function init(){
   });
   $("apply-import").addEventListener("click",()=>{if(pendingImport){load(pendingImport);pendingImport=null;$("apply-import").disabled=true;$("import-preview").hidden=true;}});
   $("generate").addEventListener("click",generate);
-  $("finalize").addEventListener("click",()=>{if(spec&&[...decisions.values()].every(d=>d.confirmed)){confirmed=true;$("export").disabled=false;$("final-status").textContent="本機草稿已確認；未傳送、未部署。"}});
+  $("finalize").addEventListener("click",()=>{if(spec&&[...decisions.values()].every(d=>d.confirmed)){confirmed=true;$("export").disabled=false;$("handoff").disabled=false;$("final-status").textContent="本機草稿已確認；未傳送、未部署。"}});
+  $("handoff").addEventListener("click",async()=>{
+    const captured=JSON.stringify(exportObject()), epoch=++handoffEpoch;
+    $("handoff-preview").hidden=true;$("handoff-preview").textContent="";
+    $("handoff-status").textContent="本機驗證交接資料中";
+    try{
+      const response=await fetch("/review-handoff",{method:"POST",headers:{"Content-Type":"application/json","X-Local-Token":boot.token},body:captured});
+      if(!response.ok)throw Error("invalid");
+      const packet=await response.json();
+      if(epoch!==handoffEpoch||!confirmed||JSON.stringify(exportObject())!==captured)return;
+      $("handoff-preview").textContent=JSON.stringify(packet,null,2);
+      $("handoff-preview").hidden=false;
+      $("handoff-status").textContent="交接預覽已產生；仍須整份規格確認，不授權施工或部署。";
+    }catch(e){if(epoch===handoffEpoch)$("handoff-status").textContent="交接驗證失敗；請重新審閱草稿。";}
+  });
   $("export").addEventListener("click",()=>{const data=exportObject();const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:"application/json"}));const a=el("a");a.href=url;a.download="website-reviewed-draft.json";a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);});
   load(boot.prefill);$("load-example").disabled=false;$("generate").disabled=false;status("已就緒；請核對預填資料或填寫 13 題。");
   if(boot.test_mode)window.intakeTest={exportObject,currentAnswers,examples:boot.examples,generate,

@@ -9,6 +9,7 @@ import sys
 
 from src.website_discovery import build_spec, questions, KEYS, ROOT
 from src.website_scenario_eval import load_cases
+from src.website_review_handoff import prepare, read_export, MAX_BYTES as MAX_REVIEW_BODY
 
 ASSETS = ROOT / "examples" / "website-intake"
 MAX_BODY = 65536
@@ -84,6 +85,15 @@ def create_server(port=8765, prefill=None, test_mode=False):
                     return self.json_response(200,{"recorded":True})
                 except (ValueError,TypeError):
                     return self.json_response(400,{"error":"bad test result"})
+            if self.path == "/review-handoff":
+                try:
+                    n = int(self.headers.get("Content-Length","0"))
+                    if not 0 < n <= MAX_REVIEW_BODY or self.headers.get_content_type() != "application/json":
+                        raise ValueError("invalid review body")
+                    self.json_response(200, prepare(read_export(self.rfile.read(n))))
+                except (ValueError, TypeError, RecursionError):
+                    self.json_response(400, {"error":"invalid or stale reviewed draft"})
+                return
             if self.path != "/draft":
                 return self.json_response(404, {"error":"not found"})
             try:

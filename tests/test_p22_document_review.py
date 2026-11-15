@@ -85,16 +85,16 @@ class TransferTests(unittest.TestCase):
     def test_revision_artifacts_and_real_case_retrieval(self):
         w=wb.initialize(self.root/'work','Synthetic document review')
         learn.setup(w)
-        # Explicit curated import from the prior training master, not invented
-        # private memory or a newly verified model capability.
-        for key,content,source in [
-            ('P21-CASE-003','idempotency ledger persist negative decisions; actor token payload; read-only reconciliation',
-             'docs/AGENT_CAPABILITY_TRAINING.md P21-CASE-003; CI 43576453447'),
-            ('P21-CASE-005','atomic transaction revision compare and swap state artifact event; receipt after interruption',
-             'docs/AGENT_CAPABILITY_TRAINING.md P21-CASE-005; CI 43606395473'),
-            ('P21-CASE-006','browser native form origin policy and CLI migration rollback boundary; real DOM',
-             'docs/AGENT_CAPABILITY_TRAINING.md P21-CASE-006; CI 43607088233')]:
-            wb.remember(w,'case',key,content,source,'observed')
+        # Real opt-in case library import; default remains just two public cases.
+        original=wb.context(w,'resume-project')['memory']
+        self.assertEqual(len(original),2)
+        imported=learn.setup(w,include_training_cases=True)
+        self.assertEqual(len(imported['seeded_case_keys']),5)
+        first=wb.context(w,'resume-project')['memory']
+        self.assertEqual(len(first),5)
+        learn.setup(w,include_training_cases=True)
+        self.assertEqual(wb.context(w,'resume-project')['memory'],first)
+        with self.assertRaises(ValueError): learn.setup(w,include_training_cases='yes')
         for skill,body in [
             ('project-intake','Synthetic local document editor, reviewer, publisher; no external release.'),
             ('requirements-spec','Immutable versions; exact current revision approval; local publication pointer; durable negative decisions; audit atomic; role guard; read-only receipt.'),

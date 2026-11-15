@@ -12,3 +12,6 @@
 下載三檔至同一資料夾，先嘗試在允許本機檔的瀏覽器開啟 index.html；若瀏覽器政策阻擋，使用既有本機靜態預覽（不公開、無新增服務）。輸入樣本數及種子，按產生；比較兩組平均，捲動完整表；CSV 可供 Excel/R/SPSS 匯入。CSV 六欄見頁面，ASCII 數字/固定枚舉、UTF-8。相同 n/seed/sim-v1 可重現。無真實資料上傳。
 ## 驗收
 在候選 checkout 執行 python -m unittest discover -s tests -p test_research_methods_app.py -v，既有 CI discover 同時執行其他回歸。測試 server 僅 loopback 三檔、真 Chromium DOM/Tab/下載檔案 byte 讀回。實際 log 及 commit 見原 TD-005 決策與主檔；不將 CI 當真人 UAT 或外部網址驗收。M2-2 真新對話接續/適用新手引導另作；C0–C6 另行管理，不能以此候選當線上部署物已上線。
+
+## M2-1 實際驗收（2026-11-15）
+修正測試版 dea0e1aa8969e9ea8c7d3a34fdf6affb377c22a3，程式三檔不變；[完整 CI](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43730072106) 517/517，375/1280 真瀏覽器操作及各100列 UTF-8 CSV 實際下載 3161 bytes 與畫面一致。原初次 CI 手機過、桌面寬度斷言未扣捲軸，修正驗收器後兩者皆過。ZIP 三檔與 Git blob 一致；file:// 直接開啟未獨立驗證，實測為 loopback 靜態頁。無真人 UAT／正式部署／真受試者分派或科學精度驗證。此包 READY_STOP；下一包須獨立核准。

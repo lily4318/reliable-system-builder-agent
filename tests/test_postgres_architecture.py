@@ -342,3 +342,150 @@ class PostgresArchitectureTests(unittest.TestCase):
         self.assertIn("permission denied",self.sql("SELECT lab.reserve('lab_alice','x',1)","lab_alice",fail=True))
         self.assertEqual(self.sql("SELECT remaining FROM lab.stock WHERE owner='lab_alice'"),"1")
         self.assertEqual(self.sql("SELECT count(*) FROM lab.receipts;"),"2")
+
+    def shared_setup(self, *, migrate=True):
+        # All changes stay in the existing disposable lab_case database.
+        self.sql("DROP SCHEMA IF EXISTS sharedlab CASCADE;")
+        self.sql("DO $$ BEGIN IF NOT EXISTS(SELECT FROM pg_roles WHERE rolname='lab_shared_exec') "
+                 "THEN CREATE ROLE lab_shared_exec NOLOGIN NOSUPERUSER NOBYPASSRLS; END IF; END $$;")
+        self.sql((SQL/"shared/01-reserve.sql").read_text())
+        self.addCleanup(self.sql,"DROP SCHEMA IF EXISTS sharedlab CASCADE;")
+        if migrate:
+            self.sql((SQL/"shared/02-cancel.sql").read_text())
+
+    def shared_state(self):
+        # Oracle uses actual business rows, independent of function responses.
+        self.assertEqual(self.sql("SELECT remaining+coalesce((SELECT sum(qty) "
+                                  "FROM sharedlab.bookings WHERE active),0)=capacity "
+                                  "FROM sharedlab.pool"),"t")
+        return self.sql("SELECT remaining,decision_version FROM sharedlab.pool")
+
+    def shared_wait(self, first_role, first_query, second_role, second_query, expected_first, expected_second):
+        with self.live_session(first_role) as first, self.live_session(second_role) as second:
+            self.assertEqual(first("BEGIN")[0],"00000")
+            self.assertEqual(first(first_query),("00000",expected_first))
+            self.assertEqual(second("SET application_name='shared_lab_waiter'")[0],"00000")
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                pending=pool.submit(second,second_query)
+                try:
+                    until=time.monotonic()+5
+                    while time.monotonic()<until:
+                        if self.sql("SELECT count(*) FROM pg_stat_activity WHERE "
+                                    "application_name='shared_lab_waiter' AND cardinality(pg_blocking_pids(pid))>0")=="1":
+                            break
+                        time.sleep(.05)
+                    else:
+                        self.fail("no real shared-resource lock wait observed")
+                    self.assertEqual(first("COMMIT")[0],"00000")
+                    self.assertEqual(pending.result(timeout=12),expected_second)
+                finally:
+                    if not pending.done():
+                        first("ROLLBACK")
+
+    def test_pg_shared_cross_actor_actual_contention_and_replay(self):
+        self.shared_setup()
+        self.shared_wait("lab_alice","SELECT sharedlab.reserve('same',7)",
+                         "lab_bob","SELECT sharedlab.reserve('same',7)",
+                         "RESERVED",("00000","INSUFFICIENT"))
+        self.assertEqual(self.shared_state(),"3|2")
+        self.assertEqual(self.sql("SELECT count(*) FROM sharedlab.decisions WHERE token='same'"),"2")
+        self.assertEqual(self.sql("SELECT sharedlab.reserve('same',7)","lab_bob"),"INSUFFICIENT")
+        self.assertEqual(self.shared_state(),"3|2")
+        self.assertEqual(self.sql("SELECT sharedlab.cancel('release','same')","lab_alice"),"CANCELLED")
+        self.assertEqual(self.shared_state(),"10|3")
+        self.assertEqual(self.sql("SELECT sharedlab.reserve('same',7)","lab_bob"),"INSUFFICIENT")
+        self.assertEqual(self.sql("SELECT sharedlab.reserve('fresh',7)","lab_bob"),"RESERVED")
+        self.assertEqual(self.shared_state(),"3|4")
+
+    def test_pg_shared_cancel_actual_contention_and_exactly_once_restore(self):
+        self.shared_setup()
+        self.sql("SELECT sharedlab.reserve('book',6)","lab_alice")
+        self.shared_wait("lab_alice","SELECT sharedlab.cancel('c1','book')",
+                         "lab_alice","SELECT sharedlab.cancel('c2','book')",
+                         "CANCELLED",("00000","NOT_ACTIVE"))
+        self.assertEqual(self.shared_state(),"10|3")
+        self.assertEqual(self.sql("SELECT sharedlab.cancel('c1','book')","lab_alice"),"CANCELLED")
+        self.assertEqual(self.sql("SELECT sharedlab.cancel('c2','book')","lab_alice"),"NOT_ACTIVE")
+        self.assertEqual(self.sql("SELECT sharedlab.reserve('book',6)","lab_alice"),"RESERVED")
+        self.assertEqual(self.sql("SELECT active FROM sharedlab.bookings WHERE token='book'"),"f")
+        self.assertEqual(self.shared_state(),"10|3")
+
+    def test_pg_shared_identity_rls_function_acl_and_foreign_cancel(self):
+        self.shared_setup()
+        self.sql("SELECT sharedlab.reserve('private-a',4)","lab_alice")
+        self.sql("SELECT sharedlab.reserve('private-b',3)","lab_bob")
+        self.assertEqual(self.sql("SELECT token FROM sharedlab.bookings","lab_alice"),"private-a")
+        self.assertEqual(self.sql("SELECT token FROM sharedlab.decisions","lab_bob"),"private-b")
+        for query in ("UPDATE sharedlab.pool SET remaining=10",
+                      "UPDATE sharedlab.bookings SET active=false",
+                      "INSERT INTO sharedlab.decisions VALUES('lab_bob','fake','cancel','x',NULL,'CANCELLED')",
+                      "SET ROLE lab_shared_exec",
+                      "SET SESSION AUTHORIZATION lab_alice"):
+            self.assertIn("permission denied",self.sql(query,"lab_bob",fail=True))
+        for query in ("SELECT * FROM sharedlab.bookings","SELECT sharedlab.reserve('x',1)",
+                      "SELECT sharedlab.cancel('x','private-a')"):
+            self.assertIn("permission denied",self.sql(query,"lab_anon",fail=True))
+        self.assertEqual(self.sql("SELECT rolcanlogin OR rolsuper OR rolbypassrls "
+                                  "FROM pg_roles WHERE rolname='lab_shared_exec'"),"f")
+        self.assertEqual(self.sql("SELECT count(*) FROM pg_proc p JOIN pg_roles r ON r.oid=p.proowner "
+                                  "WHERE p.pronamespace='sharedlab'::regnamespace AND p.prosecdef "
+                                  "AND r.rolname='lab_shared_exec'"),"2")
+        self.assertEqual(self.sql("SELECT sharedlab.cancel('foreign','private-a')","lab_bob"),"NOT_ACTIVE")
+        self.assertEqual(self.shared_state(),"3|3")
+        self.assertEqual(self.sql("SELECT active FROM sharedlab.bookings WHERE token='private-a'"),"t")
+
+    def test_pg_shared_token_conflict_negative_replay_and_transaction_abort(self):
+        self.shared_setup()
+        self.assertEqual(self.sql("SELECT sharedlab.cancel('early','future')","lab_alice"),"NOT_ACTIVE")
+        self.sql("SELECT sharedlab.reserve('future',4)","lab_alice")
+        self.assertEqual(self.sql("SELECT sharedlab.cancel('early','future')","lab_alice"),"NOT_ACTIVE")
+        for query in ("SELECT sharedlab.reserve('future',5)",
+                      "SELECT sharedlab.cancel('future','future')",
+                      "SELECT sharedlab.cancel('early','other')"):
+            self.assertIn("token conflict",self.sql(query,"lab_alice",fail=True))
+        before=self.shared_state()
+        self.assertIn("division by zero",self.sql("BEGIN; SELECT sharedlab.cancel('abort','future'); SELECT 1/0; COMMIT;",
+                                                 "lab_alice",fail=True))
+        self.assertEqual(self.shared_state(),before)
+        self.assertEqual(self.sql("SELECT count(*) FROM sharedlab.decisions WHERE token='abort'"),"0")
+        self.assertEqual(self.sql("SELECT sharedlab.cancel('abort','future')","lab_alice"),"CANCELLED")
+        self.assertEqual(self.shared_state(),"10|3")
+
+    def test_pg_shared_migration_preserves_v1_history_and_old_contract(self):
+        self.shared_setup(migrate=False)
+        self.sql("SELECT sharedlab.reserve('v1-accepted',8)","lab_alice")
+        self.sql("SELECT sharedlab.reserve('v1-denied',4)","lab_bob")
+        before=self.sql("SELECT owner,token,operation,target,qty,outcome FROM sharedlab.decisions ORDER BY owner,token")
+        with self.live_session("lab_alice") as old:
+            self.assertEqual(old("PREPARE old_booking AS SELECT token,qty FROM sharedlab.bookings")[0],"00000")
+            self.assertEqual(old("EXECUTE old_booking"),("00000","v1-accepted|8"))
+            self.sql((SQL/"shared/02-cancel.sql").read_text())
+            self.assertEqual(old("EXECUTE old_booking"),("00000","v1-accepted|8"))
+            self.assertEqual(old("SELECT sharedlab.reserve('v1-accepted',8)"),("00000","RESERVED"))
+        self.assertEqual(self.sql("SELECT owner,token,operation,target,qty,outcome FROM sharedlab.decisions ORDER BY owner,token"),before)
+        self.assertEqual(self.shared_state(),"2|2")
+        self.assertEqual(self.sql("SELECT sharedlab.cancel('new-cancel','v1-accepted')","lab_alice"),"CANCELLED")
+        self.assertEqual(self.shared_state(),"10|3")
+        self.assertEqual(self.sql("SELECT sharedlab.reserve('v1-denied',4)","lab_bob"),"INSUFFICIENT")
+
+    def test_pg_shared_repeatable_read_new_denial_versions_shared_resource(self):
+        self.shared_setup()
+        self.sql("SELECT sharedlab.reserve('fill',10)","lab_alice")
+        with self.live_session("lab_bob") as stale:
+            self.assertEqual(stale("BEGIN ISOLATION LEVEL REPEATABLE READ")[0],"00000")
+            self.assertEqual(stale("SELECT remaining FROM sharedlab.pool"),("00000","0"))
+            self.assertEqual(self.sql("SELECT sharedlab.reserve('denied',1)","lab_bob"),"INSUFFICIENT")
+            self.assertEqual(stale("SELECT sharedlab.reserve('denied',1)")[0],"40001")
+            self.assertEqual(stale("ROLLBACK")[0],"00000")
+        self.assertEqual(self.sql("SELECT sharedlab.reserve('denied',1)","lab_bob"),"INSUFFICIENT")
+        self.assertEqual(self.shared_state(),"0|2")
+        self.assertEqual(self.sql("SELECT count(*) FROM sharedlab.decisions WHERE token='denied'"),"1")
+
+    def test_pg_shared_cancel_rebook_competes_for_same_resource(self):
+        self.shared_setup()
+        self.sql("SELECT sharedlab.reserve('full',10)","lab_alice")
+        self.shared_wait("lab_alice","SELECT sharedlab.cancel('release','full')",
+                         "lab_bob","SELECT sharedlab.reserve('take',10)",
+                         "CANCELLED",("00000","RESERVED"))
+        self.assertEqual(self.shared_state(),"0|3")
+        self.assertEqual(self.sql("SELECT owner FROM sharedlab.bookings WHERE active"),"lab_bob")

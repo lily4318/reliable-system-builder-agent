@@ -39,6 +39,12 @@ def decide_scope(s: dict) -> str:
     if proposed is not None and (not isinstance(proposed, str) or not REPO_PATTERN.fullmatch(proposed)):
         return "HOLD_TARGET"
 
+    # GitHub owner/repository paths are case-insensitive. Compare only the
+    # already validated ASCII names; do not normalize arbitrary URLs, whitespace,
+    # renamed repositories or redirects, or treat name equality as authorization.
+    agent, target = agent.lower(), target.lower()
+    proposed = proposed.lower() if proposed is not None else None
+
     if intent == "improve_agent":
         if target != agent:
             return "HOLD_TARGET"

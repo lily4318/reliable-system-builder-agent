@@ -21,6 +21,7 @@
 - TD004-OFFICIAL-03 / NATIVE-DEVOPS-025：quality gate null/negative/mismatched summary 與 SHA、CI diagnostic report bytes/run attempt 綁定，DEVOPS_REPORT_BINDING_FULL_CI_VERIFIED，詳 [深度覆盤](training/reviews/2026-11-15-ci-artifact-integrity.md) / EP-14。
 
 - **TD-005｜第一版管理計畫已確認（延續 TP-009；未授權施工）**：網站建置及至少一種真實線上部署；目標 8 角色/15 技能（PM 三項核心技能）；交付優先；新增預算 NT$0；日期待協商；外部部署與正式發布獨立授權。M3 列首版必要，不再是選項。現行實體仍 7/12；本輪只記錄決策，不新增程式、角色或技能。詳[原決策紀錄 TD-005](training/DECISION_LOG.md)。
+- **TD-005 領域定位補記（使用者明確要求；首版案例及時程待核准）**：聚焦大學教師之研究、實驗、教學 APP，保留通用工程基礎，不以全領域網站為首版目標。建議單一研究方法互動教學／合成資料模擬 APP 完成 M2/M3，6 工作包、11/22 檢查點及 11/29 候選目標日皆為待協商提案；詳原決策紀錄。本輪未授權施工、部署或發版。
 
 - **方向對焦待確認（TP-008，DISCUSSION / PROPOSED）**：使用者表示不易理解最近訓練；詳 [原決策紀錄 TP-008](training/DECISION_LOG.md#tp-0082026-11-15-訓練方向對焦與使用者可理解的建站能力discussion--proposed)。本輪僅檢討及提出建站成果導向的優先序，未改 TD-001–004 或原 NEXT_ACTION；在本次方向協商中先取得使用者共識，不把提議當已核准。
 

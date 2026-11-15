@@ -68,3 +68,7 @@ C0–C2 可在候選 repo 先工作，C3 後才可外部寫入。C4/C5 任一步
 
 ## 7. 已取得的離線驗收證據
 - 2026-11-15 實際 selector 驗收補記：exact 047ca6340337d034842a6bd262ff1d2c80a5e56d / [CI 43711988622](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43711988622) job 132805354146 completed/success，raw 239471 chars，16 新測試方法全部 ok，450 tests in 51.738s，既有 EDITORIAL_BROWSER_PASS。先前434保留。涵蓋四平台選型、硬拒絕、limit-1/limit/limit+1、unknown、malformed、資源排序、CLI process、拒絕偽造外部授權等。原稿 80% 警戒是 advisory 工程假設；估算可由使用者提供但不證實實際供應商帳號/成本。文件整合 exact a59fbc00837e56c0fe14559b67fe6caeb6f44eb7 七份文件回讀 SHA 相符，CI 43712173888 尚未完成；最新回讀及 CI 待分開確認。選型規則已通過離線受控驗收，不宣稱四平台實際部署、安全或獨立模型能力。C0–C6 與 A–E 路徑皆為未來適用的實戰計畫，未有雲端 resource/URL。
+
+
+## 8. C1 真實查核（2026-11-15）
+NATIVE-CLOUD-017-C1-READONLY：實際 GitHub/Cloudflare/個人 Drive 唯讀與 Supabase app discovery，C1 PARTIAL，C3 NOT AUTHORIZED。Pages 尚未啟用、指定訓練分支未存在，建議 CLOUD-A artifact-only branch/docs；Cloudflare GET Workers/D1 0、缺 workers.dev、billing 403；GAS 專用 API 尚缺；Supabase app 可安裝未連接。詳 [C1 原證據與可編輯授權](training/reviews/2026-11-15-cloud-c1-readonly.md)。不能從工具 schema/metadata 推論外部寫入範圍。原 A07 仍 pending；真部署另確認。

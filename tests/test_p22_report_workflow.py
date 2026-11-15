@@ -175,3 +175,74 @@ class ReportWorkflowTests(unittest.TestCase):
             'Pinned snapshot hash and source/policy revisions; stale worker and exact new output tests',limit=10)
         self.assertEqual(learn.history(self.work,'P22D')['uses'][0]['topic'],'P22-CASE-003')
         print('P22D-TRANSFER: P22-CASE-003 retrieved and cited; same-revision content drift rejected',flush=True)
+
+    def test_curated_generation_case(self):
+        import subprocess
+        import sys
+        work=wb.initialize(self.root/'casework','Synthetic artifact recovery')
+        query='bound task artifact generation root revision stale worker report ZIP acceptance recovery'
+        def hits():
+            return learn.task_context(work,'debug-and-repair','SYN-GENERATION',query,limit=10)['memory']
+        learn.setup(work)
+        self.assertEqual(len(wb.context(work,'resume-project')['memory']),2)
+        self.assertNotIn('P22-CASE-004',{r['topic'] for r in hits()})
+        historical=tuple(c for c in learn.TRAINING_CASES if c[0]!='P22-CASE-004')
+        with patch.object(learn,'TRAINING_CASES',historical):
+            learn.setup(work,include_training_cases=True)
+        before={r['topic']:r for r in wb.context(work,'resume-project')['memory']}
+        self.assertEqual(len(before),7)
+        learn.setup(work,include_training_cases=True)
+        after={r['topic']:r for r in wb.context(work,'resume-project')['memory']}
+        self.assertEqual(len(after),8)
+        self.assertEqual({k:after[k] for k in before},before)
+        hit=next(r for r in hits() if r['topic']=='P22-CASE-004')
+        self.assertEqual(hit['basis'],'observed')
+        self.assertIn('43668854174',hit['evidence'])
+        self.assertIn('not automated source watching',hit['content'])
+        learn.setup(work,include_training_cases=True)
+        self.assertEqual({r['topic']:r for r in wb.context(work,'resume-project')['memory']},after)
+        args=self.root/'query.json'
+        args.write_text(json.dumps({'skill':'debug-and-repair','task':'SYN-GENERATION','query':query,'limit':10}),encoding='utf-8')
+        child=subprocess.run([sys.executable,'-m','src.workbench_learning','context','--workspace',str(work),'--input',str(args)],
+                             capture_output=True,text=True,check=True,timeout=20)
+        self.assertEqual(next(r for r in json.loads(child.stdout)['memory'] if r['topic']=='P22-CASE-004')['id'],hit['id'])
+        self.assertNotIn('P22-CASE-004',{r['topic'] for r in learn.task_context(work,'debug-and-repair','OTHER','astronomy nebula telescope',limit=10)['memory']})
+        print('P22D-DISTILL: exact 7-to-8 opt-in migration; preserved cases; idempotent cross-process retrieval',flush=True)
+
+    def test_real_process_exit_between_file_and_task_commit(self):
+        import subprocess
+        import sys
+        for name in ('intake','spec','arch','plan'):
+            self.stage(name)
+        rev,session=self.start('impl')
+        script="""import os,sys
+from src import p22_report_workflow as flow,p22_snapshot_report as report
+real_publish=report._publish_bundle
+def publish_and_exit(data,path):
+    real_publish(data,path)
+    os._exit(23)
+report._publish_bundle=publish_and_exit
+flow.complete_stage(sys.argv[1],sys.argv[2],'impl',sys.argv[3],int(sys.argv[4]),int(sys.argv[5]))
+"""
+        child=subprocess.run([sys.executable,'-c',script,str(self.work),str(self.source),session,str(rev),str(self.ident)],
+                             capture_output=True,timeout=20)
+        self.assertEqual(child.returncode,23,child.stderr)
+        path=flow._path(self.work,self.ident)
+        before=path.read_bytes()
+        self.assertEqual(self.state('impl')['state'],'RUNNING')
+        self.assertNotIn('implementation',self.artifacts())
+        self.assertNotIn('qa',tasks.review(self.work)['next_ready'])
+        self.assertEqual(flow.verify(self.work,self.source,self.ident),'COMMITTED')
+        new_session='verified-resume'
+        tasks.resume(self.work,'impl',session,new_session,'Child exit 23 and exact ZIP readback; no external side effect',True,expected_revision=rev)
+        with self.assertRaises(ValueError):
+            flow.complete_stage(self.work,self.source,'impl',session,rev,self.ident,reconcile_existing=True)
+        result=flow.complete_stage(self.work,self.source,'impl',new_session,rev,self.ident,reconcile_existing=True)
+        self.assertEqual(result['state'],'DONE')
+        self.assertEqual(path.read_bytes(),before)
+        self.assertEqual(json.loads(self.artifacts()['implementation']['content'])['zip_sha256'],report.sha(before))
+        self.stage('qa',R1)
+        self.stage('security')
+        self.stage('deploy-plan')
+        self.assertNotIn('activate',tasks.review(self.work)['next_ready'])
+        print('P22D-PROCESS-CUT: actual child exit after ZIP publish before task acceptance; exact readback and explicit resume; no repeat write',flush=True)

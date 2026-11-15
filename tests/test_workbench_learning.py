@@ -141,3 +141,47 @@ class LearningTest(unittest.TestCase):
         observed = learn.feedback(self.p,'SYN-REPORT','report-session','report-fix','test_fix','SQLite report','Missing source refused without new file','test_new_lab_report_recovery_applies_case')
         self.assertEqual(observed['basis'],'candidate')
         self.assertEqual(learn.history(self.p,'SYN-REPORT')['uses'][0]['topic'],'B001-CASE-001')
+
+
+class PublicContextTest(unittest.TestCase):
+    def test_public_context_no_private_database_and_opt_in(self):
+        query = 'SQLite 唯讀 缺庫 transaction inventory concurrency revision stale worker'
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            default = learn.public_context('debug-and-repair','ACTUAL-AUDIT',query)
+            curated = learn.public_context('debug-and-repair','ACTUAL-AUDIT',query,
+                                           include_training_cases=True,limit=20)
+            self.assertEqual({m['case_key'] for m in default['memory']},
+                             {'B001-CASE-001','B002-CASE-001'})
+            self.assertIn('P22-CASE-004',[m['case_key'] for m in curated['memory']])
+            self.assertTrue(all(m['matched_terms'] and m['evidence'] for m in curated['memory']))
+            self.assertEqual(default['status'],'PUBLIC_CASE_REVIEW_ONLY')
+            for key in ('private_workspace_read','private_resolution_state_checked',
+                        'prerequisites_verified','authority_granted','citation_persisted','model_invoked'):
+                self.assertFalse(curated[key])
+            self.assertEqual(list(root.iterdir()),[])
+            self.assertEqual(learn.public_context('architecture-design','ACTUAL-AUDIT',
+                'astronomy telescope')['required_artifact_types'],['specification'])
+            self.assertEqual(learn.public_context('debug-and-repair','ACTUAL-AUDIT',
+                'astronomy telescope')['memory'],[])
+            self.assertLessEqual(learn.public_context('debug-and-repair','ACTUAL-AUDIT',
+                query,budget=256)['payload_chars'],256)
+            for kw in ({'limit':True},{'budget':0},{'include_training_cases':1}):
+                with self.assertRaises(ValueError):
+                    learn.public_context('debug-and-repair','ACTUAL-AUDIT',query,**kw)
+
+    def test_cli_public_only_and_private_command_requires_workspace(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            inp=root/'input.json'
+            inp.write_text(json.dumps({'skill':'resume-project','task':'ACTUAL-AUDIT',
+                'query':'SQLite reconcile'}),encoding='utf-8')
+            cmd=[sys.executable,'-m','src.workbench_learning']
+            result=subprocess.run(cmd+['public-context','--input',str(inp)],capture_output=True,text=True,check=True)
+            self.assertEqual(json.loads(result.stdout)['mode'],'PUBLIC_READ_ONLY')
+            for args in (['public-context','--workspace',str(root/'absent'),'--input',str(inp)],
+                         ['setup'],['context','--input',str(inp)]):
+                result=subprocess.run(cmd+args,capture_output=True,text=True)
+                self.assertNotEqual(result.returncode,0)
+            self.assertFalse((root/'absent').exists())
+            self.assertEqual(list(root.iterdir()),[inp])

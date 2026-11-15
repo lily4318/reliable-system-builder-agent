@@ -57,6 +57,7 @@
 - 採用：先驗證所有列；固定來源 bytes 或一致 read-only snapshot、policy revision、canonical output/hash；排他建立新路徑不覆寫，未知結果唯讀核對實際 bytes 與同版 manifest。資料庫驗收與實體檔案發布分開；舊生成成品可留歷史，但不能提交為新版本 PASS。新來源或政策變更須生成、再驗。
 - 證據：原 OPT_IN P22-CASE-002 [CI 43667714699](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43667714699)、P22-CASE-003 [CI 43668235893](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43668235893)、P22-CASE-004 [CI 43668854174](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43668854174)；各自 exact source 見原 TRAINING_CASES 與主檔；最新 [CI 43702633084](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43702633084) 原始日誌回讀 `test_p22_file_intake`、`test_p22_snapshot_report`、`test_p22_report_workflow` 正反例。復用 EP-04 任務版本，不複製其 DAG 規則。
 - 限制：可信本地檔案系統、合作來源、合成資料；snapshot 不證明發布時 live-source CAS，無 Windows/斷電/惡意路徑/分散式保證。缺原快照不等於 NOT_OBSERVED；聚合不證明匿名。
+- 實際遷移 NATIVE-EP-011-SNAPSHOT-FIELD-BOUND（與 EP-08 共用證據）：資料列 cap 不等於單欄大小 cap。SQLite snapshot 原在 Python fetchall 後拒絕巨型非法 TEXT/BLOB；red [CI 43704992532](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43704992532) 六失敗。以 SQL typeof/編碼 byte bound 回 NULL sentinel（不 filter/drop/truncate），原語意驗證、snapshot/order/hash 及排他發布不變；final [CI 43705180025](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43705180025) 418/418，最大回 Python field 在反例由262144/262153變0/8，1000筆多編碼 exact ZIP 相同，1001拒絕，WAL 原契約保留。16 bytes 是原八字元 ASCII schema / UTF-16 相容上限，不適用任意文字；不限制 SQLite native sort/scan 或總 RSS，不等於 live-source CAS。
 - 狀態：EVIDENCE_VERIFIED / 原 OPT_IN 3；不新增程式案例。
 
 ### EP-06 實際瀏覽器、權限及遷移驗收分層
@@ -75,6 +76,7 @@
 - 採用：先量測相同契約、物化列數、記憶體及 query plan，再比較應用層載入、SQL 集合查詢、必要索引/遷移；保留輸出排序、IDs、依賴與歷史。只需最新 head 不應載入全部舊 payload，也不删歷史換效能。
 - 證據：NATIVE-ARCH-005，SQLite 3.46.1 合成 2400 rows/12 kinds，Python 物化 2400→12、五次中位時間 24.787→0.720 ms、Python peak 39356642→200880 bytes；red [CI 43701076849](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43701076849) 301!=3；green exact 54694806bbb70229572b1f49041cffc9c29a7856 / [CI 43701094377](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43701094377) 397/397，原 `test_team_workbench` 兩項新增 ok。原 team_workbench._latest 與 architecture-design 專節，決策紀錄 NATIVE-ARCH-005。
 - 限制：實測樣本非 SLA、非整體 Agent latency；Python peak 不含 SQLite native allocator，DB 仍掃歷史與可能 temp B-tree。未新增 index/schema 或測生產資料，禁未授權私人 benchmark。
+- 實際遷移 NATIVE-EP-011-SNAPSHOT-FIELD-BOUND（同 EP-05 證據，不重複計數）：Python 物化量須同看列/欄 bytes/type；SQL sentinel projection 先守界、保留所有非法列讓應用拒絕。首版 ORDER BY 投影 alias 實測失去 records_id 索引，增加 TEMP B-TREE；保留內部原排序鍵且只返有界欄位後，SQLite 3.46.1 原/新 EXPLAIN 同 SCAN records USING INDEX records_id，final CI 43705180025 418/418。量測欄位大小及實際 plan，不冒稱 RSS、延遲或所有 query optimizer；不在實際私人 DB 建索引。
 - 狀態：EVIDENCE_VERIFIED / INDEX_CANDIDATE；已有 architecture skill，未進程式案例。
 
 ### EP-09 跨角色輸入契約及守門順序

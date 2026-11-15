@@ -25,6 +25,9 @@ description: "設計架構、比較方案。architect 角色；交付 architectu
 - 本 repo 原 `src.team_workbench._latest` 採每類 MAX(id)＋MIN(id) 排序與 PK join，在原 schema 上只物化最新版、維持原先類別首次出現的順序，保留原 current_artifacts 依賴判斷及 append-only 歷史。先測原 2,400 列實際 SQLite，再以既有檔案庫唯讀跑新舊查詢、比對輸出與檔案 hash；額外索引只在隔離副本試驗，未採用 schema 遷移。
 - 回歸入口 `python -m unittest discover -s tests -p test_team_workbench.py -v`；實際測試與 ADR 取捨見原決策紀錄 NATIVE-ARCH-005。此例不證明所有 SQL、遠端 DB、分散式一致性或完整 Agent 性能；Python peak 不含 SQLite/C 原生配置，原生資料庫仍可能全掃描或建暫存 B-tree。禁止直接拿使用者私人資料庫做未授權 benchmark 或建立索引。
 
+### 受限快照的欄位物化與排序（NATIVE-EP-011-SNAPSHOT-FIELD-BOUND）
+讀取資料時同時列出列數、單欄 encoded bytes/type、應用程式與資料庫各自的資源界線。僅做 fetchall 後驗證或 streaming 仍可能先物化巨大非法欄；比較 SQL 型別/長度投影、應用過濾及索引/排序，禁止 filter/drop/truncate 非法列使報表看似成功。使用明確無效 sentinel，原完整語意驗證及交易/row cap 保留。文字 byte cap 要考慮 UTF-16、NUL 和原合法域。實測跨 DB→Python 欄位大小、正反輸出 hash/排序/編碼/快照契約；比較 EXPLAIN 避免新投影 alias 造成索引失效或額外排序。原 EP-05/08、CI 43704992532 six red / 43705180025 418 green；同本地可信固定 schema，不代表 SQLite native cost、全程序記憶體、任意資料庫或 SLA 保證。維持原排序鍵留在 DB，不將巨型原值傳回 Python。
+
 ### 跨角色輸入契約與依序守門（NATIVE-ARCH-006）
 - 先區分資料形狀驗證、業務狀態機、守門優先序及實際授權。逐欄檢查實際使用的型別、允許值、缺欄預設與相依；不能把 JSON 可解析、列表存在或 truthy 當成有效證據。不合法輸入產生契約規定的 HOLD，而不是未捕捉例外或自動修正成核准。
 - 比較局部驗證、集中依序驗證與集中全量預檢。原有逐步收集證據或唯讀任務可能不要求後段欄位；全量預檢可能遮蔽目標、來源與 UNKNOWN/PARTIAL 寫入的優先處置。集中化若有真實重複維護成本，須保留守門順序、缺欄語意、狀態碼與消費端相容性，再估計遷移與回退成本；不要僅因程式較整齊而全面重構或引入套件。

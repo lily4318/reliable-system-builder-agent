@@ -16,5 +16,8 @@ description: "檢查權限、隱私及安全。security 角色；交付 security
 ### 雲端架構專屬安全（TP-006 / NATIVE-CLOUD-016-STACK-SELECTION）
 讀 [多平台選型及實戰指南](../../../docs/CLOUD_ARCHITECTURE_SELECTION.md)：Pages public artifact allowlist、GAS 真 visitor identity/原試算表不公開/single script writer/RAW/atomic batch、D1 條件命中與交易/receipt/secure cookie、Supabase RLS/grants/auth JWT/service-key isolation/RPC/storage。真資料治理獨立審查；缺 evidence 不因免費、官方功能或 selector 而通過。給各平台負測、backup restore 與安全範圍；同 SHA CI 不替代遠端實測。
 
+### HTTP 收件與寫入邊界（TD004-OFFICIAL-01 / EP-12）
+讀 RFC 9110 §8.6 與 RFC 9112 §6.3/8/9.6：身份與 JSON 驗證不代替 framing。固定長度 API 在 mutation 前核 ASCII decimal、大小上限、實收 byte count 與不支援 TE；EOF/timeout 不寫入且關閉連線。QA 用真本機 HTTP 測正反例，同時核 receipt 和具權限 workspace 不變，不能只看 HTTP 狀態。區分 idle timeout/絕對期限、local-only/production；原未知 POST 守門不變。細節與證據見 [獨立官方學習覆盤](../../../docs/training/reviews/2026-11-15-http-framing.md)，不冒稱正式資安通過。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 security-review；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

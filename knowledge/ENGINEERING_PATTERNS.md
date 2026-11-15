@@ -26,6 +26,8 @@
 | EP-10 | 沒有本機工作台、GitHub 原生環境、public-context、private isolation、蒸餾 | resume-project, learn-from-feedback, knowledge-distillation | NATIVE-AUDIT-001 / NATIVE-CASE-001 |
 | EP-11 | 候選程式 QA 退件、model READY、functional oracle、bounded AST、repair budget | implement-feature, test-and-acceptance, task-planning, knowledge-distillation | P1-2c / P1-2 bounded functional gate |
 
+| EP-12 | HTTP framing、Content-Length、提前 EOF、idle timeout、request body | security-review, debug-and-repair, test-and-acceptance | TD004-OFFICIAL-01 / NATIVE-HTTP-020 |
+
 ## 知識卡（已觀測原理與適用邊界）
 
 ### EP-01 需求來源一致性，而非形式齊全
@@ -129,3 +131,8 @@
 證據定位：原 [訓練主檔](../docs/AGENT_CAPABILITY_TRAINING.md)、[訓練決策](../docs/training/DECISION_LOG.md)；基準 exact 05d123b49860ce0fef772d9cd96dd47d4e79da4d / [CI 43702633084](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43702633084) / job 132776872828，原始日誌 227954 chars，406 tests in 39.910s/OK。索引整理非重新執行以上測試；不加總重疊測試數，不宣稱統計能力增益。
 
 待人審：索引卡的適用性和升格範圍、在下一項不同真實授權任務中的選用效果。發現不適用或衝突時，回原來源核對後記新候選證據及原因；不自動蓋掉使用者偏好、有效案例或正式規格，遵循 [learning-policy](../config/learning-policy.yaml) 與既有 PR/Release 門檻。
+
+### EP-12 傳輸完整性優先於解析及持久寫入（獨立官方技術單元）
+- 採用：固定長度 API 先驗 ASCII 十進位數字、上限與實際 bytes，任何不支援的 Transfer-Encoding 欄位均拒絕；EOF 或逾時不觸發 mutation；以真 HTTP + receipt/workspace 無變更驗負例。合法 JSON、登入或 200 不足以證明協定完整。失回應仍依 EP-03 唯讀對帳。
+- 證據：TD004-OFFICIAL-01 實際 red CI 43718703256 3 failures；fix 10be998cb877cec8911f83edf61736463f735c9d CI 43718746128 FULL_CI_VERIFIED；[深度覆盤](../docs/training/reviews/2026-11-15-http-framing.md)。
+- 限制：Python 本機 HTTP, fixed length only；socket idle timeout 不是整體 deadline，未驗正式 proxy/TLS/HTTP2/3/DoS；不以此放行正式部署。狀態 INDEX_CANDIDATE（非 runtime seed/人審正式知識）；來源原理與實際 red 已確認，修復驗收依 exact CI。

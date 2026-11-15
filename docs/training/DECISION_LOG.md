@@ -123,3 +123,15 @@
 - 證據基準 05d123b49860ce0fef772d9cd96dd47d4e79da4d / CI 43702633084 job 132776872828 completed/success，406 tests / 39.910s，完整 log 227954 chars；其他 raw job 132748261530/132772332813/132775328752/132667997029 分別確認需求、查詢、依序守門及受控文件遷移。12 個 SKILL 原文以及原 CASES 2 + TRAINING_CASES 6 已讀。用既有公開工程實測，不新增/手動重跑測試。
 - 產物（候選 IMPLEMENTED 待回讀）：EP-01–11，任務詞與技能選用、適用/禁用條件、case key 及來源 SHA/CI、既有 DEFAULT/OPT_IN vs INDEX_CANDIDATE 兩軸。完整對照與重疊歸併在 [原知識索引](../../knowledge/ENGINEERING_PATTERNS.md)；原學習程式/seed、私人資料庫不變。更新原共同導航、knowledge-distillation、工作台手冊、原主檔；source SHA 及文件 CI 分開記錄。
 - 待驗收：文件回讀與可能自動 CI、跨不同實際任務的知識選用效果、獨立人審是否需新增非重複 runtime case。此輪不聲稱模型權重、能力提升、真多 Agent、正式 Release、跨專案/外部部署或真人資料處理。
+
+
+## TD-001｜2026-11-15 NATIVE-EP-008：知識遷移及專案身分守門
+
+- 使用者授權在候選 Agent 選不同尚未解的真實工程問題，使用 EP-01–11 索引、角色與技能實作及驗收。範圍只原 PR #8。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK；System Lead/resume-project、Security/security-review、Developer/debug-and-repair、QA/test-and-acceptance、Learning Evaluator/knowledge-distillation（已讀原角色與技能）。不冒稱分身或私人工作台檢索。選 EP-09（輸入/守門順序）與 EP-10（唯讀來源/專案隔離），其他卡未強制使用；source read 原知識索引 blob 0c0a5c7d0bf06e2c5475e7c7e3aa51dea29f1ad0。
+- 基準 4c0771394ae7339ce53ab4bc094aff2fd44c39b0 / CI 43703079220/job 132778228179 completed/success，raw 227947 chars，406 tests in 43.951s/OK。實際 GitHub GET repos 原名與全大寫，均回傳 id 1455152922、full_name lily4318/reliable-system-builder-agent；原 src/task_scope.py blob a29cafe71a91236ffd8da7ee1cb5b12b1624ad01 以區分大小寫相等比較，在 apply_agent 可將自身當不同外部專案，亦錯擋合法同名；判定器 advisory，未發生外部越權證據。
+- QA 固定同一 13 subcase 的兩個測試方法，red 9adf48529bca0dee7a78c2b844c8caa1e2b77bf9 / CI 43703326898/job 132778987522 completed/failure，raw 107296 chars、408 tests in 42.992s FAILED(failures=9)：自身別名 4 個錯放（PROJECT_READ_ONLY/PATCH_ONLY），原有授權/跨案/權重 gate 4 個錯擋，以及合法外部大小寫 1 個錯擋。其他原測試不删、不重造 oracle。測試 blob 830cf3cfb7e225fd2f705712fafbbdf5b9e703a9。
+- Developer 最小修補：先保留原 ASCII 格式/intent/boolean 授權，再比較 agent/target/proposed 的 lower()；不修剪空白、不解析 URL、不推定 rename/redirect、不增加網路呼叫、schema 或外部寫入。原檔 blob c39d8bb4975532a1f74abf4e9c25a0e6d608cf89 / green 44387d791df6c892dc0352be71f7aee1c77727aa；exact CI 43703386263/job 132779195199 completed/success; raw 228286 chars; Ran 408 tests in 38.985s/OK; 兩個新增 methods 均 ok，原品質及安全流程全過。 程式與測試 SHA 回讀已比對。後續同分支有其他任務提交 tests/test_bound_artifacts.py、tests/test_task_revision.py，保留並行工作，整合 HEAD 需獨立 CI，不能借用本輪 408 綠燈。
+- 覆盤：原 EP-09/10 增量交叉記錄同一次應用，原 security-review 補資源 ID 與授權隔離；不新增 EP、runtime seed、模型盲測或私人案例。此為實際單 Agent 選用/執行/驗收證據，不證明自動檢索、真獨立多 Agent、跨平台泛化或模型能力增益。正式 main/Release、其他專案、GAS、私人庫未改。獨立人審/正式升格仍未完成。
+- NEXT_ACTION: 核對此文件及當時最新 PR exact HEAD CI（與本輪 green SHA 分開）；保留並行任務驗收證據。下一項實際工程任務選不同 EP，或整理人審准入/退回標準，不重做通過的 scope測試或自行升格。
+
+- 選擇理由：相比全面重寫 scope/route 或增加遠端 API 依賴，採有限 ASCII 名稱比較是對現有契約相容、風險最低的修補；source GET 僅用於本輪核實事實，不能當通用授權。本輪新證據整合 EP-09/10（同一案例），不升格 seed。

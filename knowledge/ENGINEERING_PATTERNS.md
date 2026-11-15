@@ -80,12 +80,14 @@
 - 採用：形狀、型別、業務狀態與實際權限分開，集合檢索前驗 string；不合法回約定 HOLD 而非 exception 或自動核准。多項錯誤時維持目標/來源/unknown 或 partial write 的先後，不讓下游全量預檢掩蓋前面的安全拒絕；保留唯讀都不需後段欄位的相容契約。
 - 證據：NATIVE-ARCH-006 red [CI 43702025465](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43702025465) errors=4；green exact a0d2c1cb7d8c16f62c021f334759f023c58f7948 / [CI 43702126591](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43702126591) 399/399；`test_malformed_json_stage_is_advisory_hold_not_exception`、`test_stage_validation_preserves_prior_gates_and_incremental_inputs` ok。原 engineering_workflow.route、architecture-design 專節及原決策。
 - 限制：局部 JSON stage 修復，不是通用 schema 驗證或外部真實證據；缺 write_outcome 的原 NONE 預設維持，收緊需盤點 caller。mutation_permitted=false 不變。
+- 實際遷移 NATIVE-EP-008：GitHub owner/repo 大小寫是名稱表示而非不同資源。先驗 ASCII 路徑形狀，再作大小寫等價比較，維持原 intent、權限與跨專案守門；不自行接受 URL、空白、rename/transfer 或 redirect。原 scope 判定器 red [CI 43703326898](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43703326898) 9/13 subcases failures；green [CI 43703386263](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43703386263) 13/13 新 subcases、408/408 完整回歸。詳原決策紀錄。此為兩卡共同證據，不另建知識卡或升格 seed。
 - 狀態：EVIDENCE_VERIFIED / INDEX_CANDIDATE；已有 architecture skill，未入程式案例。
 
 ### EP-10 平台原生工作與知識檢索隔離
 - 採用：按工具與授權選 PRIVATE_WORKBENCH、REPO_NATIVE、READ_ONLY；不可為公共檢索初始化私人庫、混合專案、把公開索引當私人記憶。repo-native 讀精確 SHA、原證據與任務適用案例，保存所允許公開的最少結果；沒工具就標記未執行。沿 EP-03 唯讀語意及 EP-04 版本證據原則，不冒稱 GitHub 與 SQLite 同一交易。
 - 證據：NATIVE-AUDIT-001 / 候選 NATIVE-CASE-001，exact 7cd8085e6fd9f320fea0e0526cb3b2fd6a354af0 / [CI 43691876099](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43691876099) 390/390，既有 public-context 兩項隔離回歸且最新 CI 再驗；真實 REPO_NATIVE 回讀及後續 NATIVE-TRANSFER/REQ/ARCH 任務引用原決策紀錄。P22-CASE-001 原 [CI 43666793523](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43666793523) 真 SQLite 檢索 marker 3 retrieved/2 applied/1 non-applicable/2 candidate feedback。
 - 限制：詞彙比對非語意模型；SOURCE_READ 不是實際 CLI/cite receipt，跨平台私有同步、真正獨立 Agent/盲測與升版均不證明；私人內容未獲授權不入公共 repo。
+- 實際遷移 NATIVE-EP-008（交叉引用 EP-09）：REPO_NATIVE 唯讀原 GitHub API 查原名與全大寫別名取得相同 immutable repository id 及 canonical full_name；據此修復原 scope 比較，不靠名稱猜測權限。大小寫等價不保證 rename/transfer 後的同一資源；實際寫入仍核正式 repo id、head、授權及回讀。
 - 狀態：EVIDENCE_VERIFIED / INDEX_CANDIDATE；既有兩 DEFAULT、六 OPT_IN 範圍不變。
 
 ### EP-11 外部候選結果必須由 host 驗收

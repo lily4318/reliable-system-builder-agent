@@ -33,6 +33,9 @@ TRAINING_CASES = (
     ('P22-CASE-002','CSV file intake schema validation deterministic JSON bundle hash exclusive publication hard link reconcile interruption',
      'Validate all rows before publication; bind canonical output to exact input bytes with hashes in one bundle. Use exclusive publication rather than overwrite; after unknown outcome recompute and compare exact bytes read-only. Distinguish NOT_OBSERVED from CONFLICT; a leftover temporary file does not prove the final output failed. Scope: trusted stable local directory, compatible filesystem, synthetic data; not hostile paths, changing source, power-loss durability, distributed transactions or automatic cleanup.',
      'docs/AGENT_CAPABILITY_TRAINING.md P22-CASE-002; 088c8264d4e622ba3bb09e8212e220c91ed05caf; CI 43667714699/job 132670734319'),
+    ('P22-CASE-003','SQLite snapshot revision policy report aggregate ZIP manifest logical hash readonly export reconciliation',
+     'Bind a report to the source snapshot revision and the report policy revision separately. Read a consistent local SQLite snapshot in one read-only transaction; export only required aggregates, with a deterministic manifest binding logical snapshot and report hashes. Preserve old outputs, publish exclusively to a new path and reconcile exact bytes using the matching snapshot and policy. A stale or missing source blocks verification, not NOT_OBSERVED. Scope: cooperating local sources and trusted compatible filesystem; not live-source CAS at publication, historical verification without original snapshot, anonymity, hostile paths, Windows or power-loss durability.',
+     'docs/AGENT_CAPABILITY_TRAINING.md P22-CASE-003; c1f5a605976925dd3ff281894f4e7ceb7be5fb2e; CI 43668235893/job 132672315245'),
 )
 EVENTS = {'test_failure':'case', 'test_fix':'case', 'qa_rejection':'lesson',
           'requirement_change':'lesson', 'preference':'preference'}

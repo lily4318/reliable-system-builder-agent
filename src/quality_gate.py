@@ -2,9 +2,13 @@
 from __future__ import annotations
 import argparse
 import json
+import os
+import hashlib
+import subprocess
 import re
 import sys
 from pathlib import Path
+from src.ci_evidence_bundle import bind_current_ci, REPORT
 from src.agent_eval import evaluate as evaluate_policy
 from src.independent_acceptance import evaluate as evaluate_recovery
 from src.capability_workbench import evaluate as evaluate_capability
@@ -185,13 +189,20 @@ def main() -> int:
     args = parser.parse_args()
     try:
         report = assess(evaluate_policy(), evaluate_recovery(), load(BASELINE), load(TARGETS))
+        # Existing CI step writes the final report after all preceding report producers.
+        # Failed runs retain diagnostic behavior; only a passing gate can bind bytes.
+        if os.environ.get("GITHUB_ACTIONS") == "true" and args.output and args.output.name == REPORT and report["gate_passed"]:
+            report = bind_current_ci(report,args.output.parent,ROOT)
         content = json.dumps(report, indent=2, ensure_ascii=False) + "\n"
         print(content)
         if args.output:
             args.output.parent.mkdir(parents=True, exist_ok=True)
-            args.output.write_text(content, encoding="utf-8")
+            args.output.write_bytes(content.encode("utf-8"))
+            if "artifact_binding" in report:
+                print("CI_EVIDENCE_BOUND:",json.dumps(report["artifact_binding"]["context"],sort_keys=True),
+                      "report_sha256="+hashlib.sha256(content.encode("utf-8")).hexdigest())
         return 0 if report["gate_passed"] else 1
-    except (ValueError, OSError, KeyError, json.JSONDecodeError) as exc:
+    except (ValueError, OSError, KeyError, json.JSONDecodeError, subprocess.SubprocessError) as exc:
         print("QUALITY_GATE_BLOCKED: " + str(exc), file=sys.stderr)
         return 2
 

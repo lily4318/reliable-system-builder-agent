@@ -176,3 +176,69 @@ class SnapshotReportTests(unittest.TestCase):
         self.assertEqual(len(history['events']),1)
         self.assertEqual(wb.context(work,'deployment')['status'],'READY_TO_REVIEW_INPUTS')
         print('P22C-TRANSFER: P22-CASE-002 and B001-CASE-001 applied; browser case not applicable; R2 result checked',flush=True)
+
+    def test_curated_snapshot_case_opt_in(self):
+        from unittest.mock import patch
+        work = wb.initialize(self.root/'casework','Synthetic versioned aggregate export')
+        query = 'SQLite snapshot revision policy report aggregate ZIP manifest logical hash'
+        def retrieve():
+            return learn.task_context(work,'debug-and-repair','SYN-EXPORT',query,limit=10)['memory']
+        learn.setup(work)
+        self.assertEqual(len(wb.context(work,'resume-project')['memory']),2)
+        self.assertNotIn('P22-CASE-003',{r['topic'] for r in retrieve()})
+        historical = tuple(c for c in learn.TRAINING_CASES if c[0]!='P22-CASE-003')
+        with patch.object(learn,'TRAINING_CASES',historical):
+            learn.setup(work,include_training_cases=True)
+        before = {r['topic']:r for r in wb.context(work,'resume-project')['memory']}
+        self.assertEqual(len(before),6)
+        learn.setup(work,include_training_cases=True)
+        after = {r['topic']:r for r in wb.context(work,'resume-project')['memory']}
+        self.assertEqual(len(after),7)
+        self.assertEqual({k:after[k] for k in before},before)
+        hit = next(r for r in retrieve() if r['topic']=='P22-CASE-003')
+        self.assertEqual(hit['basis'],'observed')
+        self.assertIn('43668235893',hit['evidence'])
+        self.assertIn('not live-source CAS',hit['content'])
+        learn.setup(work,include_training_cases=True)
+        self.assertEqual({r['topic']:r for r in wb.context(work,'resume-project')['memory']},after)
+        args = self.root/'query.json'
+        args.write_text(json.dumps({'skill':'debug-and-repair','task':'SYN-EXPORT','query':query,'limit':10}),encoding='utf-8')
+        child = subprocess.run([sys.executable,'-m','src.workbench_learning','context','--workspace',str(work),'--input',str(args)],
+                               capture_output=True,text=True,check=True,timeout=20)
+        self.assertEqual(next(r for r in json.loads(child.stdout)['memory'] if r['topic']=='P22-CASE-003')['id'],hit['id'])
+        irrelevant = learn.task_context(work,'debug-and-repair','SYN-OTHER','astronomy telescope nebula',limit=10)
+        self.assertNotIn('P22-CASE-003',{r['topic'] for r in irrelevant['memory']})
+        print('P22C-DISTILL: 6-to-7 migration, preserved old IDs/content, idempotent opt-in and new process retrieval',flush=True)
+
+    def test_wal_snapshot_revision_is_not_live_publication_cas(self):
+        from unittest.mock import patch
+        real_connect = sqlite3.connect
+        with closing(real_connect(self.source)) as db:
+            self.assertEqual(db.execute('PRAGMA journal_mode=WAL').fetchone()[0],'wal')
+        events = []
+        def connect_with_trace(*args, **kwargs):
+            reader = real_connect(*args, **kwargs)
+            def writer_at_row_query(statement):
+                if statement.startswith('SELECT record_id') and not events:
+                    try:
+                        with closing(real_connect(self.source,timeout=2)) as writer, writer:
+                            writer.execute('UPDATE metadata SET revision=2')
+                            writer.execute("UPDATE records SET quantity=8 WHERE record_id='SYN-0001'")
+                        events.append('writer_committed')
+                    except Exception as exc:
+                        events.append(repr(exc))
+            reader.set_trace_callback(writer_at_row_query)
+            return reader
+        with patch.object(export.sqlite3,'connect',connect_with_trace):
+            self.assertEqual(export.publish(self.source,self.output,1,2),'PUBLISHED')
+        self.assertEqual(events,['writer_committed'])
+        raw,manifest=self.read_zip(self.output)
+        self.assertEqual(manifest['source_revision'],1)
+        self.assertEqual(json.loads(raw)['completed_quantities']['paper'],5)
+        with self.assertRaisesRegex(ValueError,'STALE_SOURCE'):
+            export.reconcile(self.source,self.output,1,2)
+        self.assertEqual(export.reconcile(self.source,self.output,2,2),'CONFLICT')
+        fresh=self.root/'revision2.zip'
+        export.publish(self.source,fresh,2,2)
+        self.assertEqual(json.loads(self.read_zip(fresh)[0])['completed_quantities']['paper'],8)
+        print('P22C-SNAPSHOT: WAL writer committed R2 during R1 read; coherent R1 report, live R2 not claimed',flush=True)

@@ -38,10 +38,25 @@ def snapshot(path, expected_revision):
     with closing(sqlite3.connect(path.absolute().as_uri()+'?mode=ro', uri=True, timeout=5)) as db:
         db.execute('PRAGMA query_only=ON')
         db.execute('BEGIN')
-        revisions = db.execute('SELECT revision FROM metadata LIMIT 2').fetchall()
+        # Keep invalid variable-length metadata out of Python as well.
+        revisions = db.execute(
+            "SELECT CASE WHEN typeof(revision)='integer' THEN revision END FROM metadata LIMIT 2"
+        ).fetchall()
         if revisions != [(expected_revision,)] or type(revisions[0][0]) is not int:
             raise ValueError('STALE_SOURCE_OR_INVALID_REVISION')
-        rows = db.execute('SELECT record_id, category, state, quantity FROM records ORDER BY record_id LIMIT ?', (MAX_ROWS+1,)).fetchall()
+        # Allow at most 16 encoded bytes per text field: every valid value
+        # has at most eight ASCII characters, including in UTF-16 databases.
+        # BLOB length counts bytes (TEXT length stops at embedded NUL).
+        # Preserve invalid rows as NULL sentinels; never filter them away.
+        # Python still validates exact identifiers, enums and quantities.
+        # This bounds returned values, not SQLite native scan/sort resources.
+        rows = db.execute("""SELECT record_id, category, state, quantity FROM (
+            SELECT CASE WHEN typeof(record_id)='text' AND length(CAST(record_id AS BLOB))<=16 THEN record_id END AS record_id,
+                   CASE WHEN typeof(category)='text' AND length(CAST(category AS BLOB))<=16 THEN category END AS category,
+                   CASE WHEN typeof(state)='text' AND length(CAST(state AS BLOB))<=16 THEN state END AS state,
+                   CASE WHEN typeof(quantity)='integer' THEN quantity END AS quantity
+            FROM records
+        ) ORDER BY record_id LIMIT ?""", (MAX_ROWS+1,)).fetchall()
         if not rows or len(rows)>MAX_ROWS:
             raise ValueError('invalid row count')
         seen = set()

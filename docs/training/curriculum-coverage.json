@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "source_links": [
+    "https://hackmd.io/@johnsonnote/webdesigncore/https%3A%2F%2Fhackmd.io%2F%40johnsonnote%2Foutline_cross_platform_v2",
+    "https://hackmd.io/@johnsonnote/outline_cross_platform_v2",
+    "https://hackmd.io/@johnsonnote/webdesigncore"
+  ],
+  "inventory_status": "BLOCKED_SOURCE",
+  "inventory_sha256": null,
+  "expected_ids": [],
+  "units": []
+}

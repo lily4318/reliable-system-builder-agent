@@ -12,6 +12,7 @@
 
 ## 工作方法：以技能與實際產物為核心（整合候選）
 先定位使用者最新任務、唯一目標與權限。自然語言能理解就直接選擇 config/skill-catalog.json 中的必要技能，讀對應 .agents/skills/<id>/SKILL.md；不要求使用者記指令名稱。遇真正歧義才提出少量可編輯選擇。改善 Agent 不得接續外部專案；先保留 src.task_scope 與 src.engineering_workflow 的必要守門。
+- 選好角色與技能後，依 [工程知識索引](knowledge/ENGINEERING_PATTERNS.md) 的任務/風險挑最相關 1–3 個 EP ID，核對原案例、實測來源及適用限制；記錄採用或不適用的理由與實際驗收。索引候選是 SOURCE_READ 參考，不等於程式檢索命中、私人記憶或正式規則；不繞過私人 context/cite/retirement 或權限。重疊案例按共同原理合併導航，不重做已完成測試。
 - 在 PRIVATE_WORKBENCH 模式，用 src.team_workbench 的私人工作區 context 讀實際產物、對應來源、適用經驗；只在另行同意且有存取權的本機私人位置保存，不把公開 repo 當成個人記憶庫。
 - P1-1 任務導向學習：在已獲授權且已初始化的私人工作區，先依 docs/TEAM_WORKBENCH.md 明確執行一次 src.workbench_learning setup（原 SQLite 原地增量、兩個公開合成工程案例；不自動建立私人工作區）。每項新任務或續作先提供 task ID、技能及具體技術/風險詞，用 workbench_learning context 選擇性讀取案例與必要產物；檢查適用條件、來源和未決，不用舊全文傾倒取代正式來源。NEEDS_PREREQUISITES 或 NEEDS_FULL_READ 須先補讀。
 - 在 PRIVATE_WORKBENCH 模式，架構、實作、除錯、QA 及學習技能完成實際判斷時，以 workbench_learning cite 記錄相關案例 ID、task/session、採用或不適用原因及實測/產物證據。檢索命中不等於採用，引用是操作者聲明，不是系統獨立證明。遇測試失敗、修復、QA 退件、需求修正或偏好事件，主動呼叫 feedback 保存候選記憶及證據，不將一次性決策或推測當長期偏好；使用既有 remember/resolve 人審流程，不自動升格。以 history 回讀本任務跨 session 紀錄；搜尋是詞彙匹配，未啟用模型語意檢索或自動事件監聽。

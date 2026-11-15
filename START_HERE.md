@@ -5,6 +5,8 @@
 ## 先找適用技能
 使用 config/skill-catalog.json 選按需技能；操作範例見 docs/TEAM_WORKBENCH.md。使用者可說「我想建立網站」「幫我除錯」「繼續」「記住這個做法」「整理經驗」，不需記指令。依 AGENTS.md 的執行模式及 docs/TEAM_WORKBENCH.md「平台原生工作模式」工作：有已授權私人工作區才啟用 SQLite 的 context/handoff/learning/tasks 操作；只有 GitHub 讀寫權時採 REPO_NATIVE，以正式來源、公開案例、原 commit/CI、原工作紀錄作交接；只有唯讀權時明示 READ_ONLY。缺私人工作區不必要求使用者安裝工具，私人資料不得移入公開 repo；只保存實際獲授權且可公開的工程證據。
 
+按任務查 [工程知識索引](knowledge/ENGINEERING_PATTERNS.md)：先選 skill，再按風險取用最相關 EP 卡、原案例及證據。索引不取代正式來源、私人檢索狀態、實際驗收或人審升版。
+
 ## 若任務是「訓練／改善／討論方向／接續這個 Agent」
 
 先定位原 Draft PR #8（candidate-skill-team-integration-20261114）的最新 head，閱讀該版本的 [唯一正式訓練主檔](docs/AGENT_CAPABILITY_TRAINING.md) 頂部及 [訓練決策紀錄](docs/training/DECISION_LOG.md)。正式 main/release 與候選訓練分開，不能使用歷史摘要或舊排程取代最新決策，也不能重做已完成工程。

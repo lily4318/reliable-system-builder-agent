@@ -179,6 +179,7 @@ context/history 真正唯讀，不建缺失資料庫，舊工作區未 setup 先
 適用限制：舊版 standalone revise/handoff 仍保留相容性，可繞過新路由，不能宣稱所有工作台操作已全域強制原子化。不自動修訂外部規格、任務產物逐級提交或撤回實際外部寫入；不得混用舊程式或未核對權限。兩次獨立閱讀也不能當同一交易快照；本 receipt 是單一只讀 snapshot。沒有變更私人工作區或外部專案。
 
 ## 共用知識與案例
+先依 [工程知識索引](../knowledge/ENGINEERING_PATTERNS.md) 按任務、風險及 skill 選取最相關 EP 卡，對照原案例證據、適用限制與人審狀態。索引候選是 SOURCE_READ，不新增 public-context 命中，也不自動匯入私人庫或復活退休案例；原 DEFAULT 2 / OPT_IN 6 保持。使用既有 PRIVATE_WORKBENCH / REPO_NATIVE 路徑記錄實際採用理由及成果。
 公開 repo 的 knowledge/ENGINEERING_PATTERNS.md、templates/WORK_ARTIFACTS.md 提供尚需依專案驗證的通用工作方法和格式；真實工作記憶與案例保留私有。去識別化且經人審查的案例才可循原 learning-policy 及獨立 PR 進入公共知識庫。跨專案共用偏好應另設有權限的私人工作區，經明確確認後選取適用條目，不自動混合兩案資料。持久化資料不加密、依賴 OS ACL；憑證不得保存，正規表示式只防部分常見金鑰。
 
 ## 測試與效力

@@ -114,3 +114,12 @@
 - Green：原 route 只在集合查詢前加字符串型別 guard，blob dd3a6dc2979879677ef8b56eaf64fa9b3cf9f50e / commit a0d2c1cb7d8c16f62c021f334759f023c58f7948，code/test 回讀成功。exact CI 43702126591/job 132775328752 completed/success，raw 226710 chars，399 tests in 39.528s/OK，兩新增 methods 均 ok，全部 steps pass、EDITABLE-DECISION-BROWSER 12/12 true（actual_browser_dom_events=true，manual_uat_completed/application_transmitted/external_approval_granted=false）。實作 IMPLEMENTED、原模組修復 VERIFIED；後續純技能/文件整合另查。未更動 schema、資料庫、API 或原 SAFE_ACTIONS。
 - 原 architecture-design/SKILL.md blob 13149b4dce9a401cf50cce84104e6cf437cff927 / dcd5783b660b2d2f9edd1f5fefd9d12140c34ac6 已加跨角色輸入 shape vs business gates、局部/集中依序/集中全量預檢取捨、優先序與最少欄位正反測、相容/遷移/回退，標明原判定器不授權或執行操作，及缺欄預設未變。候選知識：guard placement 是架構契約；安全輸出不能被格式錯誤遮蔽，依階段漸進驗證也需負向測試，不以「集中式較漂亮」取代有證據的決策。適用 JSON-compatible route 輸入及既有契約，不是通用畸形 Python 物件、所有其他判定器或遠端資料真實性之保障。未自動升格。
 - 下一步：核對最新 exact 文件整合 CI，再選不同實際缺口或整理前六輪已具證據的經驗供使用者核准蒸餾。若另要跨判定器 schema 統一，先列具體 caller/schema 及不相容證據、審查 write_outcome 缺欄語意；不要重做此已驗收 stage 缺陷。獨立多 Agent、真人 UAT、其他平台、真正新對話及盲測仍未驗證；不要求本地模型。
+
+
+## TD-001｜2026-11-15 NATIVE-KNOWLEDGE-007：工程經驗索引與去重
+
+- 使用者明確授權盤點已驗收經驗、整併重複內容、建立任務選用索引與限制並更新原訓練主檔；明確不重做已完成測試。CONFIRMED（本輪範圍）。不將 TD-001/TD-002 改為本地模型優先，不升格 TP-001–005。
+- 選項：A 直接將所有歷史候選加入 DEFAULT/TRAINING_CASES、修改各技能全文（不採用，重複規則、私人 seed/retirement 與適用審查風險）；B 另建第二個案例資料庫或向量索引（不採用，無實測需求）；C 在原 knowledge/ENGINEERING_PATTERNS.md 合併共通原理、原 case key 與證據連結，以既有入口導航（本輪採用）。保留原技能具體操作、歷史主檔、原始 CI 與決策，僅有一個知識索引。文件候選不是 runtime case 或正式核准。
+- 證據基準 05d123b49860ce0fef772d9cd96dd47d4e79da4d / CI 43702633084 job 132776872828 completed/success，406 tests / 39.910s，完整 log 227954 chars；其他 raw job 132748261530/132772332813/132775328752/132667997029 分別確認需求、查詢、依序守門及受控文件遷移。12 個 SKILL 原文以及原 CASES 2 + TRAINING_CASES 6 已讀。用既有公開工程實測，不新增/手動重跑測試。
+- 產物（候選 IMPLEMENTED 待回讀）：EP-01–11，任務詞與技能選用、適用/禁用條件、case key 及來源 SHA/CI、既有 DEFAULT/OPT_IN vs INDEX_CANDIDATE 兩軸。完整對照與重疊歸併在 [原知識索引](../../knowledge/ENGINEERING_PATTERNS.md)；原學習程式/seed、私人資料庫不變。更新原共同導航、knowledge-distillation、工作台手冊、原主檔；source SHA 及文件 CI 分開記錄。
+- 待驗收：文件回讀與可能自動 CI、跨不同實際任務的知識選用效果、獨立人審是否需新增非重複 runtime case。此輪不聲稱模型權重、能力提升、真多 Agent、正式 Release、跨專案/外部部署或真人資料處理。

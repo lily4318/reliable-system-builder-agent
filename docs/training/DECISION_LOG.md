@@ -511,3 +511,50 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 - 預設分支讀正式訓練檔出現 404，改以 GitHub repository metadata、原 Draft PR #8、branches 查核 head 162299228d02ffc1f0c6c8b8f793e183834fa381，從固定 SHA 重讀 START_HERE、AGENTS、主檔 blob 35cc184d53b0865b738c80c509ee56c7fb8a52f4、原決策、APP 說明、release/policy/catalog、resume-project/project-control/delivery-review/test-and-acceptance 和職責角色；確認現行 2/6 包、M2-2 partial、C3/M4 未授權，有效 TD-005 取代較早方向。GitHub 現存連接真讀成功，無需重新註冊。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK；沒有獨立子代理或私人 workbench 操作。參照既有 EP-10 來源接續與 EP-06/14 驗收分層，不新增案例或能力等級。
 - exact head 1622992 原 CI 43730907786 completed/success；重新讀原實作 CI 43730072106 job 132860367649 raw 257008 chars，兩個 RESEARCH-METHODS-BROWSER_PASS（375/1280，每次100列 CSV 3161 bytes）、test_academic_app_real_browser_and_download ok、Ran 517 tests in 69.663s、checkout c4f64325c0c94d366d53f6737cc35b20edfd1ba0 與 digest a040b2ad5b26a1dc8585f34c29aa15af96b77fa51fa4613f53081ac35f249daa。當前三個 APP 原檔 blob 2254022d7b8eccdaa63b0a9d026b2d53da7c0c57 / 644e3481d307ec1e7d2afec822b709b562bd09ae / df98563e19bea4b5919ee52b23316eaaaaa2c6b6 與原測試版一致；未重跑 M2-1、未重建離線 ZIP，本輪未重新取得 ZIP bytes，不冒稱新 ZIP 驗證。原包讀回證據保留。
 - 新手操作本輪只剩原離線包的真人本機操作回饋（原指南：解壓、Chrome 開 index.html、40/seed1、兩組20、重播、CSV 40筆、非法值、失敗停點）；未取得真人回報，HUMAN_LOCAL_UAT_PENDING／B10_INDEPENDENT_BEGINNER_PENDING；不把現有 GitHub 連接或 CI 冒稱驗收。M2-2 尚 BLOCKED，2/6 完成，保留 11/22、11/29 及 NT$0；請使用者完成原包必要操作並回報非敏感結果，另可用只給 URL＋授權任務的隔離新對話驗來源獨立性，若平台不支持隔離需揭露。教材原矩陣 partial 保留，無需重讀或重連，未另展開 TD-004。未更動 APP、main/release、部署、外部專案、資源及費用；只更新兩個原紀錄，待寫後回讀和該文件 commit CI 查核。完成 M2-2 必要驗收前不啟動下一階段。
+
+
+## TD-004｜教材補齊與專家分工後續訓練計畫（2026-11-16；CONFIRMED_DEFERRED_PLAN / EXECUTION_NOT_AUTHORIZED）
+
+### 決策及範圍
+- 前一輪依 TD-004 及原教材盤點作唯讀規劃；使用者本輪明確確認方向並授權增量保存至原 GitHub 決策紀錄，指定後續訓練計畫，不提前執行、不改 TD-005 首版交付優先序。此為已確認方向與待執行計畫，不是教材補齊、逐單元責任登錄、能力驗收、程式修改或部署授權。細部分工與依賴為初步依目錄提出，仍依全文與實際適用性確認。
+- 基準 Draft PR #8 head 2f92bf0caa46d4cddb8c4d0445bc77f0ee140c74，前一輪已核 [CI 43731287192](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43731287192) completed/success；主檔 blob f546bb77ba5e3c04c1d6738bf4caf96e5f479596、原決策 blob f4436f370ea98e53df50f648d38179fc2aa8c2e2、唯一 [教材矩陣](curriculum-coverage.json) blob 04cab3bea1e83e9532361269b676923427cf9c97、原 catalog blob 1bc4f3711237694b4bb82f3c38e100ac143d9d03。原課程公開目錄 https://hackmd.io/@johnsonnote/webdesigncore；前一輪真唯讀使用指定私人備份總覽和第4/7章資料夾，確認原缺檔仍在，未查核全部缺檔原 HackMD 正文或其他章最新 metadata。保留前一完整盤點 176 列出／163 對應檔／13 缺，比例僅檔案取得，不是學習覆蓋；引用、圖片、程式、版本、.NET MAUI 課程邊界及其他單元完整性未核。矩陣 PARTIAL、expected_ids 176、units [] 保持，不假造來源 pin／分派／學習程度。私人帳號、資料夾/檔案 ID、私人 URL、教材原文不得寫入公開 repo。
+
+### 教材補齊內部優先序（不影響 TD-005）
+| 優先 | 單元 ID 與主責（初步） | 原公開教材入口 |
+|---|---|---|
+| P1 | 7.6.1 範例專案建置 Developer | https://hackmd.io/@johnsonnote/vscode_employee_project |
+| P1 | 7.6.2 資料模型 Architect | https://hackmd.io/@johnsonnote/vscode_employee_model |
+| P1 | 7.6.4 CRUD Developer | https://hackmd.io/@johnsonnote/vscode_employee_crud |
+| P2 | 7.6.5 分頁 Developer | https://hackmd.io/@johnsonnote/vscode_employee_pagging |
+| P2 | 7.6.6 搜尋 Developer | https://hackmd.io/@johnsonnote/vscode_employee_search |
+| P2 | 7.6.8 排序 Developer | https://hackmd.io/@johnsonnote/vscode_employee_sort |
+| P2 | 7.6.9 複選 Developer | https://hackmd.io/@johnsonnote/vscode_employee_multiple |
+| P2 | 7.6.10 固定欄位查詢 Developer | https://hackmd.io/@johnsonnote/vscode_employee_fixedcolumn |
+| P3 | 7.6.7 共用頁面 Developer | https://hackmd.io/@johnsonnote/vscode_employee_partial |
+| P3 | 7.6.11 彈出視窗 Developer | https://hackmd.io/@johnsonnote/vscode_employee_sweetalert |
+| P3 | 7.6.12 Area Architect | https://hackmd.io/@johnsonnote/vscode_employee_area |
+| P4 | 4.1.7 Copilot Learning Evaluator | https://hackmd.io/@johnsonnote/vscode_github_copilot |
+| P4 | 4.1.8 Gemini Code Assist Learning Evaluator | https://hackmd.io/@johnsonnote/vscode_gemini_code_assist |
+
+- 先補 CRUD 的建置、模型及資料操作，再完善搜尋/分頁/排序/選取/共用 UI/區域，因研究招募、實驗場次、資料管理與教學系統可遷移；實際學習順序仍依前置依賴（包括已有 7.6.3）而非強制 P1–P4 順序。AI 輔助開發工具不是開工前提，不需新增帳號、付費訂閱或模型。
+- 另獲執行授權後，從原公開入口合法唯讀查完整正文/圖/程式/引用、核版本及存取狀態；遇不可取得集中列真缺項請使用者補匯，勿要求重下載全部。保留私人教材，公開只存合法最少來源、版本/雜湊與原創知識蒸餾。已取得的檔案也須區分完整、僅引用、缺失、不可讀、版本不同。官方替代學習獨立記錄，不冒充原教材。以原矩陣及原 src.curriculum_coverage 驗證器管理，不新增教材管理系統。
+
+### 176 個已知單元的初步角色配置
+| 章（已知單元） | 唯一主責分組（其餘均依該列互斥分配） |
+|---|---|
+| 01 教學環境介紹（6） | System Lead 1.1.1；Architect 1.1.2；Learning Evaluator 1.2.1；DevOps/SRE 其餘3 |
+| 02 SQL Server（20） | Architect 2.1.1、2.2.1–8；Security 2.1.4、2.2.10；Developer 2.2.9；DevOps/SRE 其餘8 |
+| 03 SQL 語言（19） | Architect 3.4.6；QA/UAT 3.4.7；Developer 其餘17 |
+| 04 開發工具（25） | Learning Evaluator 4.1.7–8、4.5.5；Developer 4.3 全7；DevOps/SRE 其餘15 |
+| 05 C#（36） | Architect 5.4.2；DevOps/SRE 5.4.3；Developer 其餘34 |
+| 06 網頁程式（8） | Developer 全8 |
+| 07 ASP.NET（50） | Architect 7.1.1、7.2.1、7.3.1–2、7.4.1、7.6.2、7.6.12、7.8.2、7.9.1；Security 7.1.4、7.7.2–7；DevOps/SRE 7.8.1；QA/UAT 7.8.8；Developer 其餘32 |
+| 08 專題（12） | System Lead 8.1.1；Architect 8.1.2、8.1.8；DevOps/SRE 8.1.3；Security 8.1.4、8.1.12；Developer 其餘6 |
+
+- 初步分布 Developer 105、DevOps/SRE 29、Architect 23、Security 11、Learning Evaluator 4、System Lead 2、QA/UAT 2、Project Manager 0，合計 176。PM 主責交付、範圍、優先序、工作量與停點，無需為平均數硬分技術教材；Developer 數量最多反映教材偏重開發。System Lead 管需求/接續/交接；Architect 管資料模型、交易、架構、ORM；Developer 管語言、資料操作、前後端實作與修復；DevOps/SRE 管版本/環境/備份/部署/日誌；Security 管帳號、權限、隱私及 API 風險；QA/UAT 主責測試/驗收，Learning Evaluator 主責學習方法、蒸餾與評測。跨角色必要協作與共通知識不重複計主責單元、不要求八角色重讀全教材。這是角色工作分配，非八個獨立模型已啟動。
+- 後續每單元實際登錄時按既有 schema 指定唯一 owner 與其 catalog skill、必要 collaborators、prerequisites、來源及 access、adoption 與 L0–L6 實證；不因目錄存在就標 READABLE，不以結構驗證冒充證據驗收。保留 TD-004 七階段：完整閱讀→原理→批判反思→蒸餾→原技能增量整合→實作/測試/修復→陌生遷移/交接/覆盤。逐級實據、適用性分析及原人審規則不變。先對照已有 PostgreSQL RLS/交易/併發、HTTP framing、CI/產物完整性、瀏覽器及 CSV 等原工程證據，核語意差異後才重用，避免重做或把其他技術棧既有驗收冒充教材學習。保留可安全共用原理，不強制選 SQL Server、ASP.NET、付費工具或增加角色。
+- 專題遷移候選：員工 CRUD→受試者管理；購物車/庫存→場次預約與容量一致性；會員管理→研究團隊權限；日曆→實驗排程；圖表/報表→資料呈現與重現性；多國語系→雙語教學；金流→理解外部 API、回呼與交易驗證（不新增付款功能或真金流）；完整專題→研究/教學系統整合。實際研究資料、倫理、科學效度、部署及其他專案另授權。
+
+### 後續階段與停止
+- T1 教材來源完整化（13 缺檔及引用、版本、完整邊界）；T2 單一教材責任矩陣（已知 176 單元主責、協作、前置、來源及技能）；T3 研究網站核心能力（資料庫、SQL、CRUD、HTML/CSS/JS）；T4 全系統與安全維運（後端、權限、API、備份、測試、版本、部署）；T5 學術用途陌生專題遷移；T6 實際工作持續蒸餾與知識累積。六階段為 TD-004 長期支線規劃，不是新增 TD-005 工作包或承諾時間。T1/T2 可在不影響主線的情境經獨立授權適當增量，不能要求全教材取得才完成首版；缺件僅阻塞相應單元。
+- 本輪只保存已確認計畫，未開工 T1–T6、未讀教材新內容、未登錄矩陣、未新增角色/技能/案例/測試/資源/費用，也未變更主檔 NEXT_ACTION、main/release、外部專案、排程或部署。TD-005 維持 M2-2 部分驗收（2/6 包完成，A07 source-only、人類本機操作與適用 B10 限制未解），M3/C3/M4 各自另授權，2026-11-22 檢查點、11-29 候選目標、NT$0 均不變。優先下一步仍是原 APP 真人驗收與 A07 必要查核；另獲明示授權才執行教材缺檔查核或登錄。本輪達文件保存停點即停止；寫後回讀及該文件版本 CI 分開驗證，不宣稱教材或模型能力提升。

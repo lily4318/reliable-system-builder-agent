@@ -96,6 +96,7 @@
 - 證據：NATIVE-AUDIT-001 / 候選 NATIVE-CASE-001，exact 7cd8085e6fd9f320fea0e0526cb3b2fd6a354af0 / [CI 43691876099](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43691876099) 390/390，既有 public-context 兩項隔離回歸且最新 CI 再驗；真實 REPO_NATIVE 回讀及後續 NATIVE-TRANSFER/REQ/ARCH 任務引用原決策紀錄。P22-CASE-001 原 [CI 43666793523](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43666793523) 真 SQLite 檢索 marker 3 retrieved/2 applied/1 non-applicable/2 candidate feedback。
 - 限制：詞彙比對非語意模型；SOURCE_READ 不是實際 CLI/cite receipt，跨平台私有同步、真正獨立 Agent/盲測與升版均不證明；私人內容未獲授權不入公共 repo。
 - 實際遷移 NATIVE-EP-008（交叉引用 EP-09）：REPO_NATIVE 唯讀原 GitHub API 查原名與全大寫別名取得相同 immutable repository id 及 canonical full_name；據此修復原 scope 比較，不靠名稱猜測權限。大小寫等價不保證 rename/transfer 後的同一資源；實際寫入仍核正式 repo id、head、授權及回讀。
+- NATIVE-WEB-015-A07-SOURCE-RESUME：實際按原 repo 最新 head 重建確認規格（原13R/7A逐列相同）、11實作/測試/CI/指南 blob、原始兩次 CI 434/434、兩尺寸各29；查相對連結並修復一個 ADR→master 錯路徑。保留原 A01–A06 驗收，不再執行同類測試；此為 SOURCE_READ/同對話接續證據，不能宣稱真正新對話隔離或獨立模型。與 A07 gate 分開，原知識案例數不變。
 - 狀態：EVIDENCE_VERIFIED / INDEX_CANDIDATE；既有兩 DEFAULT、六 OPT_IN 範圍不變。
 
 ### EP-11 外部候選結果必須由 host 驗收

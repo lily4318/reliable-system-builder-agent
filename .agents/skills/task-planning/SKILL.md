@@ -16,5 +16,8 @@ description: "拆解任務、規劃施工。system-lead 角色；交付 plan。"
 ### 需求修訂與重驗
 已確認需求變更先 review 確定受影響的最上游 task 與當前 revision，依操作手冊使用 revise 保存正式來源、明確確認、修訂 title/deps/gates/checks（需要時）、原子使所有下游失效，不沿用舊 PASS。已決政策另建 decision ID、更新 gates，不覆寫舊政策。若有 RECOVERY_REQUIRED 或 recovery_blockers，先確認舊操作者停止、唯讀查核部分操作再 recover，不以 resume 復活失效任務。以新 revision 與從未用於該 task 的 session 執行 start/finish，失敗或版本競寫須回讀。同步正式來源與適用 handoff，任務池不會自動監聽需求或替代外部版本/授權。
 
+### 已綁定池的增量拓撲
+任務拆解遇已綁定池，不直接 add 或用分開寫入繞過 guard。review 同一 snapshot 取得全任務 revision 與 artifact_heads，依正式來源使用 extend-topology 明確新增節點與前置邊；檢查唯一 producer、catalog 祖先、DAG、gate、受影響既有 worker。保留無關 DONE 與歷史；受影響 DONE 及產物重驗。活躍受影響 worker 先對帳，不改其依賴；未知提交查 extension-status，禁止盲重送。詳細契約見 docs/TEAM_WORKBENCH.md；根需求仍用原 combined revise。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 plan；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

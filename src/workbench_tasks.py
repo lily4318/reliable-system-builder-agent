@@ -193,6 +193,121 @@ def bind_artifacts(path, bindings, expected_revisions, expected_requirement_id,
     return {'bound':True,'affected':sorted(affected),'authorization_granted':False}
 
 
+def extend_topology(path, additions, attach, expected_revisions, expected_artifact_heads,
+                    session, evidence, confirmed=False):
+    """Add new tasks/producers and append dependencies to existing tasks atomically.
+
+    No deletion, rebinding, or root dependency change. The complete snapshot is
+    compared under the same writer lock as graph validation and invalidation.
+    """
+    if confirmed is not True:
+        raise ValueError('explicit topology confirmation required')
+    session=_id(session)
+    evidence=wb._text(evidence,'topology change evidence',4000)
+    if not isinstance(additions,list) or not additions or not isinstance(attach,dict):
+        raise ValueError('nonempty additions list and attach mapping required')
+    with closing(wb.connect(path)) as db, db:
+        db.execute('BEGIN IMMEDIATE')
+        rows=_pool(db)
+        bindings=wb._bindings(db)
+        if bindings is None:
+            raise ValueError('explicit artifact binding required first')
+        if (not isinstance(expected_revisions,dict) or set(expected_revisions)!=set(rows)
+                or any(type(v) is not int or v!=rows[k]['revision'] for k,v in expected_revisions.items())):
+            raise ValueError('stale topology or task revisions; review first')
+        heads={k:v['id'] for k,v in wb._latest(db).items()}
+        if (not isinstance(expected_artifact_heads,dict)
+                or any(type(v) is not int for v in expected_artifact_heads.values())
+                or expected_artifact_heads!=heads or 'requirements' not in heads):
+            raise ValueError('stale artifact heads; review first')
+        if db.execute('SELECT 1 FROM task_events WHERE session=?',(session,)).fetchone():
+            raise ValueError('change session already used; read receipt before retry')
+        existing=set(rows)
+        added={}
+        fields={'task','title','priority','deps','gates','checks','artifact_kind'}
+        for spec in additions:
+            if not isinstance(spec,dict) or set(spec)!=fields:
+                raise ValueError('complete new task definition required')
+            k=_id(spec['task'])
+            if k in rows:
+                raise ValueError('duplicate or existing task ID')
+            title=wb._text(spec['title'],'title',500)
+            priority=spec['priority']
+            deps,gates,checks=(_ids(spec[x]) for x in ('deps','gates','checks'))
+            if type(priority) is not int or not 0<=priority<=99 or not checks:
+                raise ValueError('invalid priority or acceptance checks')
+            if any(not db.execute('SELECT 1 FROM task_decisions WHERE id=?',(g,)).fetchone() for g in gates):
+                raise ValueError('unknown decision gate')
+            kind=spec['artifact_kind']
+            if kind is not None and not isinstance(kind,str):
+                raise ValueError('artifact kind must be string or null')
+            row={'id':k,'title':title,'priority':priority,'deps':deps,'gates':gates,
+                 'checks':checks,'state':'PENDING','session':None,'revision':1}
+            rows[k]=row
+            added[k]=row
+            bindings[k]=kind
+        before={}
+        for k,deps in attach.items():
+            if k not in existing or bindings[k]=='requirements':
+                raise ValueError('attach must target existing non-root task')
+            deps=_ids(deps)
+            if not deps or any(d not in added for d in deps):
+                raise ValueError('attach only adds newly declared prerequisite tasks')
+            before[k]=list(rows[k]['deps'])
+            rows[k]['deps']+=deps
+        _validate_bindings(rows,bindings)
+        affected=set(before)
+        while True:
+            more={k for k,r in rows.items() if affected.intersection(r['deps'])}
+            if more<=affected:
+                break
+            affected|=more
+        affected &= existing
+        # Conservatively stop rather than reinterpret dependencies of an active
+        # affected worker. Independent workers retain their existing ownership.
+        if any(rows[k]['state'] in ('RUNNING','RECOVERY_REQUIRED') for k in affected):
+            raise ValueError('affected active worker: stop and reconcile before extension')
+        for k,r in sorted(added.items()):
+            db.execute('INSERT INTO task_pool(id,title,priority,deps,gates,checks,state,session) VALUES (?,?,?,?,?,?,?,NULL)',
+                       (k,r['title'],r['priority'],json.dumps(r['deps']),json.dumps(r['gates']),json.dumps(r['checks']),'PENDING'))
+            db.execute('INSERT INTO task_artifact_bindings(task,kind) VALUES (?,?)',(k,bindings[k]))
+        for k in sorted(affected):
+            r=rows[k]
+            db.execute("UPDATE task_pool SET deps=?,revision=revision+1,state='PENDING',session=NULL WHERE id=?",
+                       (json.dumps(r['deps']),k))
+            _event(db,k,session,'TOPOLOGY_INVALIDATE',evidence,
+                   {'old_revision':r['revision'],'revision':r['revision']+1,'old_state':r['state'],
+                    'old_deps':before.get(k,r['deps']),'deps':r['deps']})
+        receipt={'added':sorted(added),'invalidated':sorted(affected),
+                 'revisions':{**{k:1 for k in added},**{k:rows[k]['revision']+1 for k in affected}},
+                 'requirement_id':heads['requirements']}
+        for i,k in enumerate(sorted(added)):
+            detail={'definition':added[k],'artifact_kind':bindings[k]}
+            if i==0:
+                detail['extension']=receipt
+            _event(db,k,session,'EXTEND' if i==0 else 'EXTEND_ADD',evidence,detail)
+    return {**receipt,'session':session,'authorization_granted':False}
+
+
+def extension_status(path, session):
+    """Read a durable extension receipt; no mutation or automatic replay."""
+    session=_id(session)
+    with closing(_ro(path)) as db:
+        db.execute('BEGIN')
+        events=db.execute("SELECT results FROM task_events WHERE kind='EXTEND' AND session=?",(session,)).fetchall()
+        if not events:
+            return {'status':'NOT_OBSERVED','session':session,'authorization_granted':False}
+        if len(events)!=1:
+            raise ValueError('ambiguous extension receipt; reconcile')
+        receipt=json.loads(events[0]['results'])['extension']
+        rows=_pool(db)
+        root=wb._latest(db).get('requirements')
+        current=root is not None and root['id']==receipt['requirement_id'] and all(
+            k in rows and rows[k]['revision']==v for k,v in receipt['revisions'].items())
+        return {**receipt,'status':'COMMITTED','session':session,
+                'revision_scope_current':current,'authorization_granted':False}
+
+
 def revise(path, task, expected_revision, session, evidence, confirmed=False,
            title=None, deps=None, gates=None, checks=None, requirement=None):
     """Reopen a task and its transitive dependants; optionally replace requirements atomically."""
@@ -412,18 +527,20 @@ def review(path):
                 'attempts':sum(e['kind'] in ('PASS','FAIL') for e in events),
                 'failed_attempts':sum(e['kind']=='FAIL' for e in events),
                 'completed':sum(r['state']=='DONE' for r in tasks),'history':events,
+                **({'artifact_heads':{k:v['id'] for k,v in wb._latest(db).items()}}
+                   if wb._bindings(db) is not None else {}),
                 'authorization_granted':False}
 
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('action',choices=('setup','question','resolve','add','start','resume','finish','review','revise','recover','revision-status','bind-artifacts'))
+    p.add_argument('action',choices=('setup','question','resolve','add','start','resume','finish','review','revise','recover','revision-status','bind-artifacts','extend-topology','extension-status'))
     p.add_argument('--workspace',required=True,type=Path)
     p.add_argument('--input',type=Path)
     a = p.parse_args()
     try:
         args = json.loads(a.input.read_text(encoding='utf-8-sig')) if a.input else {}
-        fn = {'setup':setup,'question':question,'resolve':resolve_decision,'add':add,'start':start,'resume':resume,'finish':finish,'review':review,'revise':revise,'recover':recover,'revision-status':revision_status,'bind-artifacts':bind_artifacts}[a.action]
+        fn = {'setup':setup,'question':question,'resolve':resolve_decision,'add':add,'start':start,'resume':resume,'finish':finish,'review':review,'revise':revise,'recover':recover,'revision-status':revision_status,'bind-artifacts':bind_artifacts,'extend-topology':extend_topology,'extension-status':extension_status}[a.action]
         print(json.dumps(fn(a.workspace,**args),ensure_ascii=False,indent=2))
     except (ValueError,TypeError,KeyError,OSError,sqlite3.Error) as e:
         p.exit(2,'WORKBENCH_TASKS_BLOCKED: '+str(e)+'\n')

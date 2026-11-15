@@ -187,6 +187,15 @@ context/history 真正唯讀，不建缺失資料庫，舊工作區未 setup 先
 
 ## P2-1b｜任務與 artifact 明確綁定（候選）
 
-有任務的池不能再用 standalone handoff 覆寫既有 requirements。完整跨階段守門須在備份、停止舊 worker、核對正式來源後明確採用 workbench_tasks bind-artifacts：同一 SQLite，輸入 bindings（每個 task ID 對應唯一 artifact kind；無產物的任務用 null）、expected_revisions（每個當前 task revision）、expected_requirement_id、session、evidence、confirmed=true。先建立初始 requirements 和完整 DAG。必要 artifact producer 必須在任務傳遞上游。採用時原子重開已綁定任務及傳遞下游，保留獨立分支、歷史；拒絕活躍 worker、版本衝突和錯誤 DAG。綁定後的拓撲暫不支援新增任務，需明確擴充遷移。
+有任務的池不能再用 standalone handoff 覆寫既有 requirements。完整跨階段守門須在備份、停止舊 worker、核對正式來源後明確採用 workbench_tasks bind-artifacts：同一 SQLite，輸入 bindings（每個 task ID 對應唯一 artifact kind；無產物的任務用 null）、expected_revisions（每個當前 task revision）、expected_requirement_id、session、evidence、confirmed=true。先建立初始 requirements 和完整 DAG。必要 artifact producer 必須在任務傳遞上游。採用時原子重開已綁定任務及傳遞下游，保留獨立分支、歷史；拒絕活躍 worker、版本衝突和錯誤 DAG。綁定後不可直接 add；新增任務請用下方 P2-1c 明確拓撲擴充。
 
 綁定的 producer 未 DONE 時其 artifact current=false。根需求修訂必須走 revise+requirement；根 PASS 輸入 artifact={expected_artifact_id:新版需求 ID,inputs:{}}；其餘綁定 PASS 提供 artifact={expected_artifact_id:先前同類 ID 或首次 null,inputs:精確當前前置 artifact IDs,content:新產物全文,source_ref:來源}。檢查 revision/owner、前置狀態、兩類 artifact 版本，並單交易新增產物、DONE、PASS event；失敗回退，FAIL 不帶產物。receipt still_current 指根 revision 與最新需求 ID，不等於下游 DONE。此為操作者聲明與版本守門，非語意驗收。未採用的池保留舊 API，除既有根需求 standalone 覆寫禁令。不能防直接 SQL、舊程式混用或外部寫入；未改私人 DB 或外部專案。
+
+
+## P2-1c｜已綁定任務池的安全拓撲擴充
+
+以 `python -m src.workbench_tasks review --workspace ...` 的同一唯讀 snapshot 取得所有 tasks 的 revision 及 artifact_heads（含過期 head ID），核對正式來源及新增驗收。備份並停止舊版本工具。用 `extend-topology --workspace ... --input ...`，JSON 參數包含 additions（每項 task、title、priority、deps、gates、checks、artifact_kind；沒有產物請明確 null）、attach（既有非根任務 ID → 新增前置 task IDs）、expected_revisions（完整現況）、expected_artifact_heads（完整 head map）、唯一 session、evidence、confirmed=true。新任務可互相依賴且不必按順序列出；不得循環、未知 ID、重複 producer、未知 gate 或缺 catalog 前置祖先。只增邊、不刪邊、不重綁、不改根需求，仍須以原 combined revise 處理正式根需求修訂。
+
+同 BEGIN IMMEDIATE 驗證全池版本及 artifact head，原子插入 task/binding、重開受新增前置影響的既有任務及全部下游（revision+1、舊 PASS 留歷史），產物因 producer 非 DONE 而失效；無關任務維持原狀。若受影響既有 RUNNING/RECOVERY_REQUIRED，整筆拒絕，先按原復原流程核查及處理；不重解釋執行中 worker 的舊依賴。未受影響 worker 可保持原 session。新增任務初始 PENDING/revision=1，後續沿用原 start/finish 及 artifact CAS；一律明確提供 revision。
+
+未知提交結果使用 `extension-status`，輸入 {session:唯一變更 ID}，唯讀回傳 COMMITTED / NOT_OBSERVED；revision_scope_current 只比較該次新增/失效任務版本與根 ID，不等於全池完成。確認前程序停止及外部操作後才決定新修訂，不盲重送。此機制僅同庫、可信新版 API、明確綁定，無外部寫入原子性；不支援刪除、重新指派 producer、根重接或多庫交易。

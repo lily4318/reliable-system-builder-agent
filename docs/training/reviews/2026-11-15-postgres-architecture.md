@@ -34,3 +34,6 @@ raw 247045 chars; 2026-11-15T13:39:45.3821442Z PG-ARCH-ENGINE: 18.6 (Ubuntu 18.6
 
 ## 蒸餾與接續
 原 architecture-design/security-review 及 EP-13 候選索引增量整合；L1/L2 有實際來源分析，L3 有受控真引擎實作驗收；L4 不以刻意 negative fixture 當既有產品故障，L5/L6 尚待新情境與獨立交接。 下階段優先 migration late-failure/lock contention、重複 token 同時提交與不同 owner namespace、現有編碼/連線權限剩餘缺口；另經授權才能做真正 Supabase Auth/JWT、anon/authenticated、直接 REST/RPC、Storage、advisors、migration history / restore，不能以 session_user lab 假裝已通過。原 HackMD matrix blob 25d164664d834953beea0a1c2cd41f71a017be56 不變、main/release 未改，不建立付費或免費外部資源、不部署。
+
+## 實測 engine version 回讀補記
+實測版本補核：原 Ubuntu 24.04 image 文件僅為預裝可行性參考，實際 CI 43720063088 的 PG-ARCH-ENGINE 明確為 PostgreSQL 18.6 (Ubuntu 18.6-1.pgdg26.04+2)，非 16/17。再對照本版官方 https://www.postgresql.org/docs/18/ddl-rowsecurity.html 、https://www.postgresql.org/docs/18/sql-createpolicy.html 、https://www.postgresql.org/docs/18/sql-createview.html 、https://www.postgresql.org/docs/18/transaction-iso.html 、https://www.postgresql.org/docs/18/sql-altertable.html ，本單元採用的 RLS、invoker、交易與 validation 原理仍適用。版本證據只限 18.6，其他版本須實測。SQL 及原測試不改。

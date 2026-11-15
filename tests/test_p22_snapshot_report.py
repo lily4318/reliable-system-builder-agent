@@ -1,0 +1,178 @@
+"""P2-2c developer-authored fixed oracles for a distinct source/export workflow."""
+import hashlib
+import json
+import sqlite3
+import subprocess
+import sys
+import tempfile
+import unittest
+import zipfile
+from concurrent.futures import ThreadPoolExecutor
+from contextlib import closing
+from pathlib import Path
+
+from src import p22_snapshot_report as export, team_workbench as wb, workbench_learning as learn
+
+
+class SnapshotReportTests(unittest.TestCase):
+    def setUp(self):
+        temp = tempfile.TemporaryDirectory()
+        self.addCleanup(temp.cleanup)
+        self.root = Path(temp.name)
+        self.source = self.root/'synthetic.sqlite'
+        self.output = self.root/'report.zip'
+        with closing(sqlite3.connect(self.source)) as db, db:
+            db.execute('CREATE TABLE metadata (revision INTEGER NOT NULL)')
+            db.execute('INSERT INTO metadata VALUES (1)')
+            db.execute('CREATE TABLE records (record_id TEXT, category TEXT, state TEXT, quantity INTEGER)')
+            db.executemany('INSERT INTO records VALUES (?,?,?,?)', [
+                ('SYN-0003','folder','pending',17),('SYN-0001','paper','complete',5),
+                ('SYN-0004','paper','rejected',99),('SYN-0002','folder','complete',7)])
+
+    def read_zip(self,path):
+        with zipfile.ZipFile(path) as z:
+            self.assertEqual(z.namelist(),['report.json','manifest.json'])
+            self.assertIsNone(z.testzip())
+            return z.read('report.json'),json.loads(z.read('manifest.json'))
+
+    def test_fixed_oracle_and_privacy(self):
+        before = self.source.read_bytes()
+        self.assertEqual(export.publish(self.source,self.output,1,2),'PUBLISHED')
+        raw, manifest = self.read_zip(self.output)
+        expected = b'{"completed_quantities":{"folder":7,"paper":5,"pencil":0},"policy_revision":2,"status_counts":{"complete":2,"pending":1,"rejected":1}}\n'
+        source_oracle = b'[["SYN-0001","paper","complete",5],["SYN-0002","folder","complete",7],["SYN-0003","folder","pending",17],["SYN-0004","paper","rejected",99]]\n'
+        self.assertEqual(raw,expected)
+        self.assertEqual(manifest,{'schema_version':1,'source_revision':1,'policy_revision':2,
+            'snapshot_sha256':hashlib.sha256(source_oracle).hexdigest(),
+            'report_sha256':hashlib.sha256(expected).hexdigest()})
+        self.assertNotIn(b'SYN-',raw)
+        self.assertNotIn(b'99',raw)
+        self.assertEqual(self.source.read_bytes(),before)
+        second = self.root/'again.zip'
+        export.publish(self.source,second,1,2)
+        self.assertEqual(self.output.read_bytes(),second.read_bytes())
+
+    def test_source_and_policy_revision_change(self):
+        export.publish(self.source,self.output,1,1)
+        prior = self.output.read_bytes()
+        old,_ = self.read_zip(self.output)
+        self.assertEqual(json.loads(old),{'policy_revision':1,'completed_quantities':{'paper':5,'folder':7,'pencil':0}})
+        self.assertEqual(export.reconcile(self.source,self.output,1,2),'CONFLICT')
+        with self.assertRaises(FileExistsError):
+            export.publish(self.source,self.output,1,2)
+        updated=self.root/'r2.zip'
+        export.publish(self.source,updated,1,2)
+        self.assertEqual(json.loads(self.read_zip(updated)[0])['status_counts'],{'complete':2,'pending':1,'rejected':1})
+        with closing(sqlite3.connect(self.source)) as db, db:
+            db.execute('UPDATE metadata SET revision=2')
+            db.execute("UPDATE records SET quantity=8 WHERE record_id='SYN-0001'")
+        with self.assertRaisesRegex(ValueError,'STALE_SOURCE'):
+            export.reconcile(self.source,self.output,1,1)
+        self.assertEqual(export.reconcile(self.source,updated,2,2),'CONFLICT')
+        fresh=self.root/'source2.zip'
+        export.publish(self.source,fresh,2,2)
+        self.assertEqual(json.loads(self.read_zip(fresh)[0])['completed_quantities']['paper'],8)
+        self.assertEqual(self.output.read_bytes(),prior)
+        print('P22C-REVISION: R1 output rejected under R2; old source revision blocked; new revision independently checked',flush=True)
+
+    def test_invalid_source_never_creates_output(self):
+        missing=self.root/'missing.sqlite'
+        for action in (export.publish,export.reconcile):
+            with self.assertRaises(ValueError):
+                action(missing,self.output,1,2)
+            self.assertFalse(missing.exists())
+        with self.assertRaises(ValueError):
+            export.publish(self.source,self.output,1,3)
+        changes = [
+            "INSERT INTO records VALUES ('SYN-0001','paper','complete',1)",
+            "UPDATE records SET category='unknown'",
+            "UPDATE records SET state='unknown'",
+            "UPDATE records SET quantity=-1",
+            "UPDATE records SET quantity=1.5",
+            "UPDATE records SET record_id='invalid'",
+            "DELETE FROM records",
+            "INSERT INTO metadata VALUES (1)",
+        ]
+        for idx,stmt in enumerate(changes):
+            with self.subTest(stmt=stmt):
+                broken=self.root/('bad-%d.sqlite'%idx)
+                broken.write_bytes(self.source.read_bytes())
+                with closing(sqlite3.connect(broken)) as db, db:
+                    db.execute(stmt)
+                before=broken.read_bytes()
+                with self.assertRaises(ValueError):
+                    export.publish(broken,self.output,1,2)
+                self.assertFalse(self.output.exists())
+                self.assertEqual(broken.read_bytes(),before)
+
+    def test_readonly_reconciliation_and_concurrent_policy_race(self):
+        self.assertEqual(export.reconcile(self.source,self.output,1,2),'NOT_OBSERVED')
+        def attempt(policy):
+            try:
+                return export.publish(self.source,self.output,1,policy)
+            except FileExistsError:
+                return 'EXISTS'
+        with ThreadPoolExecutor(max_workers=2) as workers:
+            results=list(workers.map(attempt,(1,2)))
+        self.assertCountEqual(results,['PUBLISHED','EXISTS'])
+        before=self.output.read_bytes()
+        statuses=[export.reconcile(self.source,self.output,1,n) for n in (1,2)]
+        self.assertEqual(statuses[results.index('PUBLISHED')],'COMMITTED')
+        self.assertEqual(statuses[results.index('EXISTS')],'CONFLICT')
+        self.assertEqual(self.output.read_bytes(),before)
+        self.output.write_bytes(before+b'corruption')
+        self.assertEqual(export.reconcile(self.source,self.output,1,2),'CONFLICT')
+        self.assertEqual(self.output.read_bytes(),before+b'corruption')
+        self.assertFalse(list(self.root.glob('.p22-report-*')))
+
+    def test_cli_recovery_after_lost_ack(self):
+        child=subprocess.run([sys.executable,'-c',
+            'import os,sys; from src.p22_snapshot_report import publish; publish(sys.argv[1],sys.argv[2],1,2); os._exit(23)',
+            str(self.source),str(self.output)],capture_output=True,timeout=20)
+        self.assertEqual(child.returncode,23)
+        before=self.output.read_bytes()
+        result=subprocess.run([sys.executable,'-m','src.p22_snapshot_report','reconcile',
+            '--source',str(self.source),'--output',str(self.output),'--source-revision','1','--policy-revision','2'],
+            capture_output=True,text=True,timeout=20,check=True)
+        self.assertEqual(json.loads(result.stdout),{'status':'COMMITTED'})
+        self.assertEqual(self.output.read_bytes(),before)
+
+    def test_actual_case_transfer_and_versioned_handoffs(self):
+        work=wb.initialize(self.root/'work','Synthetic revisioned reports')
+        learn.setup(work,include_training_cases=True)
+        for skill,body in [
+            ('project-intake','Synthetic aggregate report from a local read-only database.'),
+            ('requirements-spec','R1 completed quantities; R2 adds status counts, aggregates only; expected source revision.'),
+            ('architecture-design','SQLite read snapshot; aggregate JSON plus manifest deterministic ZIP; exclusive output.'),
+            ('task-planning','Validate exact totals, source and policy revision, negative paths and recovery.')]:
+            wb.handoff(work,skill,body,'P22c synthetic fixture')
+        query='SQLite mode ro recovery reconcile file bundle hash exclusive publication browser Origin DOM'
+        ctx=learn.task_context(work,'implement-feature','P22-REPORT',query,limit=10)
+        self.assertEqual(ctx['status'],'READY_TO_REVIEW_INPUTS')
+        hits={m['topic']:m for m in ctx['memory']}
+        for key,decision,evidence in [
+            ('P22-CASE-002','applied','Adapt single bundle from JSON to ZIP report plus manifest; compare exact bytes, reject stale policy and competing output.'),
+            ('B001-CASE-001','applied','Read-only existing SQLite source; missing source cannot be recreated.'),
+            ('P21-CASE-006','not_applicable','No browser or database migration.')]:
+            self.assertIn(key,hits)
+            learn.cite(work,'implement-feature','P22-REPORT','transfer-c',query,hits[key]['id'],decision,evidence,limit=10)
+        export.publish(self.source,self.output,1,1)
+        self.assertEqual(export.reconcile(self.source,self.output,1,2),'CONFLICT')
+        new=self.root/'new-policy.zip'
+        export.publish(self.source,new,1,2)
+        self.assertEqual(json.loads(self.read_zip(new)[0])['status_counts']['pending'],1)
+        for skill,body in [
+            ('implement-feature','src/p22_snapshot_report.py: bounded source snapshot and ZIP exporter.'),
+            ('test-and-acceptance','Exact fixed report and manifest oracle; stale source/policy and process recovery.'),
+            ('security-review','Aggregate-only report, no raw IDs; trusted paths, no production or role authentication.'),
+            ('deployment','Local synthetic export only; no external release.')]:
+            wb.handoff(work,skill,body,'P22c functional tests')
+        learn.feedback(work,'P22-REPORT','transfer-c','p22c-revision','requirement_change',
+            'report policy revision','Do not overwrite R1 output when R2 requires additional counters.',
+            'R1 output conflict and separate R2 exact result; candidate only')
+        history=learn.history(work,'P22-REPORT')
+        self.assertEqual({r['topic']:r['decision'] for r in history['uses']},
+            {'P22-CASE-002':'applied','B001-CASE-001':'applied','P21-CASE-006':'not_applicable'})
+        self.assertEqual(len(history['events']),1)
+        self.assertEqual(wb.context(work,'deployment')['status'],'READY_TO_REVIEW_INPUTS')
+        print('P22C-TRANSFER: P22-CASE-002 and B001-CASE-001 applied; browser case not applicable; R2 result checked',flush=True)

@@ -25,7 +25,8 @@ def select(state:dict, choice_id:str) -> dict:
     options = [i for i in state["items"] if i["id"]==choice_id]
     if len(options)!=1:
         raise ValueError("unknown choice")
-    return {**state,"selected_id":choice_id,
+    draft = {k:v for k,v in state.items() if k != "confirmed_text"}
+    return {**draft,"selected_id":choice_id,
             "editable_text":options[0]["proposed_text"],
             "status":"DRAFT_EDITABLE_NOT_SENT",
             "sent":False,"approval_granted":False,
@@ -42,7 +43,7 @@ def edit(state:dict, text:str) -> dict:
 
 def confirm(state:dict, explicit_user_click:bool) -> dict:
     if state.get("status")!="DRAFT_EDITABLE_NOT_SENT" or (
-        not explicit_user_click or not isinstance(state.get("editable_text"),str)
+        explicit_user_click is not True or not isinstance(state.get("editable_text"),str)
         or not state["editable_text"].strip()):
         raise ValueError("explicit confirm action and nonblank editable text required")
     # A request draft is returned, not transmitted; execution/approval still separate.

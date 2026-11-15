@@ -89,6 +89,7 @@
 - 證據：NATIVE-ARCH-006 red [CI 43702025465](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43702025465) errors=4；green exact a0d2c1cb7d8c16f62c021f334759f023c58f7948 / [CI 43702126591](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43702126591) 399/399；`test_malformed_json_stage_is_advisory_hold_not_exception`、`test_stage_validation_preserves_prior_gates_and_incremental_inputs` ok。原 engineering_workflow.route、architecture-design 專節及原決策。
 - 限制：局部 JSON stage 修復，不是通用 schema 驗證或外部真實證據；缺 write_outcome 的原 NONE 預設維持，收緊需盤點 caller。mutation_permitted=false 不變。
 - 實際遷移 NATIVE-EP-008：GitHub owner/repo 大小寫是名稱表示而非不同資源。先驗 ASCII 路徑形狀，再作大小寫等價比較，維持原 intent、權限與跨專案守門；不自行接受 URL、空白、rename/transfer 或 redirect。原 scope 判定器 red [CI 43703326898](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43703326898) 9/13 subcases failures；green [CI 43703386263](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43703386263) 13/13 新 subcases、408/408 完整回歸。詳原決策紀錄。此為兩卡共同證據，不另建知識卡或升格 seed。
+- NATIVE-CLOUD-016-STACK-SELECTION：四平台選型先驗 typed profile/安全硬限制、指定一致性/身份與估算界線，再做有理由候選排序。實測16新增方法/CI 43711988622 450/450，CLI duplicate/bytes、null vs zero、近限警示、硬拒絕不受排序影響，任何結果 deployment/write/pay/free-guarantee=false。此為決策輔助非權限驗證或完整費用計算；各平台原生交易/安全/實際部署待驗，不升格公開案例。
 - 狀態：EVIDENCE_VERIFIED / INDEX_CANDIDATE；已有 architecture skill，未入程式案例。
 
 ### EP-10 平台原生工作與知識檢索隔離

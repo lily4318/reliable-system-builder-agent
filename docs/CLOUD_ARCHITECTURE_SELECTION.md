@@ -64,3 +64,7 @@ C0–C2 可在候選 repo 先工作，C3 後才可外部寫入。C4/C5 任一步
 - https://developers.cloudflare.com/workers/platform/limits/ ; https://developers.cloudflare.com/workers/static-assets/billing-and-limitations/ ; https://developers.cloudflare.com/d1/platform/pricing/ ; https://developers.cloudflare.com/d1/platform/limits/ ; https://developers.cloudflare.com/d1/worker-api/d1-database/ ; https://developers.cloudflare.com/d1/reference/faq/
 - https://supabase.com/pricing ; https://supabase.com/docs/guides/database/postgres/row-level-security ; https://supabase.com/docs/guides/platform/backups ; https://supabase.com/docs/guides/deployment/going-into-prod
 供應商文件為公共資訊，實際使用條款、帳戶、額度、計費、availability/security 要部署前當次重查。保留日期及變更原因，以原 selector/原技能/原主檔增量更新。
+
+
+## 7. 已取得的離線驗收證據
+- 2026-11-15 實際 selector 驗收補記：exact 047ca6340337d034842a6bd262ff1d2c80a5e56d / [CI 43711988622](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43711988622) job 132805354146 completed/success，raw 239471 chars，16 新測試方法全部 ok，450 tests in 51.738s，既有 EDITORIAL_BROWSER_PASS。先前434保留。涵蓋四平台選型、硬拒絕、limit-1/limit/limit+1、unknown、malformed、資源排序、CLI process、拒絕偽造外部授權等。原稿 80% 警戒是 advisory 工程假設；估算可由使用者提供但不證實實際供應商帳號/成本。文件整合 exact a59fbc00837e56c0fe14559b67fe6caeb6f44eb7 七份文件回讀 SHA 相符，CI 43712173888 尚未完成；最新回讀及 CI 待分開確認。選型規則已通過離線受控驗收，不宣稱四平台實際部署、安全或獨立模型能力。C0–C6 與 A–E 路徑皆為未來適用的實戰計畫，未有雲端 resource/URL。

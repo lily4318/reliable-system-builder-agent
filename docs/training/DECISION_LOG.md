@@ -265,3 +265,7 @@
 - 原 architecture-design/security-review/deployment 三技能增量接入 guide/selector，仍7專家12技能；C0–C6 各自獨立 gate（需求/資源能力/同 SHA CI/外部部署授權/實際 URL與版本/真遠端功能及復原/真人與正式啟用）。CLOUD-A Pages 最小公開靜態發布；B GAS 合成單 writer 編輯待辦；C WEB-EDITORIAL-01 雲端 D1 adapter；D Supabase Auth/RLS/Postgres 共享契約差異；E 實際覆盤／遷移。不重做已通過的本機網站，未建/改外部資源，帳號權限及免費 plan 未實測。沒有自動部署 workflow 或外部寫入。
 - NEXT_ACTION：先核 selector exact CI 及文件 CI；再 C1 唯讀核對四平台現有工具與授權、帳號可行性（限制只讀/合成目標，不查無關私人內容），提出最短實際 HTTPS staging scope、可編輯單獨授權；優先 CLOUD-A 如可用，若阻塞改下一條可安全推進而非重複同一人工操作。CLOUD-B/C/D 選型與雲端特有契約驗收待實際施工。保留 A07 新對話未驗及真真人 UAT/正式發布/其他平台/獨立盲測，不用 CI 代替。
 
+
+
+## TP-006｜NATIVE-CLOUD-016-STACK-SELECTION 驗收補記
+- 2026-11-15 實際 selector 驗收補記：exact 047ca6340337d034842a6bd262ff1d2c80a5e56d / [CI 43711988622](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43711988622) job 132805354146 completed/success，raw 239471 chars，16 新測試方法全部 ok，450 tests in 51.738s，既有 EDITORIAL_BROWSER_PASS。先前434保留。涵蓋四平台選型、硬拒絕、limit-1/limit/limit+1、unknown、malformed、資源排序、CLI process、拒絕偽造外部授權等。原稿 80% 警戒是 advisory 工程假設；估算可由使用者提供但不證實實際供應商帳號/成本。文件整合 exact a59fbc00837e56c0fe14559b67fe6caeb6f44eb7 七份文件回讀 SHA 相符，CI 43712173888 尚未完成；最新回讀及 CI 待分開確認。選型規則已通過離線受控驗收，不宣稱四平台實際部署、安全或獨立模型能力。C0–C6 與 A–E 路徑皆為未來適用的實戰計畫，未有雲端 resource/URL。

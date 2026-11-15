@@ -172,6 +172,43 @@ class WebsiteScenarioTest(unittest.TestCase):
         row=inspect_case(case,spec)
         self.assertFalse(row["checks"]["explicit_answers_preserved"])
 
+    def test_requirements_source_mirrors_cannot_contradict_answers(self):
+        case=self.by_id["W102"]
+        for section,key,bad in (
+            ("functional_spec","notifications","必須寄出 Email"),
+            ("functional_spec","data_forms","收集個人資料"),
+            ("nonfunctional_spec","privacy_approval","已核准收集個資"),
+            ("architecture_design_draft","existing_infrastructure_from_user","必須連線 API"),
+            ("delivery_plan_draft","mvp_priority_from_user","正式上線並收件"),
+        ):
+            with self.subTest(section=section,key=key):
+                spec=build_spec(case["answers"])
+                spec[section][key]=bad
+                self.assertFalse(inspect_case(case,spec)["all_checks_pass"])
+
+    def test_traceability_requires_unique_ids_exact_source_and_status(self):
+        case=self.by_id["W106"]
+        for index,key,bad in ((1,"requirement_id","REQ-1"),
+                              (7,"explicit_user_answer","需要 Email 通知"),
+                              (7,"status","USER_STATED_NOT_APPROVED"),
+                              (0,"status","OPEN_UNANSWERED")):
+            with self.subTest(index=index,key=key):
+                spec=build_spec(case["answers"])
+                spec["requirement_traceability"][index][key]=bad
+                self.assertFalse(inspect_case(case,spec)["all_checks_pass"])
+
+    def test_review_question_and_proposal_must_match_source_inference(self):
+        case=self.by_id["W101"]
+        for mutation in ("question","proposal"):
+            with self.subTest(mutation=mutation):
+                spec=build_spec(case["answers"])
+                item=spec["inferred_requirement_review_items"][0]
+                if mutation=="question":
+                    item["question"]=spec["inferred_requirement_review_items"][1]["question"]
+                else:
+                    item["choices"][0]["proposed_text"]="已核准正式收件"
+                self.assertFalse(inspect_case(case,spec)["all_checks_pass"])
+
     def test_invalid_duplicate_family_is_not_accepted_as_separate_type(self):
         data=json.loads(DATASET.read_text(encoding="utf-8"))
         data["cases"][1]["family"]=data["cases"][0]["family"]

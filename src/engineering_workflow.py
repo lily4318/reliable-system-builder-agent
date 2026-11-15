@@ -80,7 +80,9 @@ def route(s: object) -> dict:
     if s.get("write_outcome", "NONE") not in ("NONE", "VERIFIED"):
         return _result("READ_ONLY_RECONCILE")
     stage = s.get("stage")
-    if stage not in STAGES:
+    # Validate JSON shape before hashing; keep prior recovery gates and
+    # incremental evidence semantics unchanged.
+    if not isinstance(stage, str) or stage not in STAGES:
         return _result("HOLD_UNSUPPORTED")
     if stage == "read_only":
         return _result("READ_ONLY_AUDIT")

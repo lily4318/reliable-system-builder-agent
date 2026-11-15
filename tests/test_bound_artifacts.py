@@ -151,3 +151,27 @@ class BoundArtifactsTests(unittest.TestCase):
             self.assertEqual(sum(pool.map(go,range(4))),1)
         with closing(w.connect(self.p)) as db:
             self.assertEqual(db.execute("SELECT count(*) FROM artifacts WHERE kind='specification'").fetchone()[0],1)
+
+    def test_combined_root_graph_edit_rejects_active_descendant_atomically(self):
+        self.bind(); self.complete('intake'); self.complete('spec')
+        rev,session=self.start('arch')
+        before=t.review(self.p)
+        artifacts=self.latest()
+        raw=(self.p/'workbench.sqlite3').read_bytes()
+        change={'expected_artifact_id':self.old,'content':'R2','source_ref':'fixture'}
+        with self.assertRaisesRegex(ValueError,'affected active worker'):
+            t.revise(self.p,'intake',2,'root-graph','fixture',True,
+                     deps=['audit'],requirement=change)
+        self.assertEqual(t.review(self.p),before)
+        self.assertEqual(self.latest(),artifacts)
+        self.assertEqual((self.p/'workbench.sqlite3').read_bytes(),raw)
+        self.assertEqual(t.revision_status(self.p,'root-graph')['status'],'NOT_OBSERVED')
+        self.revise()
+        self.assertEqual(self.state('arch')['state'],'RECOVERY_REQUIRED')
+        t.recover(self.p,'arch',3,session,'recovered','stopped',True)
+        latest=self.latest()['requirements']['id']
+        result=t.revise(self.p,'intake',3,'root-graph-new','fixture',True,
+                        deps=['audit'],requirement={**change,'expected_artifact_id':latest})
+        self.assertEqual(self.state('intake')['deps'],['audit'])
+        self.assertTrue(t.revision_status(self.p,'root-graph-new')['still_current'])
+        self.assertEqual(result['requirement_change']['old_artifact_id'],latest)

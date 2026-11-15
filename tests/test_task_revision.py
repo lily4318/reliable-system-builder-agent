@@ -193,3 +193,46 @@ class RevisionTests(unittest.TestCase):
         args.update(session='new-worker',evidence='synthetic current completion')
         self.assertEqual(call('finish',args).returncode,0)
         self.assertEqual(self.row('spec')['state'],'DONE')
+
+    def test_dependency_edit_cannot_release_quarantined_old_ancestor(self):
+        self.complete('spec','first'); self.complete('design','first')
+        t.start(self.p,'build','old-builder',1)
+        self.change()
+        self.assertEqual(self.row('spec')['recovery_blockers'],['build'])
+        before=t.review(self.p)
+        raw=(self.p/'workbench.sqlite3').read_bytes()
+        try:
+            self.change('design',2,deps=[])
+        except ValueError as exc:
+            self.assertIn('affected active worker',str(exc))
+        else:
+            self.fail('old ancestor fence lost: spec blockers=%r, next_ready=%r' %
+                      (self.row('spec')['recovery_blockers'],t.review(self.p)['next_ready']))
+        self.assertEqual(t.review(self.p),before)
+        self.assertEqual((self.p/'workbench.sqlite3').read_bytes(),raw)
+        t.recover(self.p,'build',2,'old-builder','recovery','stopped and reconciled',True)
+        result=self.change('design',2,deps=[])
+        self.assertEqual(set(result['affected']),{'design','build','qa'})
+        self.assertEqual(self.row('design')['deps'],[])
+        self.assertEqual(self.row('build')['revision'],3)
+        self.assertIn('spec',t.review(self.p)['next_ready'])
+
+    def test_dependency_edit_on_running_worker_rejected_but_unrelated_work_allowed(self):
+        self.complete('spec','first')
+        t.start(self.p,'design','live-design',1)
+        before=t.review(self.p)
+        with self.assertRaisesRegex(ValueError,'affected active worker'):
+            self.change('design',1,deps=['other'])
+        self.assertEqual(t.review(self.p),before)
+        self.change('other',1,deps=['spec'])
+        self.assertEqual(self.row('design')['session'],'live-design')
+        self.assertEqual(self.row('design')['revision'],1)
+        self.complete('other','independent')
+        t.finish(self.p,'design','live-design',{'R':'PASS'},'unchanged graph',1)
+
+    def test_noop_dependency_list_still_allows_content_invalidation(self):
+        self.complete('spec','first')
+        t.start(self.p,'design','live-design',1)
+        self.change('design',1,deps=['spec'],title='new content')
+        self.assertEqual(self.row('design')['state'],'RECOVERY_REQUIRED')
+        self.assertEqual(self.row('spec')['recovery_blockers'],['design'])

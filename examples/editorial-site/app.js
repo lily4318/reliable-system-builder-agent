@@ -1,7 +1,8 @@
 "use strict";
 const $=id=>document.getElementById(id);
 const el=(tag,text)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;return n};
-const state={actor:null,csrf:"",page:1,total:0,pending:null,busy:false,view:"public",epoch:0};
+const state={actor:null,csrf:"",page:1,total:0,pending:null,pendingActor:null,busy:false,view:"public",epoch:0,requests:0};
+const pendingKey="editorial-pending-local-action-v1";
 const labels={DRAFT:"草稿",SUBMITTED:"等待審核",RETURNED:"退回修改",APPROVED:"審核通過",PUBLISHED:"已發布",SUPERSEDED:"舊發布版",WITHDRAWN:"已下架"};
 const errors={FORBIDDEN:"權限不足或來源不符",AUTH_REQUIRED:"登入已失效，請重新登入",INVALID_LOGIN:"登入資料錯誤",INVALID_INPUT:"資料格式或長度不正確",STALE:"版本已變更，請重新讀取",INVALID_STATE:"目前狀態不允許操作",OPEN_REVISION:"已有未完成修訂稿",TOKEN_CONFLICT:"操作識別碼衝突",NOT_FOUND:"找不到資料"};
 const msg=t=>$("status").textContent=t;
@@ -9,9 +10,9 @@ const randomToken=()=>Array.from(crypto.getRandomValues(new Uint8Array(16)),x=>x
 async function request(path,data){
   const opt={cache:"no-store"};
   if(data!==undefined)Object.assign(opt,{method:"POST",headers:{"Content-Type":"application/json","X-CSRF-Token":state.csrf},body:JSON.stringify(data)});
-  const r=await fetch(path,opt);
-  const v=await r.json();
-  return {status:r.status,v};
+  state.requests++;document.querySelector("main").setAttribute("aria-busy","true");
+  try{const r=await fetch(path,opt);const v=await r.json();return {status:r.status,v}}
+  finally{state.requests--;document.querySelector("main").setAttribute("aria-busy",String(state.requests>0))}
 }
 async function get(path){
   const {status,v}=await request(path);
@@ -28,6 +29,7 @@ function actorData(data){
   state.actor=data.actor;state.csrf=data.csrf;
   $("work-nav").hidden=!state.actor;$("logout").hidden=!state.actor;$("login-nav").hidden=!!state.actor;
   $("create-panel").hidden=state.actor?.role!=="author";
+  $("reconcile").disabled=!state.pending||state.actor?.username!==state.pendingActor;
 }
 async function list(){
   const epoch=++state.epoch;
@@ -105,46 +107,62 @@ async function work(){
   $("workspace-title").textContent=(data.actor.role==="author"?"作者":"編輯")+"工作台｜"+data.actor.username;
   $("revisions").replaceChildren(...data.revisions.map(r=>card(r,data.revisions)));
   if(!data.revisions.length)$("revisions").append(el("p","目前沒有稿件。"));
-  $("events").replaceChildren(...data.events.map(e=>el("p",e.actor+" · "+e.action+" · "+(labels[e.before_state]||"—")+" → "+labels[e.after_state]+" · "+new Date(e.at*1000).toLocaleString("zh-TW"))));
+  $("events").replaceChildren(...data.events.map(e=>el("p",e.actor+" · 文章 "+e.article_id+" / 稿件 "+e.revision_id+" / 版本 "+e.revision_version+" · "+e.action+" · "+(labels[e.before_state]||"—")+" → "+labels[e.after_state]+" · "+new Date(e.at*1000).toLocaleString("zh-TW")+(e.review_reason?" · 退回理由："+e.review_reason:""))));
 }
-function unknown(token){
-  state.pending=token;$("reconcile-panel").hidden=false;
-  msg("操作結果不明；已暫停其他寫入。請唯讀查詢收據。");
+function retainPending(token,owner){
+  state.pending=token;state.pendingActor=owner;
+  try{sessionStorage.setItem(pendingKey,JSON.stringify({token,owner}))}catch(e){/* memory + visible action id fallback */}
+}
+function clearPending(){
+  state.pending=null;state.pendingActor=null;$("reconcile-panel").hidden=true;
+  try{sessionStorage.removeItem(pendingKey)}catch(e){}
+}
+function unknown(token,owner=state.pendingActor){
+  retainPending(token,owner);$("reconcile-panel").hidden=false;
+  $("reconcile").disabled=state.actor?.username!==owner;
+  $("reconcile-status").textContent="操作識別碼："+token+"（僅可由原帳號查詢）";
+  msg("操作結果不明；已暫停其他寫入。請以原帳號唯讀查詢收據。");
+}
+function restorePending(){
+  try{const p=JSON.parse(sessionStorage.getItem(pendingKey)||"null");if(p&&typeof p.owner==="string"&&/^[a-f0-9]{32}$/.test(p.token))unknown(p.token,p.owner)}catch(e){}
 }
 async function mutate(payload){
   if(state.busy||state.pending){msg("先完成現有操作及收據查核。");return}
   state.busy=true;const token=randomToken();
+  retainPending(token,state.actor.username);
   try{
     let response;
     try{response=await request("/api/action",{...payload,token})}
     catch(e){unknown(token);return}
     if(response.status>=500){unknown(token);return}
     const {v}=response;
-    if(v.ok)msg("操作完成。");
+    clearPending();
+    if(v.ok){msg("操作完成。");if(payload.op==="create"){$("new-title").value="";$("new-body").value=""}}
+
     else msg(errors[v.code||v.error]||"操作遭拒絕。");
     await work();
   }finally{state.busy=false}
 }
 async function safe(fn){try{await fn()}catch(e){msg(e.message||"操作失敗");if(e.status===401){actorData(await get("/api/bootstrap"));$("revisions").replaceChildren();$("events").replaceChildren();show("login")}}}
 async function init(){
-  actorData(await get("/api/bootstrap"));show("public");await list();
+  actorData(await get("/api/bootstrap"));show("public");await list();restorePending();
   const aid=new URLSearchParams(location.search).get("article")||location.hash.replace(/^#article-/,"");
   if(/^[1-9][0-9]*$/.test(aid))await safe(()=>detail(aid));
   $("public-nav").onclick=()=>safe(async()=>{show("public");$("article-detail").hidden=true;await list()});
   $("work-nav").onclick=()=>safe(async()=>{show("work");await work()});
   $("login-nav").onclick=()=>{show("login");$("username").focus()};
   $("login-form").onsubmit=e=>{e.preventDefault();safe(async()=>{
-    if(state.busy||state.pending)return;
+    if(state.busy)return;
     state.busy=true;
     try{
       const {status,v}=await request("/api/login",{username:$("username").value,password:$("password").value});
       $("password").value="";
       if(status!==200){msg(errors[v.error]||"登入失敗");return}
-      actorData(v);show("work");msg("登入成功");await work();
+      actorData(v);show("work");msg(state.pending?"已登入；先核對原操作收據":"登入成功");await work();
     }finally{state.busy=false}
   })};
   $("logout").onclick=()=>safe(async()=>{
-    if(state.busy||state.pending){msg("請先確認操作結果。");return}
+    if(state.busy){msg("請先完成現有操作。");return}
     state.busy=true;
     try{const {status,v}=await request("/api/logout",{});
       if(status!==200)throw Error("登出結果未確認，請重新讀取頁面。");
@@ -158,12 +176,12 @@ async function init(){
   $("next").onclick=()=>{if(state.page*20<state.total){state.page++;$("article-detail").hidden=true;safe(list)}};
   $("close-detail").onclick=()=>{$("article-detail").hidden=true;location.hash=""};
   $("reconcile").onclick=()=>safe(async()=>{
-    if(!state.pending)return;
+    if(!state.pending||state.actor?.username!==state.pendingActor)return;
     const r=await get("/api/receipt?token="+state.pending);
     $("reconcile-status").textContent=r.observed?"已查得結果："+r.result.code:"未觀測到收據；不得自動重送，先核對原資料與狀態。";
-    if(r.observed){state.pending=null;$("reconcile-panel").hidden=true;msg("原操作結果："+r.result.code);await work()}
+    if(r.observed){clearPending();msg("原操作結果："+r.result.code);await work()}
   });
-  msg("本機刊物已就緒");
+  if(!state.pending)msg("本機刊物已就緒");
   if(document.querySelector('script[src="/browser-test.js"]'))window.editorialTest={report:r=>request("/test-result",r)};
 }
 init().catch(()=>msg("載入失敗；請確認本機服務。"));

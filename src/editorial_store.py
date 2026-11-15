@@ -14,7 +14,7 @@ CATEGORIES = ('生活','文化','科技')
 ROLES = {'author-a':'author','author-b':'author','editor':'editor'}
 OPEN = ('DRAFT','SUBMITTED','RETURNED','APPROVED')
 SESSION_SECONDS = 1800
-VERSION = 1
+VERSION = 2
 TOKEN = re.compile(r'[a-f0-9]{64}')
 ACTION_TOKEN = re.compile(r'[a-f0-9]{32}')
 SCHEMA = """
@@ -30,7 +30,7 @@ CREATE TABLE article_revisions(id INTEGER PRIMARY KEY, article_id INTEGER NOT NU
   revision_no INTEGER NOT NULL CHECK(revision_no>=1), title TEXT NOT NULL, category TEXT NOT NULL,
   body TEXT NOT NULL, status TEXT NOT NULL CHECK(status IN
   ('DRAFT','SUBMITTED','RETURNED','APPROVED','PUBLISHED','SUPERSEDED','WITHDRAWN')),
-  reason TEXT NOT NULL DEFAULT '', created INTEGER NOT NULL, updated INTEGER NOT NULL,
+  reason TEXT NOT NULL DEFAULT '', version_counter INTEGER NOT NULL DEFAULT 1 CHECK(version_counter>=1), created INTEGER NOT NULL, updated INTEGER NOT NULL,
   UNIQUE(article_id,revision_no), UNIQUE(article_id,id));
 CREATE UNIQUE INDEX one_open ON article_revisions(article_id)
   WHERE status IN ('DRAFT','SUBMITTED','RETURNED','APPROVED');
@@ -40,8 +40,8 @@ CREATE TABLE action_receipts(actor INTEGER NOT NULL REFERENCES accounts(id), tok
 CREATE TABLE audit_events(id INTEGER PRIMARY KEY, actor INTEGER NOT NULL REFERENCES accounts(id),
   article_id INTEGER NOT NULL REFERENCES articles(id), revision_id INTEGER NOT NULL REFERENCES article_revisions(id),
   action TEXT NOT NULL, before_state TEXT, after_state TEXT NOT NULL, article_version INTEGER NOT NULL,
-  at INTEGER NOT NULL);
-PRAGMA user_version=1;
+  at INTEGER NOT NULL, revision_version INTEGER NOT NULL, review_reason TEXT NOT NULL DEFAULT '');
+PRAGMA user_version=2;
 """
 
 
@@ -234,7 +234,7 @@ class Store:
                    JOIN accounts ac ON ac.id=a.owner WHERE """+where+
                    ' ORDER BY r.article_id DESC,r.revision_no DESC',args).fetchall()
             events=db.execute("""SELECT e.id,e.article_id,e.revision_id,e.action,e.before_state,e.after_state,
-                         e.article_version,e.at,ac.username AS actor
+                         e.article_version,e.revision_version,e.review_reason,e.at,ac.username AS actor
                          FROM audit_events e JOIN article_revisions r ON r.id=e.revision_id
                          JOIN articles a ON a.id=e.article_id JOIN accounts ac ON ac.id=e.actor
                          WHERE """+where+' ORDER BY e.id DESC',args).fetchall()
@@ -312,31 +312,32 @@ class Store:
                 before=None
             elif op=='edit':
                 after='DRAFT'
-                db.execute("UPDATE article_revisions SET title=?,category=?,body=?,status='DRAFT',reason='',updated=? WHERE id=?",
+                db.execute("UPDATE article_revisions SET title=?,category=?,body=?,status='DRAFT',reason='',updated=?,version_counter=version_counter+1 WHERE id=?",
                            (*content(p),now,rid))
             elif op=='publish':
                 after='PUBLISHED'
                 old=a['published_revision_id']
                 if old is not None:
-                    db.execute("UPDATE article_revisions SET status='SUPERSEDED',updated=? WHERE id=? AND article_id=?",(now,old,aid))
+                    db.execute("UPDATE article_revisions SET status='SUPERSEDED',updated=?,version_counter=version_counter+1 WHERE id=? AND article_id=?",(now,old,aid))
                     self._audit(db,actor['id'],aid,old,'supersede','PUBLISHED','SUPERSEDED',version,now)
-                db.execute("UPDATE article_revisions SET status='PUBLISHED',updated=? WHERE id=?",(now,rid))
+                db.execute("UPDATE article_revisions SET status='PUBLISHED',updated=?,version_counter=version_counter+1 WHERE id=?",(now,rid))
                 db.execute('UPDATE articles SET published_revision_id=? WHERE id=?',(rid,aid))
             elif op=='withdraw':
                 if a['published_revision_id']!=rid:
                     return deny('INVALID_STATE')
                 after='WITHDRAWN'
-                db.execute("UPDATE article_revisions SET status='WITHDRAWN',updated=? WHERE id=?",(now,rid))
+                db.execute("UPDATE article_revisions SET status='WITHDRAWN',updated=?,version_counter=version_counter+1 WHERE id=?",(now,rid))
                 db.execute('UPDATE articles SET published_revision_id=NULL WHERE id=?',(aid,))
             else:
                 after={'submit':'SUBMITTED','return':'RETURNED','approve':'APPROVED'}[op]
-                db.execute('UPDATE article_revisions SET status=?,reason=?,updated=? WHERE id=?',
+                db.execute('UPDATE article_revisions SET status=?,reason=?,updated=?,version_counter=version_counter+1 WHERE id=?',
                            (after,p.get('reason',''),now,rid))
             db.execute('UPDATE articles SET version=? WHERE id=?',(version,aid))
-        self._audit(db,actor['id'],aid,rid,op,before,after,version,now)
+        self._audit(db,actor['id'],aid,rid,op,before,after,version,now,p.get('reason',''))
         return {'ok':True,'code':'COMMITTED','article_id':aid,'revision_id':rid,'version':version,'state':after}
 
     @staticmethod
-    def _audit(db,actor,aid,rid,op,before,after,version,now):
-        db.execute("""INSERT INTO audit_events(actor,article_id,revision_id,action,before_state,after_state,article_version,at)
-                      VALUES(?,?,?,?,?,?,?,?)""",(actor,aid,rid,op,before,after,version,now))
+    def _audit(db,actor,aid,rid,op,before,after,version,now,reason=''):
+        revision_version=db.execute('SELECT version_counter FROM article_revisions WHERE id=? AND article_id=?',(rid,aid)).fetchone()[0]
+        db.execute("""INSERT INTO audit_events(actor,article_id,revision_id,action,before_state,after_state,article_version,at,revision_version,review_reason)
+                      VALUES(?,?,?,?,?,?,?,?,?,?)""",(actor,aid,rid,op,before,after,version,now,revision_version,reason))

@@ -2,7 +2,7 @@
 import argparse
 import getpass
 import hmac
-from http.cookies import SimpleCookie
+from http.cookies import SimpleCookie,CookieError
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
@@ -67,7 +67,7 @@ def create_server(path,port=8777,*,test_mode=False):
                 c=SimpleCookie(self.headers.get('Cookie',''))
                 value=c[name].value if name in c else ''
                 return value if TOKEN.fullmatch(value) else ''
-            except (ValueError,TypeError):
+            except (ValueError,TypeError,CookieError):
                 return ''
 
         def valid_host(self):

@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import shutil
+import secrets
 import socket
 import struct
 import subprocess
@@ -20,6 +21,7 @@ from src.editorial_site import create_server
 # Only public synthetic fixture credentials for ephemeral databases.
 PASSWORDS={'author-a':'SyntheticAuthorA-2026','author-b':'SyntheticAuthorB-2026','editor':'SyntheticEditor-2026'}
 EXPECTED={'exact_viewport','initial_empty','keyboard_focus','wrong_login','author_create',
+          'page_one','page_two','lost_ack_pending','read_only_reconcile','workspace_no_overflow','review_reason_history',
           'author_keyboard_field','other_author_hidden','unsubmitted_hidden','submitted_visible',
           'return_reason','literal_private','approved_not_public','literal_public','search_category',
           'filter_empty','old_public_retained','atomic_public_switch','withdraw_hidden','republished',
@@ -72,6 +74,15 @@ class CDP:
 def run_one(executable,width):
     with tempfile.TemporaryDirectory() as tmp:
         root=Path(tmp);store=Store(root/'site.sqlite');store.initialize(PASSWORDS)
+        author=store.login('author-b',PASSWORDS['author-b'])
+        editor=store.login('editor',PASSWORDS['editor'])
+        for i in range(21):
+            result=store.action(author,{'op':'create','token':secrets.token_hex(16),'title':f'分頁資料 {i:02d}','body':'合成分頁測試','category':'科技'})
+            for op,session in (('submit',author),('approve',editor),('publish',editor)):
+                result=store.action(session,{'op':op,'token':secrets.token_hex(16),'article_id':result['article_id'],
+                                            'revision_id':result['revision_id'],'expected':result['version']})
+                if result['ok'] is not True:raise RuntimeError('pagination seed failed')
+        store.logout(author);store.logout(editor)
         with create_server(store.path,0,test_mode=True) as server:
             thread=threading.Thread(target=server.serve_forever,daemon=True);thread.start()
             proc=None;cdp=None

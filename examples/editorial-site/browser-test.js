@@ -3,7 +3,8 @@
 (async()=>{
  const $=id=>document.getElementById(id), checks={};
  const check=(name,condition)=>{if(!condition)throw Error(name);checks[name]=true};
- const wait=async(fn)=>{for(let i=0;i<400;i++){if(fn())return;await new Promise(r=>setTimeout(r,25))}throw Error("DOM wait timeout")};
+ const settled=()=>document.querySelector("main").getAttribute("aria-busy")!=="true";
+ const wait=async(fn)=>{for(let i=0;i<400;i++){if(fn()&&settled())return;await new Promise(r=>setTimeout(r,25))}throw Error("DOM wait timeout")};
  const input=(id,value)=>{const n=$(id);n.value=value;n.dispatchEvent(new Event("input",{bubbles:true}))};
  const first=()=>document.querySelector(".revision");
  const text=()=> $("revisions").textContent;
@@ -21,6 +22,12 @@
  try{
    await wait(()=>window.editorialTest);
    check("exact_viewport",viewport===375||viewport===1280);
+   check("page_one",document.querySelectorAll(".article-card").length===20&&!$("next").disabled);
+   $("next").click();await wait(()=>document.querySelectorAll(".article-card").length===1&&$("page-label").textContent.includes("第 2 頁"));
+   check("page_two",$("next").disabled&&!$("prev").disabled);
+   $("prev").click();await wait(()=>document.querySelectorAll(".article-card").length===20&&$("page-label").textContent.includes("第 1 頁"));
+   input("filter","文化");$("search-form").querySelector("button").click();
+   await wait(()=>$("articles").textContent.includes("沒有符合"));
    check("initial_empty",$("articles").textContent.includes("沒有符合"));
    $("login-nav").click();$("username").focus();
    check("keyboard_focus",document.activeElement===$("username")&&$("username").labels.length===1);
@@ -30,10 +37,22 @@
    check("wrong_login",!$("login-panel").hidden);
    await login("author-a","SyntheticAuthorA-2026");
    input("new-title","第一版文章");input("new-category","文化");input("new-body","最初草稿");
-   $("create-form").querySelector("button").click();
+   // Drop only the first action response AFTER the trusted server actually
+   // processed it. Reconcile with actual read-only receipt, never replay POST.
+   const originalFetch=window.fetch;let actionCalls=0;
+   window.fetch=async function(path,opt){const response=await originalFetch.call(window,path,opt);
+     if(path==="/api/action"){actionCalls++;throw Error("synthetic lost acknowledgement")}
+     return response};
+   try{$("create-form").querySelector("button").click();
+     await wait(()=>!$("reconcile-panel").hidden);
+     check("lost_ack_pending",actionCalls===1&&sessionStorage.getItem("editorial-pending-local-action-v1")!==null);
+   }finally{window.fetch=originalFetch}
+   $("reconcile").click();await wait(()=>$("reconcile-panel").hidden&&text().includes("第一版文章"));
+   check("read_only_reconcile",actionCalls===1&&sessionStorage.getItem("editorial-pending-local-action-v1")===null&&document.querySelectorAll(".revision").length===1);
    await wait(()=>text().includes("第一版文章")&&text().includes("草稿"));
    check("author_create",text().includes("最初草稿"));
    check("author_keyboard_field",first().querySelector("textarea").labels.length===1);
+   check("workspace_no_overflow",document.documentElement.scrollWidth<=innerWidth);
    await logout();
    await login("author-b","SyntheticAuthorB-2026");
    check("other_author_hidden",!text().includes("第一版文章"));
@@ -54,6 +73,7 @@
    first().querySelector("textarea").value="<script>純文字</script>\n第二行";
    await clickOp("edit",()=>text().includes("草稿")&&!text().includes("退回理由："));
    check("literal_private",first().textContent.includes("<script>純文字</script>")&&!first().querySelector("script"));
+   check("review_reason_history",$("events").textContent.includes("請修改正文"));
    await clickOp("submit",()=>text().includes("等待審核"));
    await logout();
    await login("editor","SyntheticEditor-2026");
@@ -70,10 +90,10 @@
    input("search","第一版");$("search-form").querySelector("button").click();
    await wait(()=>$("articles").textContent.includes("第一版文章"));
    check("search_category",$("page-label").textContent.includes("1 篇"));
-   input("filter","科技");$("search-form").querySelector("button").click();
+   input("filter","生活");$("search-form").querySelector("button").click();
    await wait(()=>$("articles").textContent.includes("沒有符合"));
    check("filter_empty",$("articles").textContent.includes("沒有符合")&&$("next").disabled);
-   input("search","");input("filter","");$("search-form").querySelector("button").click();
+   input("search","");input("filter","文化");$("search-form").querySelector("button").click();
    await wait(()=>$("articles").textContent.includes("第一版文章"));
    await login("author-a","SyntheticAuthorA-2026");
    await clickOp("clone",()=>document.querySelectorAll(".revision").length===2&&first().textContent.includes("草稿"));

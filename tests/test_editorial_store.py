@@ -1,6 +1,9 @@
 import copy
 import secrets
 import sqlite3
+import json
+import subprocess
+import sys
 import tempfile
 import unittest
 from concurrent.futures import ThreadPoolExecutor
@@ -60,6 +63,9 @@ class EditorialStoreTests(unittest.TestCase):
         self.assertEqual(self.store.workspace(self.a)['revisions'][0]['reason'],'請修改')
         x=self.act(self.a,'edit',x,title='新標題',category='科技',body='<script>純文字</script>')
         self.assertEqual(self.store.workspace(self.e)['revisions'],[])
+        author_history=self.store.workspace(self.a)
+        self.assertEqual(author_history['revisions'][0]['version_counter'],4)
+        self.assertEqual(next(e for e in author_history['events'] if e['action']=='return')['review_reason'],'請修改')
         x=self.act(self.a,'submit',x)
         x=self.act(self.e,'approve',x)
         self.assertIsNone(self.store.public_detail(aid))
@@ -168,3 +174,39 @@ class EditorialStoreTests(unittest.TestCase):
         self.store.logout(self.a)
         with self.assertRaises(PermissionError):
             self.store.actor(self.a)
+
+
+    def test_process_cut_atomic_receipt_and_cli_backup_restore(self):
+        x=self.create()
+        x=self.act(self.a,'submit',x)
+        x=self.act(self.e,'approve',x)
+        p=self.payload('publish',x)
+        before=self.store.workspace(self.e)
+        script="""import json,os,sys
+from src.editorial_store import Store
+s=Store(sys.argv[1]); token,payload=json.load(sys.stdin)
+original=Store._audit
+def cut(*args,**kwargs):
+    original(*args,**kwargs)
+    os._exit(17)
+Store._audit=staticmethod(cut)
+s.action(token,payload)
+"""
+        proc=subprocess.run([sys.executable,'-c',script,str(self.store.path)],
+                            input=json.dumps([self.e,p]),text=True,capture_output=True,timeout=10)
+        self.assertEqual(proc.returncode,17)
+        self.assertEqual(self.store.workspace(self.e),before)
+        self.assertIsNone(self.store.public_detail(x['article_id']))
+        self.assertFalse(self.store.receipt(self.e,p['token'])['observed'])
+        self.assertTrue(self.store.action(self.e,p)['ok'])
+        first=self.root/(secrets.token_hex(8)+'.backup')
+        second=self.root/(secrets.token_hex(8)+'.restored')
+        for op,source,target in (('backup',self.store.path,first),('restore',first,second)):
+            result=subprocess.run([sys.executable,'-m','src.editorial_site',op,'--db',str(source),'--target',str(target)],
+                                  capture_output=True,check=True,timeout=10)
+            self.assertIn(b'EDITORIAL_COPY_VERIFIED',result.stdout)
+        restored=Store(second)
+        self.assertEqual(restored.public_detail(x['article_id']),self.store.public_detail(x['article_id']))
+        self.assertEqual(restored.public_list(),self.store.public_list())
+        with self.assertRaises(PermissionError):
+            restored.actor(self.e)

@@ -25,6 +25,11 @@ document.querySelectorAll('input[name="decision"]').forEach(el=>{
     ok.disabled=false;preview.textContent="已選擇；請檢查並編輯，尚未送出。";
   });
 });
+input.addEventListener("input",()=>{
+  if(input.disabled)return;
+  ok.disabled=!input.value.trim();
+  preview.textContent=ok.disabled?"文字不可空白；尚未送出。":"文字已修改；請重新確認，尚未送出。";
+});
 ok.addEventListener("click",()=>{
   if(!input.disabled && input.value.trim())
     preview.textContent="已確認文字（僅本地預覽，未傳送）：\n"+input.value;

@@ -98,7 +98,8 @@ class ResearchMethodsTest(unittest.TestCase):
                             cdp.command("Page.navigate",{"url":f"http://127.0.0.1:{server.server_port}/index.html"})
                             wait("document.querySelectorAll('#rows tr').length===40")
                             self.assertEqual(js("innerWidth"),width)
-                            self.assertEqual(js("document.documentElement.scrollWidth"),width)
+                            self.assertLessEqual(js("document.documentElement.scrollWidth"),
+                                                 js("document.documentElement.clientWidth"))
                             self.assertEqual(js("getComputedStyle(document.querySelector('.panel')).borderRadius"),"12px")
                             base=snapshot();check_rows(base,40)
                             # Native Tab key and form submit, not a pure JS generator test.

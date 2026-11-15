@@ -121,6 +121,12 @@ class SiteTests(unittest.TestCase):
         body=urlencode(data).encode('ascii')
         self.assert_form_rejected('/cancel',m,body,[f'Content-Length: {len(body)+1}'])
 
+    def test_form_framing_idle_timeout_not_persisted(self):
+        m=self.login('member')
+        body=urlencode(self.form(m,2)).encode('ascii')
+        self.assert_form_rejected('/reserve',m,body,[f'Content-Length: {len(body)+7}'],
+                                  finish=False,status=408)
+
     def test_form_framing_complete_encoded_and_replay(self):
         m=self.login('member'); admin=self.login('admin')
         data=self.form(m,2)

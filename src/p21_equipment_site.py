@@ -17,6 +17,8 @@ from urllib.parse import parse_qs
 
 
 SCHEMA_VERSION = 1
+MAX_FORM_BODY = 4096
+SOCKET_IDLE_TIMEOUT = 5.0
 MEMBERS = ('member', 'member2')
 
 
@@ -237,12 +239,16 @@ class Site(ThreadingHTTPServer):
 
 
 class Handler(BaseHTTPRequestHandler):
+    timeout=SOCKET_IDLE_TIMEOUT  # Idle I/O, not a total request deadline.
+
     def log_message(self,*args):
         pass
 
     def page(self,status,body,cookie=None):
         payload=('<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Synthetic equipment training</title><main><h1>Equipment training</h1>'+body+'</main></html>').encode()
+        self.close_connection=True
         self.send_response(status)
+        self.send_header('Connection','close')
         self.send_header('Content-Type','text/html; charset=utf-8')
         self.send_header('Content-Security-Policy',"default-src 'none'; form-action 'self'; frame-ancestors 'none'; base-uri 'none'")
         self.send_header('X-Content-Type-Options','nosniff')
@@ -308,13 +314,24 @@ class Handler(BaseHTTPRequestHandler):
             return self.page(403,'Invalid origin')
         try:
             lengths=self.headers.get_all('Content-Length')
-            if not lengths or len(lengths)!=1 or self.headers.get('Transfer-Encoding') or self.headers.get_content_type()!='application/x-www-form-urlencoded':
+            if not lengths or len(lengths)!=1 or self.headers.get_all('Transfer-Encoding') is not None or self.headers.get_content_type()!='application/x-www-form-urlencoded':
                 raise ValueError()
-            n=int(lengths[0])
-            if not 0<n<=4096:
+            # RFC 9110 8.6 / 9112 6.3: framing precedes form decoding.
+            raw_size=lengths[0].strip(' \t')
+            significant=raw_size.lstrip('0')
+            if (not raw_size.isascii() or not raw_size.isdecimal()
+                    or not significant or len(significant)>len(str(MAX_FORM_BODY))):
                 raise ValueError()
-            self.connection.settimeout(5)
-            fields=parse_qs(self.rfile.read(n).decode('utf-8'),strict_parsing=True,max_num_fields=8)
+            n=int(significant)
+            if not 0<n<=MAX_FORM_BODY:
+                raise ValueError()
+            try:
+                body=self.rfile.read(n)
+            except TimeoutError:
+                return self.page(408,'Incomplete request')
+            if len(body)!=n:
+                raise ValueError()
+            fields=parse_qs(body.decode('utf-8'),strict_parsing=True,max_num_fields=8)
             if any(len(v)!=1 for v in fields.values()):
                 raise ValueError()
             data={k:v[0] for k,v in fields.items()}

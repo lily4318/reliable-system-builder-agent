@@ -16,5 +16,8 @@ description: "部署、處理 CI 或版本。devops-sre 角色；交付 deployme
 ### TD-003｜完全新手的環境準備
 讀 [新手引導](../../../docs/BEGINNER_ACCOUNT_ONBOARDING.md)。需求與必要平台先確認，按既有帳號/連接/真唯讀/權限/費用使用 src.account_onboarding 或同契約分流；只教目前必要的人工操作，附官方入口、預期與停點，使用者自行登入驗證與審閱同意。成功由真實可用工具回讀，失敗排除或安全替代；不讓新手自行研究、不重複註冊、不要求 CLI、不以連接授權部署。
 
+### Version-bound CI evidence 完整性（TD004-OFFICIAL-03 / EP-14）
+先核 real run/attempt、checkout SHA 與 PR head/merge diff、必要步驟結果，再核產物 ID/expiry/digest、明示 expected file set；失敗可留下 diagnostic 但不是候選部署物。統計由逐案例重算、拒絕錯型/負數/重複，保留實際完整日誌。從獨立可信來源取得完整報告 hash/context 再查每檔 byte hash，不能信同 artifact 自帶摘要、不能把 checksum 當簽章或 CI 結果。原 src.ci_evidence_bundle 離線 verifier 僅驗 supplied evidence 且不授權部署；新 CI_EVIDENCE_BOUND marker 原始 log 另核。source drift 或未知提交先唯讀對帳；回退以已核實版與新 revert/forward-fix，不 force push、不重送未知 POST。真 deployment artifact、簽章/attestation、remote bytes、UAT/Release 另門檻。見 [深度覆盤](../../../docs/training/reviews/2026-11-15-ci-artifact-integrity.md)。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 deployment-plan；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

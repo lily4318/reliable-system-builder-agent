@@ -23,3 +23,18 @@ exact c8639498064a0138f1da22dca614e2834591baa7 CI 43724770963 / job 132844602690
 
 ## 完整 CI 與遠端 artifact 位元組回讀（VERIFIED）
 NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e2834591baa7 / [CI 43724770963](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43724770963) job 132844602690 completed/success，raw 254724 chars，515 tests in 73.650s OK，2 品質守門與 6 artifact 新 test methods 全 ok；實際 quality step 完成，CI_EVIDENCE_BOUND marker 2026-11-15T14:34:01.1529178Z：repository lily4318/reliable-system-builder-agent, run_id 43724770963, run_attempt 1, checkout_sha 17fbb3da41c26b993656d52798ad9bdcc33e1b2b, report_sha256 8c9cf8667c37f9eedf78bf0d466493868c2cefaa0d1edae212eef7f3a91fe194。真 Git merge commit GET parents c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57 (main) + c8639498064a0138f1da22dca614e2834591baa7 (PR head), tree 3b972ccfe24dcc63f514fc89091e8583e5012c43 與 candidate tree 一致；不要把 GitHub run head 當 checkout SHA。服務端 artifact GET id 14165747733 / public-policy-evaluation / expired=false / 13332 bytes / digest sha256:bf758c78bf24ac51a817a00910f1e7fb97f51e4564fe29db72968099776e33d5 / run 43724770963 / head c8639498064a0138f1da22dca614e2834591baa7。實際下載該 id ZIP 到隔離工作目錄，由獨立 Python byte reader（非重用報告的 self-declared digest）先比對整個 ZIP SHA256 與服務端 digest，再以 ZIP infolist 確定 10 個唯一 allowlisted regular file、單檔 0<size<=4MiB，未解壓至檔案系統、未執行內含程式；讀 quality-gate.json SHA256 對獨立 CI log marker、strict JSON、gate_passed=true、human_approval_completed=false、formal_release_created=false、context 完全一致、逐一重算其餘九份 payload bytes + SHA256 與 manifest 相等。實際 digest/內容一致性驗收成立，非僅 artifact metadata；此次採獨立 byte reader，原 src.ci_evidence_bundle verifier 已有六項真執行單測，未把下載 bytes 說成直接 CLI 執行。非簽章/attestation，非正式可部署 build/正式 release/遠端 UAT；使用者授權未擴大，仍不建立付費資源或部署。L4 受控品質守門真缺陷 red/green + CI 證據實作/獨立下載驗證；L5 需不同建置產物/回退情境，L6 需實際跨角色整體驗收。
+
+
+## 2026-11-16 本機版本啟用與復原訓練
+- 依使用者先訓練必要專家再討論整體驗收，重用原 EP-14/EP-05/READ_ONLY_RECONCILE 原理，DevOps/SRE 主責，單 Agent role work。選原 deferred 不同產物與本機切換/rollback，不重做前一 CI 報告或研究方法 APP。官方原理 [Python os.replace / fsync](https://docs.python.org/3.13/library/os.html)：同 FS 成功 replace 具有 POSIX 原子重命名語意；flush+fsync file 後 replace 並 fsync parent。原子可見性不等於斷電持久性、CAS 或多服務事務。不可從同一不可信包自帶雜湊建立信任。
+- 可重現獨立 [lab](test_local_activation_recovery.py)，使用 `python docs/training/reviews/test_local_activation_recovery.py -v`，不列入正式服務、不執行 ZIP 程式、不使用網路。兩個合成教學版本 HTML/CSV ZIP，分開可信 controller SHA256（不是遠端/簽章證據），同目錄 next/current 指標；由 subprocess 實際 os._exit(71/72) 模擬確切切點的中斷。父流程獨立讀 current、完整 ZIP bytes、兩份成品 HTML/CSV。非 SIGKILL/電源中斷、非真雲端操作。此為自造受控案例，不是 production bug 或獨立陌生盲測。
+- 實測 Python 3.13.5，程式 SHA256 3549f2123df4f58e9867c34b80de6441d5fa902395cd82f21cd85a9b502d8d1c。原本機輸出：
+```
+test_corrupt_candidate_rejected_before_switch (__main__.ActivationRecoveryLab.test_corrupt_candidate_rejected_before_switch) ... ok
+test_corrupt_rollback_target_cannot_activate (__main__.ActivationRecoveryLab.test_corrupt_rollback_target_cannot_activate) ... ok
+test_interrupted_after_commit_reconcile_then_rollback (__main__.ActivationRecoveryLab.test_interrupted_after_commit_reconcile_then_rollback) ... ok
+test_interrupted_before_activation_old_version_remains (__main__.ActivationRecoveryLab.test_interrupted_before_activation_old_version_remains) ... ok
+Ran 4 tests in 9.256s
+OK
+```
+- 學習蒸餾：切前中斷 active v1 且 next=v2，對帳後才允許續做；切後退出 active 已 v2，舊 expected v1 retry 實際拒絕，核 v2 後才以 v2 expected 回退 v1；損毀新包與損毀回退目標拒絕，保持既有 active。部署技能增量記錄。本地 ZIP bytes 與 controller pins 受信任，版本並非實體 immutable filesystem 權限；示範不含並行 writer／不信任 symlink／多 FS／電源失效／新寫入資料回復／服務健康。實際原理遷移的局部工程訓練通過，不稱全 L5/L6、真外部 deployment、A07/B10/UAT。待候選文件同步及 exact CI，其他必要專家深化續作。

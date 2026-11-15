@@ -19,5 +19,9 @@ description: "部署、處理 CI 或版本。devops-sre 角色；交付 deployme
 ### Version-bound CI evidence 完整性（TD004-OFFICIAL-03 / EP-14）
 先核 real run/attempt、checkout SHA 與 PR head/merge diff、必要步驟結果，再核產物 ID/expiry/digest、明示 expected file set；失敗可留下 diagnostic 但不是候選部署物。統計由逐案例重算、拒絕錯型/負數/重複，保留實際完整日誌。從獨立可信來源取得完整報告 hash/context 再查每檔 byte hash，不能信同 artifact 自帶摘要、不能把 checksum 當簽章或 CI 結果。原 src.ci_evidence_bundle 離線 verifier 僅驗 supplied evidence 且不授權部署；新 CI_EVIDENCE_BOUND marker 原始 log 另核。source drift 或未知提交先唯讀對帳；回退以已核實版與新 revert/forward-fix，不 force push、不重送未知 POST。真 deployment artifact、簽章/attestation、remote bytes、UAT/Release 另門檻。見 [深度覆盤](../../../docs/training/reviews/2026-11-15-ci-artifact-integrity.md)。
 
+
+### 本機版本啟用失敗與復原（必要專家深化，2026-11-16）
+不同於 CI diagnostic artifact 完整性，本機實際使用兩個版本化教學 HTML/CSV ZIP，獨立 controller pin 與實際 subprocess 退出前/後的版本讀回，驗證未知結果先對帳、拒絕 stale retry、回退目標亦重新驗 bytes。POSIX 同一檔案系統的暫存指標 flush/fsync → os.replace → directory fsync 可縮小部分切換範圍，但不等於跨系統交易或斷電保證。先確認真 active 指標與內容，不因程序錯誤碼推斷 mutation 未發生；若舊版資料/產物不完整則停，不盲回退；有新版寫入時依原 migration/restore 契約處理。訓練程式只驗單一可信 writer、受控目錄，無並行 CAS、真部署、runtime service health、data migration 或外部 UAT；不可直接作部署程式。詳 [實作與限制](../../../docs/training/reviews/2026-11-15-ci-artifact-integrity.md#2026-11-16-本機版本啟用與復原訓練)。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 deployment-plan；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

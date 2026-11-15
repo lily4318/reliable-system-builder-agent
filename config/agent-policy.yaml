@@ -51,3 +51,12 @@ human_first_interaction:
   separate_confirm_after_edit_required: true
   editable_text_fallback_if_ui_controls_unavailable: true
   specification_approval_does_not_authorize_deployment: true
+
+  beginner_first_account_onboarding: true
+  onboard_only_required_services: true
+  check_existing_account_and_connection_before_signup: true
+  one_current_human_step_with_expected_check_and_recovery: true
+  connected_status_does_not_verify_actual_capability: true
+  account_connection_does_not_authorize_writes_or_deployment: true
+  no_required_cli_for_novice_users: true
+  identity_verification_and_consent_remain_user_controlled: true

@@ -78,3 +78,7 @@ NATIVE-CLOUD-017-C1-READONLY：實際 GitHub/Cloudflare/個人 Drive 唯讀與 S
 - 使用者完成 Supabase 連接，沿原本 C1 唯讀授權接續；前次「未連接」為歷史狀態，現已解除。讀 Supabase skill、原主檔、決策與 C1 review。實際 list_organizations 回一組可見組織、list_projects 回空清單，get_organization 回 plan=free / tier=tier_free；不保存私人組織 ID、名稱/email 或身份資訊。僅證實當前連接的可見組織與專案資源，非所有不可見帳號/組織的用量保證。
 - Supabase 官方 docs connector 查得 billing-on-supabase、free-project-pausing：Free 提供 owner/admin 所屬組織合計兩個免費專案，paused 不計；500MB DB/project、50000 MAU、1GB storage、5GB egress、500000 Edge Function invocations（多項配額按組織合計）；低活動7日可能暫停，暫停後 dashboard 可於90日內恢復。當次套餐確認成功，但組織角色、真正剩餘配額、建立專案的專案特定價格與寫入 scopes 未驗；不可保證零費用。專案報價需先由使用者選定組織，未呼叫 get_cost、confirm_cost 或 create_project。可在另行授權後核報價、選定區域/隔離新專案、驗 migrations/RLS/Auth/RPC/Edge Functions 及遠端 URL；前端仍需適當託管；禁止使用真人/敏感資料、付費、既有項目或未授權外部寫入。沒有執行 SQL、建庫、建立 branch、部署或讀取個人資料表。
 - 原 C1 文件 exact 6274f0cae29d2a71d12c15cb4ef67a97c60b2351 / CI 43712836552 job 132807956654 completed/success，raw 239471 chars，450 tests in 48.013s，EDITORIAL_BROWSER_PASS。原 C1 Pages-first 建議不因 Supabase 連接逕自取代；但 CLOUD-D 現可直接唯讀查核且具實際管理介面，列為可行的 SQL/Auth 進階訓練候選。C1 PARTIAL_VERIFIED，C3 NOT_AUTHORIZED；保留原 A07 fresh dialogue pending。沒有新增免費資源或部署，不寫正式 main。
+
+
+## 9. TD-003 新手前置引導
+C1 必須依 [完全新手引導](BEGINNER_ACCOUNT_ONBOARDING.md) 先辨識必要服務、帳號現狀、連接與可用能力；使用者完全零技術背景為預設。Agent 使用離線 src.account_onboarding 分流，真工具查核，不重註冊或要求四平台全連；缺工具/權限/成本卡點逐步解除或安全替代，C3 不變。B10 真新人評閱待實際任務。

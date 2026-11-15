@@ -7,13 +7,13 @@
 - TASK_DOMAIN: RELIABLE_AGENT_ENGINEERING_CAPABILITY_TRAINING
 - SOURCE_REPO: lily4318/reliable-system-builder-agent
 - ACTIVE_CANDIDATE: Draft PR #8, candidate-skill-team-integration-20261114；https://github.com/lily4318/reliable-system-builder-agent/pull/8
-- SOURCE_VERSION: Latest engineering-verified candidate d2ca12006988100a500a6a6fea0f41cd73de5f85 / CI 43688939298 success; confirmed TD-001/TD-002 decision log commit 05f13981d3f7f1452183b30a3afcd2b2e297e708. Current Draft PR #8 head authoritative; new documentation CI not yet verified.
-- LAST_VERIFIED_STEP: Exact CI 43688939298/job 132735394546 completed/success; full raw logs 223987 chars, 388 tests in 39.030s/OK; P12-FUNCTIONAL and P12-HOST-QA confirmed actual bounded public B003 interpreter and host failure-driven revision with fixture transport; all workflow steps success. No real local model invocation or independent blind holdout.
-- COMPLETED: P0/P1-1a/b/c/P2-1/P2-2a/b/c/d and P1-2a/b/c engineering contracts plus restricted B003 host functional gate verified at exact SHA (388 PASS). TD-001 user-confirmed platform-native professional Agent direction; local runners retained as optional evaluation artifacts. TD-002 decision log created and read back. Engineering evidence retained; no new model inference or model weight training.
-- BLOCKERS: No blanket platform access, independent subagent, blinded reviewer or general native-code sandbox capability established; verify actual tools/permissions per task. Local Ollama availability is no longer a blocker to platform-native work. Independent model benchmarks remain unverified and optional, not a prerequisite. Source ZIP not re-read in this discussion; prior training summary is evidence, not original material. Cross-project integration, formal release and external deployments require separate authorization.
+- SOURCE_VERSION: Direction/engineering-verified candidate 331b1568ffca8c0ccf6cbd27be73471e6f9d3d4d / CI 43690995549 success; TD-002 confirmation supplement and proposal index commit a6276c144ae27858ea6a96f1397e2869ee041c3c; training review commit 9285d9de17cbc3706664175921305e53cca00856. Current Draft PR #8 head authoritative; latest documentation revision CI not yet verified.
+- LAST_VERIFIED_STEP: Exact CI 43690995549/job 132741660212 completed/success; full raw logs 223985 chars, 388 tests in 48.141s/OK; P12-FUNCTIONAL/P12-HOST-QA and all workflow steps pass. Previous TD-001/TD-002 documentation and engineering regressions verified at 331b1568ffca8c0ccf6cbd27be73471e6f9d3d4d, not actual independent model/holdout or fresh-conversation acceptance. New decision log and review read back.
+- COMPLETED: All previously verified P0/P1/P2 engineering work retained (388 PASS). TD-001 platform-native priority and TD-002 continuity confirmed; previous four-file integration exact CI pass. User explicitly reconfirmed durable decision protocol; appended TD-002 evidence and TP-001–005 proposed index to original decision log, added detailed curriculum/architecture review and indexed it; corrected conflicting legacy continuation clause in this original master. Documentation only; no extra runner, model installation, or external project execution.
+- BLOCKERS: Latest documentation integration exact CI not yet verified; true fresh-conversation test and platform-specific tool/permission availability still need observation. Independent multi-agent and blinded evaluation unverified and optional. Original course ZIP not retrieved this round; review relies on preserved summary. TP-001–005 are proposals, not approved implementation. External project integration, private data, paid API, formal release and deployment require separate authorization.
 - WRITE_OWNER: 僅 Agent 候選分支；main/Release、外部專案、真實個資、付費模型或正式部署不在本次授權內。
-- SYNC_STATUS: ENGINEERING_EXACT_FULL_CI_388_PASS; TD001_PLATFORM_NATIVE_CONFIRMED; TD002_DECISION_LOG_READBACK; DOCUMENTATION_INTEGRATION_CI_UNVERIFIED; INDEPENDENT_MULTI_AGENT_NOT_VERIFIED; TRUE_HOLDOUT_NOT_RUN; NO_RELEASE.
-- NEXT_ACTION: TD-001 priority: audit the end-to-end platform-native entry and role/skill/workspace contracts; use an actually available, authorized engineering task to select needed roles, read only relevant skills/cases, deliver and verify real artifacts, record observed failures and distill transferable knowledge, then apply it to a different task. Fix observed gaps in original skills/tools, not repeated synthetic applications. Existing external project integration or data transfer needs separate authorization; do not require Ollama or paid API. Verify latest exact documentation CI and reconcile failures; preserve independent evaluation capability as optional.
+- SYNC_STATUS: TD001_TD002_PREVIOUS_INTEGRATION_EXACT_CI_388_PASS; TD002_RECONFIRMED; REVIEW_AND_DECISION_INDEX_READBACK; LATEST_DOCUMENTATION_CI_UNVERIFIED; FRESH_CONVERSATION_ACCEPTANCE_NOT_RUN; NO_RELEASE.
+- NEXT_ACTION: Follow TD-001: on next actual training turn verify latest PR head and exact CI, then demonstrate fresh-conversation source recovery and platform-native role/skill/workspace usage with a genuinely authorized engineering task. Read matching SKILL and cases, deliver verifiable output, preserve evidence and distill observed lessons; resolve real gaps only. Consult TD-002 and indexed review; TP-001–005 remain proposals until confirmed. No mandatory local model, no repeated synthetic work or external integration without authorization.
 
 ### 最新有效訓練優先序（TD-001；取代下方歷史路線的執行優先順序）
 
@@ -35,7 +35,7 @@
 
 ### 決策及跨對話接續（TD-002）
 
-- 唯一有效訓練主檔就是本檔；[DECISION_LOG.md](training/DECISION_LOG.md) 增量保存長期討論、使用者決策、取代關係及來源。深入分析可另存 training/reviews/ 並索引，不另造主檔。
+- 唯一有效訓練主檔就是本檔；[DECISION_LOG.md](training/DECISION_LOG.md) 增量保存長期討論、使用者決策、取代關係及來源。深入分析可另存 training/reviews/ 並索引，不另造主檔。已存 [2026-11-15 平台原生訓練覆盤](training/reviews/2026-11-15-platform-native-training-review.md)，涵蓋教材、架構選擇、案例學習及既有網站 Agent 的前次比較。TD-002 於本輪由使用者明確再次確認；待確認 TP-001–005 只見原決策紀錄，不是現行施工命令。
 - 新對話先讀 START_HERE、AGENTS 及原候選 PR #8 最新 head 的本節與相關決策，再驗證實際狀態。正式使用 main/release 與候選訓練分開。
 - 每次重要討論記錄 DISCUSSION/PROPOSED/CONFIRMED；實際修改及驗收另記 IMPLEMENTED/VERIFIED。改原檔並查寫前 SHA、寫後回讀和 exact CI；失敗清楚回報。
 - 歷史段落、舊 NEXT_ACTION 與未採用方案保留為證據，不作執行命令。新使用者明確決策須增量更新本節與決策紀錄。跨專案或正式升版另需授權。
@@ -351,10 +351,10 @@
 
 ### 每次續作及更新協定
 
-1. 當使用者說「訓練此 Agent」「繼續訓練」時，定位本 repo；先查 main、目前訓練 PR 的實際 head、最新 CI/PR 討論，再讀本節與直接相關技能、程式和測試。新候選轉移時保留本路徑並更新導航；不得用固定 SHA 當現況。
+1. 當使用者提出訓練、續作、改善、分析、方向討論時，定位本 repo；先查 main、當前訓練 PR #8 的實際 head、最新 CI/PR，再讀該 head 的 START_HERE.md、AGENTS.md、本檔頂部及 training/DECISION_LOG.md 的有效決策，按需讀索引 review／技能／程式／測試。新候選轉移時保留本路徑並更新導航；不得用固定 SHA 當現況。
 2. 以使用者最新決策、實際程式/測試與同 SHA 證據為準。歷史文件與舊對話只供導航；本節的建議不授權付費模型、外部寫入、合併、部署或正式發布。
-3. 優先完成最高優先且可安全執行的未完成工作；若真實 runner 受阻，實作隔離合成垂直切片、功能測試和案例學習，不停留於反覆查核或空報告。
-4. 每次實質訓練後在本節更新 SOURCE_VERSION、LAST_VERIFIED_STEP、COMPLETED、NEXT_ACTION、BLOCKERS、WRITE_OWNER、SYNC_STATUS 和路線狀態；記錄真實測試命令/CI、失敗修正、產物與限制；區分已驗證、NOT_RUN、BLOCKED、PROPOSED。回讀同分支檔案確認，保留 Git 歷史；不複製出多個互相矛盾的訓練主檔。
+3. 依 TD-001 優先在現有已授權 AI 平台完成有實際價值的工作、讀適用技能／案例、驗收及覆盤。缺本地 runner 不構成日常工作阻礙；沒有獨立子代理時標記單 Agent 分工。受控合成測試只在真實缺口或必要回歸時使用，不重複施工。缺特定工具或權限時只阻塞受影響步驟，不能擅自替代部署或跨專案寫入。
+4. 每次實質訓練後更新本檔頂部 SOURCE_VERSION、LAST_VERIFIED_STEP、COMPLETED、NEXT_ACTION、BLOCKERS、WRITE_OWNER、SYNC_STATUS 和路線狀態；記錄真實測試命令/CI、失敗修正、產物與限制。每次具有長期價值的討論同步增量保存至原 decision log；重大分析存 reviews 並索引。區分 DISCUSSION、PROPOSED、CONFIRMED、IMPLEMENTED、VERIFIED、SUPERSEDED、REJECTED 及未執行／阻塞。使用者確認、實作及驗收分開。寫前核對版本，回讀同分支檔案、核對同 SHA CI，失敗明確回報，保留 Git 歷史；不複製訓練主檔。
 5. 若候選 SHA 改變，分開記錄最後已測程式 SHA 與目前文件 SHA。單 Agent 實作/合成測試、真實 LLM 執行、獨立子代理、獨立盲測、正式 Release 均分開報告。未經授權不自行修改模型權重或宣稱已修改。
 6. 本檔為訓練方向的持久化入口，`docs/CURRENT_STATE.md` 與 PR/CI 紀錄保留實際工程歷史；有衝突先查證並更新本節，不另建重複進度來源。
 
@@ -364,7 +364,7 @@
 
 本 PR 與尚未合併的 Draft PR #4（目標分流）、#5（角色交接）及 #6（真實模型 runner/來源）**平行且不互相依賴**。本候選不替三個 PR 做合併決策；任何未來整合須按當時 main 解衝突、同 SHA 跑全套回歸及另行人工審查。
 
-## 可立即執行的公開訓練工作台
+## 選用公開評測工作台（歷史工程操作手冊，不是 TD-001 日常前提）
 
 ```bash
 # A. 出一題給真正的 Agent，公開輸入不含參考架構與解答
@@ -477,7 +477,7 @@ CI 僅驗證離線題目產生與**合成**匯入協定；合成正例即使結�
 
 `src/capability_reference.py` 是公開、可信、自行撰寫的極小參考函式；CI 使用這些函式的可信單元測試驗收參考語意。對 Agent 提交的任意 Python 程式，評測器**只用 `ast.parse` 讀取靜態形式，不 import、不執行**，避免在有網路或 Secret 的 CI 中跑不可信代碼。
 
-## 真正的能力訓練與改善前後比較流程
+## 選用獨立能力訓練與改善前後比較流程（非日常工作前提）
 
 1. **凍結基線**：保存 Agent 所用模型的實際版本、Prompt／Role SHA、工作台 SHA、公開題庫 SHA、指令與資源限制、工具權限、執行時間和成本。先用固定題目取得真正模型至少 3 次獨立輸出，保留失敗案例。
 2. **獨立人工觀察**：兩位審查者盲態評閱需求是否正確（尤其衝突與含糊處）、架構取捨、錯誤後修正；建立理由與仲裁，不只看元件名稱是否匹配。開發者不可一邊改評測題目一邊宣稱成績上升。
@@ -493,5 +493,5 @@ CI 僅驗證離線題目產生與**合成**匯入協定；合成正例即使結�
 - 不可信程式通過靜態 AST **不能**當程式已成功；沒有已核准隔離環境，就只保留為 `CODE_EXECUTION_UNVERIFIED`。
 - 人類審查安全違規一律阻擋，且任何 UNKNOWN 非冪等請求皆以唯讀對帳優先。
 
-## 本輪狀態
+## 歷史基準設計時的狀態（非現況；以頂部為準）
 **已設計並可在此 Repo CI 執行**：公開合成需求、參考產物、任務生成 CLI、結構評分器、受信任參考程式與單元測試、既有政策及復原基準。**仍沒有**：實際模型生成的系統成果、真正子代理執行、未知程式的隔離沙箱、獨立 holdout、真實部署驗收。以上項目不得借用之前 PR #6 的 runner／模型來源檢查狀態，或以任意合成 PASS 冒充完成訓練。

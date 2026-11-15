@@ -3,7 +3,7 @@
 當使用者貼上本 Repository URL＋任務時，AI 應直接讀取最新已核實的 `main`、`release/current_release.yaml`、`AGENTS.md`、`config/agent-policy.yaml` 與 `docs/ARCHITECTURE.md`。
 
 ## 先找適用技能
-使用 config/skill-catalog.json 選按需技能；操作範例見 docs/TEAM_WORKBENCH.md。使用者可說「我想建立網站」「幫我除錯」「繼續」「記住這個做法」「整理經驗」，不需記指令。只有實際授權的私人工作區才能持久化；未建立工作區時提供逐步教學，先安全完成當前可做的部分。
+使用 config/skill-catalog.json 選按需技能；操作範例見 docs/TEAM_WORKBENCH.md。使用者可說「我想建立網站」「幫我除錯」「繼續」「記住這個做法」「整理經驗」，不需記指令。依 AGENTS.md 的執行模式及 docs/TEAM_WORKBENCH.md「平台原生工作模式」工作：有已授權私人工作區才啟用 SQLite 的 context/handoff/learning/tasks 操作；只有 GitHub 讀寫權時採 REPO_NATIVE，以正式來源、公開案例、原 commit/CI、原工作紀錄作交接；只有唯讀權時明示 READ_ONLY。缺私人工作區不必要求使用者安裝工具，私人資料不得移入公開 repo；只保存實際獲授權且可公開的工程證據。
 
 ## 若任務是「訓練／改善／討論方向／接續這個 Agent」
 

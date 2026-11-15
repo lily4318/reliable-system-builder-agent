@@ -360,6 +360,13 @@ def revise(path, task, expected_revision, session, evidence, confirmed=False,
             if more <= affected:
                 break
             affected |= more
+        # Recovery blockers are derived from the current ancestry. Rewiring an
+        # affected live/quarantined worker would reinterpret its old resource
+        # dependencies and could release a still-needed upstream fence.
+        # Descendants of this node are unchanged by replacing its inbound edges.
+        if set(old['deps']) != set(new['deps']) and any(
+                rows[k]['state'] in ('RUNNING','RECOVERY_REQUIRED') for k in affected):
+            raise ValueError('affected active worker: stop and reconcile before dependency revision')
         db.execute('UPDATE task_pool SET title=?,deps=?,gates=?,checks=? WHERE id=?',
                    (new['title'],json.dumps(new['deps']),json.dumps(new['gates']),json.dumps(new['checks']),task))
         if change is not None:

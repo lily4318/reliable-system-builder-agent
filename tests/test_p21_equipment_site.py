@@ -1,6 +1,8 @@
 import http.client
 import re
 import sqlite3
+import socket
+from contextlib import closing
 import tempfile
 import threading
 import unittest
@@ -49,6 +51,91 @@ class SiteTests(unittest.TestCase):
         status,body,_=self.req('GET','/',cookie)
         self.assertEqual(status,200)
         return {'csrf':re.search('name="csrf" value="([^"]+)"',body)[1],'token':re.search('name="token" value="([^"]+)"',body)[1],'qty':qty}
+
+    def raw_form(self,path,cookie,body,framing,*,finish=True):
+        # Loopback only, actual socket bytes; never a remote or live system.
+        headers=['POST '+path+' HTTP/1.1',
+                 'Host: 127.0.0.1:'+str(self.site.server_port),
+                 'Origin: '+self.site.origin,'Cookie: '+cookie,
+                 'Content-Type: application/x-www-form-urlencoded',
+                 *framing,'','']
+        with socket.create_connection(('127.0.0.1',self.site.server_port),timeout=10) as sock:
+            sock.sendall('\r\n'.join(headers).encode('ascii')+body)
+            if finish:
+                sock.shutdown(socket.SHUT_WR)
+            with http.client.HTTPResponse(sock) as response:
+                response.begin()
+                return response.status,response.read().decode('utf-8')
+
+    def framing_snapshot(self):
+        # Compare all persisted business rows, including durable negative decisions.
+        with closing(self.store.connect('ro')) as db:
+            db.execute('BEGIN')
+            return tuple(tuple(db.execute('SELECT * FROM '+table+' ORDER BY 1,2').fetchall())
+                         for table in ('inventory','requests','lifecycle','action_attempts'))
+
+    def assert_form_rejected(self,path,cookie,body,headers,*,finish=True,status=400):
+        before=self.framing_snapshot()
+        raw_before=self.store.path.read_bytes()
+        actual,_=self.raw_form(path,cookie,body,headers,finish=finish)
+        after=self.framing_snapshot()
+        self.assertEqual((actual,after==before,self.store.path.read_bytes()==raw_before),
+                         (status,True,True))
+
+    def test_form_framing_incomplete_reserve_cancel_return(self):
+        m=self.login('member'); admin=self.login('admin')
+        for operation,cookie in [('reserve',m),('cancel',m),('return',admin)]:
+            with self.subTest(operation=operation):
+                if operation=='reserve':
+                    data=self.form(m,2)
+                else:
+                    prior=self.form(m,2)
+                    self.assertEqual(self.req('POST','/reserve',m,prior)[0],200)
+                    data=self.action(cookie,prior['token'],
+                                     'c'*32 if operation=='cancel' else 'd'*32,
+                                     'member' if operation=='return' else None)
+                body=urlencode(data).encode('ascii')
+                self.assert_form_rejected('/'+operation,cookie,body,
+                                          [f'Content-Length: {len(body)+7}'])
+
+    def test_form_framing_invalid_headers(self):
+        m=self.login('member')
+        for case in ('signed','duplicate','combined','empty-te','chunked-te','zero','oversize'):
+            with self.subTest(case=case):
+                body=urlencode(self.form(m,1)).encode('ascii')
+                n=len(body)
+                headers={
+                    'signed':[f'Content-Length: +{n}'],
+                    'duplicate':[f'Content-Length: {n}',f'Content-Length: {n}'],
+                    'combined':[f'Content-Length: {n}, {n}'],
+                    'empty-te':[f'Content-Length: {n}','Transfer-Encoding:'],
+                    'chunked-te':[f'Content-Length: {n}','Transfer-Encoding: chunked'],
+                    'zero':['Content-Length: 0'],
+                    'oversize':['Content-Length: 4097'],
+                }[case]
+                self.assert_form_rejected('/reserve',m,body,headers)
+
+    def test_form_framing_incomplete_negative_decision_not_persisted(self):
+        m=self.login('member')
+        data=self.action(m,'f'*32,'e'*32)
+        body=urlencode(data).encode('ascii')
+        self.assert_form_rejected('/cancel',m,body,[f'Content-Length: {len(body)+1}'])
+
+    def test_form_framing_complete_encoded_and_replay(self):
+        m=self.login('member'); admin=self.login('admin')
+        data=self.form(m,2)
+        body=urlencode(data).replace('qty=2','qty=%32').encode('ascii')
+        headers=[f'Content-Length: 00{len(body)}']
+        status,page=self.raw_form('/reserve',m,body,headers)
+        self.assertEqual(status,200); self.assertIn('RESERVED',page)
+        self.assertEqual(self.store.view(None)[:2],(10,2))
+        before=self.framing_snapshot()
+        self.assertEqual(self.raw_form('/reserve',m,body,headers)[0],200)
+        self.assertEqual(self.framing_snapshot(),before)
+        action=self.action(admin,data['token'],'a'*32,'member')
+        body=urlencode(action).encode('ascii')
+        self.assertEqual(self.raw_form('/return',admin,body,[f'Content-Length: {len(body)}'])[0],200)
+        self.assertEqual(self.store.view(None)[:2],(10,0))
 
     def test_member_admin_end_to_end(self):
         m=self.login('member'); other=self.login('member2'); admin=self.login('admin')

@@ -119,9 +119,27 @@ BAD_SOURCE = """def has_overlap(existing, proposed):
 """
 
 
+# These are deliberately deficient, trusted public fixtures, never native-executed.
+# All old samples have at most three intervals, so unnecessary cubic work was missed.
+EXPENSIVE_SOURCE = """def has_overlap(existing, proposed):
+    for a in existing:
+        for b in existing:
+            for c in existing:
+                ignored = c
+    for item in existing:
+        if item[0] < proposed[1] and proposed[0] < item[1]:
+            return True
+    return False
+"""
+LOWER_BOUND_SOURCE = GOOD_SOURCE.replace(
+    '    for item in existing:', '    if proposed[0] == -10080:\\n        return False\\n    for item in existing:'.replace('\\n','\n'))
+UPPER_BOUND_SOURCE = GOOD_SOURCE.replace(
+    '    for item in existing:', '    if proposed[1] == 10080:\\n        return False\\n    for item in existing:'.replace('\\n','\n'))
+
 class FunctionalTransport(Transport):
-    def __init__(self):
+    def __init__(self, first_source=BAD_SOURCE):
         super().__init__(rejections=0)
+        self.first_source=first_source
 
     def __call__(self,method,path,body=None):
         raw=super().__call__(method,path,body)
@@ -130,7 +148,7 @@ class FunctionalTransport(Transport):
             if ctx.get('task')=='implementation' and 'selected_skill_and_retrieved_cases' in ctx:
                 value=json.loads(raw)
                 answer=json.loads(value['message']['content'])
-                answer['artifact']=BAD_SOURCE if len(self.impl)==1 else GOOD_SOURCE
+                answer['artifact']=self.first_source if len(self.impl)==1 else GOOD_SOURCE
                 value['message']['content']=json.dumps(answer)
                 return local._json(value)
         return raw
@@ -191,3 +209,39 @@ class FunctionalGateContract(unittest.TestCase):
             self.assertFalse(result['general_sandbox_verified'])
             self.assertFalse(result['release_authorized'])
             print('P12-HOST-QA: model REVIEW_READY overridden by actual bounded tool failure; revision 2 passed fixed public slice; no inference',flush=True)
+
+    def test_public_gate_rejects_valid_maximum_workload_budget_bypass(self):
+        from src import p1_restricted_functional as f
+        report=f.evaluate(EXPENSIVE_SOURCE)
+        # Actual restricted semantics on valid input, independent of case list.
+        fn=f._parse(EXPENSIVE_SOURCE)
+        existing=tuple((i*2,i*2+1) for i in range(32))
+        with self.assertRaisesRegex(f.Blocked,'STEP_BUDGET'):
+            f._interpret(fn,existing,(80,81))
+        self.assertEqual(report['status'],'PUBLIC_SLICE_FAIL',report)
+        self.assertTrue(any('STEP_BUDGET' in x for x in report['findings']))
+        self.assertEqual(f.evaluate(GOOD_SOURCE)['status'],'PUBLIC_SLICE_PASS')
+
+    def test_public_gate_covers_integer_boundary_counterexamples(self):
+        from src import p1_restricted_functional as f
+        for candidate,pair in ((LOWER_BOUND_SOURCE,(-10080,-10079)),
+                               (UPPER_BOUND_SOURCE,(10079,10080))):
+            with self.subTest(pair=pair):
+                self.assertFalse(f._interpret(f._parse(candidate),(pair,),pair))
+                self.assertTrue(f._interpret(f._parse(GOOD_SOURCE),(pair,),pair))
+                self.assertEqual(f.evaluate(candidate)['status'],'PUBLIC_SLICE_FAIL')
+
+    def test_host_qa_rejects_budget_bypass_even_when_model_ready(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            out=Path(tmp)/'pilot'
+            t=FunctionalTransport(first_source=EXPENSIVE_SOURCE)
+            result=run.run('B003',MODEL,D,out,confirm_offline=True,transport=t,functional_pilot=True)
+            self.assertEqual(result['qa_rejections'],1)
+            self.assertEqual(result['repair_rounds'],1)
+            self.assertEqual([r['status'] for r in result['functional_runs']],
+                             ['PUBLIC_SLICE_FAIL','PUBLIC_SLICE_PASS'])
+            first=json.loads((out/result['functional_runs'][0]['file']).read_bytes())
+            self.assertTrue(any('STEP_BUDGET' in x for x in first['findings']))
+            self.assertTrue(any('STEP_BUDGET' in x for x in t.impl[1]['repair_findings'][0]['findings']))
+            self.assertFalse(result['program_correctness_verified'])
+            self.assertFalse(result['release_authorized'])

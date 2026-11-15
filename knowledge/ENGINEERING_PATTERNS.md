@@ -32,12 +32,14 @@
 - 採用：明示需求含否定與未決，與推導、整理副本、已確認決策分離；穩定 ID/版本、逐值校驗定義為直接鏡像的欄位、審閱項一對一追溯，缺失/重複/錯配不能放行。比較單一來源引用與保持舊 schema 的明示鏡像；保留消費端/遷移取捨。
 - 證據：NATIVE-REQ-004，red [35b7f83](https://github.com/lily4318/reliable-system-builder-agent/commit/35b7f837221d7340d467d8a2f27e2d611f27ce50) / [CI 43693171112](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43693171112) 11 subtest failures；green [52e9d48](https://github.com/lily4318/reliable-system-builder-agent/commit/52e9d485a199c1c0481f1c0851e8f1d4c4bad08a) / [CI 43693293456](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43693293456)，395/395，3 新方法及 11 負例。原 [website_scenario_eval](../src/website_scenario_eval.py)、[tests](../tests/test_website_scenario_eval.py)、requirements-spec / architecture-design 的專節；決策紀錄 NATIVE-REQ-004。
 - 限制：固定公開 schema 的結構一致性，不證明任意語意推導、架構正確、真人確認或正式研究/部署授權。真正摘要不要求逐字相同。
+- 實際遷移 NATIVE-MATURITY-012-REVIEW-HANDOFF：本機審閱 export 重新由原13答生成草稿、exact canonical 比對、ID/title/choice/text/確認全覆蓋，將接受/修改的審閱文字獨立整併、拒絕列排除、未決列保留；下一階段為 requirements-spec，非施工核准。CI 43705735689 424/424，真 DOM W101–106 6/6。原 [成熟度盤點](../docs/training/reviews/2026-11-15-website-engineering-maturity.md)；hash 非語意審查或授權。共同證據見 EP-02，不另計案例。
 - 狀態：EVIDENCE_VERIFIED / INDEX_CANDIDATE；已有技能專節，尚未入程式檢索案例。
 
 ### EP-02 確認、核准與特定內容版本綁定
 - 採用：literal boolean True 才能表示操作者確認；選擇、編輯、取消及空白草稿使舊確認和預覽失效，重新確認獨立於實際送出。文件版本核准亦不繼承到新內容；版本、actor、實際授權各自檢查。UI 依 EP-06 驗真 DOM，持久狀態依 EP-03/04 守門。
 - 證據：NATIVE-TRANSFER-002 的 `test_human_confirmation.py` 核心兩方法現仍通過；NATIVE-UI-003 真 DOM 固定檢查 9/12→12/12（另一組 10/13→13/13 重疊不加總），[CI 43692897287](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43692897287) exact 2563e54ad5779042e575bae94b9fd7d84f2c5fd1，最新整合 [CI 43702633084](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43702633084) 核心及 DOM 再驗。P22-CASE-001 [CI 43666793523](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43666793523)，exact 36c03547b84a43c5c41c9aa93388c31839f56041，同 10 項 oracle 受控前後 6→10，原 `test_p22_document_review.py`。詳主檔及兩 NATIVE 決策。
 - 限制：literal True 不證明人類身分、操作真實性；合成文件 actor 不是登入認證；受控 DOM 不等於真人 UAT、送件、對外發布或 Agent 增益。
+- NATIVE-MATURITY-012-REVIEW-HANDOFF（同 EP-01 實測）：審閱原 export 及整併 handoff 各自 canonical hash；CLI 可比對已知可信 pin，變動需重新審閱；local UI 編輯/取消/修改答案失效，epoch/captured export 防延遲回應顯示舊內容。所有權限 false，hash 不證明真人或正式核准；CI 43705735689。
 - 狀態：EVIDENCE_VERIFIED / INDEX_CANDIDATE；核心與 UI 已入 debug-and-repair / test-and-acceptance，P22-CASE-001 仍主檔候選。
 
 ### EP-03 資源交易、冪等決定及未知寫入復原

@@ -55,6 +55,9 @@ python -m src.website_discovery draft --answers /secure/website-answers.json \
 ### 六種公開合成建站需求的自動回歸
 使用 `python -m src.website_scenario_eval evaluate --output output/website-scenario-evaluation.json` 進行六種不同網站的需求保留、應推導／不應推導、完整規格結構、個別編輯確認與無授權狀態驗證。否定句例如「不需要報名表單」不能被簡單關鍵字誤判；有「不需要報名，但需要匿名回饋」時需保留後一項需求。規格另生成 13 項需求來源追溯、架構與工作計畫待核草稿。案例屬人工撰寫且公開的**確定性邏輯回歸**；真正 LLM 的理解程度、適用介面與使用者體驗仍須獨立測試。詳見 `docs/WEBSITE_SCENARIO_TRAINING.md`。
 
+### 已審閱草稿轉入工程交接（NATIVE-MATURITY-012-REVIEW-HANDOFF）
+可用原本機 UI 的「產生下一階段交接預覽」或 `src.website_review_handoff` 唯讀檢查原匯出、整併審閱決策；使用者接受/修改採審閱文字，拒絕獨立排除，未決不任意填值。對照原內容與 hash，編輯失效，不將本機文字確認或 digest 當正式核准。下一個工作是 requirements-spec 的整份語意整合、具體驗收及使用者確認，之後才進架構與已授權施工。細節見 [操作指南](WEBSITE_INTAKE_UI.md)；完整網站實戰仍待驗。
+
 ## 與能力訓練及授權的關係
 
 這三項是對話和工程需求品質規則，必須與 Agent 的既有能力基準、政策負測及正式發布守門一起驗證。合成單元測試 PASS 只表示本地契約有效；**尚未在真實 LLM、不同 UI 平台或真人網站專案完成使用者體驗測試**。下一輪可在獨立、取得允許的模型環境用陌生建站需求做真人評估，不得將這些文件誤稱已訓練底層模型權重。

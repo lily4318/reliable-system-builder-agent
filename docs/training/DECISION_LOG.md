@@ -173,3 +173,16 @@
 - 覆盤／限制：把 EP-08 從 latest-head 列數選擇遷移到單欄 bytes/type；預先界定資料跨邊界物化，再做全資料語意驗證（EP-05）。有界 projection 不代表 SQLite native scan/sort/CAST 的 CPU RAM I/O 總資源有界或查詢無延遲，原排序鍵仍可能由 DB 處理巨型值；本輪未測生產/敵意 DB、任意 UTF/SQLite schema、全程 RSS/latency 或 live-source CAS，不聲稱匿名/Windows/斷電。用可信隔離合成 DB 與原功能、同版 CI 證據，不宣稱獨立多 Agent/跨平台/模型增益。原 EP-05/EP-08 交叉引用同一新證據、architecture-design skill、主檔/決策更新；11 EP、2 DEFAULT + 6 OPT_IN 不變，未自動升格。
 - NEXT_ACTION: 核對文件版 exact CI，與已驗收程式分開；不重做此欄位物化與 index 修補、舊 oracle 或任務池。優先審查具實證的 EP 知識之非重複升格/實際適用範圍，或選不同尚未解的真實工程缺陷。未獲額外授權不改 main/Release/外部系統或私庫。
 
+
+
+## TD-001｜2026-11-15 NATIVE-MATURITY-012-REVIEW-HANDOFF：使用成熟度及規格交接落地
+
+- 使用者明確要求轉向實際使用成熟度、盤點7專家/12技能/11 EP及近期實證，實作妨礙完整網站工程之最優先缺口。維持 TD-001/002、REPO_NATIVE / SINGLE_AGENT_ROLE_WORK，不自動升格/部署/發布。詳細 [盤點及剩餘驗收路線](training/reviews/2026-11-15-website-engineering-maturity.md)。
+- 基準 exact 9384651b6f4243706ff9bfbf19df5afe7c71b29d / CI 43705370942 job 132785180100 success / 418 tests in 39.204s。回讀7角色、catalog 12技能、11 EP、原來源與決策及 website_discovery、website_intake_ui、browser export、engineering_workflow、TEAM_WORKBENCH。EP-01/02/09 SOURCE_READ；角色/技能按需分工而非獨立模型。
+- 觀察：原 UI 匯出 local_reviewed_website_draft（原草稿 + 另列決策；明示不批准）；requirements-spec 已要求真正反映接受/修改/拒絕，卻無程式化整併及向下一設計階段交接的契約。比較 A 再寫報名網站/增加合成樣例，不能解決共同上游斷點；B 狹義修補交接（採用）；C 通用自動部署/完整 Agent orchestration，須另具平台能力與授權。此次是新功能補缺，不冒稱已有 RED regression 或實際事故。
+- 新 src/website_review_handoff.py（blob 57e82c01244511362c7846333cde8f4bb67b2b31）唯讀精確 export schema、全部13答鍵、重新 build_spec 並 canonical 比對原草稿、逐項 ID/title/choice/text/literal boolean coverage、拒絕空白/重複/錯配/不合法權限。保留 REQ IDs 及原正規化文字（含否定與未決）；accept/modify 用使用者審閱後文字，reject 獨立排除及理由/歷史 proposal；缺答明確 NEEDS_REQUIREMENTS_CLARIFICATION，否則 DESIGN_REVIEW_INPUT_ONLY。canonical review hash + handoff hash，CLI 可 --expected-sha256 比對原先可信 pin；不是簽章或身份/核准證據。所有權限 flags false、construction_permitted=false；下一站 requirements-spec 仍須整合衝突、具體 acceptance、整份正式確認及獨立施工權限。無 workspace/外部寫入或新模型呼叫。
+- 原 localhost UI 新 /review-handoff 入口（沿 Host/Origin/token、1 MiB bounded JSON/拒絕 duplicate keys）、final-confirm 後才可點「產生下一階段交接預覽」；結果以純文字呈現，編輯/取消/答案修改清除、epoch 與相同 captured export 防延遲回應。原 JSON 匯出格式相容，CLI 讀同一 export，stdout only，資料由使用者留在合適私人位置。無新公開服務、資料自動保存、正式規格核准或自動部署。
+- GREEN exact 560d143bd9db245f263906bc478ad5379b9eab23 / [CI 43705735689](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43705735689) job 132786283387 completed/success，raw 232216 chars，424 tests in 41.273s/OK。6新增方法：6 case exports/拒絕與修改分流、13種 stale/malformed/pin 負例、digest 變更（文/選擇/來源）、零推導/未授權、唯讀 CLI/duplicate JSON/cap、HTTP guarded endpoint。真實 Chromium W101–106 6/6，20推導項，handoff_test=true、原 export/import 與編輯失效同過；EDITABLE-DECISION-BROWSER 12/12、P21-EQUIPMENT-BROWSER PASS。不是獨立模型或真人 UAT、未實際磁碟下載驗收。
+- 覆盤：EP-01/02/09 在真實 UI→規格交接接口遷移。改善唯一共通施工前置，不宣稱已完成從需求到產品的所有階段；缺真實語意審查、目標/來源綁定的完整已確認施工規格、實際陌生網站 vertical slice、跨對話只靠原正式產物續作與獨立實際平台/部署驗收。原11 EP、2 DEFAULT+6 OPT_IN、既有 schema/任務池/QA 功能保留。不得拿 hash 或 local flag 當確認；原主檔、決策、EP-01/02、requirements-spec 與入口指南增量更新。
+- NEXT_ACTION: 先核對文件 exact CI；使用明示為公開合成/受控的不同完整網站委託，依已確認規格、目標/版本和使用者實際授權做可運作 vertical slice 及實際功能/權限/UI QA、接續證據；先向使用者提出可編輯的具體規格，未確認不開工於新網站。實際外部整合、正式上線、私人資料與平台獨立評測仍另行授權。不重做本次交接或舊缺陷。
+

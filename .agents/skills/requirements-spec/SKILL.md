@@ -16,5 +16,8 @@ description: "整理規格、修改需求。architect 角色；交付 specificat
 - 規格草稿內每個審閱項應對應一個確切且唯一的提案，接受／修改的預填文字必須對應該提案，不以陣列順序、碰巧相同的數量或舊確認當來源。進入下一階段前驗證缺失、重複、錯配、未決與否定的正反例。真正變更需求時，保留舊版並重新核對受影響的設計與驗收，不自行核准。
 - 本 repo 既有 13 題 schema 的可重現檢查：`python -m src.website_scenario_eval evaluate`，配合 `python -m unittest discover -s tests -p test_website_scenario_eval.py -v`。此契約驗證不能證明任意自然語言或整體架構合理；適用來源見原決策紀錄 NATIVE-REQ-004，勿把公開 fixture 當真人需求或能力分數。
 
+### 網站審閱結果的實際交接（NATIVE-MATURITY-012-REVIEW-HANDOFF）
+原本機 export `local_reviewed_website_draft` 用 `src.website_review_handoff.prepare`（或 `python -m src.website_review_handoff --review <私人 JSON 路徑>`；可另帶先前可信 `--expected-sha256`）。對話/REPO_NATIVE 沒有 CLI 時按同等契約核對原回答、原草稿、完整確認決策，明示實際工具使用與未執行檢查。不得把被拒絕提案並入施工功能、不得遺失修改文字。完整13原答、拒絕/修改/未決與 source digest 分離；先解決語意衝突、具體驗收、範圍及真人整份規格確認，再以同版完整 specification 交 architecture-design。設計審閱 packet status/sha 或本機確認絕非正式核准/寫入權。只在已授權適當私人位置保存原需求及產物，不將 stdout/私人內容傳公開 repo。原 [操作指南](../../../docs/WEBSITE_INTAKE_UI.md)，[CI 43705735689](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43705735689) 424 tests、6 actual DOM。無真人/跨平台/全站驗收證據。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 specification；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

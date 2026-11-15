@@ -190,6 +190,11 @@ intake.publish(sys.argv[1],sys.argv[2])
 
     def test_curated_file_case_opt_in_and_retrieval(self):
         from unittest.mock import patch
+        # Reproduce the historical P2-2b five-to-six migration without future cases.
+        historical = tuple(c for c in learn.TRAINING_CASES if c[0] != 'P22-CASE-003')
+        corpus = patch.object(learn,'TRAINING_CASES',historical)
+        corpus.start()
+        self.addCleanup(corpus.stop)
         work = wb.initialize(self.root/'casework','Synthetic file report')
         learn.setup(work)
         query = 'CSV deterministic JSON file bundle hash exclusive publication hard link'

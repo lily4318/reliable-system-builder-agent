@@ -40,5 +40,7 @@ description: "設計架構、比較方案。architect 角色；交付 architectu
 ### PostgreSQL 與 Supabase 資料庫架構（TD004-OFFICIAL-02 / EP-13）
 先以資料所有權矩陣及操作權限界定 exposed schema、GRANT/RLS、UPDATE 新舊 row、column privilege、view invoker、function ACL、管理員 bypass；不將 UI filter/登入當授權。交易須列共享 invariant、lock scope、owner/token namespace、衝突與未知結果；用真正非 owner 角色及兩獨立連線驗正負例、持久化與 rollback。Migration 按舊資料/相容 client/constraint validate/lock/版本回退設 gate，不把一次 DDL 成功當上線相容。Supabase 新表 Data API opt-in 公告及實際 grants/settings、JWT/auth.uid()、RPC/Storage、service key 邊界另驗；原生 PostgreSQL session_user lab 非 Supabase Auth 或正式部署。實作與驗收見 [原生 PostgreSQL 覆盤](../../../docs/training/reviews/2026-11-15-postgres-architecture.md)。
 
+- 進階 migration / 同 token 競寫（NATIVE-PG-023）：先列 RLS/ACL/constraint/view/function/資料全快照，真實阻擋 DDL、晚期衝突、失敗後檢查與合法修正才續作；lock_timeout 非整體期限。舊長連線明示投影與 wildcard prepared 0A000 分開，不承諾所有舊客戶端相容。以 pg_blocking_pids 真實競寫和 SQLSTATE 檢查不同 isolation；新 denial receipt 也是決策狀態變更，若不更新協調 row version，RR 可能得到 23505 而非預期 40001。原 v3 採同 transaction no-op logical update；保留 replay/owner ACL，評估 MVCC/WAL/trigger 成本。只在確定 abort 後重跑整筆交易；unknown commit 不盲重送。以 append-only migration 保留原已驗版並測帶歷史 receipts 之升版，不混同正式遠端資料遷移。見 EP-13 / 原覆盤。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 architecture；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

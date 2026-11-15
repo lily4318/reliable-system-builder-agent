@@ -49,14 +49,16 @@ def snapshot(path, expected_revision):
         # BLOB length counts bytes (TEXT length stops at embedded NUL).
         # Preserve invalid rows as NULL sentinels; never filter them away.
         # Python still validates exact identifiers, enums and quantities.
+        # Keep original source ordering/index eligibility without returning sort_id.
         # This bounds returned values, not SQLite native scan/sort resources.
         rows = db.execute("""SELECT record_id, category, state, quantity FROM (
             SELECT CASE WHEN typeof(record_id)='text' AND length(CAST(record_id AS BLOB))<=16 THEN record_id END AS record_id,
                    CASE WHEN typeof(category)='text' AND length(CAST(category AS BLOB))<=16 THEN category END AS category,
                    CASE WHEN typeof(state)='text' AND length(CAST(state AS BLOB))<=16 THEN state END AS state,
-                   CASE WHEN typeof(quantity)='integer' THEN quantity END AS quantity
+                   CASE WHEN typeof(quantity)='integer' THEN quantity END AS quantity,
+                   records.record_id AS sort_id
             FROM records
-        ) ORDER BY record_id LIMIT ?""", (MAX_ROWS+1,)).fetchall()
+        ) ORDER BY sort_id LIMIT ?""", (MAX_ROWS+1,)).fetchall()
         if not rows or len(rows)>MAX_ROWS:
             raise ValueError('invalid row count')
         seen = set()

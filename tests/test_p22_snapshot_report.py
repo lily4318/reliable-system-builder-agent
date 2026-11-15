@@ -320,3 +320,31 @@ class SnapshotReportTests(unittest.TestCase):
                     export.publish(source,self.root/'overflow.zip',1,2)
                 self.assertFalse((self.root/'overflow.zip').exists())
         self.assertEqual(len(set(outputs)),1)
+
+    def test_bounded_projection_retains_source_index_order(self):
+        from unittest.mock import patch
+        real_connect=sqlite3.connect
+        with closing(real_connect(self.source)) as db, db:
+            db.execute('CREATE INDEX records_id ON records(record_id)')
+        queries=[]
+        def connect(*args,**kwargs):
+            reader=real_connect(*args,**kwargs)
+            reader.set_trace_callback(queries.append)
+            return reader
+        before=self.source.read_bytes()
+        with patch.object(export.sqlite3,'connect',connect):
+            rows=export.snapshot(self.source,1)
+        self.assertEqual([r[0] for r in rows],
+                         ['SYN-0001','SYN-0002','SYN-0003','SYN-0004'])
+        statement=next(q for q in queries if q.startswith('SELECT record_id'))
+        with closing(real_connect(self.source)) as db:
+            details=[r[3] for r in db.execute('EXPLAIN QUERY PLAN '+statement)]
+            original=[r[3] for r in db.execute(
+                'EXPLAIN QUERY PLAN SELECT record_id, category, state, quantity FROM records ORDER BY record_id LIMIT 1001')]
+        print('P22C-INDEX-PLAN:',sqlite3.sqlite_version,original,details,flush=True)
+        # Relative to the original on this same SQLite/fixture, do not replace
+        # index ordering with forced expression sorting.
+        if any('USING INDEX records_id' in d for d in original):
+            self.assertTrue(any('USING INDEX records_id' in d for d in details))
+            self.assertFalse(any('TEMP B-TREE' in d for d in details))
+        self.assertEqual(self.source.read_bytes(),before)

@@ -54,3 +54,7 @@
 - 共通入口：AGENTS.md blob 585300f461a4aa9659cb71bfaeb186764974c489 / 5cc659f91ebf8bd988cfe7360f825281caf221ea 明確適用七角色與十二技能的 PRIVATE_WORKBENCH、REPO_NATIVE、READ_ONLY，明示共通條款釐清原角色/技能中的私人操作要求。TEAM_WORKBENCH.md blob 756b1f808b0b71010656ca6f412ab1abe6787145 / 0c4d9ace21d982fe761df73c75667e67c1374176 實際步驟、公開案例 source-read/CLI、原 repo 交接與證據、私有資料不可外流。START_HERE.md blob 6ed44b155e4214ebd7801d225de0156706a9d783 / 7cd8085e6fd9f320fea0e0526cb3b2fd6a354af0 依平台工具選模式。以上原檔同版回讀成功。角色/技能個別文件尚未改寫；由根 AGENTS 共通規則釐清，後續應查實際使用時有無衝突或平台跳過根規則，按證據修對應技能。
 - 候選經驗 NATIVE-CASE-001（observed gap, candidate reusable lesson; 尚未加入已核准 active case corpus）：共享工作規則容易不知不覺綁定特定存取方式；保留能力與安全不變，明確區分工具運行模式，資料依權限分類，以原來源/真實 evidence 交接，不用假 SQLite 收據填補缺工具；用不同真實任務及跨新對話確認適用性，再討論升格／蒸餾。目前 GitHub read/write 可行；公共 CLI CI 尚待，非獨立多 Agent 能力證據。
 - 下一步：核對最新整合 SHA exact CI（預期 390 tests，尚不得計為 PASS），修實際失敗；新對話讀最新 TD/案例與適用技能，用另一項實際授權工作驗證來源接續、角色/技能選擇與案例遷移；不新增不必要合成任務、不要求本地模型。不變更原 main/Release、外部專案、付費 API 或部署。
+
+### NATIVE-AUDIT-001｜驗收補記
+- 2026-11-15：exact code/tests/common-mode documentation SHA 7cd8085e6fd9f320fea0e0526cb3b2fd6a354af0，CI 43691876099/job 132744079996 completed/success；完整原始日誌 224366 chars，Ran 390 tests in 43.728s/OK；兩項 PublicContextTest 方法均 ok，所有 workflow steps success。公開案例檢索、預設/擴充隔離、無 workspace CLI 和私有命令拒絕缺 workspace 的工程契約 VERIFIED。
+- 七份當前檔案於 ee431ec707a62269c44c272a35a6786529042f51 回讀一致；該文件整合 CI 43691956604 查核時 in_progress。不得將前一 SHA 的 PASS 當最新文件 SHA CI。仍未驗證全新對話、其他平台、私人工作台實際協作、獨立多 Agent 或能力增益；候選經驗未升格。下一步按原主檔，優先真正不同的授權任務。

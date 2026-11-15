@@ -64,3 +64,8 @@ Google Account 中文官方建立帳戶頁當次抓取失敗（驗證/反爬頁�
 
 ## 7. 原始 CI 驗收
 - 離線實際驗收：exact f3dc2575d7a17e1b1b39ebd1f3127ce58ef83c65 / [CI 43715589058](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43715589058) job 132816301983 completed/success；raw log 241919 chars；16 個 onboarding test methods 全 ok，完整 466 tests in 49.191s，既有 EDITORIAL_BROWSER_PASS。四平台 signup/connect、既有帳號跳過、wrong target 全局優先、拒絕/失敗/不可用、GAS capability gap、費用停點、多服務、malformed/duplicate/size/forged approval、全部 ready 仍不授權等均實際跑過。舊 450 tests 保留；沒有建立真新帳號。文件整合 exact eebba69537bb8ed00308b9054c8a6dd8578f67c1 11份檔案已回讀相符，文件版本 CI 43715814303 另查。B10 真新手獨立操作仍 pending，不能由受控測試推論理解度或真 UI 成績。
+
+## 8. 真實跨對話接續及既有連接支線證據（B10 partial, 2026-11-15）
+- 原文件 CI exact 0dbb7fc000a589fa0a94eb89f5a99ed6c5a3a2ee / [43715920202](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43715920202)，466 tests/OK、16 onboarding methods、EDITORIAL_BROWSER_PASS；前一整合文件 CI 43715814303 success。
+- 實際原訓練接續：default main 主檔及決策 GET 404，Agent 查原 PR #8 最新 head 後重新核對正確目標、原主檔與 CI 日誌；get_repo metadata 成功，已有 GitHub 連接無須真人重註冊／重連，人工帳號步數 0。此為 Agent 自己修復真實來源查找問題及取得 readback 的證據。未開外部資源或部署；不宣稱真人新手理解度、帳號安全/成本或 Pages 授權已核、B10 或 A07 獨立驗收已完成。
+- 交付給完全新手的當前說明：這一步只是確認既有 GitHub 運作；不需你按任何設定。若要自行核對，可開上方 CI 網址，查看 verify 結果是否 Success；若看不到，僅回報頁面非敏感錯誤，不更動權限。下一次確有必要真人操作時才按第3節交付並取得人類評閱。若選 CLOUD-A，先另確認 C2/C3，不先點 Pages Save。

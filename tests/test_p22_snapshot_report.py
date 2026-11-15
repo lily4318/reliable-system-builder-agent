@@ -186,6 +186,10 @@ class SnapshotReportTests(unittest.TestCase):
         learn.setup(work)
         self.assertEqual(len(wb.context(work,'resume-project')['memory']),2)
         self.assertNotIn('P22-CASE-003',{r['topic'] for r in retrieve()})
+        through_c = tuple(c for c in learn.TRAINING_CASES if c[0] in {'P21-CASE-003','P21-CASE-005','P21-CASE-006','P22-CASE-002','P22-CASE-003'})
+        corpus = patch.object(learn,'TRAINING_CASES',through_c)
+        corpus.start()
+        self.addCleanup(corpus.stop)
         historical = tuple(c for c in learn.TRAINING_CASES if c[0]!='P22-CASE-003')
         with patch.object(learn,'TRAINING_CASES',historical):
             learn.setup(work,include_training_cases=True)

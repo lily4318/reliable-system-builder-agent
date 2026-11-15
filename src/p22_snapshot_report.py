@@ -100,7 +100,11 @@ def reconcile(source, output, expected_revision, policy):
 
 
 def publish(source, output, expected_revision, policy):
-    data = bundle(source, expected_revision, policy)
+    return _publish_bundle(bundle(source, expected_revision, policy), output)
+
+
+def _publish_bundle(data, output):
+    """Publish already validated bytes; caller owns the source/policy check."""
     output = Path(output)
     if output.exists() or output.is_symlink():
         raise FileExistsError('existing output; reconcile without overwrite')

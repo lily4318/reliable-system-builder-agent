@@ -2,14 +2,22 @@
 
 適用此儲存庫。先讀 START_HERE.md、release/current_release.yaml、config/agent-policy.yaml，再讀工作所屬專案的最新正式來源。Agent 自身訓練、方向討論與改善先定位原 Draft PR #8 最新 head，讀該版本 docs/AGENT_CAPABILITY_TRAINING.md 頂部及 docs/training/DECISION_LOG.md；候選訓練不等於正式 main/release。
 
+## 執行模式與工作空間（TD-001，適用所有七角色與十二技能）
+
+- 進入任務時先核對平台真實工具、目標與授權，選必要角色與 catalog skill，讀實際角色及 SKILL.md。依 docs/TEAM_WORKBENCH.md「平台原生工作模式」選路徑。此共通條款優先釐清各角色/SKILL 中的 context、handoff、cite、feedback、history、私人任務池等操作描述：它們只在實際已授權、可存取且已初始化的私人工作區執行，不是所有 AI 平台的開工前提。
+- PRIVATE_WORKBENCH：照原 SQLite 工作台契約，檢查前置產物、current/revision、依賴、案例及審查狀態；不得以其他模式繞過現有私人工作區的失效或權限控制。
+- REPO_NATIVE：若沒有可用私人工作區，但有目標 repo 授權，從精確 commit SHA 讀正式來源、前置產物、有效決策；以原 repo 的授權檔案、diff、commit 與實際 CI 直接工作，使用原進度與決策紀錄保存允許公開的最少必要證據。公開案例可直接讀本 repo 同版 src/workbench_learning.py 的 CASES；需擴充公開案例時明示 TRAINING_CASES opt-in。若可用 Python，可執行 public-context（不接受 workspace）；若只具檔案讀取工具，直接讀該常數及案例原始證據，記為 SOURCE_READ，不宣稱呼叫 CLI 或 SQLite citation。公開案例不代表私人記憶、正式核准或 prerequisite PASS。
+- READ_ONLY：無寫入權時只讀來源及提出具體方案，明示未寫入。若資料屬私人且無合適持久化位置，留在授權對話或以未保存回報，不移入公開 repo，不建立替代私人記憶或未核准外部服務。
+- 任一模式均須遵守前置依賴、需求確認、授權與版本；缺必要交接資料就阻塞該工作。沒有獨立子代理時只標 SINGLE_AGENT_ROLE_WORK；有工具執行及驗收證據才能回報完成。非冪等寫入未知、競寫或來源不確定，先查當前 head/blob、原結果及實際狀態，不盲目重試。
+
 ## 工作方法：以技能與實際產物為核心（整合候選）
 先定位使用者最新任務、唯一目標與權限。自然語言能理解就直接選擇 config/skill-catalog.json 中的必要技能，讀對應 .agents/skills/<id>/SKILL.md；不要求使用者記指令名稱。遇真正歧義才提出少量可編輯選擇。改善 Agent 不得接續外部專案；先保留 src.task_scope 與 src.engineering_workflow 的必要守門。
-- 用 src.team_workbench 的私人工作區 context 讀實際產物、對應來源、適用經驗；只在另行同意且有存取權的本機私人位置保存，不把公開 repo 當成個人記憶庫。
+- 在 PRIVATE_WORKBENCH 模式，用 src.team_workbench 的私人工作區 context 讀實際產物、對應來源、適用經驗；只在另行同意且有存取權的本機私人位置保存，不把公開 repo 當成個人記憶庫。
 - P1-1 任務導向學習：在已獲授權且已初始化的私人工作區，先依 docs/TEAM_WORKBENCH.md 明確執行一次 src.workbench_learning setup（原 SQLite 原地增量、兩個公開合成工程案例；不自動建立私人工作區）。每項新任務或續作先提供 task ID、技能及具體技術/風險詞，用 workbench_learning context 選擇性讀取案例與必要產物；檢查適用條件、來源和未決，不用舊全文傾倒取代正式來源。NEEDS_PREREQUISITES 或 NEEDS_FULL_READ 須先補讀。
-- 架構、實作、除錯、QA 及學習技能完成實際判斷時，以 workbench_learning cite 記錄相關案例 ID、task/session、採用或不適用原因及實測/產物證據。檢索命中不等於採用，引用是操作者聲明，不是系統獨立證明。遇測試失敗、修復、QA 退件、需求修正或偏好事件，主動呼叫 feedback 保存候選記憶及證據，不將一次性決策或推測當長期偏好；使用既有 remember/resolve 人審流程，不自動升格。以 history 回讀本任務跨 session 紀錄；搜尋是詞彙匹配，未啟用模型語意檢索或自動事件監聽。
+- 在 PRIVATE_WORKBENCH 模式，架構、實作、除錯、QA 及學習技能完成實際判斷時，以 workbench_learning cite 記錄相關案例 ID、task/session、採用或不適用原因及實測/產物證據。檢索命中不等於採用，引用是操作者聲明，不是系統獨立證明。遇測試失敗、修復、QA 退件、需求修正或偏好事件，主動呼叫 feedback 保存候選記憶及證據，不將一次性決策或推測當長期偏好；使用既有 remember/resolve 人審流程，不自動升格。以 history 回讀本任務跨 session 紀錄；搜尋是詞彙匹配，未啟用模型語意檢索或自動事件監聽。
 - Agent 自身訓練以 docs/AGENT_CAPABILITY_TRAINING.md 頂部最新主檔、docs/training/DECISION_LOG.md 相關有效決策及實際 PR/CI 為接續入口；歷史段落與未核准建議不是現行指令。每次重要討論依 TD-002 增量保存問題、分析、選項、理由、使用者決策、影響、未決與來源；必要深入分析可存 training/reviews/ 並索引。區分討論、建議、確認、實作、驗收，寫入原檔後回讀；不另建主檔。
 - 工作主要順序：需求訪談 → 確認規格 → 架構 → 工作包 → 程式與功能測試 → QA／必要安全與 SRE → 經驗整理。可依任務跳過不適用技能，不能跳過必要依賴與權限。
-- 技能應實際產出規格、可執行程式、測試或修復，而不只寫完成報告。handoff 登錄產物文字及來源；修改上游會使相關下游產物過期。context 的 current 僅表示工作區依賴一致，不證明正式核准或外部 SHA。
+- 技能應實際產出規格、可執行程式、測試或修復，而不只寫完成報告。PRIVATE_WORKBENCH 的 handoff 登錄產物文字及來源；修改上游會使相關下游產物過期。context 的 current 僅表示工作區依賴一致，不證明正式核准或外部 SHA。
 - 只記明確偏好或有證據的經驗；假設標 candidate。distill 預覽相同 topic 的重複／衝突，使用者確認後才 resolve，保留歷史。不可憑記憶覆蓋有效研究規則、權限或安全。
 - 人工操作用逐步教學；新建站 13 題訪談（10–15 之內）；任何確認選項可編輯後再送出。自然語言模型與真正子代理能力取決於平台；沒有時不要聲稱已啟動。
 - 舊 PR #4/#5/#6 的適用工具、測試與門檻整合於此候選；詳細見 docs/TEAM_WORKBENCH.md。正式 main、Release 及四份原 PR 不變。

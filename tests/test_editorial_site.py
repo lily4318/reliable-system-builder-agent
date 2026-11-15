@@ -2,6 +2,8 @@
 from contextlib import closing
 from http.cookiejar import CookieJar
 import json
+import queue
+import re
 from pathlib import Path
 import secrets
 import subprocess
@@ -168,3 +170,41 @@ class EditorialHTTPTests(unittest.TestCase):
             self.assertEqual(client.get('/api/article?id='+str(x['article_id']))[1]['title'],'RESTART')
         finally:
             second.shutdown();second.server_close();thread.join(5)
+
+
+    def test_cli_fresh_initialization_and_two_process_restarts(self):
+        fresh=Store(self.root/(secrets.token_hex(8)+'.fresh'))
+        cmd=[sys.executable,'-m','src.editorial_site']
+        result=subprocess.run(cmd+['init','--db',str(fresh.path)],
+            input='\n'.join(self.passwords[n] for n in ROLES)+'\n',text=True,
+            capture_output=True,check=True,timeout=15)
+        self.assertIn('EDITORIAL_INITIALIZED',result.stdout)
+        verified=subprocess.run(cmd+['verify','--db',str(fresh.path)],capture_output=True,check=True,timeout=10)
+        self.assertIn(b'EDITORIAL_INTEGRITY_OK',verified.stdout)
+        for phase in (0,1):
+            proc=subprocess.Popen(cmd+['serve','--db',str(fresh.path),'--port','0'],
+                                  stdout=subprocess.PIPE,stderr=subprocess.PIPE,text=True)
+            try:
+                lines=queue.Queue()
+                threading.Thread(target=lambda:lines.put(proc.stdout.readline()),daemon=True).start()
+                line=lines.get(timeout=15)
+                match=re.fullmatch(r'Local synthetic site: (http://127\.0\.0\.1:[0-9]+/)\n',line)
+                self.assertIsNotNone(match)
+                client=Client(match.group(1).rstrip('/'))
+                if phase==0:
+                    self.assertEqual(client.get('/api/articles')[1]['total'],0)
+                    self.assertEqual(client.login('author-a',self.passwords['author-a'])[0],200)
+                    x=client.action('create',title='CLI persisted',category='生活',body='first process')[1]
+                    x=client.action('submit',x)[1]
+                    self.assertEqual(client.logout()[0],200)
+                    self.assertEqual(client.login('editor',self.passwords['editor'])[0],200)
+                    x=client.action('approve',x)[1]
+                    self.assertTrue(client.action('publish',x)[1]['ok'])
+                else:
+                    self.assertEqual(client.get('/api/articles')[1]['items'][0]['title'],'CLI persisted')
+            finally:
+                if proc.poll() is None:
+                    proc.terminate()
+                    try:proc.wait(timeout=5)
+                    except subprocess.TimeoutExpired:proc.kill();proc.wait()
+                proc.stdout.close();proc.stderr.close()

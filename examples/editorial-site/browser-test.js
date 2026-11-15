@@ -31,6 +31,9 @@
    check("initial_empty",$("articles").textContent.includes("沒有符合"));
    $("login-nav").click();$("username").focus();
    check("keyboard_focus",document.activeElement===$("username")&&$("username").labels.length===1);
+   document.body.dataset.keyboardReady="1";
+   await wait(()=>document.activeElement===$("password"));
+   check("real_tab_navigation",document.activeElement===$("password"));
    input("username","author-a");input("password","incorrect-fixture");
    $("login-form").querySelector("button").click();
    await wait(()=>$("status").textContent.includes("登入資料錯誤"));
@@ -40,15 +43,21 @@
    // Drop only the first action response AFTER the trusted server actually
    // processed it. Reconcile with actual read-only receipt, never replay POST.
    const originalFetch=window.fetch;let actionCalls=0;
-   window.fetch=async function(path,opt){const response=await originalFetch.call(window,path,opt);
-     if(path==="/api/action"){actionCalls++;throw Error("synthetic lost acknowledgement")}
+   window.fetch=async function(path,opt){
+     if(path==="/api/action")actionCalls++;
+     const response=await originalFetch.call(window,path,opt);
+     if(path==="/api/action"&&actionCalls===1)throw Error("synthetic lost acknowledgement");
      return response};
    try{$("create-form").querySelector("button").click();
      await wait(()=>!$("reconcile-panel").hidden);
      check("lost_ack_pending",actionCalls===1&&sessionStorage.getItem("editorial-pending-local-action-v1")!==null);
+     await logout();await login("author-b","SyntheticAuthorB-2026");
+     check("reconcile_owner_guard",$("reconcile").disabled&&!$("reconcile-panel").hidden);
+     await logout();await login("author-a","SyntheticAuthorA-2026");
+     check("reconcile_after_relogin",!$("reconcile").disabled&&!$("reconcile-panel").hidden);
+     $("reconcile").click();await wait(()=>$("reconcile-panel").hidden&&text().includes("第一版文章"));
+     check("read_only_reconcile",actionCalls===1&&sessionStorage.getItem("editorial-pending-local-action-v1")===null&&document.querySelectorAll(".revision").length===1);
    }finally{window.fetch=originalFetch}
-   $("reconcile").click();await wait(()=>$("reconcile-panel").hidden&&text().includes("第一版文章"));
-   check("read_only_reconcile",actionCalls===1&&sessionStorage.getItem("editorial-pending-local-action-v1")===null&&document.querySelectorAll(".revision").length===1);
    await wait(()=>text().includes("第一版文章")&&text().includes("草稿"));
    check("author_create",text().includes("最初草稿"));
    check("author_keyboard_field",first().querySelector("textarea").labels.length===1);

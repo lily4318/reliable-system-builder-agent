@@ -22,6 +22,7 @@ from src.editorial_site import create_server
 PASSWORDS={'author-a':'SyntheticAuthorA-2026','author-b':'SyntheticAuthorB-2026','editor':'SyntheticEditor-2026'}
 EXPECTED={'exact_viewport','initial_empty','keyboard_focus','wrong_login','author_create',
           'page_one','page_two','lost_ack_pending','read_only_reconcile','workspace_no_overflow','review_reason_history',
+          'real_tab_navigation','reconcile_owner_guard','reconcile_after_relogin',
           'author_keyboard_field','other_author_hidden','unsubmitted_hidden','submitted_visible',
           'return_reason','literal_private','approved_not_public','literal_public','search_category',
           'filter_empty','old_public_retained','atomic_public_switch','withdraw_hidden','republished',
@@ -104,6 +105,21 @@ def run_one(executable,width):
                 cdp=CDP(next(p['webSocketDebuggerUrl'] for p in pages if p['type']=='page'))
                 cdp.command('Emulation.setDeviceMetricsOverride',{'width':width,'height':900,'deviceScaleFactor':1,'mobile':width==375})
                 cdp.command('Page.navigate',{'url':f'http://127.0.0.1:{server.server_port}/'})
+                # The page deliberately pauses on the focused username field.
+                # A native CDP key event, not a synthetic focus() assertion,
+                # must move focus to the password field.
+                deadline=time.monotonic()+15
+                while time.monotonic()<deadline:
+                    result=cdp.command('Runtime.evaluate',{'expression':'document.body?.dataset.keyboardReady==="1"','returnByValue':True})
+                    if result['result']['result'].get('value') is True:break
+                    if server.test_result is not None:break
+                    time.sleep(.05)
+                else:
+                    raise RuntimeError('keyboard readiness timeout')
+                if server.test_result is None:
+                    for event in ('keyDown','keyUp'):
+                        cdp.command('Input.dispatchKeyEvent',{'type':event,'key':'Tab','code':'Tab',
+                                    'windowsVirtualKeyCode':9,'nativeVirtualKeyCode':9})
                 deadline=time.monotonic()+60
                 while server.test_result is None and time.monotonic()<deadline:
                     if proc.poll() is not None:raise RuntimeError('Chrome closed')

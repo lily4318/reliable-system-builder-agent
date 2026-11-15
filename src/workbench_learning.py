@@ -19,6 +19,18 @@ CASES = (
      'Separate exclusive creation, mode=ro reads and mode=rw updates. Check resource invariants and save the request result in the same transaction. Reconcile unknown outcomes without retry; COMMITTED is not necessarily RESERVED. Scope: local single SQLite database, synthetic faults; not distributed locking or crash recovery.',
      'docs/AGENT_CAPABILITY_TRAINING.md B002-CASE-001; 20c4e85bd6572831ac78a33b56d4344b376b8572; test_missing_database_never_created_by_read_or_reserve and test_rollback_after_inventory_before_ledger'),
 )
+# Explicit opt-in curated public engineering cases; default corpus unchanged.
+TRAINING_CASES = (
+    ('P21-CASE-003','SQLite idempotency ledger actor token payload negative decisions denied replay receipt',
+     'Persist valid negative decisions as well as successful state transitions. Bind actor/token to exact payload; save state change and decision atomically. Known replay returns original decision; unknown outcome requires read-only reconciliation. Scope: trusted local single SQLite, not distributed transactions or external service receipts.',
+     'docs/AGENT_CAPABILITY_TRAINING.md P21-CASE-003; 64a5f2ed8fe5dff429fe38d8edf191c6532b7c51; CI 43576453447'),
+    ('P21-CASE-005','SQLite atomic transaction revision compare and swap artifact state event receipt interruption',
+     'When related indexes are in one SQLite database, compare both expected versions and commit state, artifact and event in one transaction. Recover split historical states only after independently confirming the authoritative requirement; use a new revision. Scope: local coordinated route, not all legacy clients or external writes.',
+     'docs/AGENT_CAPABILITY_TRAINING.md P21-CASE-005; f6ad1e35eaef281a09eec3ce102fffd2e1c35eec; CI 43606395473'),
+    ('P21-CASE-006','browser native form origin policy Chromium DOM CLI migration rollback boundary',
+     'HTTP success does not prove real browser form compatibility. Reproduce actual DOM flow, preserve strict Origin/CSRF guards and run negative tests. Validate migration, process restart and rollback separately; old snapshots cannot replace new committed writes. Scope: synthetic local Chromium/CLI, not manual UAT, external deployment or power-loss recovery.',
+     'docs/AGENT_CAPABILITY_TRAINING.md P21-CASE-006; 0f4f536d4c3daf05304add614d24e2563b42b1ef; CI 43607088233'),
+)
 EVENTS = {'test_failure':'case', 'test_fix':'case', 'qa_rejection':'lesson',
           'requirement_change':'lesson', 'preference':'preference'}
 
@@ -33,14 +45,17 @@ def _ro(path):
     return db
 
 
-def setup(path):
-    """Explicit, repeatable additive migration; never replace retired cases."""
+def setup(path, include_training_cases=False):
+    """Explicit, repeatable additive migration; opt in to curated public cases."""
+    if type(include_training_cases) is not bool:
+        raise ValueError('explicit boolean required for training case import')
+    selected = CASES + (TRAINING_CASES if include_training_cases else ())
     with closing(wb.connect(path)) as db, db:
         db.execute('BEGIN IMMEDIATE')
         db.execute('CREATE TABLE IF NOT EXISTS learning_cases (case_key TEXT PRIMARY KEY, memory_id INTEGER UNIQUE NOT NULL REFERENCES memory(id), tags TEXT NOT NULL)')
         db.execute('CREATE TABLE IF NOT EXISTS learning_events (event_id TEXT PRIMARY KEY, task TEXT NOT NULL, session TEXT NOT NULL, event_type TEXT NOT NULL, memory_id INTEGER NOT NULL REFERENCES memory(id))')
         db.execute('CREATE TABLE IF NOT EXISTS learning_uses (id INTEGER PRIMARY KEY, task TEXT NOT NULL, session TEXT NOT NULL, skill TEXT NOT NULL, query TEXT NOT NULL, memory_id INTEGER NOT NULL REFERENCES memory(id), decision TEXT NOT NULL, evidence TEXT NOT NULL)')
-        for key, tags, content, evidence in CASES:
+        for key, tags, content, evidence in selected:
             old = db.execute('SELECT * FROM learning_cases WHERE case_key=?', (key,)).fetchone()
             if old:
                 continue
@@ -49,7 +64,7 @@ def setup(path):
             mid = db.execute('INSERT INTO memory(kind,topic,content,evidence,basis) VALUES (?,?,?,?,?)',
                              ('case',key,content,evidence,'observed')).lastrowid
             db.execute('INSERT INTO learning_cases VALUES (?,?,?)', (key,mid,tags))
-    return {'setup':True, 'seeded_case_keys':[c[0] for c in CASES]}
+    return {'setup':True, 'seeded_case_keys':[c[0] for c in selected]}
 
 
 def _terms(value):

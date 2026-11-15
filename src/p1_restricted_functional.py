@@ -10,6 +10,8 @@ import hashlib
 import json
 
 CONTRACT={
+    'public_oracle_version':2,
+    'resource_budget':'3000 interpreted steps per case; exceeding budget rejects candidate; public examples are not exhaustive',
     'task':'B003','function':'has_overlap(existing, proposed)',
     'input':'existing tuple of up to 32 pairs; proposed pair; exact integers -10080..10080, start < end',
     'output':'strict boolean: any existing interval overlaps proposed; endpoints touching do not overlap',
@@ -30,6 +32,14 @@ CASES=(
  ('last-overlap',((0,5),(20,30),(12,13)),(10,20),True),
  ('negative-time',((-8,-3),),(-3,2),False),
  ('negative-overlap',((-8,-3),),(-4,2),True),
+ # Cover the public contract's valid maximum workload and both integer bounds.
+ # Fixed expected booleans derive from interval geometry, not candidate output.
+ ('max-disjoint',tuple((i*2,i*2+1) for i in range(32)),(80,81),False),
+ ('max-last-overlap',tuple((i*2,i*2+1) for i in range(31))+((80,81),),(80,81),True),
+ ('max-first-overlap',((80,81),)+tuple((i*2,i*2+1) for i in range(31)),(80,81),True),
+ ('lower-bound-overlap',((-10080,-10079),),(-10080,-10079),True),
+ ('upper-bound-overlap',((10079,10080),),(10079,10080),True),
+ ('full-domain',((0,1),),(-10080,10080),True),
 )
 ALLOWED=(ast.Module,ast.FunctionDef,ast.arguments,ast.arg,ast.If,ast.For,
          ast.Return,ast.Assign,ast.Name,ast.Load,ast.Store,ast.Constant,
@@ -176,7 +186,7 @@ def oracle_digest():
 
 def evaluate(source):
     """Return only bounded tool facts; never execute arbitrary source."""
-    report={'tool':'restricted-b003-intervals-v1','oracle_sha256':oracle_digest(),
+    report={'tool':'restricted-b003-intervals-v2','oracle_sha256':oracle_digest(),
             'source_sha256':_hash(source.encode('utf-8')) if isinstance(source,str) else None,
             'cases':[],'findings':[],'candidate_native_code_executed':False,
             'public_development_only':True,'independent_human_review':False,

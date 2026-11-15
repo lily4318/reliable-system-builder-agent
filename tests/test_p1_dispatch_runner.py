@@ -160,7 +160,9 @@ class FunctionalGateContract(unittest.TestCase):
         good=f.evaluate(GOOD_SOURCE)
         bad=f.evaluate(BAD_SOURCE)
         self.assertEqual(good['status'],'PUBLIC_SLICE_PASS')
-        self.assertEqual(len(good['cases']),12)
+        self.assertEqual(len(good['cases']),18)
+        self.assertEqual(good['tool'],'restricted-b003-intervals-v2')
+        self.assertEqual(good['oracle_sha256'],f.oracle_digest())
         self.assertTrue(all(x['pass'] for x in good['cases']))
         self.assertEqual(bad['status'],'PUBLIC_SLICE_FAIL')
         self.assertGreater(len(bad['findings']),0)
@@ -168,7 +170,7 @@ class FunctionalGateContract(unittest.TestCase):
         self.assertNotEqual(good['source_sha256'],bad['source_sha256'])
         self.assertFalse(good['candidate_native_code_executed'])
         self.assertFalse(good['independent_human_review'])
-        print('P12-FUNCTIONAL: bounded interpreter ran 12 public fixed cases; correct and incorrect sources distinguished',flush=True)
+        print('P12-FUNCTIONAL: bounded interpreter ran 18 public fixed cases; correct and incorrect sources distinguished',flush=True)
 
     def test_host_rejects_unsafe_syntax_invalid_data_and_excess_work(self):
         from src import p1_restricted_functional as f

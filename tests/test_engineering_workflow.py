@@ -103,6 +103,34 @@ class EngineeringWorkflowTest(unittest.TestCase):
         self.assertEqual(self.decision({"write_outcome": "untrusted"}) ,
                          "READ_ONLY_RECONCILE")
 
+    def test_malformed_json_stage_is_advisory_hold_not_exception(self):
+        for stage in ([], {}, ["verify"], {"stage": "verify"}, None, True, 1, "", "VERIFY"):
+            with self.subTest(stage=stage):
+                result = route({**READY, "stage": stage})
+                self.assertEqual(result["decision"], "HOLD_UNSUPPORTED")
+                self.assertEqual(result["owner_role"], "system-lead")
+                self.assertIn(result["next_safe_action"], SAFE_ACTIONS)
+                self.assertFalse(result["mutation_permitted"])
+
+    def test_stage_validation_preserves_prior_gates_and_incremental_inputs(self):
+        for key, value, expected in (
+            ("target_confirmed", False, "HOLD_TARGET"),
+            ("current_head_sha", "b"*40, "HOLD_SOURCE"),
+            ("write_outcome", "UNKNOWN", "READ_ONLY_RECONCILE"),
+            ("write_outcome", "PARTIAL", "READ_ONLY_RECONCILE"),
+            ("write_outcome", [], "READ_ONLY_RECONCILE"),
+            ("write_outcome", {}, "READ_ONLY_RECONCILE"),
+        ):
+            with self.subTest(key=key, value=value):
+                result = route({**READY, "stage": [], key: value})
+                self.assertEqual(result["decision"], expected)
+                self.assertFalse(result["mutation_permitted"])
+        minimal = {"target_confirmed": True, "source_sha": SHA,
+                   "current_head_sha": SHA, "stage": "read_only"}
+        self.assertEqual(route(minimal)["decision"], "READ_ONLY_AUDIT")
+        self.assertEqual(route({**minimal, "stage": "design"})["decision"], "HOLD_REQUIREMENTS")
+        self.assertEqual(route({**READY, "stage": "design"})["decision"], "READY_FOR_DESIGN_REVIEW_ONLY")
+
     def test_all_roles_routed_by_public_human_labelled_cases(self):
         cases = load_cases()
         self.assertGreaterEqual(len(cases), 20)

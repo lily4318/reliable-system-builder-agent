@@ -124,7 +124,10 @@ class ReportWorkflowTests(unittest.TestCase):
             'Fixture call stopped; historical ZIP inspected; no remote write',True)
         self.complete(R2)
         self.assertEqual(orphan.read_bytes(),before)
-        self.assertNotEqual(self.artifacts()['implementation']['content'],before.decode('latin1'))
+        evidence=json.loads(self.artifacts()['implementation']['content'])
+        self.assertEqual(evidence['root_id'],self.ident)
+        self.assertEqual(evidence['zip_sha256'],report.sha(flow._path(self.work,self.ident).read_bytes()))
+        self.assertNotEqual(evidence['zip_sha256'],report.sha(before))
         print('P22D-STALE: file committed before root revise; old worker PASS rejected; explicit recovery and new output accepted',flush=True)
 
     def test_unknown_output_requires_explicit_reconciliation_and_qa_failure(self):

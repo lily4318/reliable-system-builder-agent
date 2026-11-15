@@ -191,7 +191,7 @@ intake.publish(sys.argv[1],sys.argv[2])
     def test_curated_file_case_opt_in_and_retrieval(self):
         from unittest.mock import patch
         # Reproduce the historical P2-2b five-to-six migration without future cases.
-        historical = tuple(c for c in learn.TRAINING_CASES if c[0] != 'P22-CASE-003')
+        historical = tuple(c for c in learn.TRAINING_CASES if c[0] in {'P21-CASE-003','P21-CASE-005','P21-CASE-006','P22-CASE-002'})
         corpus = patch.object(learn,'TRAINING_CASES',historical)
         corpus.start()
         self.addCleanup(corpus.stop)

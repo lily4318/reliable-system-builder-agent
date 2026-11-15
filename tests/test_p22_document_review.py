@@ -89,9 +89,9 @@ class TransferTests(unittest.TestCase):
         original=wb.context(w,'resume-project')['memory']
         self.assertEqual(len(original),2)
         imported=learn.setup(w,include_training_cases=True)
-        self.assertEqual(len(imported['seeded_case_keys']),5)
+        self.assertEqual(len(imported['seeded_case_keys']),6)
         first=wb.context(w,'resume-project')['memory']
-        self.assertEqual(len(first),5)
+        self.assertEqual(len(first),6)
         learn.setup(w,include_training_cases=True)
         self.assertEqual(wb.context(w,'resume-project')['memory'],first)
         with self.assertRaises(ValueError): learn.setup(w,include_training_cases='yes')

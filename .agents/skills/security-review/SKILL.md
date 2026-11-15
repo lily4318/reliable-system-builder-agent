@@ -19,5 +19,7 @@ description: "檢查權限、隱私及安全。security 角色；交付 security
 ### HTTP 收件與寫入邊界（TD004-OFFICIAL-01 / EP-12）
 讀 RFC 9110 §8.6 與 RFC 9112 §6.3/8/9.6：身份與 JSON 驗證不代替 framing。固定長度 API 在 mutation 前核 ASCII decimal、大小上限、實收 byte count 與不支援 TE；EOF/timeout 不寫入且關閉連線。QA 用真本機 HTTP 測正反例，同時核 receipt 和具權限 workspace 不變，不能只看 HTTP 狀態。區分 idle timeout/絕對期限、local-only/production；原未知 POST 守門不變。細節與證據見 [獨立官方學習覆盤](../../../docs/training/reviews/2026-11-15-http-framing.md)，不冒稱正式資安通過。
 
+- 同一原理遷移至 form-urlencoded 時，傳輸層先驗完整 bytes，之後才做 percent decoding、欄位數量、CSRF 及業務權限。區分傳輸無效（不應寫任何業務決策）和合法業務拒絕（原契約可能要求持久化 NOT_ACTIVE）；負測必須核對 inventory/requests/lifecycle/action_attempts 等相關表及檔案 bytes，正測保留正常編碼與冪等重放。NATIVE-HTTP-021 實際 red 六個副作用；fix 見原 EP-12 exact CI，無正式網路部署授權。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 security-review；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

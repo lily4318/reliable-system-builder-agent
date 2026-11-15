@@ -18,5 +18,8 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### 同一網站的多層實際驗收（NATIVE-WEB-014-EDITORIAL）
 功能完整度依確切 R/A 追溯；把資料交易/角色/HTTP/DOM/CLI 啟動及復原分層，不能用某一層 PASS 代替其他層。對版本公開切換、原 actor token replay、未知寫入分別測未提交 subprocess cut 與已提交但回應丟失、直接 API 越權及重新登入唯讀查 receipt；真 DOM 在 exact viewport 驗分頁、鍵盤、稿件與公開視圖狀態。不得為 runner 放寬 Origin/CSRF/ACL 或加入日常 test route。CI 43708288874 434/434 +375/1280 each29；受控本機，不等於真使用者 UAT、完整 accessibility/security audit 或正式部署。
+### HTTP framing 跨解析器與無副作用驗收（EP-12）
+以本機真連線對同一舊版建立 red 測試，正確內容前綴但未收足宣告 bytes、異常標頭、逾時等負例；具權限的操作也不能因解析成功執行。驗收 oracle 包含狀態碼及所有相關業務表（包含負向決策 ledger）與可行時原檔 bytes；單用 4xx 或庫存不變不足。正向保留合法編碼及原冪等語意，固定 red/green SHA。實例 NATIVE-HTTP-020/021 詳 [原覆盤](../../../docs/training/reviews/2026-11-15-http-framing.md)；不把 loopback 或其他網站 DOM 當真設備 UAT。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 qa；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

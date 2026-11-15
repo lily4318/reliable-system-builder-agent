@@ -354,3 +354,20 @@
 
 ### NATIVE-HTTP-021 驗收補記（VERIFIED）
 NATIVE-HTTP-021 修復後 exact a1cf40d0fa5bdca908c057e92f73436ce4c4a50e / [CI 43719406375](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43719406375) job 132828041718 completed/success，所有列示步驟通過；raw log 245557 chars，487 tests in 63.561s OK，5 新 form framing methods 全 ok（含 6 原 red 情境、idle 408、正例及 replay）；P21-EQUIPMENT-BROWSER PASS actual_browser_dom_events=true, roles=3, stock=10, reserved=0, manual_uat=false；EDITORIAL_BROWSER_PASS 375/1280。四表與 SQLite bytes 無副作用負測通過；保留原正常業務拒絕持久化。L5 受控工程知識遷移證據成立（不同 parser/業務流程，非獨立未見 holdout、L6 或模型能力證明）；原 pending 記錄由本補記接續，不改歷史。
+
+## TD-004｜TD004-OFFICIAL-02 / NATIVE-PG-022：Architect 原生 PostgreSQL 資料架構單元（非 HackMD）
+- 使用者明確授權 Architect 研讀 PostgreSQL/Supabase RLS、權限、交易及 migration，完成實作、正反例、回歸，不得付費或外部部署。基準 bba46fedcb7733b2f090c694123f5cb5c0fa4916 CI 43719636689 success（run metadata），原 487 tests 保留。原 tree 無 SQL/native Postgres；缺的是真引擎驗收，而不是已知 Supabase 產品漏洞。
+- 深度來源及 ADR 見 [原生 PostgreSQL 單元覆盤](reviews/2026-11-15-postgres-architecture.md)：GRANT 與 RLS 兩層、USING/WITH CHECK、invoker view、trusted writer/transaction + owner-token ledger、migration validate 與相容性。官方 changelog 宣布新表 Data API exposure 改 opt-in 時程至 2026-10-30，正式須核對現存 grants/settings。Lab 真正 DB login/session_user 不等於 Supabase JWT；writer 仍是可信角色，非通用 SQL 防竄改。
+- 實作 examples/postgres-architecture/01-baseline.sql / 02-rls-transaction.sql，7 test methods 於 tests/test_postgres_architecture.py。使用原 CI 的暫時 PostgreSQL cluster / private Unix socket、TCP disabled，使用合成資料，CI engine 缺失 fail；本地容器無 binary。原 source blobs 357e05f6a44efa9115c95ee74e493a8562291add / d9da162f188d8133a7e65592e80500845fe11a69 / 817d9b2e918fb7c736df19546e3a33639ca58c68 回讀一致。沒有 Supabase 專案、CLI migration/advisors、live JWT/REST/RPC 或付費/部署。
+- SQL 與測試 exact b5e61035272a8687b2f24a05030fda9d2eddfd44 / [CI 43720063088](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43720063088) job 132829900213；completed/success。全部 7 項真 PostgreSQL 測試及既有 487 項回歸已確認。
+raw 247045 chars; 2026-11-15T13:39:45.3821442Z PG-ARCH-ENGINE: 18.6 (Ubuntu 18.6-1.pgdg26.04+2) private Unix socket; TCP disabled
+2026-11-15T13:39:45.4638462Z test_backend_only_mutation_and_receipt_isolation (test_postgres_architecture.PostgresArchitectureTests.test_backend_only_mutation_and_receipt_isolation) ... ok
+2026-11-15T13:39:45.5276568Z test_insert_update_and_owner_transfer (test_postgres_architecture.PostgresArchitectureTests.test_insert_update_and_owner_transfer) ... ok
+2026-11-15T13:39:45.6047016Z test_invalid_legacy_data_aborts_migration_without_partial_schema (test_postgres_architecture.PostgresArchitectureTests.test_invalid_legacy_data_aborts_migration_without_partial_schema) ... ok
+2026-11-15T13:39:45.6596651Z test_migration_preserves_rows_and_old_column_contract (test_postgres_architecture.PostgresArchitectureTests.test_migration_preserves_rows_and_old_column_contract) ... ok
+2026-11-15T13:39:46.1322077Z test_real_concurrent_stock_and_idempotent_decisions (test_postgres_architecture.PostgresArchitectureTests.test_real_concurrent_stock_and_idempotent_decisions) ... ok
+2026-11-15T13:39:46.1825241Z test_transaction_failure_rolls_back_stock_and_receipt (test_postgres_architecture.PostgresArchitectureTests.test_transaction_failure_rolls_back_stock_and_receipt) ... ok
+2026-11-15T13:39:46.2683717Z test_unprotected_grant_negative_control_and_rls_isolation (test_postgres_architecture.PostgresArchitectureTests.test_unprotected_grant_negative_control_and_rls_isolation) ... ok
+2026-11-15T13:39:54.6274516Z Ran 494 tests in 70.531s
+2026-11-15T13:39:54.6274790Z OK
+- 逐角色與成果限制：Architect 主責，Security/Developer/QA 是同一 Agent 按需工程分工，非獨立模型；L3 真引擎正負案例工程實作證據，L4–L6 未驗收（刻意不安全 fixture 不能宣稱修真 production）。原專屬 architecture-design、security-review 及 EP-13 候選知識整合，HackMD matrix 不變。保留主線未決 B10/A07/C1/C3；NEXT 針對 migration late failure / lock / concurrent same token 做下一個真實能力缺口，或另外選擇專家單元；不重做本次七項。

@@ -37,5 +37,8 @@ description: "設計架構、比較方案。architect 角色；交付 architectu
 ### 多平台免費選型（TP-006 / NATIVE-CLOUD-016-STACK-SELECTION）
 依 confirmed requirement ID 提取 [多平台選型及實戰指南](../../../docs/CLOUD_ARCHITECTURE_SELECTION.md) 的 typed profile；用 src.cloud_architecture_selection 離線比對 Pages、GAS/Sheets、Workers/D1、Supabase+前端（可選混合架構），未知明示 null；先排硬限制與資料治理，再比較用量、帳號、維護與部署途徑。保留來源日期、估算範圍、理由與替代；preferred 不代表授權、真實費用或適配驗收。既有架構不符需 ADR/使用者確認，不盲目遷移。
 
+### PostgreSQL 與 Supabase 資料庫架構（TD004-OFFICIAL-02 / EP-13）
+先以資料所有權矩陣及操作權限界定 exposed schema、GRANT/RLS、UPDATE 新舊 row、column privilege、view invoker、function ACL、管理員 bypass；不將 UI filter/登入當授權。交易須列共享 invariant、lock scope、owner/token namespace、衝突與未知結果；用真正非 owner 角色及兩獨立連線驗正負例、持久化與 rollback。Migration 按舊資料/相容 client/constraint validate/lock/版本回退設 gate，不把一次 DDL 成功當上線相容。Supabase 新表 Data API opt-in 公告及實際 grants/settings、JWT/auth.uid()、RPC/Storage、service key 邊界另驗；原生 PostgreSQL session_user lab 非 Supabase Auth 或正式部署。實作與驗收見 [原生 PostgreSQL 覆盤](../../../docs/training/reviews/2026-11-15-postgres-architecture.md)。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 architecture；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

@@ -28,6 +28,8 @@
 
 | EP-12 | HTTP framing、Content-Length、提前 EOF、idle timeout、request body | security-review, debug-and-repair, test-and-acceptance | TD004-OFFICIAL-01 / NATIVE-HTTP-020 |
 
+| EP-13 | PostgreSQL、Supabase RLS、grants、view invoker、transaction、schema migration | architecture-design, security-review, test-and-acceptance | TD004-OFFICIAL-02 / NATIVE-PG-022 |
+
 ## 知識卡（已觀測原理與適用邊界）
 
 ### EP-01 需求來源一致性，而非形式齊全
@@ -138,3 +140,9 @@
 - 限制：Python 本機 HTTP, fixed length only；socket idle timeout 不是整體 deadline，未驗正式 proxy/TLS/HTTP2/3/DoS；不以此放行正式部署。狀態 INDEX_CANDIDATE（非 runtime seed/人審正式知識）；來源原理與實際 red 已確認，修復驗收依 exact CI。
 - 第二情境（NATIVE-HTTP-021）：設備 form-urlencoded 預約、取消、歸還與不完整負向決策；原 red CI 43719342135 六個真持久化副作用，fix a1cf40d0fa5bdca908c057e92f73436ce4c4a50e CI 43719406375 UNIT_TESTS_VERIFIED_FULL_CI_PENDING。**錯誤 HTTP 狀態也可能有業務寫入**，拒絕傳輸須在進入業務 ledger 前。QA 對照 inventory/requests/lifecycle/action_attempts 全表及 SQLite 檔案位元組；合法 percent encoding 及同 token replay 保留。原 4096 bytes cap，不改 schema/權限/原交易。L5 待確認修復驗收，非獨立模型能力證明。詳 [原覆盤](../docs/training/reviews/2026-11-15-http-framing.md)。
 - NATIVE-HTTP-021 最終驗收：NATIVE-HTTP-021 修復後 exact a1cf40d0fa5bdca908c057e92f73436ce4c4a50e / [CI 43719406375](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43719406375) job 132828041718 completed/success，所有列示步驟通過；raw log 245557 chars，487 tests in 63.561s OK，5 新 form framing methods 全 ok（含 6 原 red 情境、idle 408、正例及 replay）；P21-EQUIPMENT-BROWSER PASS actual_browser_dom_events=true, roles=3, stock=10, reserved=0, manual_uat=false；EDITORIAL_BROWSER_PASS 375/1280。四表與 SQLite bytes 無副作用負測通過；保留原正常業務拒絕持久化。L5 受控工程知識遷移證據成立（不同 parser/業務流程，非獨立未見 holdout、L6 或模型能力證明）；原 pending 記錄由本補記接續，不改歷史。
+
+### EP-13 資料庫原生權限、交易及遷移契約
+- 分離 schema exposure、GRANT、row policy、column privilege、function EXECUTE、admin bypass；WITH CHECK 與 USING 分別守新舊 row，view invoker 不能省略。驗真正非 owner/非 BYPASSRLS 角色；Supabase JWT/auth.uid() 非本機 session_user 替代，Data API defaults 版本需實查。
+- 每 owner stock row lock 再查 durable token；扣減及 ledger 同 transaction，否決亦可持久化；payload conflict 停止，未知結果依 EP-03 對帳。可信 writer 不是 browser 身分；不要推論可限制任意 trusted DML。
+- ADD/VALIDATE constraint、舊欄 explicit INSERT 相容及 invalid legacy fail closed。遷移前後 lock/資料/版本與新寫入之回退分開；小型同 transaction 不等於無鎖 online migration。
+- 證據：TD004-OFFICIAL-02 b5e61035272a8687b2f24a05030fda9d2eddfd44 / CI 43720063088 POSTGRES_NATIVE_CI_VERIFIED，[原生 PostgreSQL 覆盤](../docs/training/reviews/2026-11-15-postgres-architecture.md)。INDEX_CANDIDATE，非 runtime seed/正式 Supabase 驗收。

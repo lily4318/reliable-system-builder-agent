@@ -246,3 +246,77 @@ class SnapshotReportTests(unittest.TestCase):
         export.publish(self.source,fresh,2,2)
         self.assertEqual(json.loads(self.read_zip(fresh)[0])['completed_quantities']['paper'],8)
         print('P22C-SNAPSHOT: WAL writer committed R2 during R1 read; coherent R1 report, live R2 not claimed',flush=True)
+
+    def test_invalid_oversized_fields_not_materialized_into_python(self):
+        from unittest.mock import patch
+        real_connect=sqlite3.connect
+        # Actual SQLite TEXT/BLOB; measure values returned to Python, not a
+        # synthetic estimate or native SQLite allocation claim.
+        for table,column,value in (
+            ('metadata','revision','x'*262144),
+            ('records','record_id','x'*262144),
+            ('records','category','x'*262144),
+            ('records','state',b'x'*262144),
+            ('records','quantity',b'x'*262144),
+            ('records','record_id','SYN-0005'+chr(0)+'x'*262144),
+        ):
+            with self.subTest(table=table,column=column,kind=type(value).__name__):
+                source=self.root/'oversized.sqlite'
+                source.write_bytes(self.source.read_bytes())
+                with closing(real_connect(source)) as db, db:
+                    db.execute('UPDATE '+table+' SET '+column+'=?',(value,))
+                before=source.read_bytes()
+                self.output.write_bytes(b'prior output')
+                seen=[]
+                def connect(*args,**kwargs):
+                    reader=real_connect(*args,**kwargs)
+                    def measure(cursor,row):
+                        seen.extend(len(v) for v in row if isinstance(v,(str,bytes)))
+                        return row
+                    reader.row_factory=measure
+                    return reader
+                with patch.object(export.sqlite3,'connect',connect):
+                    for action in (export.publish,export.reconcile):
+                        with self.assertRaises(ValueError):
+                            action(source,self.output,1,2)
+                self.assertEqual(source.read_bytes(),before)
+                self.assertEqual(self.output.read_bytes(),b'prior output')
+                self.assertFalse(list(self.root.glob('.p22-report-*')))
+                largest=max(seen,default=0)
+                print('P22C-FIELD-BOUND:',table,column,type(value).__name__,
+                      'largest Python text/blob field',largest,flush=True)
+                self.assertLessEqual(largest,16)
+                self.output.unlink()
+
+    def test_snapshot_field_bounds_preserve_valid_utf8_utf16_and_row_limit(self):
+        rows=[('SYN-%04d'%i,'pencil','complete',999) for i in range(1000)]
+        expected={'policy_revision':2,'completed_quantities':{'paper':0,'pencil':999000,'folder':0},
+                  'status_counts':{'complete':1000,'pending':0,'rejected':0}}
+        outputs=[]
+        for encoding in ('UTF-8','UTF-16le','UTF-16be'):
+            with self.subTest(encoding=encoding):
+                source=self.root/(encoding+'.sqlite')
+                with closing(sqlite3.connect(source)) as db, db:
+                    db.execute("PRAGMA encoding='"+encoding+"'")
+                    self.assertEqual(db.execute('PRAGMA encoding').fetchone()[0],encoding)
+                    db.execute('CREATE TABLE metadata(revision INTEGER)')
+                    db.execute('INSERT INTO metadata VALUES (1)')
+                    db.execute('CREATE TABLE records(record_id TEXT, category TEXT, state TEXT, quantity INTEGER)')
+                    db.executemany('INSERT INTO records VALUES (?,?,?,?)',reversed(rows))
+                before=source.read_bytes()
+                self.assertEqual(export.snapshot(source,1),rows)
+                output=self.root/(encoding+'.zip')
+                self.assertEqual(export.publish(source,output,1,2),'PUBLISHED')
+                raw,manifest=self.read_zip(output)
+                self.assertEqual(json.loads(raw),expected)
+                independent=json.dumps(rows,sort_keys=True,separators=(',',':')).encode('ascii')+b'\n'
+                self.assertEqual(manifest['snapshot_sha256'],hashlib.sha256(independent).hexdigest())
+                self.assertEqual(source.read_bytes(),before)
+                outputs.append(output.read_bytes())
+                self.assertEqual(export.reconcile(source,output,1,2),'COMMITTED')
+                with closing(sqlite3.connect(source)) as db, db:
+                    db.execute("INSERT INTO records VALUES ('SYN-1000','paper','pending',1)")
+                with self.assertRaisesRegex(ValueError,'row count'):
+                    export.publish(source,self.root/'overflow.zip',1,2)
+                self.assertFalse((self.root/'overflow.zip').exists())
+        self.assertEqual(len(set(outputs)),1)

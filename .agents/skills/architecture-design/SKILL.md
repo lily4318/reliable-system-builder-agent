@@ -25,5 +25,11 @@ description: "設計架構、比較方案。architect 角色；交付 architectu
 - 本 repo 原 `src.team_workbench._latest` 採每類 MAX(id)＋MIN(id) 排序與 PK join，在原 schema 上只物化最新版、維持原先類別首次出現的順序，保留原 current_artifacts 依賴判斷及 append-only 歷史。先測原 2,400 列實際 SQLite，再以既有檔案庫唯讀跑新舊查詢、比對輸出與檔案 hash；額外索引只在隔離副本試驗，未採用 schema 遷移。
 - 回歸入口 `python -m unittest discover -s tests -p test_team_workbench.py -v`；實際測試與 ADR 取捨見原決策紀錄 NATIVE-ARCH-005。此例不證明所有 SQL、遠端 DB、分散式一致性或完整 Agent 性能；Python peak 不含 SQLite/C 原生配置，原生資料庫仍可能全掃描或建暫存 B-tree。禁止直接拿使用者私人資料庫做未授權 benchmark 或建立索引。
 
+### 跨角色輸入契約與依序守門（NATIVE-ARCH-006）
+- 先區分資料形狀驗證、業務狀態機、守門優先序及實際授權。逐欄檢查實際使用的型別、允許值、缺欄預設與相依；不能把 JSON 可解析、列表存在或 truthy 當成有效證據。不合法輸入產生契約規定的 HOLD，而不是未捕捉例外或自動修正成核准。
+- 比較局部驗證、集中依序驗證與集中全量預檢。原有逐步收集證據或唯讀任務可能不要求後段欄位；全量預檢可能遮蔽目標、來源與 UNKNOWN/PARTIAL 寫入的優先處置。集中化若有真實重複維護成本，須保留守門順序、缺欄語意、狀態碼與消費端相容性，再估計遷移與回退成本；不要僅因程式較整齊而全面重構或引入套件。
+- 本 repo `src.engineering_workflow.route` 先核目標、來源、寫入結果，才驗 stage；在集合查詢前檢查字串。回歸須覆蓋 JSON 陣列／物件／null／數字／布林、合法階段、多個同時錯誤時的優先順序、最小唯讀輸入及既有案例。保留所有輸出 mutation_permitted=false；此判定器只產生建議，不驗證外部證據或執行操作。
+- 回歸入口 `python -m unittest discover -s tests -p test_engineering_workflow.py -v`；原型比較與 red/green 證據見決策紀錄 NATIVE-ARCH-006。局部修補僅針對已觀測 JSON stage 錯誤，不等同通用 schema 驗證、惡意 Python 物件防禦、資料來源真實性或其他判定器的安全證明。原 write_outcome 缺欄預設維持不變，若要改成強制明示須盤點呼叫端及另行決策。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 architecture；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

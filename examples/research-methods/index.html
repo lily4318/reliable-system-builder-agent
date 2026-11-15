@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'none'; base-uri 'none'; form-action 'none'">
+<title>研究方法互動教學｜隨機分派</title>
+<link rel="stylesheet" href="style.css">
+<script defer src="app.js"></script>
+</head>
+<body>
+<main>
+  <header><p class="eyebrow">RESEARCH METHODS · 教學示範</p><h1>隨機分派與實驗資料模擬</h1><p>在等額分派的條件下，觀察控制組與實驗組的合成資料。</p></header>
+  <p class="notice">所有資料均為虛構。分數差異來自預設的模擬規則，並非真實研究結果，也不能據此推論介入效果。</p>
+  <section class="panel" aria-labelledby="config-title">
+    <h2 id="config-title">01　設定模擬參數</h2>
+    <form id="simulation" novalidate>
+      <div class="fields">
+        <label for="sample">虛擬樣本數 <span>20–100 的偶數</span><input id="sample" inputmode="numeric" maxlength="3" value="40" required aria-describedby="status"></label>
+        <label for="seed">隨機種子 <span>0–4294967295 的整數</span><input id="seed" inputmode="numeric" maxlength="10" value="1" required aria-describedby="status"></label>
+      </div>
+      <div class="actions"><button type="submit" id="generate">產生模擬資料</button><button type="button" class="secondary" id="download" disabled>下載 CSV</button></div>
+      <p id="status" role="status" aria-live="polite"></p>
+    </form>
+  </section>
+  <section class="panel" aria-labelledby="result-title" id="results" hidden>
+    <h2 id="result-title">02　分派與結果</h2>
+    <p id="run-info" class="muted"></p>
+    <div class="groups">
+      <div class="group a"><h3>A｜控制組</h3><p id="count-a" class="count"></p><p>平均模擬分數 <strong id="mean-a"></strong></p><meter id="bar-a" min="0" max="100" aria-label="控制組平均模擬分數"></meter></div>
+      <div class="group b"><h3>B｜實驗組</h3><p id="count-b" class="count"></p><p>平均模擬分數 <strong id="mean-b"></strong></p><meter id="bar-b" min="0" max="100" aria-label="實驗組平均模擬分數"></meter></div>
+    </div>
+    <p class="muted">平均分數以 0–100 為比較尺度；資料表包含所有虛擬樣本。</p>
+    <div class="table-scroll" tabindex="0" role="region" aria-label="完整合成資料表，可捲動">
+      <table><caption>完整模擬資料</caption><thead><tr><th scope="col">虛擬編號</th><th scope="col">組別</th><th scope="col">模擬分數</th></tr></thead><tbody id="rows"></tbody></table>
+    </div>
+  </section>
+  <section class="panel learning" aria-labelledby="learn-title"><h2 id="learn-title">03　課堂討論</h2><p>等額隨機分派讓兩組人數相同，但不保證所有特徵相同。隨機分派不同於從母群體隨機抽樣。更換種子觀察結果；相同樣本數和種子會重現相同資料。</p><p>本示範使用 32 位元確定性偽亂數、Fisher–Yates 洗牌。A 組基準 50、B 組基準 58，加上三個 0–10 整數亂數之和減 15；不假設真實分數分布。此演算法不供正式受試者分派。</p><p class="muted">CSV 欄位：sample_id（虛擬編號）、group（A/B）、simulated_score（合成分數）、sample_size（總樣本數）、seed（種子）、simulation_version（模擬規則版本）。</p></section>
+  <footer>模擬規則 sim-v1 · 本機運算，無帳號、無個資、無網路資料傳輸</footer>
+</main>
+</body>
+</html>

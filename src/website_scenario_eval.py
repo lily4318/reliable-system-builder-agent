@@ -95,14 +95,27 @@ def case_packet(case: dict) -> dict:
 def _review_contract(items: object, inferred: list) -> bool:
     if not isinstance(items,list) or len(items)!=len(inferred):
         return False
-    seen = set()
+    # Bind each review question to exactly one inference in this draft.
+    # Positions and counts alone cannot prove the intended text is reviewed.
+    proposals = {}
+    for row in inferred:
+        if not isinstance(row,dict):
+            return False
+        title, proposal = row.get("title"), row.get("proposal")
+        if (not isinstance(title,str) or not title.strip() or title in proposals
+            or not isinstance(proposal,str) or not proposal.strip()):
+            return False
+        proposals[title] = proposal
+    seen, reviewed = set(), set()
     for record in items:
         if not isinstance(record,dict):
             return False
-        rid = record.get("id")
-        if not isinstance(rid,str) or rid in seen:
+        rid, title = record.get("id"), record.get("question")
+        if (not isinstance(rid,str) or not rid.strip() or rid in seen
+            or not isinstance(title,str) or title not in proposals or title in reviewed):
             return False
         seen.add(rid)
+        reviewed.add(title)
         choices = record.get("choices")
         if (record.get("approval_state")!="PENDING_USER_REVIEW"
             or record.get("editable_text_on_select") is not True
@@ -110,7 +123,9 @@ def _review_contract(items: object, inferred: list) -> bool:
             or not isinstance(choices,list)
             or [x.get("id") for x in choices if isinstance(x,dict)]!=[
                 "accept", "modify", "reject"
-            ]):
+            ] or len(choices)!=3
+            or any(not isinstance(x,dict) for x in choices)
+            or any(x.get("proposed_text")!=proposals[title] for x in choices[:2])):
             return False
         try:
             state = new_review(choices)
@@ -146,21 +161,50 @@ def inspect_case(case: dict, spec: dict) -> dict:
     normalized_missing = set(case["expected_missing"])
     open_keys = spec.get("unanswered_questions")
     open_keys = set(open_keys) if isinstance(open_keys,list) else set()
+    # These are explicitly source-mirroring fields in this versioned draft
+    # schema, not a semantic comparison of arbitrary architecture proposals.
+    source = {key: "待確認" if key in normalized_missing else answers.get(key)
+              for key in KEYS}
+    mirrors = {
+        "functional_spec": {
+            "purpose":"purpose", "user_roles":"audience", "flows":"journey",
+            "pages":"pages", "authentication_authorization":"identity",
+            "data_forms":"forms", "state_booking_rules":"slots",
+            "notifications":"notice", "administration":"admin"},
+        "nonfunctional_spec": {
+            "privacy_approval":"privacy", "infrastructure_integrations":"integrations",
+            "responsive_accessibility_localization":"experience",
+            "release_acceptance_maintenance":"release"},
+        "architecture_design_draft": {
+            "ui_pages_from_user":"pages", "user_flow_from_user":"journey",
+            "existing_infrastructure_from_user":"integrations"},
+        "delivery_plan_draft": {"mvp_priority_from_user":"release"},
+    }
+    mirrors_ok = all(
+        isinstance(spec.get(section),dict) and all(
+            isinstance(source[key],str) and spec[section].get(field)==source[key]
+            for field,key in fields.items())
+        for section,fields in mirrors.items()
+    )
     preserved = (
         len(sections)==13 and
-        len({x.get("source_key") for x in sections if isinstance(x,dict)})==13
-        and all(
-            any(s.get("source_key")==key and
-                (s.get("user_stated")==answers.get(key)
-                 or (key in normalized_missing and s.get("user_stated")=="待確認"))
-                for s in sections if isinstance(s,dict))
-            for key in KEYS
-        )
+        all(isinstance(x,dict) and isinstance(x.get("source_key"),str) for x in sections)
+        and {x["source_key"] for x in sections}==set(KEYS)
+        and all(isinstance(source[x["source_key"]],str) and
+                x.get("user_stated")==source[x["source_key"]] for x in sections)
+        and mirrors_ok
     )
+    expected_ids = {key:"REQ-"+str(i) for i,key in enumerate(KEYS,1)}
     trace_ok = (len(trace)==13 and
-        {x.get("source_question") for x in trace if isinstance(x,dict)}==set(KEYS)
-        and all(isinstance(x,dict) and x.get("status") in (
-            "USER_STATED_NOT_APPROVED","OPEN_UNANSWERED") for x in trace))
+        all(isinstance(x,dict) and isinstance(x.get("source_question"),str) for x in trace)
+        and {x["source_question"] for x in trace}==set(KEYS)
+        and all(
+            x.get("requirement_id")==expected_ids[x["source_question"]]
+            and x.get("explicit_user_answer")==source[x["source_question"]]
+            and isinstance(source[x["source_question"]],str)
+            and x.get("status")==("OPEN_UNANSWERED" if x["source_question"] in normalized_missing
+                                   else "USER_STATED_NOT_APPROVED")
+            for x in trace))
     complete = (
         isinstance(spec.get("functional_spec"),dict) and
         len(spec["functional_spec"])>=9 and

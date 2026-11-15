@@ -39,6 +39,35 @@ class TaskScopeTest(unittest.TestCase):
         self.assertEqual(decide_scope({**s, "write_authorized": True,
                                        "proposed_write_repo": AGENT}), "BLOCK_CROSS_PROJECT_WRITE")
 
+    def test_github_case_alias_is_not_a_separate_project(self):
+        for target in (AGENT.upper(), "Example/system-builder-agent"):
+            for authorized in (False, True):
+                with self.subTest(target=target, authorized=authorized):
+                    s = {**BASE, "intent": "apply_agent", "target_repo": target,
+                         "proposed_write_repo": target if authorized else None,
+                         "write_authorized": authorized}
+                    self.assertEqual(decide_scope(s), "HOLD_TARGET")
+
+    def test_github_case_alias_preserves_scoped_authorization(self):
+        s = {**BASE, "intent": "improve_agent", "target_repo": AGENT.upper(),
+             "proposed_write_repo": "Example/system-builder-agent", "write_authorized": True}
+        cases = [
+            (s, "AGENT_CANDIDATE_PR_ONLY"),
+            ({**s, "write_authorized": False}, "AGENT_READ_ONLY"),
+            ({**s, "proposed_write_repo": PROJECT.upper()}, "BLOCK_CROSS_PROJECT_WRITE"),
+            ({**s, "requests_weight_training": True}, "HOLD_WEIGHT_TRAINING"),
+            ({**s, "intent_confirmed_from_latest_user": "true"}, "HOLD_INTENT"),
+            ({**s, "target_repo": " " + AGENT}, "HOLD_TARGET"),
+            ({**s, "proposed_write_repo": None}, "HOLD_TARGET"),
+            ({**s, "intent": "apply_agent", "target_repo": PROJECT.upper(),
+              "proposed_write_repo": PROJECT}, "PROJECT_PATCH_ONLY"),
+            ({**s, "intent": "apply_agent", "target_repo": PROJECT,
+              "proposed_write_repo": AGENT.upper()}, "BLOCK_CROSS_PROJECT_WRITE"),
+        ]
+        for scenario, expected in cases:
+            with self.subTest(expected=expected, scenario=scenario):
+                self.assertEqual(decide_scope(scenario), expected)
+
     def test_weight_training_needs_separate_evidence(self):
         self.assertEqual(decide_scope({**BASE, "intent": "improve_agent",
                                        "target_repo": AGENT, "proposed_write_repo": AGENT,

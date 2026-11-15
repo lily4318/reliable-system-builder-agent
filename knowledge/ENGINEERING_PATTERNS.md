@@ -95,6 +95,7 @@
 - 採用：模型或其他生成者的 REVIEW_READY 只代表候選，不能等同程式功能 PASS。預先定義可重現 oracle、限定輸入及執行範圍，保存精確版本/輸出證據；功能失敗即由 host QA 退件，以既有任務池重開實作及必要下游，保留不受影響前置，設定有限修復次數與未知回應復原。未知 native code 不直接在有憑證或外網的環境執行。
 - 證據：P1-2c exact 53f2f44f88d617797cfed8a4ef746c5280e56130 / [CI 43688435072](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43688435072) 385/385；P1-2 bounded functional gate exact d2ca12006988100a500a6a6fea0f41cd73de5f85 / [CI 43688939298](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43688939298) 388/388，最新 406-test CI 六個 DispatchContract / FunctionalGateContract 方法 ok。原 src/p1_dispatch_runner.py、src/p1_restricted_functional.py、tests/test_p1_dispatch_runner.py。
 - 限制：fake transport 與有限 AST 的實際語意測試，未跑真模型或任意 Python、未證實獨立多 Agent、通用安全沙箱或真正自動修復能力。本地 runner 為選用評測，不是 TD-001 開工前提。
+- 實際遷移 NATIVE-EP-010-ORACLE-BOUNDARY：公開 oracle 必須測到已聲明合法域的必要邊界與資源上限。原12案例最多3筆卻接受32筆，實際可錯放超3000步及數值端點錯誤候選。red [CI 43704461951](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43704461951) 四失敗；green [CI 43704563695](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43704563695) 415/415，oracle v2 18固定案例，安全限制不放寬，host 退件後修復通過。oracles 版本/契約/cases hash 變更後不能借舊 PASS（EP-05 原理）；仍非完整輸入域或獨立模型/人審驗收。
 - 狀態：EVIDENCE_VERIFIED（有限契約/本機功能）/ INDEX_CANDIDATE；非可宣稱真模型案例。
 
 ## 現有檢索案例對照（唯一程式主本仍為 src/workbench_learning.py）

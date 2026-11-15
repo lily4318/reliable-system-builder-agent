@@ -1,11 +1,13 @@
 """Actual local HTTP routes, no credentials/real identities in repo."""
 from contextlib import closing
 from http.cookiejar import CookieJar
+from http.client import HTTPResponse
 import json
 import queue
 import re
 from pathlib import Path
 import secrets
+import socket
 import subprocess
 import sys
 import tempfile
@@ -141,6 +143,65 @@ class EditorialHTTPTests(unittest.TestCase):
             self.assertIn("frame-ancestors 'none'",raw.headers['Content-Security-Policy'])
             self.assertEqual(raw.headers['Cache-Control'],'no-store')
             self.assertNotIn(b'browser-test.js',raw.read())
+
+    def raw_framed_action(self, body, framing, *, finish=True):
+        # Actual loopback HTTP bytes, not a mock of the body parser.
+        cookie=next(c.value for c in self.a.jar if c.name=='editorial_session')
+        headers=[
+            'POST /api/action HTTP/1.1',
+            f'Host: 127.0.0.1:{self.server.server_port}',
+            f'Origin: {self.url}',
+            f'Cookie: editorial_session={cookie}',
+            f'X-CSRF-Token: {self.a.csrf}',
+            'Content-Type: application/json',
+            *framing,
+            '', '',
+        ]
+        with socket.create_connection(('127.0.0.1',self.server.server_port),timeout=10) as sock:
+            sock.sendall('\r\n'.join(headers).encode('ascii')+body)
+            if finish:
+                sock.shutdown(socket.SHUT_WR)
+            with HTTPResponse(sock) as response:
+                response.begin()
+                return response.status,json.load(response)
+
+    def framed_create(self):
+        payload={'op':'create','token':secrets.token_hex(16),
+                 'title':'合成框架檢查','category':'文化','body':'多位元組'}
+        return payload['token'],json.dumps(payload,ensure_ascii=False).encode('utf-8')
+
+    def assert_framing_refused(self, token, body, framing, *, finish=True, status=400):
+        before=self.a.get('/api/workspace')[1]
+        result=self.raw_framed_action(body,framing,finish=finish)
+        receipt=self.a.get('/api/receipt?token='+token)[1]
+        self.assertEqual((result[0],receipt['observed'],self.a.get('/api/workspace')[1]),
+                         (status,False,before))
+
+    def test_http_framing_incomplete_valid_json_has_no_mutation(self):
+        token,body=self.framed_create()
+        self.assert_framing_refused(token,body,[f'Content-Length: {len(body)+8}'])
+
+    def test_http_framing_invalid_length_or_transfer_encoding_has_no_mutation(self):
+        for case in ('signed','duplicate','combined','empty-te','chunked-te'):
+            with self.subTest(case=case):
+                token,body=self.framed_create()
+                n=len(body)
+                framing={
+                    'signed':[f'Content-Length: +{n}'],
+                    'duplicate':[f'Content-Length: {n}',f'Content-Length: {n}'],
+                    'combined':[f'Content-Length: {n}, {n}'],
+                    'empty-te':[f'Content-Length: {n}','Transfer-Encoding:'],
+                    'chunked-te':[f'Content-Length: {n}','Transfer-Encoding: chunked'],
+                }[case]
+                self.assert_framing_refused(token,body,framing)
+
+    def test_http_framing_complete_utf8_and_leading_zero_length(self):
+        token,body=self.framed_create()
+        status,result=self.raw_framed_action(body,[f'Content-Length: 00{len(body)}'])
+        self.assertEqual(status,200)
+        self.assertTrue(result['ok'])
+        self.assertTrue(self.a.get('/api/receipt?token='+token)[1]['observed'])
+        self.assertEqual(self.a.get('/api/workspace')[1]['revisions'][0]['title'],'合成框架檢查')
 
     def test_http_session_expiry_logout_and_restart_persistence(self):
         self.assertEqual(self.reader.login('author-a','bad password')[0],401)

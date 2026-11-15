@@ -56,11 +56,13 @@ def validate(matrix, catalog):
     by_id = {}
     for u in units:
         require(isinstance(u, dict) and set(u) == {
-            "id", "source_url", "source_sha256", "access", "owner", "collaborators",
-            "skill", "prerequisites", "maturity", "evidence"
+            "id", "title", "source_url", "source_sha256", "access", "owner", "collaborators",
+            "skill", "prerequisites", "maturity", "evidence", "next_action",
+            "adoption", "adoption_reason"
         }, "unit fields")
         uid = u["id"]
         require(nonblank(uid) and uid in expected and uid not in by_id, "duplicate/unknown unit")
+        require(nonblank(u["title"]) and nonblank(u["next_action"]), "title and next action")
         require(nonblank(u["source_url"]), "source URL")
         require(isinstance(u["owner"], str) and u["owner"] in roles, "single catalog owner")
         require(unique_strings(u["collaborators"]) and set(u["collaborators"]) <= roles
@@ -80,6 +82,12 @@ def validate(matrix, catalog):
         else:
             require(level == 0 and u["source_sha256"] is None,
                     "unread/blocked source cannot claim maturity or pin")
+        require(u["adoption"] in ("UNDECIDED", "APPLICABLE", "LEGACY", "NOT_ADOPTED"), "adoption")
+        if u["adoption"] == "UNDECIDED":
+            require(u["adoption_reason"] is None, "undecided adoption has no conclusion")
+        else:
+            require(level >= 2 and nonblank(u["adoption_reason"]),
+                    "adoption conclusion needs analysis and reason")
         by_id[uid] = u
     if status == "COMPLETE_DECLARED":
         require(set(by_id) == set(expected), "missing inventory unit")

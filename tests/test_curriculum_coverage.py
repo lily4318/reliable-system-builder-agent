@@ -11,10 +11,11 @@ URL = "https://example.invalid/synthetic-training"
 
 
 def unit(uid, owner="developer", skill="implement-feature", prerequisites=None):
-    return {"id": uid, "source_url": URL, "source_sha256": PIN,
+    return {"id": uid, "title": "Synthetic " + uid, "source_url": URL, "source_sha256": PIN,
             "access": "READABLE", "owner": owner, "collaborators": ["qa-uat"],
             "skill": skill, "prerequisites": prerequisites or [],
-            "maturity": 0, "evidence": {}}
+            "maturity": 0, "evidence": {}, "next_action": "Read and verify",
+            "adoption": "UNDECIDED", "adoption_reason": None}
 
 
 def inventory(*units):
@@ -30,8 +31,16 @@ class CurriculumCoverageTests(unittest.TestCase):
     def check(self, data):
         return validate(data, self.catalog)
 
-    def test_actual_blocked_matrix_has_no_completion(self):
+    def test_live_matrix_valid_during_future_progress(self):
         report = self.check(load_json(MATRIX))
+        self.assertFalse(report["source_verified"])
+        self.assertFalse(report["curriculum_completed"])
+
+    def test_blocked_matrix_has_no_completion(self):
+        data = {"schema_version": 1, "source_links": [URL],
+                "inventory_status": "BLOCKED_SOURCE", "inventory_sha256": None,
+                "expected_ids": [], "units": []}
+        report = self.check(data)
         self.assertEqual(report["inventory_status"], "BLOCKED_SOURCE")
         self.assertTrue(report["unknown_total"])
         self.assertIsNone(report["coverage_percent"])
@@ -103,6 +112,17 @@ class CurriculumCoverageTests(unittest.TestCase):
         data = inventory(unit("one"))
         data["inventory_status"] = "BLOCKED_SOURCE"
         with self.assertRaises(ValueError):
+            self.check(data)
+
+    def test_adoption_requires_analysis_and_reason(self):
+        data = inventory(unit("one"))
+        data["units"][0].update(adoption="NOT_ADOPTED", adoption_reason="Not suitable")
+        with self.assertRaisesRegex(ValueError, "adoption conclusion"):
+            self.check(data)
+        data["units"][0].update(maturity=2, evidence={"principles": "ref1", "analysis": "ref2"})
+        self.assertFalse(self.check(data)["evidence_verified"])
+        data["units"][0]["next_action"] = ""
+        with self.assertRaisesRegex(ValueError, "title and next action"):
             self.check(data)
 
     def test_duplicate_json_keys_rejected(self):

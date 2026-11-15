@@ -193,6 +193,9 @@ context/history 真正唯讀，不建缺失資料庫，舊工作區未 setup 先
 綁定的 producer 未 DONE 時其 artifact current=false。根需求修訂必須走 revise+requirement；根 PASS 輸入 artifact={expected_artifact_id:新版需求 ID,inputs:{}}；其餘綁定 PASS 提供 artifact={expected_artifact_id:先前同類 ID 或首次 null,inputs:精確當前前置 artifact IDs,content:新產物全文,source_ref:來源}。檢查 revision/owner、前置狀態、兩類 artifact 版本，並單交易新增產物、DONE、PASS event；失敗回退，FAIL 不帶產物。receipt still_current 指根 revision 與最新需求 ID，不等於下游 DONE。此為操作者聲明與版本守門，非語意驗收。未採用的池保留舊 API，除既有根需求 standalone 覆寫禁令。不能防直接 SQL、舊程式混用或外部寫入；未改私人 DB 或外部專案。
 
 
+### 既有 revise 的依賴修改與復原隔離
+真正修改 deps 集合時，若該 task 或傳遞下游是 RUNNING/RECOVERY_REQUIRED，交易整筆拒絕（affected active worker）。不變更舊圖、revision、artifact、事件；先確認舊 worker 完成/停止並按原復原程序對帳，之後重讀最新版本再確認修改。相同集合的 deps、單純內容修訂仍依原失效方式處理。既有舊版已重接而遺失保護的歷史不能自行還原，須唯讀人工對帳，不將新 guard 當成舊庫修復或外部程序停止證明。實測詳 NATIVE-EP-009-RECOVERY-FENCE / CI 43703631052。
+
 ## P2-1c｜已綁定任務池的安全拓撲擴充
 
 以 `python -m src.workbench_tasks review --workspace ...` 的同一唯讀 snapshot 取得所有 tasks 的 revision 及 artifact_heads（含過期 head ID），核對正式來源及新增驗收。備份並停止舊版本工具。用 `extend-topology --workspace ... --input ...`，JSON 參數包含 additions（每項 task、title、priority、deps、gates、checks、artifact_kind；沒有產物請明確 null）、attach（既有非根任務 ID → 新增前置 task IDs）、expected_revisions（完整現況）、expected_artifact_heads（完整 head map）、唯一 session、evidence、confirmed=true。新任務可互相依賴且不必按順序列出；不得循環、未知 ID、重複 producer、未知 gate 或缺 catalog 前置祖先。只增邊、不刪邊、不重綁、不改根需求，仍須以原 combined revise 處理正式根需求修訂。

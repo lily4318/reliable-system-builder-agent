@@ -135,3 +135,15 @@
 - NEXT_ACTION: 核對此文件及當時最新 PR exact HEAD CI（與本輪 green SHA 分開）；保留並行任務驗收證據。下一項實際工程任務選不同 EP，或整理人審准入/退回標準，不重做通過的 scope測試或自行升格。
 
 - 選擇理由：相比全面重寫 scope/route 或增加遠端 API 依賴，採有限 ASCII 名稱比較是對現有契約相容、風險最低的修補；source GET 僅用於本輪核實事實，不能當通用授權。本輪新證據整合 EP-09/10（同一案例），不升格 seed。
+
+
+## TD-001｜2026-11-15 NATIVE-EP-009-RECOVERY-FENCE：舊 worker 復原隔離知識遷移
+
+- 使用者授權以 EP-01–11 選真正未解工程任務、實作、驗收、覆盤，範圍原 Draft PR #8。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK；按需讀 System Lead/task-planning、Developer/debug-and-repair、Security/security-review、QA/test-and-acceptance、Learning Evaluator/knowledge-distillation 原角色/技能與 formal sources。EP-04 主卡（current DAG/revision/復原隔離），EP-03（同庫拒絕原子性與唯讀憑據）、EP-09（業務狀態守門先於寫入）輔助；其餘八卡不強制套用。SOURCE_READ 原 index blob 0c0a5c7d0bf06e2c5475e7c7e3aa51dea29f1ad0；無 runtime retrieval、私人引用或獨立子代理。
+- 基準 4c0771394ae7339ce53ab4bc094aff2fd44c39b0 / CI 43703079220/job 132778228179 raw 227947 chars，406 tests in 43.951s/OK。並行 scope repair 44387d791df6c892dc0352be71f7aee1c77727aa / CI 43703386263/job 132779195199 408/408；保留 NATIVE-EP-008，不歸為本輪成果。
+- 根因：原 workbench_tasks._pool 從當前 DAG 計算 RECOVERY_REQUIRED worker 的祖先 recovery_blockers；revise(deps=...) 可重接其祖先，讓舊上游保護消失，與 extend_topology 的 active affected worker 拒絕不一致。比較 A 依新圖重算（已知失敗，不採用）、B 保存舊/新完整資源圖與遷移（有意義但需 schema/歷史及外部資源另驗，暫不採用）、C 沿既有拓撲守門，真正改邊且受影響節點 RUNNING/RECOVERY_REQUIRED 時拒絕整筆（採用）。同一 BEGIN IMMEDIATE、驗證圖及 affected closure 後、任務/需求 artifact/event 寫入前檢查；改入邊不改該節點下游集合，集合相同的 deps 或單純內容修訂維持原失效及復原路徑。無 schema、資料遷移、外部操作。
+- RED：tests/test_task_revision.py blob 6d679fbad924402e0b6a469a12472226ca2f550a、tests/test_bound_artifacts.py blob b3dffa9bb7bf34e27edb20eb99b6ab242f93f116；exact 6ed0c60d58246c65f84559edfeaf25a858cae42b / CI 43703424124/job 132779499998 completed/failure，raw 97429 chars，412 tests in 40.043s FAILED(failures=3)。實際 old ancestor fence lost: spec blockers=[], next_ready=['other', 'spec']；直接 running edit 及 combined root graph edit 未拒絕；相同 deps 內容修訂原已通過。未發生真實外部事故。
+- GREEN：a55f0c99c382f4326fc48865f19c76131832283b / [CI 43703631052](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43703631052) / job 132779930593 completed/success，raw 229106 chars，412 tests in 42.650s/OK。原 src/workbench_tasks.py blob cd452201d0c0daa53759fb5d259ab2644995b938，7 行新增、原兩 test blobs 不變，四項新方法全 ok；確認拒絕前後 task/event/artifact/DB bytes 不變及 receipt NOT_OBSERVED，recover 後合法修訂、獨立工作與正常內容修訂可繼續。原所有 CI steps、EDITABLE-DECISION-BROWSER 12/12、P21-EQUIPMENT-BROWSER PASS。保留並行 EP-008 記錄 commit 9a2560c7ae40d104088d56866ef0310f0b0b9c7d；競寫時以最新 parent 接續，非 force。
+- 覆盤：EP-04 由「新增節點」遷移到既有 revise 改邊，EP-03/09 提供交易及守門位置，具同 oracle red/green 實證；不將知識選用自述當獨立評審、模型增益、真多 Agent 或自動檢索。增量更新原 EP-04、task-planning、TEAM_WORKBENCH、原決策，11 卡及 2 DEFAULT/6 OPT_IN 未改數量。不增加第二案例庫或升格。限制：可信同庫新版 API；禁止活躍受影響 worker 改邊，不代表已完整實作任意刪邊/重綁、保存舊資源圖、阻止舊版/direct SQL、修復歷史上已被解除的 fence、確認 OS worker 停止或撤回外部操作。舊庫須另行人工唯讀對帳，不自動推定或修復。未改真私人庫、main/Release、外部專案或部署。
+- NEXT_ACTION: 核對本次文件回讀與其 exact CI，與已驗證的程式 SHA 分開；後續選不重複的不同真實工作或進行知識人審，無須重做本缺陷。未獲授權不處理外部或私人庫。
+

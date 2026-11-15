@@ -2,18 +2,43 @@
 
 ## 最新訓練主檔｜2026-11-15（持續更新入口）
 
-**使用者決策：** 將本次教材比對與訓練建議持久保存，以後每次要求訓練此 Agent，先讀本節與最新實際進度，再接續施工。2026-11-15 最新明確決策：後續優先 P1-2，解除真實獨立多 Agent 與盲測執行阻礙，驗證七專家自主應用技能與案例庫；不啟用未授權付費 API 或外部部署。此節為目前訓練方向及接續索引；下方保留既有評測協定與歷史，不將建議自動視為正式 Release 或額外授權。
+**使用者決策（2026-11-15 最新、TD-001）：** 以教材的專業角色、技能、記憶、工作空間及實際工作覆盤為核心，使用既有 AI 平台執行；本地模型降為選用評測工具，保留已完成的工程能力。此決策取代歷史 P1-2「本地模型優先／缺本地模型先阻塞」的接續順序；不否定真實獨立評測的價值。每次先讀本節及 [訓練決策紀錄](training/DECISION_LOG.md) 的相關有效 ID，歷史頁面僅供證據查核。未核准之建議不覆蓋正式決策；本候選不代表已發布 main 或額外授權。
 
 - TASK_DOMAIN: RELIABLE_AGENT_ENGINEERING_CAPABILITY_TRAINING
 - SOURCE_REPO: lily4318/reliable-system-builder-agent
 - ACTIVE_CANDIDATE: Draft PR #8, candidate-skill-team-integration-20261114；https://github.com/lily4318/reliable-system-builder-agent/pull/8
-- SOURCE_VERSION: P1-2c exact integrated head 53f2f44f88d617797cfed8a4ef746c5280e56130 CI 43688435072 success. Restricted B003 interpreter 8846ef9a4c20878bb8657d22b82226dd3915fb0b; host QA gate cfe4528a9e8e4efe025382b833e62624b52ce983; code/tests f957b8a85dc7e981184daf05a70ec34b513b5f16, 43688881282 in_progress/unverified; new CI not verified. Current PR head authoritative.
-- LAST_VERIFIED_STEP: Exact P1-2c CI 43688435072/job 132733951433 completed/success; full raw logs 385 tests in 46.839s/OK; P12-DISPATCH, P12-SKILL-CASE and all workflow steps success. No previous actual failure. Current local tool/loopback preflight no ollama/codex/claude/llama-cli/docker/podman/bwrap, localhost 11434/1234 connect_ex=111, no listed Ollama/llama_cpp/transformers/wasmtime modules; unshare available, not a verified general sandbox. No model inference. New restricted tool, integration and tests read back; CI unverified.
-- COMPLETED: P0/P1-1a/b/c/P2-1 and P2-2a/b/c/d controlled engineering validated. P1-2a/b/c local role, case and dispatch contracts exact CI 385 PASS. User priority actual execution and functional evaluation. Added opt-in B003 bounded AST interpretation of candidate interval predicate with immutable prevalidated synthetic inputs, fixed independent-of-candidate public oracle of 12 cases, forbidden syntax and step limits, exact source/oracle/candidate revision evidence. Host tool failure overrides model REVIEW_READY, existing task pool QA FAIL/revise/retry; preserves first candidate and report, no native code execution. Three targeted regression methods committed/read back, pending actual CI.
-- BLOCKERS: New exact CI unverified. No reachable authorized model/subagent execution endpoint in present chat; user Windows host model availability/digest and offline isolation unobserved. B003 tool is a narrow manually interpreted subset, not general Python sandbox, not all B003 requirements, not independently authored holdout or human blind review. Invalid interval input blocked by host, not evidence of candidate error handling. Model dispatcher uses fixed safety DAG; tool invocation is host-controlled optional QA, not arbitrary autonomous tools. No real inference, no genuine model repair, no provider attestation or real functional gain, no private data, paid API or deployment. Need separately authorized verified general isolation for full system/native candidate execution.
+- SOURCE_VERSION: Latest engineering-verified candidate d2ca12006988100a500a6a6fea0f41cd73de5f85 / CI 43688939298 success; confirmed TD-001/TD-002 decision log commit 05f13981d3f7f1452183b30a3afcd2b2e297e708. Current Draft PR #8 head authoritative; new documentation CI not yet verified.
+- LAST_VERIFIED_STEP: Exact CI 43688939298/job 132735394546 completed/success; full raw logs 223987 chars, 388 tests in 39.030s/OK; P12-FUNCTIONAL and P12-HOST-QA confirmed actual bounded public B003 interpreter and host failure-driven revision with fixture transport; all workflow steps success. No real local model invocation or independent blind holdout.
+- COMPLETED: P0/P1-1a/b/c/P2-1/P2-2a/b/c/d and P1-2a/b/c engineering contracts plus restricted B003 host functional gate verified at exact SHA (388 PASS). TD-001 user-confirmed platform-native professional Agent direction; local runners retained as optional evaluation artifacts. TD-002 decision log created and read back. Engineering evidence retained; no new model inference or model weight training.
+- BLOCKERS: No blanket platform access, independent subagent, blinded reviewer or general native-code sandbox capability established; verify actual tools/permissions per task. Local Ollama availability is no longer a blocker to platform-native work. Independent model benchmarks remain unverified and optional, not a prerequisite. Source ZIP not re-read in this discussion; prior training summary is evidence, not original material. Cross-project integration, formal release and external deployments require separate authorization.
 - WRITE_OWNER: 僅 Agent 候選分支；main/Release、外部專案、真實個資、付費模型或正式部署不在本次授權內。
-- SYNC_STATUS: P2_2D_DISTILL_EXACT_FULL_CI_377_PASS; P1_2C_DISPATCH_CONTRACT_EXACT_FULL_CI_385_PASS; P1_2_RESTRICTED_B003_HOST_FUNCTIONAL_SOURCE_TEST_READBACK; NEW_CI_UNVERIFIED; ACTUAL_MODEL_CALLS_ZERO; TRUE_HOLDOUT_NOT_RUN; NO_RELEASE.
-- NEXT_ACTION: Verify latest exact CI and P12-FUNCTIONAL/P12-HOST-QA markers; fix actual failures only. Highest priority obtain real local runtime evidence via existing user-host read-only probe, select installed local model digest, confirm offline isolation and run opt-in B003 public pilot once. Review exact candidate/host reports and actual model QA repair, not fixture results. Then pair default/curated real runs and independently sealed tasks/reviewers; plan separately authorized verified native sandbox, no paid APIs or deployments. Do not create more synthetic apps or blindly retry a partial run.
+- SYNC_STATUS: ENGINEERING_EXACT_FULL_CI_388_PASS; TD001_PLATFORM_NATIVE_CONFIRMED; TD002_DECISION_LOG_READBACK; DOCUMENTATION_INTEGRATION_CI_UNVERIFIED; INDEPENDENT_MULTI_AGENT_NOT_VERIFIED; TRUE_HOLDOUT_NOT_RUN; NO_RELEASE.
+- NEXT_ACTION: TD-001 priority: audit the end-to-end platform-native entry and role/skill/workspace contracts; use an actually available, authorized engineering task to select needed roles, read only relevant skills/cases, deliver and verify real artifacts, record observed failures and distill transferable knowledge, then apply it to a different task. Fix observed gaps in original skills/tools, not repeated synthetic applications. Existing external project integration or data transfer needs separate authorization; do not require Ollama or paid API. Verify latest exact documentation CI and reconcile failures; preserve independent evaluation capability as optional.
+
+### 最新有效訓練優先序（TD-001；取代下方歷史路線的執行優先順序）
+
+**定位：** 不是建立另一個 LLM，而是讓 ChatGPT、Claude、Copilot 或其他已授權平台上的 AI 能按共同的工程角色與技能完成任務。是否可以真正啟用子代理、執行工具及持久化，依平台實際能力。單一模型按角色分工可完成實際工作，但必須標記單 Agent，不得宣稱獨立多代理。
+
+| 優先 | 工作主線 | 可驗收成果 |
+|---|---|---|
+| 1 | 平台原生任務啟動與需求理解 | 從最新正式來源選擇適用技能與權限，沒有本地模型依賴 |
+| 2 | 專業角色、技能及工作空間 | 按需角色與交接；讀實際 SKILL；獨立專案來源、案例與任務狀態 |
+| 3 | 真實工作交付、測試與除錯 | 使用已有授權工具實作、驗證與修正實際問題；保留前後版本與日誌 |
+| 4 | 覆盤、案例檢索、技能深化與遷移 | 記錄可重現的根因、修復、限制及引用；人審後增量更新，下一個不同任務觀察應用 |
+| 5 | 跨平台可用性、獨立能力評測 | 按實際平台能力驗證；同模型/資源的比較與盲測另列、非日常工作門檻 |
+
+以真實授權任務及實際缺陷為優先。無獲授權外部專案時，可在本 Agent repo 完成有實際價值的改進與驗收，不自動接管 Study1 或其他系統。公開 repo 僅保存去識別化、可泛化工程知識；私人工作空間仍需實際授權，不混用個資、研究資料、Secret 或私人日誌。
+
+**覆盤最低證據：** 任務 ID、正式來源及 SHA、選擇的角色/技能及理由、案例 ID/適用判斷、實際產物及驗收、缺陷及根因、改進前後證據、可泛化原理與限制、候選/已核准狀態、下一次應用結果。檢索命中不等於有效遷移；不因單次結果或合成 CI 宣稱模型增益。無工具時標記限制，仍可完成授權範圍內可證實的工作。
+
+**保留能力及選用工具：** 原七專家、十二技能、工作台、任務池及版本失效、候選 QA/安全、受限功能直譯器、案例庫、Ollama runner、公開基準及私人 holdout 協定均保留。Ollama、本地模型安裝、模型權重微調、擴充通用沙箱及獨立推論測試不作必要工作前提。除非有具體評測需求和適用授權，不再反覆要求本機 probe、增加模型執行器、provider 稽核或同類合成案例。
+
+### 決策及跨對話接續（TD-002）
+
+- 唯一有效訓練主檔就是本檔；[DECISION_LOG.md](training/DECISION_LOG.md) 增量保存長期討論、使用者決策、取代關係及來源。深入分析可另存 training/reviews/ 並索引，不另造主檔。
+- 新對話先讀 START_HERE、AGENTS 及原候選 PR #8 最新 head 的本節與相關決策，再驗證實際狀態。正式使用 main/release 與候選訓練分開。
+- 每次重要討論記錄 DISCUSSION/PROPOSED/CONFIRMED；實際修改及驗收另記 IMPLEMENTED/VERIFIED。改原檔並查寫前 SHA、寫後回讀和 exact CI；失敗清楚回報。
+- 歷史段落、舊 NEXT_ACTION 與未採用方案保留為證據，不作執行命令。新使用者明確決策須增量更新本節與決策紀錄。跨專案或正式升版另需授權。
 
 ### 教材比對與改善方向
 
@@ -29,14 +54,14 @@
 | 蒸餾 | 同 topic 去重不是語意蒸餾；提出可驗證合併與技能改善，保留歷史、經審核後推廣，使用新任務驗證 |
 | 實戰評測 | 保留既有結構評分與安全門檻，另量測實際功能、修復、任務完成與遷移；真實多 Agent 需要執行證據 |
 
-### 訓練路線（依驗收而非固定天數）
+### 歷史工程訓練路線（留存既有能力驗收；執行優先序依上方 TD-001）
 
 | 優先序 | 訓練任務 | 驗收 | 狀態 |
 |---|---|---|---|
 | P0-1 | B001 社區工作坊：需求→規格→架構→DAG→可執行垂直切片→QA；額滿候補、重複報名、需求衝突、未知寫入復原 | 獨立功能正反測、可重現的修復紀錄；公開合成實作與真實 Agent 評測分列 | LOCAL_FUNCTIONAL_PASS / FULL_CI_PASS |
 | P0-2 | B001 案例記錄、蒸餾，遷移到 B002 公用設備借用 | 相關案例被實際取用；新任務功能測試，對照有/無經驗和適用限制 | CONTROLLED_TRANSFER_PASS / LOCAL_FUNCTIONAL_PASS / FULL_CI_PASS |
 | P1-1 | 主動回饋事件、分層記憶檢索、技能專業深度、技術探索、任務池/覆盤 | 新工作階段重讀、無跨案混用；測試實際檢索與回饋行為 | P1-1a/b FULL_CI_PASS; P1-1c FULL_CI_PASS |
-| P1-2 | 專家獨立協作與交接 | 有授權平台才做真子代理；獨立 QA、交接與整合證據；無平台標單 Agent 分工 | P1-2a LOCAL_ROLE_CONTRACT_EXACT_CI_PASS; P1-2b SKILL_CASE_CONTRACT_EXACT_CI_PASS; P1-2c READY_TASK_DISPATCH_CONTRACT_EXACT_CI_PASS; RESTRICTED_B003_HOST_TOOL_CI_UNVERIFIED; ACTUAL_INFERENCE_BLOCKED |
+| P1-2 | 專家獨立協作與交接 | 有授權平台才做真子代理；獨立 QA、交接與整合證據；無平台標單 Agent 分工 | P1-2a LOCAL_ROLE_CONTRACT_EXACT_CI_PASS; P1-2b SKILL_CASE_CONTRACT_EXACT_CI_PASS; P1-2c READY_TASK_DISPATCH_CONTRACT_EXACT_CI_PASS; RESTRICTED_B003_HOST_TOOL_EXACT_CI_PASS; OPTIONAL_LOCAL_INFERENCE_NOT_RUN |
 | P2-1 | 隔離合成完整系統：前後端、資料庫、權限、後台、預約、復原 | 可操作成品、端到端功能及安全測試 | P2-1a/b/c/d CONTROLLED_FUNCTIONAL_PASS; REAL_CHROMIUM_DOM_PASS; CLI_MIGRATION_RESTART_PASS; FULL_CI_PASS; MANUAL_UAT_NOT_RUN |
 | P2-2 | 未見題獨立前後測、語意蒸餾、必要跨平台同步 | 等模型/工具/資源條件、獨立評審、保留失敗；只有需要且授權才同步 | P2-2a CONTROLLED_TRANSFER_AND_EXACT_CI_PASS; P2-2b DISTILL_EXACT_FULL_CI_PASS; P2-2c DISTILL_EXACT_FULL_CI_PASS; P2-2d DISTILL_EXACT_FULL_CI_PASS; TRUE_HOLDOUT_NOT_RUN |
 
@@ -318,6 +343,11 @@
 - tests/test_p1_dispatch_runner.py blob 1abe0bfef5eced5555b359d85e936b3c9f933727 / head f957b8a85dc7e981184daf05a70ec34b513b5f16：三個必要 tests（真實 bounded interpreter 12-case oracle 區分 correct/incorrect；拒絕 unsafe AST/dead branch/invalid input/excess steps；fake model REVIEW_READY 但第一版實際功能失敗、host QA 退件後第二版受限函式實際通過，檢查兩代 report hashes、原真實能力 claims false）。readback，43688881282 in_progress/unverified；預期 388 tests，尚不得計入 PASS。程式執行的是受限 AST 語意，不是在 public CI import/exec 未知 Python。
 - 真實實跑路徑（待 exact CI PASS）：Windows 既有 Ollama/Python read-only probe（先前已提供 ollama --version / ollama list / py -3 --version；不要求反覆執行已可取得的結果）。若本地模型已安裝，利用 exact SHA checkout、`py -3 -m src.p1_local_role_runner probe` 取得完整 name/digest；確認 cloud disabled/本地離線、私人新目錄及資源預算。首輪 `py -3 -m src.p1_dispatch_runner --task B003 --model "<observed tag>" --digest "<observed digest>" --output "$env:LOCALAPPDATA\\SystemBuilder-B003-001" --case-mode curated --functional-b003 --confirm-offline-local-model`，最多 39 chat requests、兩次修復，不自動重跑。驗收 evidence 私人保留 exact candidate/functional reports/repair history，不將本地聲明當獨立 provider 認證。當前無可用模型，不能依測試替身宣稱七專家實跑。後續真正盲測沿既有 protocol 凍結獨立題目與外部 oracle，需 verified sandbox 才能跑任意模型產出的 native Python/完整系統；獨立作者與雙評閱者仍未取得。 
 - WRITE_OWNER: 原 Draft PR #8 branch only；main、Release、舊 PR、外部研究專案、真實資料不動；不啟用付費 API 或外部部署。
+
+### 2026-11-15｜TD-001／TD-002 重新定位及最後工程基準
+
+- 本輪 exact engineering head d2ca12006988100a500a6a6fea0f41cd73de5f85，CI 43688939298/job 132735394546 全部步驟成功；完整 logs 223987 chars，388 tests in 39.030s/OK，P12-FUNCTIONAL 12 項公開固定 oracle 實際受限語意運算、P12-HOST-QA 模型替身 REVIEW_READY 仍被真實 host fail 退件並於 revision 2 通過。此為受限工程證據，不是模型實跑或盲測成績。
+- 使用者明確確認 TD-001（決策原文及分析見 training/DECISION_LOG.md）；TD-002 跨對話接續與決策保存同步。舊本地模型優先路徑被取代，所有程式、案例、測試及歷史保留不刪；不啟用付費 API、部署、跨專案寫入、不合併／發布。後續優先已授權平台上的實際工作與可遷移知識，按實際證據標示協作模式。此輪只變更文件，不宣稱新架構已通過真實工作驗收。
 
 ### 每次續作及更新協定
 

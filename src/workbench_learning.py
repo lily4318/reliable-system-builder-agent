@@ -86,6 +86,45 @@ def _terms(value):
     return terms
 
 
+def public_context(skill, task, query, budget=6000, limit=4, include_training_cases=False):
+    """Read-only retrieval from the same public seed constants, without a workspace.
+
+    Candidate engineering knowledge only: no personal memory, artifact acceptance,
+    private case retirement state, or automatic authority. Callers must read the
+    actual task prerequisites and assess applicability themselves.
+    """
+    if type(include_training_cases) is not bool:
+        raise ValueError('explicit boolean required for training case retrieval')
+    if type(budget) is not int or not 256 <= budget <= 20000 or type(limit) is not int or not 1 <= limit <= 20:
+        raise ValueError('invalid context bounds')
+    task = wb._text(task, 'task ID', 120)
+    target = _terms(wb._text(query, 'task query', 2000))
+    s = wb.catalog()[skill]
+    selected = CASES + (TRAINING_CASES if include_training_cases else ())
+    ranked = []
+    for case_key, tags, content, evidence in selected:
+        matched = sorted(target & _terms(tags))
+        if matched:
+            ranked.append((len(matched), case_key, content, evidence, matched))
+    remaining, matches = budget, []
+    for score, case_key, content, evidence, matched in sorted(ranked, key=lambda r: (-r[0], r[1])):
+        if len(matches) >= limit:
+            break
+        cost = len(content) + len(evidence)
+        if cost > remaining:
+            continue
+        matches.append({'case_key':case_key, 'content':content, 'evidence':evidence,
+                        'matched_terms':matched, 'score':score, 'basis':'observed_public'})
+        remaining -= cost
+    return {'task':task, 'skill':skill, 'mode':'PUBLIC_READ_ONLY',
+            'status':'PUBLIC_CASE_REVIEW_ONLY',
+            'required_artifact_types':list(s['requires']), 'memory':matches,
+            'payload_chars':budget-remaining, 'curated':include_training_cases,
+            'private_workspace_read':False, 'private_resolution_state_checked':False,
+            'prerequisites_verified':False, 'authority_granted':False,
+            'citation_persisted':False, 'model_invoked':False}
+
+
 def _context(db, skill, task, query, budget, limit):
     if type(budget) is not int or not 256 <= budget <= 20000 or type(limit) is not int or not 1 <= limit <= 20:
         raise ValueError('invalid context bounds')
@@ -187,14 +226,21 @@ def history(path, task):
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('action',choices=('setup','context','feedback','cite','history'))
-    p.add_argument('--workspace',type=Path,required=True)
+    p.add_argument('action',choices=('setup','context','feedback','cite','history','public-context'))
+    p.add_argument('--workspace',type=Path,help='required except public-context')
     p.add_argument('--input',type=Path,help='JSON object with function arguments; required except setup')
     a = p.parse_args()
     try:
         args = json.loads(a.input.read_text(encoding='utf-8-sig')) if a.input else {}
         if not isinstance(args,dict):
             raise ValueError('input must be a JSON object')
+        if a.action == 'public-context':
+            if a.workspace is not None:
+                raise ValueError('public-context never accepts a private workspace')
+            print(json.dumps(public_context(**args),ensure_ascii=False,indent=2))
+            return 0
+        if a.workspace is None:
+            raise ValueError('private workspace required for this action')
         fn = {'setup':setup,'context':task_context,'feedback':feedback,'cite':cite,'history':history}[a.action]
         print(json.dumps(fn(a.workspace,**args),ensure_ascii=False,indent=2))
         return 0

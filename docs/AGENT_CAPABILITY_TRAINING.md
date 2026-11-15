@@ -7,13 +7,18 @@
 - TASK_DOMAIN: RELIABLE_AGENT_ENGINEERING_CAPABILITY_TRAINING
 - SOURCE_REPO: lily4318/reliable-system-builder-agent
 - ACTIVE_CANDIDATE: Draft PR #8, candidate-skill-team-integration-20261114；https://github.com/lily4318/reliable-system-builder-agent/pull/8
-- SOURCE_VERSION: NATIVE-MATURITY-013-EDITORIAL-SPEC WEB-EDITORIAL-01/v0.1 PROPOSED, source review training/reviews/2026-11-15-editorial-website-spec.md; latest Draft PR #8 HEAD authoritative.
-- LAST_VERIFIED_STEP: Prior maturity docs exact a8d392d2ded5386b44613246567df5953f8bfdce / CI 43705942761 job 132786914468 success 424/424; actual browser 6/6 handoff. New editorial proposal only; no implementation/tests run for website.
-- COMPLETED: Selected a distinct public synthetic editorial website and drafted 13 source-linked requirements, data/roles/state model, 7 acceptance gates and 6 decisions for editable user review; previous 7 roles/12 skills/11 EP retained.
-- BLOCKERS: Specification and independent candidate-write scope not yet explicitly confirmed. No site implementation/acceptance, actual user review, deployment or cross-platform evidence. New docs CI separate. Do not use proposal as authorization.
+- SOURCE_VERSION: NATIVE-WEB-014-EDITORIAL confirmed WEB-EDITORIAL-01/v0.1; architecture plan docs/training/reviews/2026-11-15-editorial-architecture.md; actual latest HEAD authoritative.
+- LAST_VERIFIED_STEP: Previous proposal exact 45b3e32f09107934a8aa6c94e0072446b5d89db9 / CI 43706231648 success 424/424; W0/W1 documented, website not yet tested.
+- COMPLETED: User explicitly confirmed R01–R13/A01–A07 and separately authorized bounded PR #8 implementation; W0/W1 ADR/DAG documented.
+- BLOCKERS: Website W2–W6 implementation and tests pending; real UAT, independent full task/other platform/remote deployment not verified or authorized.
 - WRITE_OWNER: 僅 Agent 候選分支；main/Release、外部專案、真實個資、付費模型或正式部署不在本次授權內。
-- SYNC_STATUS: EDITORIAL_SPEC_PROPOSED; EP01_EP02_EP07_SOURCE_READ; ORIGINAL_MASTER_DECISION_REVIEW_UPDATE; DOCUMENT_READBACK_AND_CI_SEPARATE; NO_IMPLEMENTATION_OR_RELEASE.
-- NEXT_ACTION: Obtain user's editable review and explicit confirmation of WEB-EDITORIAL-01/v0.1 R01–R13/A01–A07 plus separate bounded candidate-write D6. Record actual decision/revision; then architecture/plan and working website with actual tests. No external deployment or private data.
+- SYNC_STATUS: EDITORIAL_SPEC_CONFIRMED; CANDIDATE_WRITE_AUTHORIZED; ADR_PLAN_DOCUMENTED; NO_RELEASE.
+- NEXT_ACTION: Implement W2 transaction store and W3 HTTP/UI, then W4 actual functional and security/browser acceptance, W5 guide and evidence, W6 training feedback. Do not repeat proposal.
+
+### 2026-11-15｜NATIVE-WEB-014-EDITORIAL：確認規格、架構與施工工作包
+
+- 使用者本輪明示：「我確認 WEB-EDITORIAL-01/v0.1 完整規格 R01–R13 及驗收 A01–A07，並另行授權在原 reliable-system-builder-agent PR #8 候選分支內實作此合成網站。請完成架構設計、工作拆分、前後端、資料庫及實際驗收，持續更新原訓練主檔。不授權正式發布、外部部署或跨專案修改。」狀態 CONFIRMED（規格與獨立候選寫入兩項）；原 v0.1 內容 blob 121e93d77799905c73043bbfe7971d77bd3f56dd @ 45b3e32f09107934a8aa6c94e0072446b5d89db9，無需求變更，保留歷史。非本機確認或模型產生旗標。
+- 基準 45b3e32f09107934a8aa6c94e0072446b5d89db9 / CI 43706231648 job 132787799571 success，424/424，43.929s。架構與 DAG [原實戰架構](training/reviews/2026-11-15-editorial-architecture.md)，W0/W1 設計已記錄，W2–W6 待實作與驗收。選 stdlib SQLite/HTTP/HTML 以零依賴受控本機，非正式公開架構；EP-02/03/06 SOURCE_READ，同一實際 Agent 角色分工。不得自動發布。
 
 ### 2026-11-15｜NATIVE-MATURITY-013-EDITORIAL-SPEC：完整網站工程實戰，規格提案（TD-001）
 

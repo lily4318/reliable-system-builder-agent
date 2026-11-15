@@ -195,3 +195,10 @@
 - 建議網站限定公開合成資料、localhost、匿名讀者/兩作者/編輯，草稿→送審→退回/核准→另行發布→修訂/下架；舊公開版不隨私稿變更。資料模型/交易/權限/驗收及技術取捨先提案。只更新原訓練主檔/決策與 review 規格文件，不寫網站程式、不自動部署或升格案例，不改正式 main/Release 或外部專案。
 - NEXT_ACTION: 等使用者真實逐項編輯或確認整份 WEB-EDITORIAL-01/v0.1（R01–R13/A01–A07）及獨立候選程式寫入授權 D6；有修改先保存 v0.2 或後續版本與決策證據，核對實際 source/範圍。再 architecture-design/ADR、task-planning、implement-feature、QA/security、部署準備及真實驗收。不把按選項、hash、local review 當授權。未確認不進入施工；無付費模型或本地模型前置。
 
+
+
+## TD-001｜2026-11-15 NATIVE-WEB-014-EDITORIAL：正式規格確認及工作包
+
+- 使用者本輪明示：「我確認 WEB-EDITORIAL-01/v0.1 完整規格 R01–R13 及驗收 A01–A07，並另行授權在原 reliable-system-builder-agent PR #8 候選分支內實作此合成網站。請完成架構設計、工作拆分、前後端、資料庫及實際驗收，持續更新原訓練主檔。不授權正式發布、外部部署或跨專案修改。」狀態 CONFIRMED（規格與獨立候選寫入兩項）；原 v0.1 內容 blob 121e93d77799905c73043bbfe7971d77bd3f56dd @ 45b3e32f09107934a8aa6c94e0072446b5d89db9，無需求變更，保留歷史。非本機確認或模型產生旗標。
+- 基準 45b3e32f09107934a8aa6c94e0072446b5d89db9 / CI 43706231648 job 132787799571 success，424/424，43.929s。架構與 DAG [原實戰架構](training/reviews/2026-11-15-editorial-architecture.md)，W0/W1 設計已記錄，W2–W6 待實作與驗收。選 stdlib SQLite/HTTP/HTML 以零依賴受控本機，非正式公開架構；EP-02/03/06 SOURCE_READ，同一實際 Agent 角色分工。不得自動發布。
+

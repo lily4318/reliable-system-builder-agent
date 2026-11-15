@@ -195,6 +195,11 @@ class EditorialHTTPTests(unittest.TestCase):
                 }[case]
                 self.assert_framing_refused(token,body,framing)
 
+    def test_http_framing_idle_timeout_has_no_mutation(self):
+        token,body=self.framed_create()
+        self.assert_framing_refused(token,body,[f'Content-Length: {len(body)+8}'],
+                                    finish=False,status=408)
+
     def test_http_framing_complete_utf8_and_leading_zero_length(self):
         token,body=self.framed_create()
         status,result=self.raw_framed_action(body,[f'Content-Length: 00{len(body)}'])

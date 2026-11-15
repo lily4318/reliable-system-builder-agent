@@ -15,6 +15,7 @@ from src.editorial_store import Store, ROLES, TOKEN, digest, CATEGORIES
 
 ASSETS=Path(__file__).resolve().parents[1]/'examples/editorial-site'
 MAX_BODY=131072
+SOCKET_IDLE_TIMEOUT=5.0
 
 
 def unique(pairs):
@@ -39,11 +40,16 @@ def create_server(path,port=8777,*,test_mode=False):
     if test_mode:
         assets['/browser-test.js']=('browser-test.js','text/javascript; charset=utf-8')
     class Handler(BaseHTTPRequestHandler):
+        # Bounded idle socket operations, not an overall request deadline.
+        timeout=SOCKET_IDLE_TIMEOUT
+
         def log_message(self,*args):
             pass
 
         def send_data(self,status,data,mime,cookies=()):
+            self.close_connection=True
             self.send_response(status)
+            self.send_header('Connection','close')
             self.send_header('Content-Type',mime)
             self.send_header('Content-Length',str(len(data)))
             self.send_header('Cache-Control','no-store')
@@ -144,12 +150,25 @@ def create_server(path,port=8777,*,test_mode=False):
                 return self.respond(403,{'error':'FORBIDDEN'})
             try:
                 sizes=self.headers.get_all('Content-Length') or []
-                if len(sizes)!=1 or self.headers.get('Transfer-Encoding') or self.headers.get_content_type()!='application/json':
+                if len(sizes)!=1 or self.headers.get_all('Transfer-Encoding') is not None or self.headers.get_content_type()!='application/json':
                     raise ValueError('invalid body')
-                size=int(sizes[0])
+                # RFC 9110 8.6 / RFC 9112 6.3: decimal octets, not Python's
+                # permissive int grammar. Strip only HTTP optional whitespace.
+                raw_size=sizes[0].strip(' \t')
+                significant=raw_size.lstrip('0')
+                if (not raw_size.isascii() or not raw_size.isdecimal()
+                        or not significant or len(significant)>len(str(MAX_BODY))):
+                    raise ValueError('invalid size')
+                size=int(significant)
                 if not 0<size<=MAX_BODY:
                     raise ValueError('invalid size')
-                data=json.loads(self.rfile.read(size).decode('utf-8'),object_pairs_hook=unique)
+                try:
+                    raw_body=self.rfile.read(size)
+                except TimeoutError:
+                    return self.respond(408,{'error':'INCOMPLETE_REQUEST'})
+                if len(raw_body)!=size:
+                    raise ValueError('incomplete body')
+                data=json.loads(raw_body.decode('utf-8'),object_pairs_hook=unique)
                 if not isinstance(data,dict):
                     raise ValueError('object required')
                 if path=='/api/login':

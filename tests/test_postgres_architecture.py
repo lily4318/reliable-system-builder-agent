@@ -4,6 +4,9 @@ No external DB connection or Supabase Auth simulation. CI must execute, not skip
 """
 from concurrent.futures import ThreadPoolExecutor
 import os
+from contextlib import contextmanager
+import queue
+import time
 from pathlib import Path
 import subprocess
 import tempfile
@@ -165,3 +168,156 @@ class PostgresArchitectureTests(unittest.TestCase):
         self.sql("UPDATE lab.stock SET remaining=10 WHERE owner='lab_alice';")
         self.migrate()
         self.assertEqual(self.sql("SELECT count(*) FROM lab.drafts;","lab_alice"),"1")
+
+    @contextmanager
+    def live_session(self, role="lab_admin"):
+        # Actual long-lived psql connection; expose SQLSTATE, not error wording.
+        # The private cluster and fixed role allowlist are inherited from setUpClass.
+        self.assertIn(role, ROLES)
+        with tempfile.TemporaryFile(mode="w+t") as errors:
+            proc = subprocess.Popen(
+                [str(self.bin/"psql"), "-X", "-w", "-qAt", "-h", str(self.socket),
+                 "-p", "5432", "-U", role, "-d", "lab_case", "-v", "ON_ERROR_STOP=0"],
+                env=self.env, stdin=subprocess.PIPE, stdout=subprocess.PIPE,
+                stderr=errors, text=True, bufsize=1)
+            lines = queue.Queue()
+            def collect():
+                for line in proc.stdout:
+                    lines.put(line.rstrip("\n"))
+                lines.put(None)
+            reader = threading.Thread(target=collect, daemon=True)
+            reader.start()
+            def execute(query):
+                proc.stdin.write(query.rstrip(";") + ";\n\\echo __LAB_DONE__ :SQLSTATE\n")
+                proc.stdin.flush()
+                result = []
+                deadline = time.monotonic() + 12
+                while True:
+                    line = lines.get(timeout=max(0.1, deadline-time.monotonic()))
+                    if line is None:
+                        raise AssertionError("live test connection exited")
+                    if line.startswith("__LAB_DONE__ "):
+                        return line.split()[1], "\n".join(result)
+                    result.append(line)
+            try:
+                yield execute
+            finally:
+                proc.stdin.close()
+                try:
+                    proc.wait(timeout=5)
+                except subprocess.TimeoutExpired:
+                    proc.kill()
+                    proc.wait(timeout=5)
+                reader.join(timeout=5)
+                proc.stdout.close()
+
+    def migration_snapshot(self):
+        # Include catalogue policies, object ACLs, columns, constraints, function
+        # signatures, view definitions, and the actual persisted business rows.
+        return self.sql("""
+          SELECT jsonb_build_array(
+            (SELECT jsonb_agg(to_jsonb(c) ORDER BY c.relname) FROM
+              (SELECT relname,relkind,relacl,relrowsecurity,relforcerowsecurity,reloptions
+               FROM pg_class WHERE relnamespace='lab'::regnamespace) c),
+            (SELECT jsonb_agg(to_jsonb(c) ORDER BY c.table_name,c.ordinal_position)
+               FROM information_schema.columns c WHERE table_schema='lab'),
+            (SELECT jsonb_agg(to_jsonb(c) ORDER BY c.conname)
+               FROM (SELECT conname,convalidated,pg_get_constraintdef(oid) AS def
+               FROM pg_constraint WHERE connamespace='lab'::regnamespace) c),
+            (SELECT jsonb_agg(to_jsonb(p) ORDER BY p.tablename,p.policyname)
+               FROM pg_policies p WHERE schemaname='lab'),
+            (SELECT jsonb_agg(to_jsonb(p) ORDER BY p.proname)
+               FROM (SELECT proname,proacl,pg_get_functiondef(oid) AS def
+               FROM pg_proc WHERE pronamespace='lab'::regnamespace) p),
+            (SELECT jsonb_agg(to_jsonb(v) ORDER BY v.viewname)
+               FROM pg_views v WHERE schemaname='lab'),
+            (SELECT nspacl FROM pg_namespace WHERE nspname='lab'),
+            (SELECT jsonb_agg(to_jsonb(d) ORDER BY owner,id) FROM lab.drafts d),
+            (SELECT jsonb_agg(to_jsonb(s) ORDER BY owner) FROM lab.stock s),
+            (SELECT jsonb_agg(to_jsonb(r) ORDER BY owner,token) FROM lab.receipts r));
+        """)
+
+    def test_pg_advanced_migration_lock_timeout_no_partial_change(self):
+        before=self.migration_snapshot()
+        with self.live_session() as held:
+            self.assertEqual(held("BEGIN; LOCK TABLE lab.drafts IN ACCESS SHARE MODE")[0],"00000")
+            self.assertIn("lock timeout",self.sql((SQL/"02-rls-transaction.sql").read_text(),fail=True))
+            self.assertEqual(self.migration_snapshot(),before)
+            self.assertEqual(held("ROLLBACK")[0],"00000")
+        self.migrate()
+        self.assertEqual(self.sql("SELECT count(*) FROM lab.draft_view","lab_alice"),"1")
+
+    def test_pg_advanced_late_migration_failure_preserves_existing_objects(self):
+        # Existing view collides late, after table, policy and grant statements.
+        self.sql("CREATE VIEW lab.draft_view AS SELECT owner,id FROM lab.drafts;")
+        before=self.migration_snapshot()
+        self.assertIn("already exists",self.sql((SQL/"02-rls-transaction.sql").read_text(),fail=True))
+        self.assertEqual(self.migration_snapshot(),before)
+        self.sql("DROP VIEW lab.draft_view;")  # synthetic fixture only, reviewed conflict
+        self.migrate()
+        self.assertEqual(self.sql("SELECT body FROM lab.draft_view","lab_alice"),"A")
+
+    def test_pg_advanced_live_old_prepared_projection_and_new_column(self):
+        with self.live_session() as old:
+            self.assertEqual(old("PREPARE explicit_v1 AS SELECT owner,id,body FROM lab.drafts ORDER BY owner; "
+                                 "PREPARE wildcard_v1 AS SELECT * FROM lab.drafts ORDER BY owner")[0],"00000")
+            self.assertEqual(old("EXECUTE explicit_v1"),("00000","lab_alice|draft|A\nlab_bob|draft|B"))
+            self.assertEqual(old("EXECUTE wildcard_v1")[0],"00000")
+            self.migrate()
+            self.assertEqual(old("EXECUTE explicit_v1"),("00000","lab_alice|draft|A\nlab_bob|draft|B"))
+            # SELECT * has a different result shape. Do not claim it is compatible.
+            self.assertEqual(old("EXECUTE wildcard_v1")[0],"0A000")
+            self.sql("UPDATE lab.drafts SET label='new-v2' WHERE id='draft'","lab_alice")
+            self.assertEqual(old("EXECUTE explicit_v1"),("00000","lab_alice|draft|A\nlab_bob|draft|B"))
+            self.assertEqual(old("DEALLOCATE wildcard_v1")[0],"00000")
+        self.assertEqual(self.sql("SELECT body,label FROM lab.drafts","lab_alice"),"A|new-v2")
+
+    def test_pg_advanced_same_token_actual_wait_replay_and_namespace(self):
+        self.migrate()
+        for token,qty,second_qty,expected in (
+                ("same",4,4,("00000","RESERVED")),
+                ("conflict",1,2,("22023","")),
+                ("denied",10,10,("00000","INSUFFICIENT"))):
+            with self.subTest(token=token):
+                with self.live_session("lab_writer") as first, self.live_session("lab_writer") as second:
+                    self.assertEqual(first("BEGIN")[0],"00000")
+                    self.assertEqual(first(f"SELECT lab.reserve('lab_alice','{token}',{qty})")[0],"00000")
+                    self.assertEqual(second("SET application_name='pg_lab_waiter'")[0],"00000")
+                    with ThreadPoolExecutor(max_workers=1) as pool:
+                        pending=pool.submit(second,f"SELECT lab.reserve('lab_alice','{token}',{second_qty})")
+                        try:
+                            deadline=time.monotonic()+5
+                            observed=False
+                            while time.monotonic()<deadline:
+                                if self.sql("SELECT count(*) FROM pg_stat_activity WHERE "
+                                            "application_name='pg_lab_waiter' AND cardinality(pg_blocking_pids(pid))>0")=="1":
+                                    observed=True
+                                    break
+                                time.sleep(.05)
+                            self.assertTrue(observed, "expected actual blocked DB session")
+                            self.assertEqual(first("COMMIT")[0],"00000")
+                            self.assertEqual(pending.result(timeout=12),expected)
+                        finally:
+                            if not pending.done():
+                                first("ROLLBACK")
+                self.assertEqual(self.sql(f"SELECT count(*) FROM lab.receipts WHERE owner='lab_alice' AND token='{token}'"),"1")
+        self.assertEqual(self.sql("SELECT remaining FROM lab.stock WHERE owner='lab_alice'"),"5")
+        self.assertEqual(self.sql("SELECT lab.reserve('lab_bob','same',4)","lab_writer"),"RESERVED")
+        self.assertEqual(self.sql("SELECT count(*) FROM lab.receipts WHERE token='same'"),"2")
+        self.assertEqual(self.sql("SELECT remaining FROM lab.stock WHERE owner='lab_bob'"),"6")
+
+    def test_pg_advanced_repeatable_read_stale_denial_is_retryable(self):
+        self.migrate()
+        self.sql("SELECT lab.reserve('lab_alice','fill',10)","lab_writer")
+        with self.live_session("lab_writer") as stale:
+            self.assertEqual(stale("BEGIN ISOLATION LEVEL REPEATABLE READ")[0],"00000")
+            self.assertEqual(stale("SELECT remaining FROM lab.stock WHERE owner='lab_alice'"),("00000","0"))
+            # Overlapping transaction commits a durable denial while the other
+            # session still holds the old snapshot. It has no stock decrement.
+            self.assertEqual(self.sql("SELECT lab.reserve('lab_alice','rr-denied',1)","lab_writer"),"INSUFFICIENT")
+            code,_=stale("SELECT lab.reserve('lab_alice','rr-denied',1)")
+            self.assertEqual(code,"40001")
+            self.assertEqual(stale("ROLLBACK")[0],"00000")
+        self.assertEqual(self.sql("SELECT lab.reserve('lab_alice','rr-denied',1)","lab_writer"),"INSUFFICIENT")
+        self.assertEqual(self.sql("SELECT count(*) FROM lab.receipts WHERE token='rr-denied'"),"1")
+        self.assertEqual(self.sql("SELECT remaining FROM lab.stock WHERE owner='lab_alice'"),"0")

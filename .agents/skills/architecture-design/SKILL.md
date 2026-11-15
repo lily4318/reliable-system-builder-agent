@@ -44,5 +44,8 @@ description: "設計架構、比較方案。architect 角色；交付 architectu
 
 - 共享名額與生命週期（NATIVE-PG-024 / EP-13）：先定共享 invariant 與鎖順序（pool before ledger/booking）、actor/token 的 operation/target/qty binding、拒絕決策持久化、取消 transition exactly-once；歷史 receipt 不等於當前狀態，恢復名額不重判舊 token。避免直接 client stock DML；若採 SECURITY DEFINER 需專屬 NOLOGIN 非 owner/非 BYPASSRLS、可信登入身分而非 caller owner、固定安全 search_path、全限定 schema、同 transaction 撤 PUBLIC/grant、own-row policy；自主共享查詢可見性列入資料責任，Supabase JWT 另驗。測試真 lock wait、不同 actor/相同 token、取消競寫、回復、歷史 migration 及舊明示 projection，核 pool+active booking 守恆與 ledger/version；單資源成功不代表多資源死鎖、零停機或正式資安。參見原 PG 覆盤及實際 CI。
 
+### 研究專案成員權限與服務層隔離（TD-005 必要專家訓練）
+比較全域角色與「可信 session→actor→當前 study membership→operation」的授權；研究專案撤權後既有 session 不得沿用舊 membership。讀取、單筆更新及全部匯出均需 scope；study/id 複合鍵、參數化查詢、在同一交易查權限與副作用，拒絕須比較原資料、業務事件及適用 DB 快照，不只比較錯誤回應。區分安全稽核事件的合法契約與越權業務寫入。先用跨專案同 ID、撤權、讀者寫入、匯出、正常 operation 的獨立負正例；RLS 可作防縱深而非取代 API 層。參見 [受控研究 scope lab](../../../docs/training/reviews/test_research_scope.py) 及原訓練決策。本例合成 SQLite 本機證據，非真 Auth/JWT、同時撤權競寫、production 或完整資安驗收，不為無登入的靜態 APP 新增功能。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 architecture；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

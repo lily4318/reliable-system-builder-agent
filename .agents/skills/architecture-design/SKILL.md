@@ -55,3 +55,6 @@ description: "設計架構、比較方案。architect 角色；交付 architectu
 
 ### GAS/Sheets 交易邊界與未知在途請求（GAS-DATA-003）
 單 workbook atomic batch 非 SQL 隔離；列全 writer（同 script/trigger/admin/其他 script/人工 API），ScriptLock 只合作同 script；若無法約束 writers 或要求真唯一/FK/高可靠隔離，提出 DB 選型，不自動遷移。以可信身份+study/operation/target/token/payload 契約，持久 receipt/audit/outbox 與業務同 batch。未知 commit 可能在鎖釋放後仍未確定，先確認 durable intent，整個受影響 invariant HOLD，absence 不證 abort；intent 寫入本身未知也停，不能 TTL 解鎖。保守模型假設不是 provider CAS/保證；需真可驗 durable fencing 或安全替代。詳 [覆盤](../../../docs/training/reviews/2026-11-16-gas-data-integrity.md)。
+
+### Trial 跨文件持久化及重試契約（TRIAL-RECOVERY-004）
+研究者核准後區分 logical trial 與 attempt ID，持久 pending 再呈現刺激，reload 先讀狀態而非跨 timeOrigin 續算；原 attempt 保留 interrupted/null，明示重試生成 parent 關聯與新 doc/time origin。版本、當前 attempt、原點與 receipt 同步守門；真研究缺失/重試政策、資料耐久/倫理獨立核。IndexedDB 與 server storage 權責分開，不把 unload/best effort 或 SQLite 交易冒充 GAS 遠端承諾；詳 [覆盤](../../../docs/training/reviews/trial-recovery-004.md)。

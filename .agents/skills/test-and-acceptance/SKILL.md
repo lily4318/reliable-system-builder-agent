@@ -33,3 +33,6 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### GAS/Sheets 資料完整性 QA（GAS-DATA-003）
 區分鎖忙、未送、definitive batch reject、未知已送、晚提交風險；以 row/capacity/receipt/audit/outbox/pending/revision 整體不變或完整提交為 oracle，測 cache loss、相同 token 不同 actor/payload、negative receipt、其他 writer 反例與通知 ACK；無真並行時標模型。restore 先隔離副本，核可信 checkpoint 完整資料、收據、未決 mutation/通知及新版增量，不只比筆數，另查原始值/欄位/ACL/附件/復原相容；直接 version restore 可能破壞編輯歷史。配額與 actual API、真備份復原另驗，不能以 18/18 模型當 Google UAT。詳 [覆盤](../../../docs/training/reviews/2026-11-16-gas-data-integrity.md)。
+
+### Trial 持久化 QA（TRIAL-RECOVERY-004）
+真 reload/close/reopen + 獨立資料讀回，核原 pending/terminal row、parent、新時間原點、null 與 receipt；注入 commit 後 UNKNOWN 和 transaction rollback，重放同 payload 不變、不同 payload 拒絕，舊分頁 finish STALE、雙 tab 只一開始。host binding 非 HTTP、同步 callback 非真競寫鎖等待；browser origin storage 受限須標未驗而非偽造成功，不改安全政策。詳 [9/9 本機替代實測及限制](../../../docs/training/reviews/trial-recovery-004.md)。

@@ -24,3 +24,6 @@ description: "完成某功能、實作網站。developer 角色；交付 impleme
 
 ### GAS/Sheets 單寫入者及冪等故障處理（GAS-DATA-003）
 tryLock 失敗不寫、finally release，鎖內重新查 id/receipt/容量；SpreadsheetApp.flush 在必要時於釋放前執行但非 rollback。使用同 workbook 一次 batch 寫業務/receipt/audit/outbox，values API RAW 或 UpdateCells typed stringValue/numberValue、精確 range/field mask（不混淆 RAW 與 UpdateCells），cache 非持久 receipt。未知 intent/remote ACK、partial/跨 writer 先對帳並阻擋共享寫入，不盲重送；定案未送/確定拒絕才按原契約恢復。額度錯誤有界退避/jitter 不持鎖等待，外部郵件/PDF 狀態分開、UNKNOWN 不自動重發。詳 [覆盤](../../../docs/training/reviews/2026-11-16-gas-data-integrity.md)；受控 JS 模型非生產 adapter。
+
+### Trial 重開與未知結果（TRIAL-RECOVERY-004）
+先交易提交 pending，再呈現；恢復依 durable current 狀態，明示 retry 在同交易保留中斷與新 attempt；expected ID/current doc/origin 避免舊回應污染。終結與 receipt 同交易，相同 payload replay、變更 conflict；未知提交唯讀對帳，拒絕舊來源與負 RT。不要用 reload 或 unload 自動重新計時/刪除舊資料；跨網路/雲端在途/真身份另驗，不能直接部署此 host bridge。詳 [覆盤](../../../docs/training/reviews/trial-recovery-004.md)。

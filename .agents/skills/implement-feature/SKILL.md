@@ -21,3 +21,6 @@ description: "完成某功能、實作網站。developer 角色；交付 impleme
 
 ### 心理實驗的受控時序與事件狀態（TD-005）
 使用同頁 performance.now()/Event.timeStamp 區分事件發生與處理時間，記錄刺激 DOM 寫入、frame readiness、response window 和中斷事件。以 trial identity 防舊 callback 導致新 trial 污染；結束只一次，取消 callback、區分 valid/invalid/missing，保留原始原因/null。防 held/repeat、不可信程式事件（非反作弊保證）；依已確認研究規格處理 focus/visibility/pagehide、延遲及未完成；持久化和 reload 另驗，不把頁面離開事件當可靠收件。見 docs/training/reviews/2026-11-16-experiment-timing.md；lab 不覆蓋完整 pending watchdog、硬體精度和全部真生命週期。
+
+### GAS/Sheets 單寫入者及冪等故障處理（GAS-DATA-003）
+tryLock 失敗不寫、finally release，鎖內重新查 id/receipt/容量；SpreadsheetApp.flush 在必要時於釋放前執行但非 rollback。使用同 workbook 一次 batch 寫業務/receipt/audit/outbox，values API RAW 或 UpdateCells typed stringValue/numberValue、精確 range/field mask（不混淆 RAW 與 UpdateCells），cache 非持久 receipt。未知 intent/remote ACK、partial/跨 writer 先對帳並阻擋共享寫入，不盲重送；定案未送/確定拒絕才按原契約恢復。額度錯誤有界退避/jitter 不持鎖等待，外部郵件/PDF 狀態分開、UNKNOWN 不自動重發。詳 [覆盤](../../../docs/training/reviews/2026-11-16-gas-data-integrity.md)；受控 JS 模型非生產 adapter。

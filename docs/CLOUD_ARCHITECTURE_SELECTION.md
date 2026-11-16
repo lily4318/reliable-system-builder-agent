@@ -88,3 +88,6 @@ C1 必須依 [完全新手引導](BEGINNER_ACCOUNT_ONBOARDING.md) 先辨識必�
 
 ### GAS 多層診斷與版本同步（GAS-DIAG-002）
 先查 [專業深度覆盤、官方來源、唯讀順序與 QA 矩陣](training/reviews/2026-11-16-gas-diagnosis.md)。六層：browser/session；script/deployment URL；Git/HEAD/version/active/runtime；access/executeAs/visitor/OAuth；doGet/RPC；下游 resource/quota/log。以同一角色及可比較環境隔離；部署者/頁面200/HEAD 或 build marker 不代替實際角色正反測和完整 content readback。updateContent 全量替換、原 deployment 指向新 version、未知寫入只讀對帳、空訪客需識別時 fail closed。離線 28 案通過非雲端 UAT，真 GAS/C3 尚未授權。原 GAS-ACCESS-SESSION-001 與 EP-06/14 保留，不將 CLOUD-B 變成匿名研究系統。
+
+### GAS/Sheets 研究交易、配額及復原（GAS-DATA-003）
+沿 EP-03/13 與 [深度覆盤](training/reviews/2026-11-16-gas-data-integrity.md)；原 CLOUD-B 真驗收不變。ScriptLock 僅同 script 合作 writer；單 workbook atomic batch 非通用 DB isolation/CAS；先核所有寫入者、持久 receipt、unknown-inflight fence 與外部 outbox，資料不明 stop/reconcile。API 讀寫各300/min/project、60/min/user/project、180s timeout、2MB建議，另查 Apps Script及Mail/Drive限額、實際帳戶整體流量，bounded backoff 不重送未知操作。2026-09-03 Sheets limits 頁提及 later 2026 超額計費計畫，NT$0 需實際核最新 billing、不得自動升配額/付費。版本歷史/backup 先唯讀與隔離 copy、核完整資料+receipt+audit+pending+outbox+後續合法寫入；原部署權限、ACL、C3/真 UAT 不變。離線故障模型 18/18，並未實際呼叫 Google API 或測真 restore。

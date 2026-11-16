@@ -52,3 +52,6 @@ description: "設計架構、比較方案。architect 角色；交付 architectu
 
 ### 線上心理實驗時序與 trial 契約（TD-005）
 研究者核准 stimulus/timing window、有效性與中斷政策後，分離 wall clock、同一 context 單調時鐘、DOM write、frame proxy、input event timestamp、handler delay、terminal status；禁止跨 reload/time origin 直接相減。先比較成熟框架（jsPsych/PsychoJS 等）和必要自寫方案、平台/裝置及方法風險；rAF 或高解析 API 不等於實際物理 onset。保留 trial/attempt 版本、原始狀態、null/原因與適用校準需求，不能自動剔除或重試真研究資料。詳 docs/training/reviews/2026-11-16-experiment-timing.md；合成 lab 非科學精度驗證。
+
+### GAS/Sheets 交易邊界與未知在途請求（GAS-DATA-003）
+單 workbook atomic batch 非 SQL 隔離；列全 writer（同 script/trigger/admin/其他 script/人工 API），ScriptLock 只合作同 script；若無法約束 writers 或要求真唯一/FK/高可靠隔離，提出 DB 選型，不自動遷移。以可信身份+study/operation/target/token/payload 契約，持久 receipt/audit/outbox 與業務同 batch。未知 commit 可能在鎖釋放後仍未確定，先確認 durable intent，整個受影響 invariant HOLD，absence 不證 abort；intent 寫入本身未知也停，不能 TTL 解鎖。保守模型假設不是 provider CAS/保證；需真可驗 durable fencing 或安全替代。詳 [覆盤](../../../docs/training/reviews/2026-11-16-gas-data-integrity.md)。

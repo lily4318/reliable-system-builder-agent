@@ -29,3 +29,6 @@ Architect 建立角色與所有權矩陣，Security 核 exposed schema、GRANT�
 
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 security-review；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。
+
+### GAS 入口、執行者及訪客權限（GAS-DIAG-002）
+access 與 executeAs 分開，USER_DEPLOYING 的 effective user 不代表訪客；ActiveUser email 空白時需識別的操作拒絕，禁止 fallback 到部署者、client email/role。核准匿名非特權入口不等於管理功能公開；每個 server RPC/route 校驗角色及資料範圍，隱藏 UI 不能代替 ACL。USER_ACCESSING 查 granular OAuth scope、Workspace 政策/資源 ACL，不盲升 scope、不公開 Sheet/Drive、不傳 OAuth token；暫時 user key 作診斷而非登入證明。真角色正負測、未預期公開存取立即安全 HOLD，保留 C3/UAT。詳 [GAS-DIAG-002](../../../docs/training/reviews/2026-11-16-gas-diagnosis.md)。

@@ -85,3 +85,6 @@ C1 必須依 [完全新手引導](BEGINNER_ACCOUNT_ONBOARDING.md) 先辨識必�
 
 ### GAS 公開存取失敗：先隔離瀏覽器工作階段（GAS-ACCESS-SESSION-001）
 正式版 /exec 與 deploymentId/version/access/executeAs 先唯讀查核；ANYONE 為已登入、ANYONE_ANONYMOUS 才含未登入。Google 明示 multi-login 不支援 Web App；部署者能開而其他帳號不能時，先以乾淨無痕或獨立 Chrome profile 用同 URL 測符合要求的匿名或單一非部署者帳號。無痕預設可能阻擋第三方 Cookie；單帳號、另一設定檔亦可比對。若乾淨 session 成功，優先排除登入衝突，必要時告知登出及網站資料損失風險、取得知情同意再清除相關網站 Cookie；若仍失敗，查 Workspace/OAuth/ACL/doGet/後端權限；不盲改部署或公開 Sheet，不用公開入口代替管理功能負測。實際預期角色正反測與版本回讀分開記錄；不擴大原 CLOUD-B 私有研究系統的匿名權限。來源：https://developers.google.com/apps-script/guides/support/troubleshooting?hl=zh-tw；https://developers.google.com/apps-script/manifest/web-app-api-executable?hl=zh-tw；https://support.google.com/chrome/answer/95647?hl=zh-Hant 。使用者真實恢復回報及限制見 [原決策](training/DECISION_LOG.md) GAS-ACCESS-SESSION-001。非本輪獨立雲端驗收；C3 仍獨立授權。
+
+### GAS 多層診斷與版本同步（GAS-DIAG-002）
+先查 [專業深度覆盤、官方來源、唯讀順序與 QA 矩陣](training/reviews/2026-11-16-gas-diagnosis.md)。六層：browser/session；script/deployment URL；Git/HEAD/version/active/runtime；access/executeAs/visitor/OAuth；doGet/RPC；下游 resource/quota/log。以同一角色及可比較環境隔離；部署者/頁面200/HEAD 或 build marker 不代替實際角色正反測和完整 content readback。updateContent 全量替換、原 deployment 指向新 version、未知寫入只讀對帳、空訪客需識別時 fail closed。離線 28 案通過非雲端 UAT，真 GAS/C3 尚未授權。原 GAS-ACCESS-SESSION-001 與 EP-06/14 保留，不將 CLOUD-B 變成匿名研究系統。

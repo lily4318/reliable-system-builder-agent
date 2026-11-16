@@ -18,3 +18,6 @@ description: "功能壞了、幫我除錯。developer 角色；交付 repair。"
 
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 repair；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。
+
+### GAS 多層故障定位（GAS-DIAG-002）
+先核目標/正式 URL/未知 mutation/越權及版本，再比較同一合法訪客的原與乾淨工作階段，不以不同帳號或無痕成功確診 Cookie。頁面能開不等 RPC 正常；google.script.run 非同步，核 success/failure handler、亂序、支援參數型別、Console/Network（脫敏）及 Executions Failed/Timed out；依 scope/執行身分查下游權限、配額。timeout/回應遺失不證未寫，依原 receipt/唯讀對帳，不能盲重送；不收 cookie/token/raw HAR、研究資料。詳 [實作與來源](../../../docs/training/reviews/2026-11-16-gas-diagnosis.md)，不擅改真站。

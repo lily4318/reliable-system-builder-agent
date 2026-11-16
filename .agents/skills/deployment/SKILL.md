@@ -28,3 +28,6 @@ description: "部署、處理 CI 或版本。devops-sre 角色；交付 deployme
 
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 deployment-plan；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。
+
+### GAS 多層版本同步及唯讀對帳（GAS-DIAG-002）
+分開核目標 Git SHA/完整轉換後文件/HEAD/固定 versionNumber/deploymentConfig/WEB_APP URL+access+executeAs/真 runtime；先界定候選來源與 active release，HEAD 可合法未發布。getContent HEAD 與指定 version 分讀；deployment GET 核 scriptId、version、entryPoint；updateContent PUT 全量替換，非 patch，須完整 manifest+文件、備份、獨立授權、寫前與寫後對帳；未知結果停相關寫入。更新原 deployment 可維持 URL，禁止盲建新部署；原 owner 變更/跨網域與資料相容 rollback 另核。詳 [GAS-DIAG-002](../../../docs/training/reviews/2026-11-16-gas-diagnosis.md)，離線 advice 不代表真 GAS 操作或部署核准。

@@ -49,3 +49,6 @@ description: "設計架構、比較方案。architect 角色；交付 architectu
 
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 architecture；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。
+
+### 線上心理實驗時序與 trial 契約（TD-005）
+研究者核准 stimulus/timing window、有效性與中斷政策後，分離 wall clock、同一 context 單調時鐘、DOM write、frame proxy、input event timestamp、handler delay、terminal status；禁止跨 reload/time origin 直接相減。先比較成熟框架（jsPsych/PsychoJS 等）和必要自寫方案、平台/裝置及方法風險；rAF 或高解析 API 不等於實際物理 onset。保留 trial/attempt 版本、原始狀態、null/原因與適用校準需求，不能自動剔除或重試真研究資料。詳 docs/training/reviews/2026-11-16-experiment-timing.md；合成 lab 非科學精度驗證。

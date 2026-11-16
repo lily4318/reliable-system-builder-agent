@@ -27,3 +27,6 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 qa；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。
+
+### 心理實驗的瀏覽器時序品質（TD-005）
+用真瀏覽器執行刺激 DOM 和自動化按鍵，同時計錄不同時間代理與 QA oracle，負測 wall clock 注入、主執行緒阻塞/延遲、重複或合成輸入、timeout、中斷；檢查狀態、row uniqueness、null 及版本。不將 programmatic blur/hidden/pagehide 冒稱真失焦、或軟體時間代理冒稱硬體精度。實際未產生預期 OS/browser transition 時保留 SKIP/BLOCKED，不計通過；不同設備/瀏覽器及研究者科學精度確認另行驗。原 lab 11 PASS / 1 SKIP；對照8 FAIL，詳 docs/training/reviews/2026-11-16-experiment-timing.md。不得以自動化輸入當人類反應。

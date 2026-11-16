@@ -18,3 +18,6 @@ description: "完成某功能、實作網站。developer 角色；交付 impleme
 
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 implementation；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。
+
+### 心理實驗的受控時序與事件狀態（TD-005）
+使用同頁 performance.now()/Event.timeStamp 區分事件發生與處理時間，記錄刺激 DOM 寫入、frame readiness、response window 和中斷事件。以 trial identity 防舊 callback 導致新 trial 污染；結束只一次，取消 callback、區分 valid/invalid/missing，保留原始原因/null。防 held/repeat、不可信程式事件（非反作弊保證）；依已確認研究規格處理 focus/visibility/pagehide、延遲及未完成；持久化和 reload 另驗，不把頁面離開事件當可靠收件。見 docs/training/reviews/2026-11-16-experiment-timing.md；lab 不覆蓋完整 pending watchdog、硬體精度和全部真生命週期。

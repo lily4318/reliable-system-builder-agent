@@ -82,3 +82,6 @@ NATIVE-CLOUD-017-C1-READONLY：實際 GitHub/Cloudflare/個人 Drive 唯讀與 S
 
 ## 9. TD-003 新手前置引導
 C1 必須依 [完全新手引導](BEGINNER_ACCOUNT_ONBOARDING.md) 先辨識必要服務、帳號現狀、連接與可用能力；使用者完全零技術背景為預設。Agent 使用離線 src.account_onboarding 分流，真工具查核，不重註冊或要求四平台全連；缺工具/權限/成本卡點逐步解除或安全替代，C3 不變。B10 真新人評閱待實際任務。
+
+### GAS 公開存取失敗：先隔離瀏覽器工作階段（GAS-ACCESS-SESSION-001）
+正式版 /exec 與 deploymentId/version/access/executeAs 先唯讀查核；ANYONE 為已登入、ANYONE_ANONYMOUS 才含未登入。Google 明示 multi-login 不支援 Web App；部署者能開而其他帳號不能時，先以乾淨無痕或獨立 Chrome profile 用同 URL 測符合要求的匿名或單一非部署者帳號。無痕預設可能阻擋第三方 Cookie；單帳號、另一設定檔亦可比對。若乾淨 session 成功，優先排除登入衝突，必要時告知登出及網站資料損失風險、取得知情同意再清除相關網站 Cookie；若仍失敗，查 Workspace/OAuth/ACL/doGet/後端權限；不盲改部署或公開 Sheet，不用公開入口代替管理功能負測。實際預期角色正反測與版本回讀分開記錄；不擴大原 CLOUD-B 私有研究系統的匿名權限。來源：https://developers.google.com/apps-script/guides/support/troubleshooting?hl=zh-tw；https://developers.google.com/apps-script/manifest/web-app-api-executable?hl=zh-tw；https://support.google.com/chrome/answer/95647?hl=zh-Hant 。使用者真實恢復回報及限制見 [原決策](training/DECISION_LOG.md) GAS-ACCESS-SESSION-001。非本輪獨立雲端驗收；C3 仍獨立授權。

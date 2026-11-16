@@ -23,5 +23,8 @@ description: "部署、處理 CI 或版本。devops-sre 角色；交付 deployme
 ### 本機版本啟用失敗與復原（必要專家深化，2026-11-16）
 不同於 CI diagnostic artifact 完整性，本機實際使用兩個版本化教學 HTML/CSV ZIP，獨立 controller pin 與實際 subprocess 退出前/後的版本讀回，驗證未知結果先對帳、拒絕 stale retry、回退目標亦重新驗 bytes。POSIX 同一檔案系統的暫存指標 flush/fsync → os.replace → directory fsync 可縮小部分切換範圍，但不等於跨系統交易或斷電保證。先確認真 active 指標與內容，不因程序錯誤碼推斷 mutation 未發生；若舊版資料/產物不完整則停，不盲回退；有新版寫入時依原 migration/restore 契約處理。訓練程式只驗單一可信 writer、受控目錄，無並行 CAS、真部署、runtime service health、data migration 或外部 UAT；不可直接作部署程式。詳 [實作與限制](../../../docs/training/reviews/2026-11-15-ci-artifact-integrity.md#2026-11-16-本機版本啟用與復原訓練)。
 
+### GAS Web App 公開存取與瀏覽器工作階段（GAS-ACCESS-SESSION-001）
+已開放存取但非部署者無法開啟時，不先重部署、改程式或放寬 ACL。先唯讀核正式 /exec、deploymentId/version、access（ANYONE=已登入，ANYONE_ANONYMOUS=含未登入）、executeAs；使用同一 URL 在乾淨無痕／獨立瀏覽器設定檔測所需匿名或僅一個合法非部署者帳號，另驗不應有權限的管理與資料功能。官方明示 GAS Web App 不支援多重登入；若乾淨 session 成功而原環境失敗，先排 session/multi-login，單帳號或獨立 profile 優先，再知情同意下清除相關網站 Cookie/資料（可能登出、清掉偏好）；無痕也可能受第三方 Cookie 限制，不單以此判定部署失敗。都失敗再查 Workspace、OAuth、應用層/後端 ACL 與實際錯誤。不接受 cookie/token、不公開資料源、不盲重部署或誤升權。依 [原案例及官方來源](../../../docs/training/DECISION_LOG.md#gas-access-session-001gas-已開放存取但其他帳號無法開啟2026-11-16user_reported_recovery--official_doc_corroborated--index_candidate)；使用者回報清除 Cookie 後其他帳號恢復，根因未獨立重現；不可當正式跨帳號 UAT。
+
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 deployment-plan；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

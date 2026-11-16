@@ -19,7 +19,7 @@
 | EP-03 | 名額、庫存、重複提交、idempotency、actor/token、unknown POST、missing DB | architecture-design, implement-feature, deployment, security-review | B001/B002、P21-CASE-003 |
 | EP-04 | 需求或任務改版、舊 DONE、DAG、revision、artifact、topology、worker | task-planning, resume-project, implement-feature, test-and-acceptance | TASK-CASE-001、P21-CASE-005、NATIVE-TOPOLOGY-006、P22-CASE-004 |
 | EP-05 | CSV、批次匯入、報表、ZIP、snapshot、hash、exclusive publication | architecture-design, implement-feature, security-review, deployment | P22-CASE-002/003/004 |
-| EP-06 | HTTP 正常但 UI 失敗、Chromium、Origin、角色隔離、migration、rollback | debug-and-repair, test-and-acceptance, security-review, deployment | P21-CASE-006 |
+| EP-06 | HTTP 正常但 UI 失敗、Chromium、Origin、角色隔離、migration、rollback | debug-and-repair, test-and-acceptance, security-review, deployment | P21-CASE-006 / GAS-ACCESS-SESSION-001 |
 | EP-07 | 排程/區間、產品政策未決、PoC、oracle、gate | architecture-design, task-planning, test-and-acceptance | B003-CASE-001 |
 | EP-08 | 歷史增長、查詢慢、SQLite latest head、memory、index | architecture-design, debug-and-repair | NATIVE-ARCH-005 |
 | EP-09 | JSON 型別錯誤、跨角色交接、ordered guard、HOLD、gate priority | architecture-design, security-review, debug-and-repair | NATIVE-ARCH-006 |
@@ -71,6 +71,8 @@
 - 狀態：EVIDENCE_VERIFIED / 原 OPT_IN 3；不新增程式案例。
 
 ### EP-06 實際瀏覽器、權限及遷移驗收分層
+
+- GAS Web App 存取的工作階段分層（GAS-ACCESS-SESSION-001，USER_REPORTED_RECOVERY / OFFICIAL_DOC_CORROBORATED / INDEX_CANDIDATE）：任何人可存取但非部署者失敗、Chrome Cookie 清除後恢復（使用者回報）。先核同版正式 /exec、access、executeAs，再測乾淨 session/單一帳號／適用匿名，區別多帳號與真正 ACL/應用錯誤；僅在必要時知情同意清網站資料，不擴權、不盲部署。Google [multi-login 疑難排解](https://developers.google.com/apps-script/guides/support/troubleshooting?hl=zh-tw)、[Chrome Cookie](https://support.google.com/chrome/answer/95647?hl=zh-Hant)；詳 [原決策紀錄](../docs/training/DECISION_LOG.md) GAS-ACCESS-SESSION-001。本案未獨立重現、未確認精確根因，非新 L4/正式 UAT 或 runtime case。適用 deployment/debug-and-repair/test-and-acceptance/security-review。
 - 採用：HTTP、真 DOM、真人 UAT、正式部署、資料遷移與復原分開；使用真正 browser form/Origin 行為，不為測試通過放寬 CSRF 或 actor 隔離。遷移先停止舊 writer、保留來源與歷史、核對目標；已有新版寫入不能直接回退舊快照。UI 內容確認採 EP-02。
 - 證據：OPT_IN P21-CASE-006 / exact 0f4f536d4c3daf05304add614d24e2563b42b1ef / [CI 43607088233](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/43607088233) 351/351，native browser 3 roles、CLI migration 及 strict Origin。最新 406-test CI 仍有 P21-EQUIPMENT-BROWSER PASS、EDITABLE-DECISION-BROWSER 12/12。原 src/p21_equipment_site.py、src/p21_equipment_browser_test.py、tests/test_p21_equipment_cli.py，主檔 P2-1d。
 - 限制：本機合成 Chromium/CLI 非真人驗收、正式服務/資安審計或斷電耐久；不是解除實際權限、安全配置的授權。

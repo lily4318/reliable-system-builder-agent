@@ -68,3 +68,7 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### TD-004｜異構UNION及遞迴CTE驗收（TD004-SQL-CTE-01）
 以逐來源鍵、欄序/值/單位/型別及拒絕清單為oracle，測位置互換但查詢成功、CAST部分有效/非法被吞、前導零及同來源局部鍵；原始值保持。重構前後核逐鍵與精度邊界，避免先整數化avg改變篩選。遞迴負測環、self-loop、多路徑、跨scope及depth邊界，在受控資源內實測取消；外層WHERE或帶depth的UNION非終止保障。核路徑、唯一節點、循環狀態及深度截斷的未展開frontier，無完備證據不承諾完整；圖寬/資源預算、真身份/任意鍵編碼及引擎特有行為另驗。合成SQLite 3/3非SQL Server或獨立模型評測。
+
+
+### TD-004｜逐列與Pivot真值驗收（TD004-SQL-CURSOR-PIVOT-01）
+逐筆與集合結果用固定逐鍵oracle驗同tick、負值、多次threshold crossing、ROWS/RANGE及穩定順序；測同cursor內層重執行截斷外迴圈、記實際SQL trace次數而非推估耗時。寬表核精確欄名/順序/列值（含rows/valid/sum）、無觀測欄、全NULL/真0、同分合法兩筆、未核分類；刻意測補0混淆、DISTINCT丟合法觀測、空/重複/未知/注入樣動態欄，回讀原事件未變。來源粒度與母群按需求，不以合計相同證明原始可逆。3/3本機SQLite為合成測試，非真研究、SQL Server、UNPIVOT或獨立模型。參見[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

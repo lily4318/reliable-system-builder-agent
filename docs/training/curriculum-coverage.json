@@ -544,15 +544,21 @@
       "id": "2.2.6",
       "title": "資料表索引",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_index",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "bbc5cfb3c2e3f297bcef81d4c000ba6b73baf8bc9545319381c0839f0edf07ad",
+      "access": "READABLE",
       "owner": "architect",
-      "collaborators": [],
+      "collaborators": [
+        "developer",
+        "qa-uat"
+      ],
       "skill": "architecture-design",
-      "prerequisites": [],
+      "prerequisites": [
+        "2.2.2",
+        "2.2.3"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "原 Markdown 正文及文字SQL已讀，36圖/共用嵌入未取得，L0保留。TD004-DB-INDEX-01 真SQLite 3.46.1 五設計、40000筆查詢、四設計5000筆插入/更新、VM steps/plan/頁數及中位耗時；不等於SQL Server SSMS、叢集索引或正式負載。另待圖與適用原生環境，不阻其他單元。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

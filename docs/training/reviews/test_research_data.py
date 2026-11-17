@@ -283,4 +283,92 @@ class NormalizationRelationLesson(unittest.TestCase):
             self.assertEqual(db.execute('SELECT * FROM annotation').fetchall(), [(1,None)])
             self.assertEqual(db.execute('PRAGMA foreign_key_check').fetchall(), [])
 
+class IndexDesignLesson(unittest.TestCase):
+    @staticmethod
+    def data(start, end):
+        return [(i, i % 100, i, i % 37, 'x' * 80) for i in range(start, end)]
+
+    @staticmethod
+    def database(index):
+        db = sqlite3.connect(':memory:')
+        db.execute('CREATE TABLE event (id INTEGER PRIMARY KEY, cohort INTEGER NOT NULL, tick INTEGER NOT NULL, score INTEGER NOT NULL, payload TEXT NOT NULL)')
+        db.executemany('INSERT INTO event VALUES (?,?,?,?,?)', IndexDesignLesson.data(0, 40000))
+        if index:
+            db.execute('CREATE INDEX idx_event ON event(' + index + ')')
+        db.execute('ANALYZE')
+        db.commit()
+        return db
+
+    def test_index_order_covering_and_equivalent_results(self):
+        import statistics
+        import time
+        query = 'SELECT tick,id,score FROM event WHERE cohort=? AND tick>=? AND tick<? ORDER BY tick,id'
+        args = (7, 10000, 30000)
+        expected = [(i,i,i%37) for i in range(10007,30000,100)]
+        for index in ('', 'cohort', 'tick,cohort', 'cohort,tick', 'cohort,tick,id,score'):
+            with self.subTest(index=index):
+                db = self.database(index)
+                try:
+                    plan = ' | '.join(r[3] for r in db.execute('EXPLAIN QUERY PLAN '+query,args))
+                    self.assertEqual(db.execute(query,args).fetchall(), expected)
+                    steps = [0]
+                    def count_step():
+                        steps[0] += 1
+                        return 0
+                    db.set_progress_handler(count_step,1)
+                    try:
+                        self.assertEqual(db.execute(query,args).fetchall(), expected)
+                    finally:
+                        db.set_progress_handler(None,0)
+                    elapsed = []
+                    for _ in range(5):
+                        start = time.perf_counter()
+                        for _ in range(30):
+                            db.execute(query,args).fetchall()
+                        elapsed.append((time.perf_counter()-start)*1000/30)
+                    if not index:
+                        self.assertIn('SCAN event',plan)
+                        self.assertIn('TEMP B-TREE',plan)
+                    elif index == 'cohort':
+                        self.assertIn('cohort=?',plan)
+                        self.assertIn('TEMP B-TREE',plan)
+                    elif index == 'tick,cohort':
+                        self.assertIn('tick>? AND tick<?',plan)
+                        self.assertNotIn('cohort=? AND',plan)
+                    else:
+                        self.assertIn('cohort=? AND tick>? AND tick<?',plan)
+                        self.assertNotIn('TEMP B-TREE',plan)
+                    if index == 'cohort,tick,id,score':
+                        self.assertIn('COVERING INDEX',plan)
+                        not_covered = ' | '.join(r[3] for r in db.execute('EXPLAIN QUERY PLAN '+query.replace('tick,id,score','tick,id,score,payload',1),args))
+                        self.assertNotIn('COVERING INDEX',not_covered)
+                    print('INDEX-READ',repr(index), 'plan='+plan, 'vm_steps='+str(steps[0]), 'median_ms=%.6f'%statistics.median(elapsed),flush=True)
+                finally:
+                    db.close()
+
+    def test_index_write_and_space_tradeoff(self):
+        import statistics
+        import time
+        for index in ('', 'cohort', 'cohort,tick', 'cohort,tick,id,score'):
+            insert_ms, update_ms, sizes = [], [], []
+            for _ in range(5):
+                db = self.database(index)
+                try:
+                    sizes.append(db.execute('PRAGMA page_count').fetchone()[0]*db.execute('PRAGMA page_size').fetchone()[0])
+                    batch = self.data(40000,45000)
+                    start = time.perf_counter()
+                    with db:
+                        db.executemany('INSERT INTO event VALUES (?,?,?,?,?)',batch)
+                    insert_ms.append((time.perf_counter()-start)*1000)
+                    start = time.perf_counter()
+                    with db:
+                        db.execute('UPDATE event SET score=score+1 WHERE id>=40000')
+                    update_ms.append((time.perf_counter()-start)*1000)
+                    self.assertEqual(db.execute('SELECT id,cohort,tick,score,payload FROM event WHERE id>=40000 ORDER BY id').fetchall(), [(i,c,t,s+1,p) for i,c,t,s,p in batch])
+                    self.assertEqual(db.execute('SELECT COUNT(*) FROM event').fetchone(),(45000,))
+                    self.assertEqual(db.execute('PRAGMA integrity_check').fetchone(),('ok',))
+                finally:
+                    db.close()
+            print('INDEX-WRITE',repr(index),'bytes='+str(sizes),'insert_ms=%.6f'%statistics.median(insert_ms),'update_ms=%.6f'%statistics.median(update_ms),flush=True)
+
 if __name__ == '__main__': unittest.main(verbosity=2)

@@ -227,3 +227,30 @@ Architect 主責：設計取捨及語意；Developer：自寫lab；QA：固定�
 3. 合成研究版本複合FK：run10引用R1v1、run11引用R1v2，新增v3不變舊join；NO ACTION 拒刪被引用v1、拒引用不存在v99；CASCADE只示範run刪除後附屬可丟棄draft移除（不表示研究run可合法刪除），版本仍三筆；可選tag刪除令annotation FK=NULL而保留行，FKcheck=[]。此不限制任意UPDATE舊版本、run 刪除或可信writer，也不等於研究倫理/正式刪除政策。需後續依權限、不可變版本契約、稽核政策驗證。
 ### 蒸餾與覆盤
 把新原理增量寫 architecture-design、test-and-acceptance：功能依賴、歷史事實與現在主檔語意不同、無損/依賴保留、生命週期及安全，保留原來源版本/案例及成熟度。無新增工作台、知識庫、角色、APP或外部服務。依核心準則本輪專業成果3方法21斷言，新案例未替代真外部任務；0人工操作請求、0舊實驗重跑，無可比較長期工時或真人成效資料，未宣稱模型能力增益。原兩單元圖像缺件沿既有已知限制，只保留待證，不再次重試相同失敗途徑。下一輪2.2.6索引（先查原已驗 query plan 路徑，測不同複合索引/查詢型態），個別圖/前置受阻改可完整取得教材。安全優先，保留 A07/B10/C4–C6/M4及首版3/6，NT$0；不部署、不改main/release。
+
+
+## TD004-DB-INDEX-01｜索引設計、實際查詢計畫及讀寫取捨（2026-11-17；TEXT_PARTIAL / SQLITE_LAB_VERIFIED）
+依使用者明確指令、TD-006與TD004-DB-NORMAL-01續作。原 START_HERE/AGENTS/CORE_TRAINING_PRINCIPLES/唯一主檔/有效決策/matrix及覆盤、catalog、Architect/Developer/QA/Evaluator角色與四相關skill來源已重新取得並檢視；EP-08採用相同輸出、SQL plan及可量測成本，EP-13採用原生引擎與交易契約。不重跑先前資料正規化、NULL、識別映射、PG遷移/容量及NATIVE-ARCH-005/EP-011原實驗。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK，無私人工作台或獨立代理。
+基準 cbaca48fc86d7c2a70b7867a5e459ee3bd90c3f2 / tree f8215cb51e6b49607837735c818a2b4ec6b15f0d。前輪 CI 44043614630/job133903845315 completed/failure，原始log 116160 chars：519 tests in 86.565s，唯一 error test_academic_app_real_browser_and_download 行66讀不到 /tmp/.../profile/DevToolsActivePort（FileNotFoundError）；offline unit tests停止，後續品質步驟skipped。不是資料庫實驗失敗，真根因未確認，也不宣稱環境暫時故障已修復；歷史核心準則 CI 44042533418 成功不替代本版本。保留失敗與品質門檻，未改APP、未手動重跑舊驗收，不因單一暫未診斷的瀏覽器錯誤停止獨立專業實驗。
+教材2.2.6 原授權備份 Markdown 6029 chars，SHA256 bbc5cfb3c2e3f297bcef81d4c000ba6b73baf8bc9545319381c0839f0edf07ad（connector UTF8文字，hash abc自檢通過），36圖片、共用embed未取得；不再沿已知無效相同圖像路徑重試。原文§1 Heap/Table Scan/Index Seek，§2五筆Customers及SQL條件，§3 B-Tree，§4.2-3叢集/非叢集及lookup，§5 SSMS操作多為圖像未驗。實讀原文字及SQL，不執行教材DROP TABLE於任何真DB。9 READABLE文字、154 UNREAD、13 BLOCKED_SOURCE，176 L0保留。
+來源批判及延伸：Microsoft官方 https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-index-design-guide?view=sql-server-ver17 和 https://learn.microsoft.com/en-us/sql/relational-databases/sql-server-index-design-guide?view=azuresqldb-current 實讀：rowstore B+ tree、heap可有nonclustered、PK clustered是預設而非必然、clustered葉為data pages，頁內邏輯順序非物理連續，不取代ORDER BY。非叢集可透過INCLUDE覆蓋，無必然key lookup；寬索引增加維護/磁碟/快取成本。SQL Server原生實機、SSMS圖示、頁分裂或鎖、INCLUDE與clustered設計未驗。SQLite官方 https://www.sqlite.org/queryplanner.html、https://www.sqlite.org/eqp.html 實讀：多欄左前綴、covering、search+sort、SCAN/SEARCH/TEMP B-TREE；EQP格式可隨版本變化，非production API。SQLite rowid表不是SQL Server heap/clustered的實測替身；SQLite covering附加欄不是SQL Server INCLUDE同機制。應依分布、實際filter/sort/projection、統計、寫入量決定索引順序；等值後範圍是此查詢適用起點而非全域定律。
+### 真SQLite實作及量測
+自寫既有test_research_data.py class IndexDesignLesson；本機 SQLite 3.46.1，python -m unittest -v index_lesson.IndexDesignLesson，2/2 OK、3.082s，class含末尾換行SHA256 f67f4cfab705386cf36261d1ed60bcfed802268135279ac21de063d89332e265。自寫合成工作負載，不是產品缺陷或獨立盲測。40000 rows，id INTEGER PRIMARY KEY、cohort=i%100、tick=i、score=i%37、payload='x'*80。每組新:memory: DB、固定schema/data、額外索引、ANALYZE、commit；無額外索引仍有rowid主鍵。固定 query SELECT tick,id,score FROM event WHERE cohort=7 AND tick>=10000 AND tick<30000 ORDER BY tick,id；以Python固定期望200筆逐行核值，另次set_progress_handler(n=1)計VM callbacks後移除，五批每批30次fetchall平均耗時取中位數（含Python回傳成本，未冷快取/隨機組序、非SLA）：
+| 額外索引 | 實測 EQP detail | VM callbacks | 每次ms |
+|---|---|---:|---:|
+| 無 | SCAN event; USE TEMP B-TREE FOR ORDER BY | 123612 | 1.671986 |
+| cohort | SEARCH event USING INDEX idx_event (cohort=?); USE TEMP B-TREE FOR ORDER BY | 4815 | 0.289594 |
+| tick,cohort | SEARCH event USING INDEX idx_event (tick>? AND tick<?); USE TEMP B-TREE FOR LAST TERM OF ORDER BY | 104215 | 2.130724 |
+| cohort,tick | SEARCH event USING INDEX idx_event (cohort=? AND tick>? AND tick<?) | 1417 | 0.195631 |
+| cohort,tick,id,score | SEARCH event USING COVERING INDEX idx_event (cohort=? AND tick>? AND tick<?) | 1216 | 0.147399 |
+覆蓋索引加查payload即失去COVERING，真EQP負例；逆序索引在本工作負載仍SEARCH但範圍較寬、需局部排序，耗時甚至大於scan，不能以SEARCH判效能或VM callback當磁碟頁數。
+另一方法每組5個獨立重建DB，測初始page_count*page_size（已ANALYZE，包含資料與索引配置頁，不是RSS或真檔案大小）、5000筆同交易insert、按id範圍5000筆score+1同交易update，各取5次中位數；每次核逐行資料、45000筆及integrity_check=ok。四設計，不測逆序索引寫入。
+| 索引 | 初始配置bytes（5次一致） | insert ms/5000筆 | update ms/5000筆 |
+|---|---:|---:|---:|
+| 無 | 3944448 | 5.475919 | 1.276839 |
+| cohort | 4317184 | 10.062119 | 1.507612 |
+| cohort,tick | 4444160 | 10.514491 | 1.326850 |
+| cohort,tick,id,score | 4648960 | 9.517162 | 5.919286 |
+覆蓋score增加查詢覆蓋與score更新成本；insert測值並非索引愈寬必愈慢，不做速度assert，不將偶然差異因果泛化；未測真磁碟I/O、WAL/耐久、並發、不同分布/負載、更新索引鍵、真雲端或SQL Server。計畫文字斷言只供這個引擎版本受控教學，未作產品runtime依賴。
+### 蒸餾及覆盤
+Architect/Developer/QA/Evaluator角色分工；既有architecture-design與test-and-acceptance增量：先確定read/write workload與固定結果，實測等值/範圍/排序欄位、covering及加欄負例、索引冗餘與維護成本；使用原技能，不新增管理或知識庫。新知支持研究事件、預約或教學平台的查詢設計，但未改外部系統、未實測獨立真情境遷移。0使用者人工操作、0舊lab手動重跑；無可比長期工時及真人成效，不聲稱模型增益。原七階段未完整（缺圖/SSMS/真遷移），L0保留。下一輪依2.2.9資料匯入的原教材及既有匯出/原子遷移證據選新缺口，例如staging與拒絕非法列，不重做既有識別映射。另以必要最小診斷處理重發Chrome啟動錯誤，不放寬守門或阻塞獨立專業學習。R2、NT$0、A07/B10、C4-C6/M4延期、3/6及權限不變；不部署、不改main/release。

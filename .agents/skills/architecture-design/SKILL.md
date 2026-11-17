@@ -66,3 +66,7 @@ description: "設計架構、比較方案。architect 角色；交付 architectu
 
 ### TD-004｜正規化、依賴保留與歷史事實（TD004-DB-NORMAL-01）
 先從業務規格列候選鍵、功能依賴、關聯基數及資料生命週期，核1NF/2NF/3NF/BCNF而非只算拆表數；無損接合及依賴保留分別核。BCNF可能失去原唯一性規則；若不能可靠強制，保留適當3NF或設計可交易驗證之約束。區分現行主檔值與交易當時值/研究版本，事件金額、原規格與研究測量不能因當前主檔變更而被重算；以來源/版本外鍵與必要不可變權限契約保留。NO ACTION為保守起點，CASCADE限明確可同生命週期處理的資料，SET NULL/DEFAULT須合語意、合法父鍵與留存政策；外鍵不等於授權。反正規化前核實負載/索引/延遲/重建與對帳。原SQLite三方法見[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)，非正式研究刪除政策、全部引擎或效能實證。
+
+
+### TD-004｜依工作負載設計索引（TD004-DB-INDEX-01）
+先固定資料與實際filter/join/order/projection及讀寫比例、分布、既有索引與統計；比較無額外索引、單欄、合理複合鍵順序及覆蓋索引。等值後範圍在本情境可降低搜尋及排序成本，不泛化為所有查詢；反序SEARCH仍可能很慢。保留原始行語意/排序，核索引維護、寫入、空間及缺覆蓋欄位；不因增加索引個數或命中SEARCH放行。SQL Server heap仍可有nonclustered、PK不必clustered、clustered邏輯順序非磁碟物理保證，INCLUDE與SQLite covering機制不同。使用實際引擎的計畫及量測，先核冗餘索引再加，真資料庫DDL/鎖/回退另核授權。見原覆盤2.2.6真SQLite結果，非正式負載/SQL Server實機效能。

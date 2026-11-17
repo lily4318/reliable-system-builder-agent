@@ -72,3 +72,7 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### TD-004｜逐列與Pivot真值驗收（TD004-SQL-CURSOR-PIVOT-01）
 逐筆與集合結果用固定逐鍵oracle驗同tick、負值、多次threshold crossing、ROWS/RANGE及穩定順序；測同cursor內層重執行截斷外迴圈、記實際SQL trace次數而非推估耗時。寬表核精確欄名/順序/列值（含rows/valid/sum）、無觀測欄、全NULL/真0、同分合法兩筆、未核分類；刻意測補0混淆、DISTINCT丟合法觀測、空/重複/未知/注入樣動態欄，回讀原事件未變。來源粒度與母群按需求，不以合計相同證明原始可逆。3/3本機SQLite為合成測試，非真研究、SQL Server、UNPIVOT或獨立模型。參見[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。
+
+
+### TD-004｜排名與分層的逐鍵驗收（TD004-SQL-RANKING-01）
+固定oracle比較ROW_NUMBER/RANK/DENSE_RANK及top-N入選ID與人數，特別測邊界同分、跳號、加ID破壞peer及兩種索引路徑下無tie-break的反例；反例計畫依引擎，不將未指定排序當固定契約。測資格過濾先後、跨研究同局部鍵/同組名、真0與NULL、合資格與有效分母；NTILE驗不能均分、小母群、同分拆組、非法N及原事件不變。結果與分析母群、排序及版本一起追溯；不把排名或NTILE當真隨機分派/百分位數驗證，實際研究規格與引擎另驗。詳[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

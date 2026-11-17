@@ -797,15 +797,20 @@
       "id": "3.3.2",
       "title": "Union 語法",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_sql_union",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "d8ceaa4ef39f472e073c552b49b07f366313938ab8d76fd15bc1de2aef54fc50",
+      "access": "READABLE",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "architect",
+        "qa-uat"
+      ],
       "skill": "implement-feature",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.2.4"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "原Markdown/SQL 7071字元、13圖與共用embed未取；TD004-SQL-CTE-01 欄序/不同單位與型別、來源鍵、CAST負例實證；非原SQL Server/完整轉型驗證，L0。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -813,15 +818,22 @@
       "id": "3.3.3",
       "title": "CTE 語法",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_sql_cte",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "c0ad6dff38ec64be79a07588629afe0aadaabda5074db27ba38d3aa75e788f30",
+      "access": "READABLE",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "architect",
+        "qa-uat"
+      ],
       "skill": "implement-feature",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.2.4",
+        "3.3.1",
+        "3.3.2"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "原Markdown/SQL 11052字元、19圖與共用embed未取；TD004-SQL-CTE-01 精度等價、遞迴scope/循環/深度及菱形路徑、VM中止；非SQL Server MAXRECURSION實機，未驗大圖、完備性通用偵測，L0。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

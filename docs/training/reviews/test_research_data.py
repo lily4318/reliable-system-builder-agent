@@ -769,4 +769,84 @@ class JoinGrainLesson(unittest.TestCase):
         self.db.execute('RELEASE wrong_dedup')
         self.assertEqual(self.db.execute('SELECT * FROM measurement ORDER BY mid').fetchall(),before)
 
+class UnionCteLesson(unittest.TestCase):
+    def setUp(self):
+        self.db = sqlite3.connect(':memory:')
+        self.addCleanup(self.db.close)
+
+    def test_source_contract_and_cast(self):
+        d = self.db
+        d.executescript("""CREATE TABLE a(r INTEGER PRIMARY KEY, pid TEXT, score INTEGER, ms INTEGER);
+          CREATE TABLE b(r INTEGER PRIMARY KEY, pid TEXT, seconds TEXT, points TEXT);
+          INSERT INTO a VALUES(1,'007',12,1500);
+          INSERT INTO b VALUES(1,'007','2','34'),(2,'008','3','bad'),(3,'009','4','34x'),(4,'010','5','034'),(5,'011','6','101');""")
+        wrong = d.execute("SELECT r,pid,score,ms FROM a UNION ALL SELECT r,pid,seconds,points FROM b WHERE r=1").fetchall()
+        self.assertEqual(wrong, [(1,'007',12,1500),(1,'007','2','34')])
+        self.assertEqual(d.execute("SELECT CAST('bad' AS INTEGER),CAST('34x' AS INTEGER),CAST('007' AS INTEGER)").fetchone(), (0,34,7))
+        with self.assertRaises(sqlite3.OperationalError):
+            d.execute('SELECT r,pid FROM a UNION ALL SELECT r FROM b')
+        q = """WITH mapped(source,r,pid,score,ms,valid) AS (
+          SELECT 'A',r,pid,score,ms,1 FROM a UNION ALL
+          SELECT 'B',r,pid,CAST(points AS INTEGER),CAST(seconds AS INTEGER)*1000,
+            points=CAST(CAST(points AS INTEGER) AS TEXT) AND CAST(points AS INTEGER) BETWEEN 0 AND 100
+          FROM b)
+          SELECT source,r,pid,score,ms,valid FROM mapped ORDER BY source,r"""
+        rows = d.execute(q).fetchall()
+        self.assertEqual(rows, [('A',1,'007',12,1500,1),('B',1,'007',34,2000,1),('B',2,'008',0,3000,0),('B',3,'009',34,4000,0),('B',4,'010',34,5000,0),('B',5,'011',101,6000,0)])
+        self.assertEqual([(s,r,p,v,t) for s,r,p,v,t,ok in rows if ok], [('A',1,'007',12,1500),('B',1,'007',34,2000)])
+        self.assertEqual([(s,r) for s,r,p,v,t,ok in rows if not ok], [('B',2),('B',3),('B',4),('B',5)])
+        self.assertEqual(len({(s,r) for s,r,*_ in rows}),6)
+        self.assertEqual(d.execute('SELECT points FROM b ORDER BY r').fetchall(), [('34',),('bad',),('34x',),('034',),('101',)])
+
+    def test_cte_refactor_preserves_precision(self):
+        d = self.db
+        d.executescript("CREATE TABLE score(id INTEGER PRIMARY KEY, grp TEXT, value REAL); INSERT INTO score VALUES(1,'A',1.1),(2,'A',1.2),(3,'A',1.3),(4,'B',9.0);")
+        old = 'SELECT id FROM score s WHERE value>(SELECT AVG(value) FROM score WHERE grp=s.grp) ORDER BY id'
+        cte = 'WITH averages AS (SELECT grp, %s AS mean FROM score GROUP BY grp) SELECT id FROM score JOIN averages USING(grp) WHERE value>mean ORDER BY id'
+        self.assertEqual(d.execute(old).fetchall(),[(3,)])
+        self.assertEqual(d.execute(cte % 'CAST(AVG(value) AS INTEGER)').fetchall(),[(1,),(2,),(3,)])
+        self.assertEqual(d.execute(cte % 'AVG(value)').fetchall(),[(3,)])
+        with self.assertRaises(sqlite3.OperationalError):
+            d.execute('SELECT * FROM averages')
+
+    def test_recursive_cycle_depth_and_diamond(self):
+        d = self.db
+        d.executescript("""CREATE TABLE edge(scope TEXT, src INTEGER, dst INTEGER, PRIMARY KEY(scope,src,dst));
+          INSERT INTO edge VALUES ('A',1,2),('A',1,3),('A',2,4),('A',3,4),('A',4,5),('A',5,2),('A',9,9),('B',1,99);""")
+        # Outer WHERE does not bound recursion. Abort with a real VM progress handler.
+        unsafe = """WITH RECURSIVE walk(node,depth) AS (SELECT 1,0 UNION
+          SELECT e.dst,w.depth+1 FROM walk w JOIN edge e ON e.src=w.node WHERE e.scope='A')
+          SELECT count(*) FROM walk WHERE depth<=2"""
+        calls = [0]
+        def stop():
+            calls[0] += 1
+            return int(calls[0] >= 20)
+        d.set_progress_handler(stop,100)
+        try:
+            with self.assertRaisesRegex(sqlite3.OperationalError,'interrupted'):
+                d.execute(unsafe).fetchone()
+        finally:
+            d.set_progress_handler(None,0)
+        self.assertEqual(calls[0],20)
+        walk = """WITH RECURSIVE walk(node,depth,path,cycle) AS (
+          SELECT :root,0,printf('/%d/',:root),0 UNION ALL
+          SELECT e.dst,w.depth+1,w.path||printf('%d/',e.dst),
+            instr(w.path,printf('/%d/',e.dst))>0
+          FROM walk w JOIN edge e ON e.src=w.node AND e.scope=:scope
+          WHERE w.depth<:cap AND w.cycle=0)
+          SELECT node,depth,path,cycle FROM walk ORDER BY depth,path"""
+        def run(root,cap):
+            return d.execute(walk,dict(root=root,scope='A',cap=cap)).fetchall()
+        shallow = run(1,2)
+        self.assertEqual(shallow,[(1,0,'/1/',0),(2,1,'/1/2/',0),(3,1,'/1/3/',0),(4,2,'/1/2/4/',0),(4,2,'/1/3/4/',0)])
+        frontier = {n for n,dep,p,c in shallow if dep==2 and not c}
+        self.assertEqual(frontier,{4})
+        self.assertEqual(d.execute("SELECT dst FROM edge WHERE scope='A' AND src=4").fetchall(),[(5,)])
+        full = run(1,8)
+        self.assertEqual({n for n,dep,p,c in full if not c},{1,2,3,4,5})
+        self.assertEqual([p for n,dep,p,c in full if c], ['/1/2/4/5/2/','/1/3/4/5/2/4/'])
+        self.assertEqual(run(9,8),[(9,0,'/9/',0),(9,1,'/9/9/',1)])
+        self.assertFalse(any(n==99 for n,*_ in full))
+        self.assertEqual(d.execute('SELECT count(*) FROM edge').fetchone(),(8,))
+
 if __name__ == '__main__': unittest.main(verbosity=2)

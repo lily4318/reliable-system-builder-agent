@@ -39,3 +39,7 @@ tryLock 失敗不寫、finally release，鎖內重新查 id/receipt/容量；Spr
 
 ### TD-004｜資料粒度、關聯與統計口徑（TD004-SQL-JOIN-01）
 先確認輸出一列代表受試者、事件、報酬或其他業務粒度，按完整範圍鍵、關聯基數與真實身份聯結。保留母群時將右表資格條件放ON或先篩右資料；WHERE加OR NULL也不能補回已有不合格匹配的左列。多個1:N子表先各自聚合至同一目標粒度，再JOIN，或只查存在性時用EXISTS；COUNT DISTINCT或SUM DISTINCT不能普遍修復fan-out（同額合法事件被消除），明確區分受試者/事件等權平均及缺失值、母群/有效分母。INSERT SELECT以目標粒度唯一鍵與明示欄位驗收；刪除重複必依核定事件身份、留存及授權，不能以同分或名稱判重。原SQLite見[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)，非SQL Server或真研究推論/權限。
+
+
+### TD-004｜跨來源整合與有界CTE（TD004-SQL-CTE-01）
+依核定資料契約明示每個分支的欄序、語意、型別、值域、單位及來源版本/記錄鍵；禁止只靠欄數相同/CAST成功/UNION去重判合法。保留原值與拒絕診斷，識別碼不得數值化；轉型依實際引擎，非單一小樣本validator。重構CTE須保留比較精度與分母，展示格式於計算之後。遞迴以可信scope及根、內部終止/深度、無歧義路徑與循環拒絕或標記、結果/資源預算，明示截斷/未知而非完整成功；路徑與唯一節點語意分開，先核是否允許多父節點，禁止無界MAXRECURSION 0。CTE非永久快照或保證物化；原合成SQLite見[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)，真引擎/權限/完整性與負載另驗。

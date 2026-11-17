@@ -792,3 +792,7 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 
 ## TD004-SQL-JOIN-01（2026-11-17；TEXT_PARTIAL / LOCAL_LAB_VERIFIED）
 - 依核心準則及使用者指令，讀3.2.1/3.2.3/3.2.4/3.3.1原正文；SQLite3/3實測22斷言位置，LEFT JOIN右條件、fan-out、平均分母、INSERT SELECT/合法重複誤刪。18文字/145未讀/13缺/176 L0，原圖、原sqldb及SQL Server未驗。原技能/測試/矩陣及[覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)增量；前輪CI44047731069 28步success、519 tests，Chrome根因未明。下一輪3.3.2/3.3.3新缺口，核心與授權不變。
+
+
+## TD004-SQL-CTE-01（2026-11-17；TEXT_PARTIAL / LOCAL_LAB_VERIFIED）
+- 使用者明示依核心準則續3.3.2/3.3.3。原Markdown與官方SQLite/Microsoft文檔、真SQLite 3/3/22斷言位置；欄位位置/型別/來源追溯、CTE重構改變比較精度、循環與遞迴深度實際中止/修正。原兩技能、測試、矩陣及[覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)增量；20文字/143未讀/13缺/176 L0，圖/嵌入/SQL Server及真陌生任務未驗。前輪exact CI44048838168 success（metadata）；新CI待核。下一輪3.3.4/3.3.5選未驗新能力，R2/TP010/TD006、原安全及授權不變。

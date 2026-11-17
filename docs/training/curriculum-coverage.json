@@ -885,15 +885,22 @@
       "id": "3.3.6",
       "title": "Ranking 語法",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_sql_ranking",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "9dde8b49f659e173baff6658a0d14de4d5cb8a0b395ec0f0789533580992c36b",
+      "access": "READABLE",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "architect",
+        "qa-uat"
+      ],
       "skill": "implement-feature",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.2.4",
+        "3.3.3",
+        "3.3.4"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-SQL-RANKING-01 原Markdown正文11910字元，25圖/embed未取；同分top-N、兩索引下穩定排序、資格先後/完整分區、NTILE同分拆組已實測，原生SQL Server/真研究/完整習得未驗，L0。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

@@ -841,15 +841,21 @@
       "id": "3.3.4",
       "title": "Cursor 語法",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_sql_cursor",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "78d4065de89e170fff3d80af35b3ca47b0da8a7bd02a3d57141f00322498f82e",
+      "access": "READABLE",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "architect",
+        "qa-uat"
+      ],
       "skill": "implement-feature",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.2.4",
+        "3.3.3"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-SQL-CURSOR-PIVOT-01 原Markdown 9716字元，11圖及embed未取；逐列順序、ROWS/RANGE、cursor重用及trace已試，原生server cursor與真遷移未驗，L0。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -857,15 +863,21 @@
       "id": "3.3.5",
       "title": "Pivot 語法",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_sql_pivot",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "07c1b8562ac7cc6bfce15be9c03f3cc0db66e7a99b1867fc99b5a3ac4eec9f3e",
+      "access": "READABLE",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "architect",
+        "qa-uat"
+      ],
       "skill": "implement-feature",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.2.4",
+        "3.3.1"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-SQL-CURSOR-PIVOT-01 原Markdown 19414字元，20圖及embed未取；寬表rows/valid/sum、固定/白名單欄位及原值已試，原生PIVOT/UNPIVOT與真研究未驗，L0。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

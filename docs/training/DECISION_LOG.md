@@ -763,3 +763,8 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 
 ## TD004-DB-KEYTYPE-01（2026-11-17；USER_CONFIRMED_CONTINUATION / LOCAL_LAB_VERIFIED）
 - 使用者確認 TP-010-AUDIT-01 之專業優先、原教材與真工作成效閉環，不新增管理架構/知識庫。沿原 R2/TP010，實讀2.2.1–4 Markdown、官方型別，採用 EP-01/13；本輪兩真 SQLite lab 方法通過、17 assertion sites，教材圖/嵌入及真 T-SQL 未驗故全 L0。新原矩陣6 READABLE/157 UNREAD/13 BLOCKED_SOURCE，原176初步主責不變。新增原技能與測試、原覆盤詳[TD004-DB-KEYTYPE-01](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。無私人資料、無需主人操作、無舊 lab 重跑；下一輪正規化及完整可讀課程，不重開 Pages，不把此作獨立LLM遷移或正式發布。
+
+
+## TD-006｜核心訓練準則（2026-11-17；USER_REQUESTED / CANONICAL_GUIDE）
+- 使用者本輪要求提取原 Agent 訓練範本核心，形成一份文件供未來網站建設 Agent 訓練不偏離。重新實讀原第一天版 00_先看這裡.md、AGENTS.md、九項 SKILL.md；沿已完成 TP-010-AUDIT-01 之對照，不重做全面稽核。提煉先認識使用者、開工記憶、專業分工、共用空間、真實依據與產出、日常回饋、蒸餾、成效改善八核心；原行銷/本機細節不直接移植。
+- 新增唯一長期準則 [CORE_TRAINING_PRINCIPLES.md](CORE_TRAINING_PRINCIPLES.md)，由原 START_HERE/AGENTS/訓練主檔索引並要求每輪實讀；命名與八項歸納為本次整理選擇，延續已確認原決策，非另一份主檔或新增能力機制。原 NEXT_ACTION 與 R2/TP010、TD004、既有未驗與安全限制均保留。基準 cdf09a1bdd785fac3d3a0be5a6630d99ab2c30cc；CI 44027038088 completed/success（metadata）。本輪文檔更新，不重跑舊 lab，不證明未來自主遵循或獨立模型能力、不改 main/release/外部專案/APP/部署、不公開私人資料。後續真任務依原覆盤查採用，無需另作管理訓練。

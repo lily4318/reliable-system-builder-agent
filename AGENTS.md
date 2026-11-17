@@ -2,6 +2,10 @@
 
 適用此儲存庫。先讀 START_HERE.md、release/current_release.yaml、config/agent-policy.yaml，再讀工作所屬專案的最新正式來源。Agent 自身訓練、方向討論與改善先定位原 Draft PR #8 最新 head，讀該版本 docs/AGENT_CAPABILITY_TRAINING.md 頂部及 docs/training/DECISION_LOG.md；候選訓練不等於正式 main/release。
 
+## 核心訓練準則（每次必讀）
+
+所有 Agent 自身訓練、改善、方向討論及續作必先實讀 [CORE_TRAINING_PRINCIPLES.md](docs/training/CORE_TRAINING_PRINCIPLES.md)，再依最新主檔/決策、按需角色技能執行。用原準則檢查開工與結案是否真正增加專業能力或改善真工作；不增加管理關卡。此檔為原 TD-001/004、TD-005-R2、TP-010 的長期提煉，不是第二主檔，不擴大授權，不取代共同安全規則。
+
 ## 執行模式與工作空間（TD-001，適用所有八角色與十五核心技能）
 
 - 進入任務時先核對平台真實工具、目標與授權，選必要角色與 catalog skill，讀實際角色及 SKILL.md。依 docs/TEAM_WORKBENCH.md「平台原生工作模式」選路徑。此共通條款優先釐清各角色/SKILL 中的 context、handoff、cite、feedback、history、私人任務池等操作描述：它們只在實際已授權、可存取且已初始化的私人工作區執行，不是所有 AI 平台的開工前提。

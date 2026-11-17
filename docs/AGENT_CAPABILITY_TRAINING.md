@@ -6,6 +6,8 @@
 
 **2026-11-17 使用者明示確認 TD-005-R2：Agent 專業能力提升最高優先，解除首版剩餘驗收對長期專業學習的依賴。原 TD-004 七階段、逐角色/單元 L0–L6、唯一主責、八角色十五技能、教材與真任務雙軌保留；真外部任務、部署、付費、私人資料、正式發布仍另行授權。首版 3/6、未驗門檻獨立延期，不視為通過或批准 Release；停止展示 APP 追加驗收、依原授權停用 Pages，保留分支和證據，最晚 2026-11-24 23:59 Asia/Taipei。停用待 owner UI 操作及回讀，不阻塞訓練。** 詳[決策紀錄](training/DECISION_LOG.md) TD-005-R2、[八角色缺口及實際訓練順序](training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。以下被取代的原交付順序均留歷史，不作現行 NEXT_ACTION。
 
+- CORE_TRAINING_PRINCIPLES (2026-11-17; TD-006 / USER_REQUESTED_CANONICAL_GUIDE): 每輪訓練必讀[核心訓練準則](training/CORE_TRAINING_PRINCIPLES.md)，由原實戰營的啟動/總規則/九技能萃取八項原則，整合已確認 TD-001/002/004/005-R2/TP-010；專業能力與真工作回饋為主，不重做管理。本檔仍唯一正式訓練主檔；核心準則不記進度，不改原 NEXT_ACTION、安全或授權。
+
 - TASK_DOMAIN: RELIABLE_AGENT_ENGINEERING_CAPABILITY_TRAINING
 - SOURCE_REPO: lily4318/reliable-system-builder-agent
 - ACTIVE_CANDIDATE: Draft PR #8, candidate-skill-team-integration-20261114；https://github.com/lily4318/reliable-system-builder-agent/pull/8

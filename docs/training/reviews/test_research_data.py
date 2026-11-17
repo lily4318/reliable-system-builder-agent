@@ -115,4 +115,28 @@ class ResearchData(unittest.TestCase):
         self.store.apply('v1',1,[self.row(score=2)])
         self.assertEqual(self.state(),([('v1',2)],[('P001',2,'')],[(1,1),(2,1)]))
 
+class MissingValueLesson(unittest.TestCase):
+    def test_missing_and_zero_must_not_be_conflated(self):
+        with sqlite3.connect(':memory:') as db:
+            db.execute('CREATE TABLE trial (id TEXT PRIMARY KEY NOT NULL, score INTEGER DEFAULT 0)')
+            db.executemany('INSERT INTO trial(id,score) VALUES (?,?)', [('observed-zero',0),('unobserved',None),('observed-positive',12)])
+            self.assertEqual(db.execute('SELECT id FROM trial WHERE score IS NULL').fetchall(), [('unobserved',)])
+            self.assertEqual(db.execute('SELECT id FROM trial WHERE score = NULL').fetchall(), [])
+            self.assertEqual(db.execute('SELECT id FROM trial WHERE score = 0').fetchall(), [('observed-zero',)])
+            self.assertEqual(db.execute('SELECT COUNT(*), COUNT(score), AVG(score), AVG(COALESCE(score,0)) FROM trial').fetchone(), (3,2,6.0,4.0))
+            self.assertEqual(db.execute('SELECT 10+20+NULL, NULLIF(0,0), COALESCE(NULL,0)').fetchone(), (None,None,0))
+            db.execute("INSERT INTO trial(id) VALUES ('omitted')")
+            self.assertEqual(db.execute("SELECT score FROM trial WHERE id='omitted'").fetchone(), (0,))
+            self.assertEqual(db.execute("SELECT score FROM trial WHERE id='unobserved'").fetchone(), (None,))
+            with self.assertRaises(sqlite3.IntegrityError):
+                db.execute('INSERT INTO trial(id,score) VALUES (NULL, 0)')
+        # Transfer: missing vs zero for an unrelated operational count, not research data.
+        with sqlite3.connect(':memory:') as db:
+            db.execute('CREATE TABLE capacity (id TEXT PRIMARY KEY, slots INTEGER)')
+            db.executemany('INSERT INTO capacity VALUES (?,?)', [('unknown',None),('full',0),('open',4)])
+            self.assertEqual(db.execute('SELECT id FROM capacity WHERE slots=0').fetchall(), [('full',)])
+            self.assertEqual(db.execute('SELECT id FROM capacity WHERE slots IS NULL').fetchall(), [('unknown',)])
+            self.assertEqual(db.execute('SELECT COUNT(slots), SUM(slots) FROM capacity').fetchone(), (2,4))
+            self.assertEqual(db.execute('SELECT COUNT(slots), SUM(slots) FROM capacity WHERE slots IS NULL').fetchone(), (0,None))
+
 if __name__ == '__main__': unittest.main(verbosity=2)

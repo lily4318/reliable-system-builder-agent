@@ -67,3 +67,7 @@ C0 ADR prepared，C1 BLOCKED_ACCOUNT_READBACK，C2 PARTIAL，M3-1 未完成；2/
 ## 2026-11-17｜TD-005-R2｜部署成果保留、獨立延期及安全停用（PAGES_DISABLE_PENDING_OWNER_UI）
 C3 曾明示授權且已完成 v1 部署；專用 branch pages-td005-acceptance head b732a50171aacebfab6d99b34c8568bb6dc0ea0d/tree bcd8521164803fc23c2458d24e6382db672266e9，Pages run 44016972755 success，artifact 14299571063，先前實際下載 ZIP SHA256 72920dc0847523bfe23a352caafbc006945f2e8866a5b1f2d0b99205ba784ca4 及四檔一致。使用者 UI source saved/branch root/HTTPS。原 GET helper 2026-11-17T04:28:15.606Z 三資產及負路徑均 TypeError Failed to fetch，無 HTTP/body/hash；CORS 或網路原因未證，非網站故障結論。Work cloud browser 無操作工具。C4 PARTIAL/REMOTE_BROWSER_BLOCKED，線上 HTTPS/200、404、三資產 bytes、DOM/CSV、安全仍未完整驗；C5/C6 NOT_RUN，A07 source-only PARTIAL，B10 independent beginner pending，file:// NOT_TESTED/NOT_PROMISED，M4 未授權。M1/M2-1/M3-1 已完成，3/6。現查 repo has_pages=true、head 未變；owner 至 Settings→Pages→Deploy from a branch→Branch None→Save（若實際 UI 提供 Unpublish site，先核對同 repo 後停用），保留 branch。不推 v2、不刪分支、不改預算。查 has_pages/source 及公開 URL 是否仍可用；網路工具受限則分開標 URL 未證。停站待 owner 操作，無自動到期停用保證。
 候選文件更新獨立於部署；不為取得停用驗證再次啟站或重跑 deployment。遠端 URL 若工具仍受限另標未證，不阻專業訓練。
+
+
+## 2026-11-17｜安全停用階段 readback
+真 GET repository has_pages=false，pages-td005-acceptance head b732a50171aacebfab6d99b34c8568bb6dc0ea0d 維持，main 未動。依 R2 停止追加驗收；未由 Agent 呼叫 Pages mutation 或取得 owner UI 操作證據，外部 URL 是否已失效仍缺獨立網路證據。狀態 PAGES_DISABLED_PROVIDER_METADATA / PUBLIC_URL_NOT_VERIFIED，保留 C3實證、C4 partial、C5/C6 not run、A07/B10、M4與原期限；不再要求重做設定或重新部署。專業訓練不受阻塞。

@@ -64,6 +64,7 @@ human_first_interaction:
 
 # TD-005 candidate role/skill contract; not an executable permission grant.
 project_management:
+  # Authorized website-delivery tasks only; TD-005-R2 Agent training is professional-capability-first.
   delivery_first: true
   academic_focus: research_experiment_teaching_web_apps
   require_user_confirmed_scope_and_major_changes: true

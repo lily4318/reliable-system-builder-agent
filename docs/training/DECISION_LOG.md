@@ -834,3 +834,8 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 
 ## TD004-SQL-FUNCTION-01（2026-11-17；NATIVE_CI_PENDING / CURRICULUM_TEXT_UNREAD）
 - 使用者明示3.4.4新能力，Developer主責、Architect/Security/QA視角，REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。原教材指定頁無法讀，前輪授權備份未定位，依核心準則不重複已失敗入口；無正文不替換、不升L0。真PG CI隔離框架新增四方法55 assert sites，程式exact 28f63d4bf3de884a1c09aa0b3e6457918796af72 / test blob 5f6c12fcf90e555e06d7213205e3dea96603a849，回讀相符。CI44106659225/job134120726735 尚未取得完整原始日誌，不宣稱通過。 前輪最終cc1f3fd / CI44100456504 job134099319206 success/28步、536 tests in84.773s，四Procedure方法全ok。原主檔、矩陣、兩技能及[原覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)增量。先核 exact 28f63d4bf3de884a1c09aa0b3e6457918796af72 / CI44106659225 完整原始日誌，若新測試失敗依真根因最小修復，不降gate；原生實證後接續3.4.5 Debug。 23正文/140未讀/13缺/176 L0不變，非T-SQL/真研究/獨立模型或正式發布；無外部資源、跨專案或費用。
+
+
+### TD004-SQL-FUNCTION-01 原生綠測回讀（NATIVE_POSTGRES_FULL_CI_VERIFIED；2026-11-17）
+- TD004-SQL-FUNCTION-01 最終實證：exact 28f63d4bf3de884a1c09aa0b3e6457918796af72 / CI44106659225 job134120726735 completed/success，raw260982 chars，PG18.6 private Unix socket/TCP disabled，新增四native function方法全ok（55 assertEqual/assertIn sites），Ran 540 tests in83.145s OK；checkout 641092bd9ed0abf0a06d181f4d5f9c56c7848221，tree ccc1d96ac7ad499a21db67c90148fc42a6f5eddb 與程式候選相符，report SHA256 9a9ed2538adf4ef12e67c5449ce71f3eeeac649acc6e968a8c6d76fef7830e30。真驗標量/集合、NULL及母群、STRICT省略DML與VOLATILE必要副作用、STABLE 0A000及同UPDATE快照3|9、錯IMMUTABLE持續prepared plan舊20對正200，ALTER STABLE重建plan及再改設定真6|6；錯IMMUTABLE索引更設定後查20仍錯中id2，全表掃描無列、STABLE expression index拒42P17，移錯索引後正動態200查得id2、純固定參數索引與seq兩路徑結果相同，100列sum5050保留。首次完整CI成功；刻意錯例及修復在同一測試中實測，非產品事故或獨立模型盲測。未驗artifact bytes/原T-SQL/真正式負載與實際外部任務。
+- 受控合成實驗只證PG技術契約，不升原教材能力級；23正文/140未讀/13缺/176 L0不變。原技能與主檔增量保存，下一3.4.5 Debug。原授權不變，無新外部資源或費用。

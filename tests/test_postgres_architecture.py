@@ -682,3 +682,178 @@ class PostgresArchitectureTests(unittest.TestCase):
             self.assertEqual(self.sql("SELECT n FROM procdemo.stage ORDER BY n"),"1")
             self.assertEqual(call("SELECT n FROM procdemo.stage ORDER BY n"),("00000","1"))
 
+    def function_setup(self):
+        self.sql("""
+            DROP SCHEMA IF EXISTS fnlesson CASCADE;
+            CREATE SCHEMA fnlesson;
+            REVOKE ALL ON SCHEMA fnlesson FROM PUBLIC;
+            CREATE TABLE fnlesson.people(id integer PRIMARY KEY);
+            INSERT INTO fnlesson.people VALUES(1),(2),(3),(4);
+            CREATE TABLE fnlesson.obs(id integer PRIMARY KEY, person integer, score integer);
+            INSERT INTO fnlesson.obs VALUES(1,1,0),(2,1,NULL),(3,2,5),(4,2,5),(5,4,NULL);
+            CREATE TABLE fnlesson.config(factor integer NOT NULL);
+            INSERT INTO fnlesson.config VALUES(10);
+            CREATE TABLE fnlesson.counter(n integer NOT NULL);
+            INSERT INTO fnlesson.counter VALUES(0);
+        """)
+
+    def test_pg_function_scalar_set_and_null_contracts(self):
+        self.function_setup()
+        self.sql("""
+            CREATE FUNCTION fnlesson.scalar_score(p integer) RETURNS integer
+                LANGUAGE sql STABLE STRICT AS $$
+                SELECT score FROM fnlesson.obs WHERE person=p ORDER BY id
+                $$;
+            CREATE FUNCTION fnlesson.scores(p integer)
+                RETURNS TABLE(observation_id integer, score integer)
+                LANGUAGE sql STABLE STRICT AS $$
+                SELECT o.id,o.score FROM fnlesson.obs o WHERE o.person=p
+                $$;
+            CREATE FUNCTION fnlesson.strict_default(x integer) RETURNS integer
+                LANGUAGE sql IMMUTABLE STRICT AS $$ SELECT coalesce(x,99) $$;
+            CREATE FUNCTION fnlesson.explicit_default(x integer) RETURNS integer
+                LANGUAGE sql IMMUTABLE CALLED ON NULL INPUT AS $$ SELECT coalesce(x,99) $$;
+            REVOKE ALL ON ALL FUNCTIONS IN SCHEMA fnlesson FROM PUBLIC;
+        """)
+        self.assertEqual(self.sql("SELECT fnlesson.scalar_score(1),fnlesson.scalar_score(2),"
+                                  "fnlesson.scalar_score(3) IS NULL,fnlesson.scalar_score(4) IS NULL"),
+                         "0|5|t|t")
+        self.assertEqual(self.sql("SELECT * FROM fnlesson.scores(2) ORDER BY observation_id"),"3|5\n4|5")
+        self.assertEqual(self.sql("SELECT count(*) FROM fnlesson.scores(NULL::integer)"),"0")
+        self.assertEqual(self.sql("SELECT fnlesson.strict_default(NULL::integer) IS NULL,"
+                                  "fnlesson.explicit_default(NULL::integer),fnlesson.strict_default(0)"),
+                         "t|99|0")
+        # CROSS LATERAL removes the person with no observation; LEFT preserves it.
+        self.assertEqual(self.sql("""SELECT p.id,count(*) FROM fnlesson.people p
+             CROSS JOIN LATERAL fnlesson.scores(p.id) s GROUP BY p.id ORDER BY p.id"""),
+                         "1|2\n2|2\n4|1")
+        self.assertEqual(self.sql("""SELECT p.id,count(s.observation_id),count(s.score),
+                   coalesce(sum(s.score)::text,'NULL')
+             FROM fnlesson.people p LEFT JOIN LATERAL fnlesson.scores(p.id) s ON true
+             GROUP BY p.id ORDER BY p.id"""),"1|2|1|0\n2|2|2|10\n3|0|0|NULL\n4|1|0|NULL")
+        self.assertEqual(self.sql("""SELECT proretset,proisstrict,provolatile::text
+             FROM pg_proc WHERE oid='fnlesson.scores(integer)'::regprocedure"""),"t|t|s")
+        self.assertEqual(self.sql("SELECT id,person,score FROM fnlesson.obs ORDER BY id"),
+                         "1|1|0\n2|1|\n3|2|5\n4|2|5\n5|4|")
+
+    def function_lookup_setup(self):
+        self.sql("""
+            -- Deliberately incorrect volatility, only inside the disposable fixture.
+            CREATE FUNCTION fnlesson.bad_factor(x integer) RETURNS integer
+                LANGUAGE plpgsql IMMUTABLE STRICT AS $$
+                BEGIN RETURN x*(SELECT factor FROM fnlesson.config); END;
+                $$;
+            CREATE FUNCTION fnlesson.live_factor(x integer) RETURNS integer
+                LANGUAGE plpgsql STABLE STRICT AS $$
+                BEGIN RETURN x*(SELECT factor FROM fnlesson.config); END;
+                $$;
+            CREATE FUNCTION fnlesson.pure_scale(x integer,f integer) RETURNS integer
+                LANGUAGE plpgsql IMMUTABLE STRICT AS $$
+                BEGIN RETURN x*f; END;
+                $$;
+            REVOKE ALL ON ALL FUNCTIONS IN SCHEMA fnlesson FROM PUBLIC;
+        """)
+
+    def test_pg_function_false_immutable_cached_plan(self):
+        self.function_setup()
+        self.function_lookup_setup()
+        with self.live_session() as old:
+            self.assertEqual(old("SET plan_cache_mode=force_generic_plan")[0],"00000")
+            self.assertEqual(old("PREPARE factors AS SELECT fnlesson.bad_factor(2),"
+                                 "fnlesson.live_factor(2)")[0],"00000")
+            self.assertEqual(old("EXECUTE factors"),("00000","20|20"))
+            self.sql("UPDATE fnlesson.config SET factor=100")
+            # Cached constant remains stale while the stable lookup sees the new statement snapshot.
+            self.assertEqual(old("EXECUTE factors"),("00000","20|200"))
+            self.assertEqual(self.sql("SELECT fnlesson.bad_factor(2),fnlesson.live_factor(2)"),"200|200")
+            self.assertEqual(old("ALTER FUNCTION fnlesson.bad_factor(integer) STABLE")[0],"00000")
+            self.assertEqual(old("DEALLOCATE factors")[0],"00000")
+            self.assertEqual(old("PREPARE factors AS SELECT fnlesson.bad_factor(2),"
+                                 "fnlesson.live_factor(2)")[0],"00000")
+            self.assertEqual(old("EXECUTE factors"),("00000","200|200"))
+            self.sql("UPDATE fnlesson.config SET factor=3")
+            self.assertEqual(old("EXECUTE factors"),("00000","6|6"))
+        self.assertEqual(self.sql("SELECT fnlesson.pure_scale(2,100),fnlesson.pure_scale(2,3)"),"200|6")
+
+    def test_pg_function_strict_side_effect_and_snapshot(self):
+        self.function_setup()
+        self.sql("""
+            CREATE FUNCTION fnlesson.bump(x integer) RETURNS integer
+                LANGUAGE plpgsql VOLATILE STRICT AS $$
+                DECLARE v integer;
+                BEGIN UPDATE fnlesson.counter SET n=n+1 RETURNING n INTO v; RETURN v; END;
+                $$;
+            CREATE FUNCTION fnlesson.illegal_stable() RETURNS integer
+                LANGUAGE plpgsql STABLE AS $$
+                BEGIN UPDATE fnlesson.counter SET n=n+10; RETURN 10; END;
+                $$;
+            CREATE FUNCTION fnlesson.read_stable() RETURNS integer LANGUAGE plpgsql STABLE AS $$
+                BEGIN RETURN (SELECT n FROM fnlesson.counter); END;
+                $$;
+            CREATE FUNCTION fnlesson.read_volatile() RETURNS integer LANGUAGE plpgsql VOLATILE AS $$
+                BEGIN RETURN (SELECT n FROM fnlesson.counter); END;
+                $$;
+            REVOKE ALL ON ALL FUNCTIONS IN SCHEMA fnlesson FROM PUBLIC;
+        """)
+        with self.live_session() as c:
+            self.assertEqual(c("SELECT fnlesson.bump(NULL::integer) IS NULL"),("00000","t"))
+            self.assertEqual(self.sql("SELECT n FROM fnlesson.counter"),"0")
+            self.assertEqual(c("SELECT sum(fnlesson.bump(g)) FROM generate_series(1,3) g"),("00000","6"))
+            self.assertEqual(self.sql("SELECT n FROM fnlesson.counter"),"3")
+            self.assertEqual(c("SELECT fnlesson.illegal_stable()")[0],"0A000")
+            self.assertEqual(self.sql("SELECT n FROM fnlesson.counter"),"3")
+            # One UPDATE statement: stable sees its starting snapshot; volatile sees the update.
+            self.assertEqual(c("UPDATE fnlesson.counter SET n=9 RETURNING "
+                               "fnlesson.read_stable(),fnlesson.read_volatile()"),("00000","3|9"))
+            self.assertEqual(c("SELECT fnlesson.read_stable(),fnlesson.read_volatile()"),("00000","9|9"))
+        self.assertEqual(self.sql("SELECT n FROM fnlesson.counter"),"9")
+
+    def test_pg_function_expression_index_wrong_result_and_repair(self):
+        self.function_setup()
+        self.function_lookup_setup()
+        self.sql("""
+            CREATE TABLE fnlesson.item(id integer PRIMARY KEY, base integer NOT NULL);
+            INSERT INTO fnlesson.item SELECT g,g FROM generate_series(1,100) g;
+            CREATE INDEX fnlesson_bad_idx ON fnlesson.item(fnlesson.bad_factor(base));
+            ANALYZE fnlesson.item;
+        """)
+        with self.live_session() as c:
+            self.assertEqual(c("CREATE INDEX fnlesson_invalid_idx ON "
+                               "fnlesson.item(fnlesson.live_factor(base))")[0],"42P17")
+            self.assertEqual(c("SET enable_seqscan=off")[0],"00000")
+            self.assertEqual(c("SET enable_bitmapscan=off")[0],"00000")
+            q="SELECT id FROM fnlesson.item WHERE fnlesson.bad_factor(base)=20"
+            code,plan=c("EXPLAIN (COSTS OFF) "+q)
+            self.assertEqual(code,"00000")
+            self.assertIn("Index Scan using fnlesson_bad_idx",plan)
+            self.assertEqual(c(q),("00000","2"))
+            self.sql("UPDATE fnlesson.config SET factor=100")
+            # Index entries still contain values computed under factor=10.
+            self.assertEqual(c(q),("00000","2"))
+            self.assertEqual(c("SELECT fnlesson.bad_factor(2)"),("00000","200"))
+            self.assertEqual(c("SET enable_seqscan=on")[0],"00000")
+            self.assertEqual(c("SET enable_indexscan=off")[0],"00000")
+            self.assertEqual(c("SET enable_indexonlyscan=off")[0],"00000")
+            code,plan=c("EXPLAIN (COSTS OFF) "+q)
+            self.assertEqual(code,"00000")
+            self.assertIn("Seq Scan",plan)
+            self.assertEqual(c(q),("00000",""))
+            self.assertEqual(c("DROP INDEX fnlesson.fnlesson_bad_idx")[0],"00000")
+            self.assertEqual(c("ALTER FUNCTION fnlesson.bad_factor(integer) STABLE")[0],"00000")
+            self.assertEqual(c("SELECT id FROM fnlesson.item WHERE fnlesson.bad_factor(base)=200"),
+                             ("00000","2"))
+            # Explicit fixed factor is a different, genuinely immutable contract.
+            self.assertEqual(c("CREATE INDEX fnlesson_pure_idx ON "
+                               "fnlesson.item(fnlesson.pure_scale(base,100))")[0],"00000")
+            self.assertEqual(c("SET enable_indexscan=on")[0],"00000")
+            self.assertEqual(c("SET enable_seqscan=off")[0],"00000")
+            good="SELECT id FROM fnlesson.item WHERE fnlesson.pure_scale(base,100)=200"
+            code,plan=c("EXPLAIN (COSTS OFF) "+good)
+            self.assertEqual(code,"00000")
+            self.assertIn("Index Scan using fnlesson_pure_idx",plan)
+            self.assertEqual(c(good),("00000","2"))
+            self.assertEqual(c("SET enable_seqscan=on")[0],"00000")
+            self.assertEqual(c("SET enable_indexscan=off")[0],"00000")
+            self.assertEqual(c(good),("00000","2"))
+        self.assertEqual(self.sql("SELECT count(*),sum(base) FROM fnlesson.item"),"100|5050")
+

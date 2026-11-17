@@ -809,3 +809,7 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 
 ## TD004-SQL-CURSOR-PIVOT-01（2026-11-17；TEXT_PARTIAL / LOCAL_LAB_VERIFIED）
 - 使用者明示續原3.3.4/3.3.5，核心與授權不變。TD004-SQL-CURSOR-PIVOT-01 (2026-11-17): 3.3.4/3.3.5原Markdown，SQLite3.46.1真3/3新方法20斷言位置（首次反序oracle漏第二次跨越，修正後通過），逐列/ROWS與RANGE、cursor重用及101 vs 1查詢、固定/核准動態欄、缺格/NULL/真0/合法重複；22文字/141未讀/13缺/176 L0。[原覆盤](training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)，測試新增tests/test_sql_cursor_pivot_lesson.py並回讀同hash；前輪CI44086356945 exact519/519，原Chrome根因未明，新CI另核。 新增測試與原兩技能、矩陣、主檔及[原覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)整合；新實驗不重跑既有，非原生SQL Server、真獨立遷移或發布。下一輪3.3.6 Ranking，新CI依exact head查。
+
+
+## TD004-SQL-RANKING-01（2026-11-17；TEXT_PARTIAL / LOCAL_LAB_VERIFIED）
+- 使用者明示續原3.3.6，核心與授權不變。TD004-SQL-RANKING-01 (2026-11-17): 3.3.6原Markdown正文；SQLite3.46.1新3/3、22斷言位置，首次rank跳號oracle錯修正後通過；雙索引同分top-N實際差異及穩定鍵修正、ROW_NUMBER/RANK/DENSE_RANK、排名資格/分區、NTILE同分拆組與小組。23文字/140未讀/13缺/176 L0；[原覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)，tests/test_sql_ranking_lesson.py已寫入且hash一致；原CI44088177957 exact522/522，CursorPivotLesson三項納入CI。新CI另核。 原兩技能、矩陣、主檔及原覆盤增量；未重做舊lab。首次PR metadata暫回舊head，停止寫入並回讀分支/PR確認已更新後續作，未重送。無新角色、外部專案、正式部署或真研究驗收。原生SQL Server/25圖/embed及獨立遷移未驗；下一輪3.4.1 View。

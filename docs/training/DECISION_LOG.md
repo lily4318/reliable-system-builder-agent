@@ -663,3 +663,9 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 - 真讀兩個 exact SHA 的三份 APP 檔，內容與 Git blob 各相等：index.html 2254022d7b8eccdaa63b0a9d026b2d53da7c0c57、style.css 644e3481d307ec1e7d2afec822b709b562bd09ae、app.js df98563e19bea4b5919ee52b23316eaaaaa2c6b6。首答版本、CI、scope、2/6、費用目標、授權限制、下一步及如實揭露均與原來源一致，內容查核 PASS；未見重做/越權等行為的文字證據，未獨立取得新對話操作 trace，不能據此證其所有操作。其 REPO_NATIVE 自述同時說唯讀操作：如實只有唯讀權則依 AGENTS 使用 READ_ONLY，若有寫權但選擇唯讀則 REPO_NATIVE 可相容；工具實際權限未證，非本輪已見越權或功能缺陷。
 - A07 overall PARTIAL（真新對話依使用者回報成立，內容 corroborated，source-only 獨立性未證），非產品能力 FAIL；保留原 history-assisted 證據，不再重跑已核內容、不要求相同新對話重試。最小補證：若原測試對話仍開啟，只請其釐清「部分先前對話背景」是否包含本專案歷史/答案（僅分類，勿披露隱藏指令或私人資料），以及列實際可公開的來源/工具證據、哪些未取得；使用者可附已存在模式/來源畫面（不必更改設定）。後續自述/截圖不能證明絕對無隱藏上下文，若實質隔離與來源證據仍不足則保留 PARTIAL，提出不同可用隔離環境或徵求使用者明示在 A07 未關閉時先驗 APP（只改順序、不降標準、不自動完成 M2-2）。若原暫時聊天已關閉則回報即可，不要求重開不存在的紀錄。使用者本輪條件為 A07 通過才提供 APP 操作，故本輪不進 APP/B10、不重包、不提前 M3/C3/M4。
 - 依原 TD-005 及 ACCEPTANCE-PLAN-006，仍 2/6、M2-2 PARTIAL、HUMAN_LOCAL_UAT_PENDING、B10 pending、NT$0、原日期及獨立授權不變。只保存最少去識別查核摘要，不保存私有聊天全文、任何私人識別、Cookie/Token 或隱藏上下文。候選分支寫後回讀及例行 CI 分開，main/release/APP/部署不動。
+
+
+## TD-005｜A07 原暫時聊天已關閉（2026-11-17；EVIDENCE_RETAINED / ORIGINAL_SESSION_FOLLOWUP_BLOCKED）
+- 使用者回報「暫時聊天已經關閉」。先核最新候選 a1bf0070ac3d40e864e9c91240140fe640c64b33、主檔及決策、原 ACCEPTANCE-PLAN-006；CI 44005425734 completed/success（run metadata，非新增真人驗收）。依前一輪原協定，原對話追加來源及背景分類補證不可行；不要求復原、重開或重複相同測試，不推定平台隔離原因及不要求私人資料。
+- 保留前輪已核對的首答內容、版本、CI、三 APP blob 與使用者回報的真新對話；A07 仍 CONTENT_CORROBORATED / SOURCE_ONLY_PARTIAL，不標 PASS/FAIL 或全部完成。建議將獨立性缺口與 APP 真人操作分開，待使用者明確確認只調整 M2-2 驗收次序後，先做原 APP 真人 UAT 及適用 B10；獨立性 gate 不取消，日後有不同且實際可驗的隔離與來源證據途徑再補。若已有截圖或來源紀錄可用則接受，不要求重新製作；若無則直接保留未證，避免無效反覆嘗試。本輪尚未獲次序調整確認，依原條件停在人決策處，不進 APP 操作、不重包、不提前 M3/C3/M4。
+- M2-2 partial、2/6、NT$0、原日期目標及所有獨立授權不變。僅增量候選主檔/決策/原驗收方案，無產品程式、main、release、部署改動。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。寫後回讀及 CI 另核。

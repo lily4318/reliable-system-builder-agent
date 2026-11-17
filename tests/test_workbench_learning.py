@@ -70,6 +70,50 @@ class LearningTest(unittest.TestCase):
         self.assertIn(result['memory_id'],[m['id'] for m in self.ctx()['review_candidates']])
         self.assertNotIn(result['memory_id'],[m['id'] for m in self.ctx()['memory']])
 
+    def test_confirmed_work_preference_across_unrelated_tasks(self):
+        mid = wb.remember(self.p,'preference','communication style',
+                          'Use short written explanations','explicit synthetic instruction','user-stated')['memory_id']
+        for skill, task, query in (('debug-and-repair','SQL-DIAG','SQLite inventory'),
+                                  ('project-intake','TEACHING-NEW','lecture design accessibility')):
+            ctx = learn.task_context(self.p,skill,task,query,limit=1)
+            self.assertEqual([m['id'] for m in ctx['work_preferences']],[mid])
+            self.assertNotIn(mid,[m['id'] for m in ctx['memory']])
+            self.assertFalse(ctx['authorization_granted'])
+        inp = self.root/'pref.json'
+        inp.write_text(json.dumps({'skill':'project-intake','task':'FUTURE-TASK','query':'astronomy telescope'}),encoding='utf-8')
+        res = subprocess.run([sys.executable,'-m','src.workbench_learning','context','--workspace',str(self.p),'--input',str(inp)],capture_output=True,text=True,check=True)
+        self.assertEqual([m['id'] for m in json.loads(res.stdout)['work_preferences']],[mid])
+        other = wb.initialize(self.root/'other-pref','synthetic separate')
+        learn.setup(other)
+        self.assertEqual(learn.task_context(other,'project-intake','OTHER','astronomy')['work_preferences'],[])
+
+    def test_preference_conflict_candidate_resolution_and_budget(self):
+        mid = wb.remember(self.p,'preference','communication style','Concise replies',
+                          'explicit synthetic preference','user-stated')['memory_id']
+        bad = learn.feedback(self.p,'T-OTHER','s1','evt-pref-tp010','preference',
+                             'communication style','Long replies','unconfirmed change')['memory_id']
+        ctx = learn.task_context(self.p,'project-intake','T-NEW','astronomy')
+        self.assertEqual(ctx['work_preferences'],[])
+        self.assertEqual(ctx['preference_review'],[{'topic':'communication style','ids':[mid,bad]}])
+        with self.assertRaises(ValueError):
+            wb.resolve(self.p,mid,bad,'must not replace confirmed with candidate')
+        wb.resolve(self.p,bad,mid,'synthetic confirmed rejection')
+        self.assertEqual([m['id'] for m in learn.task_context(self.p,'project-intake','T-NEW','astronomy')['work_preferences']],[mid])
+        big = wb.remember(self.p,'preference','another topic','x'*300,'explicit fixture','user-stated')['memory_id']
+        tiny = learn.task_context(self.p,'project-intake','T-NEW','astronomy',budget=256)
+        self.assertEqual(tiny['status'],'NEEDS_FULL_READ')
+        self.assertIn(big,tiny['omitted_work_preference_ids'])
+        self.assertNotIn('x'*300,json.dumps(tiny))
+        self.assertLessEqual(tiny['payload_chars'],256)
+        self.assertFalse(tiny['authorization_granted'])
+        newer = wb.remember(self.p,'preference','communication style','Concise plus headings',
+                            'second explicit fixture','user-stated')['memory_id']
+        wb.resolve(self.p,mid,newer,'synthetic confirmed replacement')
+        later = learn.task_context(self.p,'project-intake','T-LATER','chemistry')
+        self.assertIn(newer,[x['id'] for x in later['work_preferences']])
+        self.assertNotIn(mid,[x['id'] for x in later['work_preferences']])
+        self.assertNotIn('work_preferences',learn.public_context('project-intake','PUBLIC','chemistry'))
+
     def test_case_citation_persists_in_new_process(self):
         mid = self.ctx()['memory'][0]['id']
         result = learn.cite(self.p,'debug-and-repair','SYN-LAB-3','session-1',self.query,mid,'applied','synthetic repair test')

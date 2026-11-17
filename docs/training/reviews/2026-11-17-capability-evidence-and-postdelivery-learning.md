@@ -117,3 +117,9 @@ A. 維持現有分層而只增加紀錄（不建議，容易增加查閱負擔�
 B. 推薦將原唯一主檔頂部/有效決策與授權私人記憶形成小型開工閱讀順序；不另建平行主檔。開工以任務/目標/最新 source/有效決策/必要角色技能及相關 1–3 EP/真工具權限/下一成果為可查的最小證據。明示且允許保存的回饋即分類：持久偏好、專案規格、此次例外、工程候選經驗、禁止/安全；就原權責位置增量寫入、回讀、回覆實際保存位置；私人偏好只能在授權私人位置或原對話。可採原蒸餾機制定期精簡有效條目，保留歷史，不用日期自動覆蓋安全或專案正式規格。結案查實際讀/採用/拒絕及正負測，下一不同任務用實際成果驗生效；缺來源獨立性明示。P0 先核是否已有功能、修訂不一致／增加最小回歸、以真正不同任務核執行遵循，P1 教材並行；不增管理引擎。
 C. 完整複製原範本的文件結構或強迫本機工作台（不建議，環境/保密/工程需求不同）。
 本輪僅對照與提出建議，沒有批准 B、修改運行規則/技能、設定私人工作台、修改教材矩陣、執行新訓練或部署。P0/P1 優先仍依 TD-005-R2，原 A07/B10/M3-2/M4 與安全授權保留。
+
+
+## TP-010｜確認及增量實作（2026-11-17；CONFIRMED / P0_IMPLEMENTED_PENDING_CI）
+- 使用者明示採用 TP-010 改善方向：開工必讀、使用者工作記憶、日常回饋、知識蒸餾、真實運用，P0-1–5 原機制增量、正負測及跨任務，P1 同步、不建重複主檔或管理引擎。原基準 1a4801f52f06663633d9558046424ac9a7e6f391，CI 44023083755 success（metadata）。實讀原 catalog、workspace code/既有測試、適用角色技能及 R2 正式決策。
+- 原 remember/feedback（候選）、distill/resolve（人工衝突）、case context/cite/history、PM 兩次停點均保留。實際缺口：舊 _context 所有記憶經 lexical filter，明示有效偏好可在新無關任務被漏；部分文件殘留舊交付優先。新增原 _context 的 work_preferences（唯一、active,user-stated、private workspace）、preference_review 衝突 ID、omitted_work_preference_ids/NEEDS_FULL_READ；不變 schema/table，不跨 workspace/公開讀取或新增管理引擎。修原啟動、共同規則、相關角色與技能；未增加新角色/skill。既有 PM 停止規則足夠，工具可達性/證據 guard 用原共同規則，下一真任務核落實。
+- 新原測試兩方法涵蓋無關 task/skill/query、新 subprocess、另一私有 workspace、衝突、候選不可覆蓋、resolve/退休、預算及公開界線。未執行新 CI 前不稱測試通過；container DNS 無法取得 GitHub checkout，未聲稱本機真紅綠。實際 LLM 跨任務遵循及來源獨立 A07 待證。P1 已定位原八章備份與目錄，讀 1.1.1/1.2.1/2.2.2/2.2.4 文字（圖片/嵌入未齊），待 P1 獨立矩陣工作；不寫私人 Drive、原文或個資。R2/未驗門檻/NT$0 維持，不改 main/APP/workflow/release/Pages branch，不接管外部專案。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。

@@ -19,4 +19,4 @@ review 必須同時檢查 task revision、recovery_review、recovery_blockers �
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 resume-note；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。
 
 ### 跨對話的能力收斂接續（CAPABILITY-CONVERGENCE-005）
-從最新主檔 NEXT_ACTION 與有效決策查有界訓練停點是否僅建議、原 M2-2/A07/B10/UAT 與部署授權；不因訓練完成假定交付完成。查原 APP blob、exact CI run/checkout/tree 與各自 local/model lab 原證據；不泛化 CI 綠燈至未執行 lab。真新對話 source-only 驗收另行，訓練停點後等使用者決定驗收順序，不重問已有授權或盲接下一階段。詳 [原覆盤](../../../docs/training/reviews/2026-11-16-research-handoff.md)。
+從最新主檔 NEXT_ACTION 與有效決策查有界訓練停點、原 M2-2/A07/B10/UAT 與部署授權；TP-010 先核開工記憶與真工具，R2 專業訓練不受交付餘項阻塞；不因訓練完成假定交付完成。查原 APP blob、exact CI run/checkout/tree 與各自 local/model lab 原證據；不泛化 CI 綠燈至未執行 lab。真新對話 source-only 驗收另行，歷史首版停點不阻 R2 專業訓練；外部驗收與發布另核授權，不重問已有授權或盲接下一階段。詳 [原覆盤](../../../docs/training/reviews/2026-11-16-research-handoff.md)。

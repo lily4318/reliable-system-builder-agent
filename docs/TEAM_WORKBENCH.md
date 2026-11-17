@@ -22,6 +22,10 @@ PM 的 project-scope（前置 specification）→ project-control → delivery-r
 | REPO_NATIVE | 授權 GitHub 或等效版本化 repo 存取，沒有可用私人工作區 | 在指定 repo 原檔／原 PR／原進度紀錄工作；讀確切 SHA、驗證依賴、diff、寫後回讀及 exact CI；只保存可公開的工程證據 |
 | READ_ONLY | 只有讀取或對話工具 | 可完成唯讀分析及可編輯方案，不能宣稱寫入、執行測試或持久保存 |
 
+### TP-010｜工作偏好及回饋閉環
+
+原私人 `workbench_learning context` 新欄 `work_preferences` 是當前 workspace 唯一、未退休的 user-stated preference（不按關鍵字或可選案例 limit）；`preference_review` 是至少一個明示偏好但同 topic 衝突的 ID，不能自行選；`omitted_work_preference_ids` 是預算不足的未載入偏好，標 NEEDS_FULL_READ（若缺必要前置則 NEEDS_PREREQUISITES 優先）。前置內容先載入，不超預算、不重複列偏好，`memory` 為其他相關知識；原候選、去重、衝突處理不變。只有已授權私人工作台可用，public-context 無私人偏好。操作者只將明確持久偏好分類 user-stated；非自動認證或授權。REPO_NATIVE 只讀當前主檔/有效決策與必要技能/案例，實際讀取、採用或不採用及原權責保存/回讀，不造假工作台；無私人位置則明示未持久化。
+
 ### REPO_NATIVE：只具 GitHub 讀寫工具時的實際步驟
 
 1. 先釐清工作屬於通用 Agent 自身還是外部專案（不得自動跨案），以最新正式來源、分支、授權及必要前置資料為準。選擇 catalog 的必要 role/skill，讀實際文件，若有缺前置就補讀或阻塞受影響步驟。沒有獨立子代理工具時明示 SINGLE_AGENT_ROLE_WORK。

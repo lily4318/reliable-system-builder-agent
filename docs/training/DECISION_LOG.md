@@ -735,3 +735,9 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 ## TP-010｜開工、需求記憶與原團隊範本對照（DISCUSSION / PROPOSED）
 - 使用者詢問 Agent 每次如何開始訓練、需求討論後寫入何處，以及與原始團隊訓練範本的差異及改進。此次實讀已授權私人教材備份的啟動說明、團隊總規則、使用者訪談技能、回饋與蒸餾技能及九技能目錄；未讀個案或私人品牌資料，未全面審查九技能。公開 repo 不保存私人 Drive 位址、個案、手冊內容或教材原文，僅記本 Agent 的原創改善分析；完整對照留原授權對話。查原候選 START_HERE/AGENTS、主檔與決策、catalog、workbench、需求訪談流程、工程知識索引、project-intake/project-control/resume-project/learn-from-feedback/knowledge-distillation 與教材矩陣；基準 14b5c7df80226db14993697e1dee51ee0ec22866，前次 R2 CI 44018479117 completed/success（run metadata，非本輪重跑）。原 R2、P0/P1 與停用決策不改。
 - 建議 B：不照搬範本、不建第二主檔，利用原有效決策及有授權的私人記憶提高開工簡潔性、回饋分類、實際保存回讀、跨任務生效證據；詳[原覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。原 project-control 已有阻塞停止與獨立續作，優先檢驗落實而非重寫。建議尚待使用者確認，沒有新的正式決策或外部授權，R2/P0/P1 不變。本輪只增量記錄分析，未執行新訓練。
+
+
+## TP-010｜確認及增量實作（2026-11-17；CONFIRMED / P0_IMPLEMENTED_PENDING_CI）
+- 使用者明示採用 TP-010 改善方向：開工必讀、使用者工作記憶、日常回饋、知識蒸餾、真實運用，P0-1–5 原機制增量、正負測及跨任務，P1 同步、不建重複主檔或管理引擎。原基準 1a4801f52f06663633d9558046424ac9a7e6f391，CI 44023083755 success（metadata）。實讀原 catalog、workspace code/既有測試、適用角色技能及 R2 正式決策。
+- 原 remember/feedback（候選）、distill/resolve（人工衝突）、case context/cite/history、PM 兩次停點均保留。實際缺口：舊 _context 所有記憶經 lexical filter，明示有效偏好可在新無關任務被漏；部分文件殘留舊交付優先。新增原 _context 的 work_preferences（唯一、active,user-stated、private workspace）、preference_review 衝突 ID、omitted_work_preference_ids/NEEDS_FULL_READ；不變 schema/table，不跨 workspace/公開讀取或新增管理引擎。修原啟動、共同規則、相關角色與技能；未增加新角色/skill。既有 PM 停止規則足夠，工具可達性/證據 guard 用原共同規則，下一真任務核落實。
+- 新原測試兩方法涵蓋無關 task/skill/query、新 subprocess、另一私有 workspace、衝突、候選不可覆蓋、resolve/退休、預算及公開界線。未執行新 CI 前不稱測試通過；container DNS 無法取得 GitHub checkout，未聲稱本機真紅綠。實際 LLM 跨任務遵循及來源獨立 A07 待證。P1 已定位原八章備份與目錄，讀 1.1.1/1.2.1/2.2.2/2.2.4 文字（圖片/嵌入未齊），待 P1 獨立矩陣工作；不寫私人 Drive、原文或個資。R2/未驗門檻/NT$0 維持，不改 main/APP/workflow/release/Pages branch，不接管外部專案。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。

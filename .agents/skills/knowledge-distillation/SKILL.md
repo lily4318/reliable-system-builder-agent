@@ -26,3 +26,7 @@ description: "整理學到的事、蒸餾。learning-evaluator 角色；交付 k
 
 ### 既有技能的證據覆核（CAPABILITY-CONVERGENCE-005）
 沿原 catalog 與已存在的覆盤增量對照各 skill 的真實測試方法、raw log、精確 run/checkout/tree、適用限制與是否為 same source。共享方法只計一次；15/15 skill 有 evidence entry 不等同獨立評測或 L6，review lab 不在 CI discover 範圍時保留各自執行紀錄、確認 blob，不自動重跑。缺口若不阻礙原 MUST 或屬未來獨立授權/真人驗收，明示延後而非製造合成訓練。詳 [15 項原始日誌對照](../../../docs/training/reviews/2026-11-16-research-handoff.md)。
+
+
+### TP-010｜有效記憶精簡與遷移
+原 distill/resolve 處理同 topic 去重與衝突，candidate 不取代 user-stated，不用新日期覆蓋安全。主檔頂部維持有效規則與接續，歷史保留。用原案例及不同真任務的可比實際結果查採用/拒絕，未驗不升格。

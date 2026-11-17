@@ -560,15 +560,21 @@
       "id": "2.2.7",
       "title": "資料庫正規化",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_normalization",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "1533af2a5ab3be071489efe4faa1bebaf25e4d0d23a890b6d3a4706ad7b6aa48",
+      "access": "READABLE",
       "owner": "architect",
-      "collaborators": [],
+      "collaborators": [
+        "developer",
+        "qa-uat"
+      ],
       "skill": "architecture-design",
-      "prerequisites": [],
+      "prerequisites": [
+        "2.2.2",
+        "2.2.3"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "原 Markdown 正文已讀，20圖/共用嵌入未取得；L0保留。TD004-DB-NORMAL-01 真SQLite 三方法中前兩方法驗資料異常、2NF/3NF依賴拆分、BCNF無損/依賴保留差異及事件值；未實測效能、完整4NF/5NF或原圖練習。先核缺圖及前置，不阻其他單元。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -576,15 +582,21 @@
       "id": "2.2.8",
       "title": "關聯性",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_relation",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "0e6dfc5846eb877119f74230c1e08bac552480d89f76d5aefd884ac9546f960f",
+      "access": "READABLE",
       "owner": "architect",
-      "collaborators": [],
+      "collaborators": [
+        "developer",
+        "qa-uat"
+      ],
       "skill": "architecture-design",
-      "prerequisites": [],
+      "prerequisites": [
+        "2.2.2",
+        "2.2.7"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "原 Markdown 正文已讀，44圖/共用嵌入未取得；L0保留。TD004-DB-NORMAL-01 真SQLite第三方法驗版本複合FK/NO ACTION/CASCADE/SET NULL與歷史不隨新版本變更；未驗不可變寫入權限、SQL Server T-SQL、全部關聯動作或原圖。前置仍L0。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

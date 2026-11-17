@@ -199,4 +199,88 @@ class IdentityAndTypeLesson(unittest.TestCase):
                     db.execute('INSERT INTO observation VALUES (?,?,?)', ('bad',amount,start))
             self.assertEqual(db.execute('SELECT * FROM observation ORDER BY code').fetchall(), before)
 
+class NormalizationRelationLesson(unittest.TestCase):
+    def test_normalize_independent_entities_and_temporal_facts(self):
+        with sqlite3.connect(':memory:') as db:
+            db.execute('PRAGMA foreign_keys=ON')
+            db.executescript('''CREATE TABLE flat (person TEXT NOT NULL, protocol TEXT NOT NULL,
+              label TEXT NOT NULL, unit TEXT NOT NULL, amount INTEGER NOT NULL,
+              PRIMARY KEY(person,protocol));
+              INSERT INTO flat VALUES ('P1','R1','Initial','lab-A',100),('P2','R1','Initial','lab-A',120);''')
+            db.execute("UPDATE flat SET label='Revised' WHERE person='P1'")
+            self.assertEqual(db.execute('SELECT COUNT(DISTINCT label) FROM flat').fetchone(), (2,))
+            with self.assertRaises(sqlite3.IntegrityError):
+                db.execute("INSERT INTO flat VALUES (NULL,'R2','New','lab-A',0)")
+            db.execute("DELETE FROM flat WHERE protocol='R1'")
+            self.assertEqual(db.execute('SELECT COUNT(*) FROM flat').fetchone(), (0,))
+            db.executescript('''CREATE TABLE unit (id TEXT PRIMARY KEY NOT NULL, name TEXT NOT NULL);
+              CREATE TABLE protocol (id TEXT PRIMARY KEY NOT NULL, label TEXT NOT NULL, unit_id TEXT NOT NULL REFERENCES unit(id));
+              CREATE TABLE person (id TEXT PRIMARY KEY NOT NULL);
+              CREATE TABLE participation (person_id TEXT NOT NULL REFERENCES person(id), protocol_id TEXT NOT NULL REFERENCES protocol(id),
+                amount_at_event INTEGER NOT NULL, PRIMARY KEY(person_id,protocol_id));
+              INSERT INTO unit VALUES ('U1','lab-A');
+              INSERT INTO protocol VALUES ('R1','Initial','U1'),('R2','New','U1');
+              INSERT INTO person VALUES ('P1'),('P2');
+              INSERT INTO participation VALUES ('P1','R1',100),('P2','R1',120);''')
+            sql='SELECT person_id,protocol_id,label,name,amount_at_event FROM participation JOIN protocol ON protocol_id=protocol.id JOIN unit ON unit_id=unit.id ORDER BY person_id'
+            self.assertEqual(db.execute(sql).fetchall(), [('P1','R1','Initial','lab-A',100),('P2','R1','Initial','lab-A',120)])
+            db.execute("UPDATE protocol SET label='Revised' WHERE id='R1'")
+            db.execute("UPDATE unit SET name='lab-B' WHERE id='U1'")
+            self.assertEqual(db.execute(sql).fetchall(), [('P1','R1','Revised','lab-B',100),('P2','R1','Revised','lab-B',120)])
+            self.assertEqual(db.execute("SELECT count(*) FROM protocol WHERE id='R2'").fetchone(), (1,))
+            db.execute("DELETE FROM participation WHERE protocol_id='R1'")
+            self.assertEqual(db.execute('SELECT id FROM protocol ORDER BY id').fetchall(), [('R1',),('R2',)])
+
+    def test_bcnf_lossless_does_not_preserve_every_dependency(self):
+        with sqlite3.connect(':memory:') as db:
+            db.execute('PRAGMA foreign_keys=ON')
+            db.executescript('''CREATE TABLE mentor (id TEXT PRIMARY KEY NOT NULL, topic TEXT NOT NULL);
+              CREATE TABLE assignment (learner TEXT NOT NULL, mentor_id TEXT NOT NULL REFERENCES mentor(id), PRIMARY KEY(learner,mentor_id));
+              INSERT INTO mentor VALUES ('M1','T1'),('M2','T1');
+              INSERT INTO assignment VALUES ('L1','M1'),('L2','M2');''')
+            query='SELECT learner,topic,mentor_id FROM assignment JOIN mentor ON mentor_id=mentor.id ORDER BY learner,mentor_id'
+            self.assertEqual(db.execute(query).fetchall(), [('L1','T1','M1'),('L2','T1','M2')])
+            # Assumed rule: (learner, topic) determines mentor; mentor determines topic.
+            db.execute("INSERT INTO assignment VALUES ('L1','M2')")
+            self.assertEqual(db.execute('PRAGMA foreign_key_check').fetchall(), [])
+            self.assertEqual(db.execute('SELECT learner,topic FROM assignment JOIN mentor ON mentor_id=mentor.id GROUP BY learner,topic HAVING count(*)>1').fetchall(), [('L1','T1')])
+            db.executescript('''CREATE TABLE assigned (learner TEXT NOT NULL,topic TEXT NOT NULL,mentor_id TEXT NOT NULL,PRIMARY KEY(learner,topic));
+              INSERT INTO assigned VALUES ('L1','T1','M1');''')
+            with self.assertRaises(sqlite3.IntegrityError):
+                db.execute("INSERT INTO assigned VALUES ('L1','T1','M2')")
+            # The retained 3NF relation still needs enforcement of mentor -> topic; not a complete schema.
+            self.assertEqual(db.execute('SELECT * FROM assigned').fetchall(), [('L1','T1','M1')])
+
+    def test_relationship_lifecycle_and_versioned_history(self):
+        with sqlite3.connect(':memory:') as db:
+            db.execute('PRAGMA foreign_keys=ON')
+            db.executescript('''CREATE TABLE protocol_version (protocol TEXT NOT NULL, version INTEGER NOT NULL, label TEXT NOT NULL, PRIMARY KEY(protocol,version));
+              CREATE TABLE run (id INTEGER PRIMARY KEY, protocol TEXT NOT NULL, version INTEGER NOT NULL,
+                 FOREIGN KEY(protocol,version) REFERENCES protocol_version(protocol,version) ON DELETE NO ACTION);
+              CREATE TABLE draft (id INTEGER PRIMARY KEY, run_id INTEGER NOT NULL REFERENCES run(id) ON DELETE CASCADE);
+              CREATE TABLE optional_tag (id INTEGER PRIMARY KEY);
+              CREATE TABLE annotation (id INTEGER PRIMARY KEY, tag_id INTEGER REFERENCES optional_tag(id) ON DELETE SET NULL);
+              INSERT INTO protocol_version VALUES ('R1',1,'baseline'),('R1',2,'revision');
+              INSERT INTO run VALUES (10,'R1',1),(11,'R1',2);
+              INSERT INTO draft VALUES (1,10),(2,11);
+              INSERT INTO optional_tag VALUES (1);
+              INSERT INTO annotation VALUES (1,1);''')
+            old='SELECT run.id,label FROM run JOIN protocol_version USING(protocol,version) ORDER BY run.id'
+            self.assertEqual(db.execute(old).fetchall(), [(10,'baseline'),(11,'revision')])
+            db.execute("INSERT INTO protocol_version VALUES ('R1',3,'later')")
+            self.assertEqual(db.execute(old).fetchall(), [(10,'baseline'),(11,'revision')])
+            db.commit()
+            with self.assertRaises(sqlite3.IntegrityError), db:
+                db.execute("DELETE FROM protocol_version WHERE protocol='R1' AND version=1")
+            self.assertEqual(db.execute(old).fetchall(), [(10,'baseline'),(11,'revision')])
+            with self.assertRaises(sqlite3.IntegrityError), db:
+                db.execute("INSERT INTO run VALUES (12,'R1',99)")
+            # Cascade only for the disposable draft relationship; no production deletion authorization.
+            db.execute('DELETE FROM run WHERE id=11')
+            self.assertEqual(db.execute('SELECT * FROM draft').fetchall(), [(1,10)])
+            self.assertEqual(db.execute('SELECT * FROM protocol_version ORDER BY version').fetchall(), [('R1',1,'baseline'),('R1',2,'revision'),('R1',3,'later')])
+            db.execute('DELETE FROM optional_tag WHERE id=1')
+            self.assertEqual(db.execute('SELECT * FROM annotation').fetchall(), [(1,None)])
+            self.assertEqual(db.execute('PRAGMA foreign_key_check').fetchall(), [])
+
 if __name__ == '__main__': unittest.main(verbosity=2)

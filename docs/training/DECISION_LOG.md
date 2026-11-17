@@ -768,3 +768,7 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 ## TD-006｜核心訓練準則（2026-11-17；USER_REQUESTED / CANONICAL_GUIDE）
 - 使用者本輪要求提取原 Agent 訓練範本核心，形成一份文件供未來網站建設 Agent 訓練不偏離。重新實讀原第一天版 00_先看這裡.md、AGENTS.md、九項 SKILL.md；沿已完成 TP-010-AUDIT-01 之對照，不重做全面稽核。提煉先認識使用者、開工記憶、專業分工、共用空間、真實依據與產出、日常回饋、蒸餾、成效改善八核心；原行銷/本機細節不直接移植。
 - 新增唯一長期準則 [CORE_TRAINING_PRINCIPLES.md](CORE_TRAINING_PRINCIPLES.md)，由原 START_HERE/AGENTS/訓練主檔索引並要求每輪實讀；命名與八項歸納為本次整理選擇，延續已確認原決策，非另一份主檔或新增能力機制。原 NEXT_ACTION 與 R2/TP010、TD004、既有未驗與安全限制均保留。基準 cdf09a1bdd785fac3d3a0be5a6630d99ab2c30cc；CI 44027038088 completed/success（metadata）。本輪文檔更新，不重跑舊 lab，不證明未來自主遵循或獨立模型能力、不改 main/release/外部專案/APP/部署、不公開私人資料。後續真任務依原覆盤查採用，無需另作管理訓練。
+
+
+## TD004-DB-NORMAL-01（2026-11-17；LOCAL_LAB_VERIFIED / TEXT_PARTIAL）
+- 使用者要求依 TD-006 與最新主檔續專業訓練，已實際採用核心準則與EP-05/13；2.2.7/8原Markdown正文、真SQLite三方法21斷言通過；教材圖/嵌入、原生T-SQL與真獨立遷移未驗，8文字可讀/155未讀/13缺、176 L0。原技能/測試/matrix與[原覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)增量，無新管理機制或方向變更。下一輪2.2.6索引及不同可讀單元，原有安全、授權及R2不變。

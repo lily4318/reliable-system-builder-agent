@@ -62,3 +62,7 @@ description: "設計架構、比較方案。architect 角色；交付 architectu
 
 ### TD-004｜資料身份、型別與跨庫映射（TD004-DB-KEYTYPE-01）
 辨認業務鍵、local surrogate、跨來源 stable identity 與授權是不同契約；依穩定度、分布、查詢與整合選自然鍵/整數/原生UUID或混合，另保業務唯一約束。跨庫匯入以可追溯來源鍵→目的鍵映射、交易及固定預期父子語意驗收，FK 合法不代表資料對。欄位以核定資料字典的單位、語意、值域、精度、時區選型（非數字識別碼保留 leading zeros；精確定點用途適用原生decimal或有範圍的縮放整數）。實際查詢用起點包含/終點排除，時區及精度以實際契約驗；SQL Server rowversion/timestamp 非日期時間，datetime2 表示精度非物理測量準確度。原教材 SQL Server 特定建議不得泛化；用原有命名與 schema，不為風格重命名。參見[原實證](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)與既有 test_research_data.py 新 class，SQLite 局部證據，非 T-SQL 實機/UUID效能/完整教材或正式研究。
+
+
+### TD-004｜正規化、依賴保留與歷史事實（TD004-DB-NORMAL-01）
+先從業務規格列候選鍵、功能依賴、關聯基數及資料生命週期，核1NF/2NF/3NF/BCNF而非只算拆表數；無損接合及依賴保留分別核。BCNF可能失去原唯一性規則；若不能可靠強制，保留適當3NF或設計可交易驗證之約束。區分現行主檔值與交易當時值/研究版本，事件金額、原規格與研究測量不能因當前主檔變更而被重算；以來源/版本外鍵與必要不可變權限契約保留。NO ACTION為保守起點，CASCADE限明確可同生命週期處理的資料，SET NULL/DEFAULT須合語意、合法父鍵與留存政策；外鍵不等於授權。反正規化前核實負載/索引/延遲/重建與對帳。原SQLite三方法見[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)，非正式研究刪除政策、全部引擎或效能實證。

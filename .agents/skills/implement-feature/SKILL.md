@@ -43,3 +43,7 @@ tryLock 失敗不寫、finally release，鎖內重新查 id/receipt/容量；Spr
 
 ### TD-004｜跨來源整合與有界CTE（TD004-SQL-CTE-01）
 依核定資料契約明示每個分支的欄序、語意、型別、值域、單位及來源版本/記錄鍵；禁止只靠欄數相同/CAST成功/UNION去重判合法。保留原值與拒絕診斷，識別碼不得數值化；轉型依實際引擎，非單一小樣本validator。重構CTE須保留比較精度與分母，展示格式於計算之後。遞迴以可信scope及根、內部終止/深度、無歧義路徑與循環拒絕或標記、結果/資源預算，明示截斷/未知而非完整成功；路徑與唯一節點語意分開，先核是否允許多父節點，禁止無界MAXRECURSION 0。CTE非永久快照或保證物化；原合成SQLite見[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)，真引擎/權限/完整性與負載另驗。
+
+
+### TD-004｜逐列處理及寬表統計契約（TD004-SQL-CURSOR-PIVOT-01）
+逐列處理先核行順序、同序值的穩定鍵、狀態轉移與資源釋放；有集合/視窗等價方案時以逐鍵oracle比較，ROWS/RANGE、ties與負值跨越不能互換。避免同cursor重執行覆蓋迭代結果及N+1查詢；有真正逐筆依賴再選游標/分批，交易和錯誤清理獨立確認。寬表先確定粒度、穩定鍵、核准欄位/順序、聚合和觀測單位；保留rows/valid/value區分缺格、全NULL、真0與合法重複，原事件另存，聚合非可逆。動態欄位由可信白名單映射識別名，值參數化，額外分類明示診斷及處理政策；固定欄不能因無資料消失。顯示空白、型別格式及總計列與原值/分類分開。詳[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)；SQLite Python cursor/FILTER不等於原生T-SQL Cursor/PIVOT/UNPIVOT，真研究統計、引擎鎖、效能與權限另驗。

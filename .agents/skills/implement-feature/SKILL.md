@@ -47,3 +47,7 @@ tryLock 失敗不寫、finally release，鎖內重新查 id/receipt/容量；Spr
 
 ### TD-004｜逐列處理及寬表統計契約（TD004-SQL-CURSOR-PIVOT-01）
 逐列處理先核行順序、同序值的穩定鍵、狀態轉移與資源釋放；有集合/視窗等價方案時以逐鍵oracle比較，ROWS/RANGE、ties與負值跨越不能互換。避免同cursor重執行覆蓋迭代結果及N+1查詢；有真正逐筆依賴再選游標/分批，交易和錯誤清理獨立確認。寬表先確定粒度、穩定鍵、核准欄位/順序、聚合和觀測單位；保留rows/valid/value區分缺格、全NULL、真0與合法重複，原事件另存，聚合非可逆。動態欄位由可信白名單映射識別名，值參數化，額外分類明示診斷及處理政策；固定欄不能因無資料消失。顯示空白、型別格式及總計列與原值/分類分開。詳[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)；SQLite Python cursor/FILTER不等於原生T-SQL Cursor/PIVOT/UNPIVOT，真研究統計、引擎鎖、效能與權限另驗。
+
+
+### TD-004｜排名與研究母群契約（TD004-SQL-RANKING-01）
+先確定分析粒度、合資格母群/缺失政策、完整分區鍵、排名方向與同分處理。固定筆數用ROW_NUMBER加核准次排序唯一鍵；RANK依分數peer且跳號、DENSE_RANK依不同值等級，保留同分時不得把ID加入名次ORDER BY；外層展示另明示穩定排序。排名前後篩選不能互換；跨研究/組別分區非ACL、ROW_NUMBER非持久識別或跨版本固定名單。NTILE近似均分列，可拆同分及產生少於N個非空組，非分位數切點或隨機分派；研究資格及tie-break需核准，不以資料庫預設代替研究設計。詳[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)；SQLite合成實驗非SQL Server或真研究。

@@ -776,3 +776,7 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 
 ## TD004-DB-INDEX-01（2026-11-17；TEXT_PARTIAL / LOCAL_LAB_VERIFIED）
 - 依本輪指令、核心準則及TD004-DB-NORMAL-01續作，實讀2.2.6原Markdown與官方技術文件、採EP-08/13；SQLite 3.46.1 五索引設計40000筆讀取、四設計5000筆增寫/更新2/2 PASS，固定結果、真plan、VM callbacks、配置頁及實測耗時。保留原圖/SSMS/真SQL Server/外部遷移限制，9 READABLE文字/154 UNREAD/13缺、L0。既有技能、矩陣、測試、[覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)增量。前輪 CI44043614630 唯一瀏覽器DevToolsActivePort錯誤，後續gate未通過，根因未驗；不誤判資料庫實作失敗、不手動重跑原驗收。下一輪2.2.9資料匯入及必要非重複診斷，既有授權不變。
+
+
+## TD004-DB-IMPORT-01（2026-11-17；TEXT_PARTIAL / LOCAL_LAB_VERIFIED）
+- 使用者依核心準則續原2.2.9。原Markdown/SQL與Microsoft官方文件，採EP-01/05/13；SQLite 3.46.1 新class 3/3 PASS，23 assert sites，4筆資料5拒絕原因、4格式負例、收據失敗整批rollback、count/sum相同但逐值錯置負例。原10文字可讀/153未讀/13缺，L0保留；原圖/Excel/SSMS/樣本/SQL Server及真外部移轉未驗。更新原skill、測試與[原覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。前輪CI44044299687 exact519/519成功，瀏覽器啟動錯誤未再現但根因未確認。下一輪2.2.10 Security 新缺口，不重做既有RLS/ACL；核心及授權不變。

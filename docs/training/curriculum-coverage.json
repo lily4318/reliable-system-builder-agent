@@ -610,15 +610,23 @@
       "id": "2.2.9",
       "title": "資料匯入",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_import",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "0ef608eb06c5c3f7159b6d5e915ed4b31d0f8b0256f72c0b03d3e50d286e73a4",
+      "access": "READABLE",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "architect",
+        "qa-uat"
+      ],
       "skill": "implement-feature",
-      "prerequisites": [],
+      "prerequisites": [
+        "2.2.2",
+        "2.2.3",
+        "2.2.7",
+        "2.2.8"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "原Markdown正文及T-SQL文字已讀；27圖、共用嵌入及郵遞區號樣本未取得，L0保留。TD004-DB-IMPORT-01真SQLite三方法驗CSV暫存、逐列拒絕、全批交易與收據、逐值對帳及回滾。非原SQL Server BULK INSERT/Excel實測、正式匯入或耐久/大批量驗證；後續補可用原生環境，不阻其他單元。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

@@ -371,4 +371,112 @@ class IndexDesignLesson(unittest.TestCase):
                     db.close()
             print('INDEX-WRITE',repr(index),'bytes='+str(sizes),'insert_ms=%.6f'%statistics.median(insert_ms),'update_ms=%.6f'%statistics.median(update_ms),flush=True)
 
+class StagedImportLesson(unittest.TestCase):
+    def setUp(self):
+        self.db = sqlite3.connect(':memory:')
+        self.addCleanup(self.db.close)
+        self.db.execute('PRAGMA foreign_keys=ON')
+        self.db.executescript('''CREATE TABLE target (code TEXT PRIMARY KEY NOT NULL, score INTEGER NOT NULL CHECK(score BETWEEN 0 AND 100), note TEXT NOT NULL) STRICT;
+          INSERT INTO target VALUES ('EXIST',50,'old');
+          CREATE TABLE manifest (batch TEXT PRIMARY KEY, digest TEXT NOT NULL, status TEXT NOT NULL);
+          CREATE TABLE stage (batch TEXT REFERENCES manifest(batch), n INTEGER, code TEXT, score TEXT, note TEXT, PRIMARY KEY(batch,n));
+          CREATE TABLE rejection (batch TEXT, n INTEGER, reason TEXT, PRIMARY KEY(batch,n,reason), FOREIGN KEY(batch,n) REFERENCES stage(batch,n));
+          CREATE TABLE receipt (batch TEXT PRIMARY KEY REFERENCES manifest(batch), rows INTEGER NOT NULL);''')
+
+    def stage(self, batch, raw):
+        if len(raw) > 65536:
+            raise ValueError('file size')
+        reader = csv.reader(io.StringIO(raw.decode('utf-8-sig'), newline=''), strict=True)
+        if next(reader, None) != ['code','score','note']:
+            raise ValueError('header')
+        rows = list(reader)
+        if not 1 <= len(rows) <= 100 or any(len(r) != 3 for r in rows):
+            raise ValueError('shape')
+        with self.db:
+            self.db.execute('INSERT INTO manifest VALUES (?,?,?)',(batch,hashlib.sha256(raw).hexdigest(),'STAGED'))
+            self.db.executemany('INSERT INTO stage VALUES (?,?,?,?,?)',[(batch,n,*r) for n,r in enumerate(rows,1)])
+
+    def errors(self, batch):
+        rows = self.db.execute('SELECT n,code,score,note FROM stage WHERE batch=? ORDER BY n',(batch,)).fetchall()
+        counts = {c: sum(r[1]==c for r in rows) for _,c,_,_ in rows}
+        prior = {r[0] for r in self.db.execute('SELECT code FROM target')}
+        errors = []
+        for n,c,s,note in rows:
+            for bad,reason in [(not re.fullmatch(r'[A-Z0-9]{1,12}',c),'CODE'),(not re.fullmatch(r'(?:0|[1-9][0-9]?|100)',s),'SCORE'),(len(note)>200 or chr(0) in note,'NOTE'),(counts[c]>1,'DUPLICATE'),(c in prior,'EXISTS')]:
+                if bad:
+                    errors.append((batch,n,reason))
+        return sorted(errors)
+
+    def promote(self, batch):
+        with self.db:
+            self.db.execute('BEGIN IMMEDIATE')
+            if self.db.execute('SELECT status FROM manifest WHERE batch=?',(batch,)).fetchone() != ('STAGED',):
+                raise ValueError('not staged')
+            errors = self.errors(batch)
+            if errors:
+                self.db.executemany('INSERT INTO rejection VALUES (?,?,?)',errors)
+                self.db.execute("UPDATE manifest SET status='REJECTED' WHERE batch=?",(batch,))
+                return False
+            rows = self.db.execute('SELECT code,CAST(score AS INTEGER),note FROM stage WHERE batch=? ORDER BY n',(batch,)).fetchall()
+            before = self.db.execute('SELECT * FROM target ORDER BY code').fetchall()
+            self.db.executemany('INSERT INTO target VALUES (?,?,?)',rows)
+            if self.db.execute('SELECT * FROM target ORDER BY code').fetchall() != sorted(before+rows):
+                raise ValueError('reconciliation')
+            self.db.execute('INSERT INTO receipt VALUES (?,?)',(batch,len(rows)))
+            self.db.execute("UPDATE manifest SET status='COMMITTED' WHERE batch=?",(batch,))
+        return True
+
+    def snapshot(self):
+        return tuple(self.db.execute('SELECT * FROM '+t+' ORDER BY 1,2').fetchall() for t in ('target','manifest','stage','rejection','receipt'))
+
+    def test_lossless_staging_and_complete_rejection_report(self):
+        raw = 'code,score,note\r\n001,9,"中文,引號"\r\nA2,abc,bad\r\nA2,101,bad\r\nEXIST,20,collision\r\n'.encode('utf-8')
+        self.stage('bad',raw)
+        self.assertEqual(self.db.execute('SELECT code,score,note FROM stage WHERE batch=? ORDER BY n',('bad',)).fetchall(), [('001','9','中文,引號'),('A2','abc','bad'),('A2','101','bad'),('EXIST','20','collision')])
+        self.assertFalse(self.promote('bad'))
+        self.assertEqual(self.db.execute('SELECT n,reason FROM rejection ORDER BY n,reason').fetchall(),[(2,'DUPLICATE'),(2,'SCORE'),(3,'DUPLICATE'),(3,'SCORE'),(4,'EXISTS')])
+        self.assertEqual(self.db.execute('SELECT * FROM target').fetchall(),[('EXIST',50,'old')])
+        self.assertEqual(self.db.execute('SELECT * FROM receipt').fetchall(),[])
+        self.assertEqual(self.db.execute('SELECT digest,status FROM manifest').fetchone(),(hashlib.sha256(raw).hexdigest(),'REJECTED'))
+        before = self.snapshot()
+        for raw in (b'code,score,note\n001,1,\xff', b'score,code,note\n1,001,x', b'code,score,note\n001,1', b'code,score,note\n001,1,"unclosed'):
+            with self.subTest(raw=raw), self.assertRaises((ValueError,csv.Error)):
+                self.stage('invalid',raw)
+            self.assertEqual(self.snapshot(),before)
+
+    def test_late_receipt_failure_rolls_back_promotion(self):
+        self.stage('good','code,score,note\n001,0,"多行\n內容"\n002,100,ok\n'.encode('utf-8-sig'))
+        before = self.snapshot()
+        self.db.execute("CREATE TRIGGER block_receipt BEFORE INSERT ON receipt BEGIN SELECT RAISE(ABORT,'receipt failure'); END")
+        with self.assertRaisesRegex(sqlite3.IntegrityError,'receipt failure'):
+            self.promote('good')
+        self.assertEqual(self.snapshot(),before)
+        self.db.execute('DROP TRIGGER block_receipt')
+        self.assertTrue(self.promote('good'))
+        self.assertEqual(self.db.execute('SELECT * FROM target ORDER BY code').fetchall(),[('001',0,'多行\n內容'),('002',100,'ok'),('EXIST',50,'old')])
+        self.assertEqual(self.db.execute('SELECT * FROM receipt').fetchall(),[('good',2)])
+        after = self.snapshot()
+        with self.assertRaises(ValueError):
+            self.promote('good')
+        self.assertEqual(self.snapshot(),after)
+
+    def test_equal_count_and_sum_can_hide_corruption(self):
+        self.stage('swap',b'code,score,note\nA,10,x\nB,20,y\n')
+        before = self.snapshot()
+        self.db.execute("CREATE TRIGGER swap_score AFTER INSERT ON target WHEN NEW.code IN ('A','B') BEGIN UPDATE target SET score=30-NEW.score WHERE code=NEW.code; END")
+        self.db.execute('SAVEPOINT unsafe_preview')
+        self.db.execute("INSERT INTO target VALUES ('A',10,'x'),('B',20,'y')")
+        self.assertEqual(self.db.execute("SELECT COUNT(*),SUM(score) FROM target WHERE code IN ('A','B')").fetchone(),(2,30))
+        self.assertEqual(self.db.execute("SELECT code,score FROM target WHERE code IN ('A','B') ORDER BY code").fetchall(),[('A',20),('B',10)])
+        self.db.execute('ROLLBACK TO unsafe_preview')
+        self.db.execute('RELEASE unsafe_preview')
+        self.assertEqual(self.snapshot(),before)
+        with self.assertRaisesRegex(ValueError,'reconciliation'):
+            self.promote('swap')
+        self.assertEqual(self.snapshot(),before)
+        self.db.execute('DROP TRIGGER swap_score')
+        self.assertTrue(self.promote('swap'))
+        self.assertEqual(self.db.execute('SELECT code,score FROM target WHERE code IN (\'A\',\'B\') ORDER BY code').fetchall(),[('A',10),('B',20)])
+        self.assertEqual(self.db.execute('PRAGMA foreign_key_check').fetchall(),[])
+
 if __name__ == '__main__': unittest.main(verbosity=2)

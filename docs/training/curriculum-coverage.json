@@ -634,15 +634,20 @@
       "id": "2.2.10",
       "title": "資料庫安全性",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_security",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "52dbcb97594a0b3dfbba213173dda4e0bf39e381b1111b7d885d1f81096bf9c2",
+      "access": "READABLE",
       "owner": "security",
-      "collaborators": [],
+      "collaborators": [
+        "developer",
+        "qa-uat"
+      ],
       "skill": "security-review",
-      "prerequisites": [],
+      "prerequisites": [
+        "2.2.9"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "原Markdown正文/T-SQL文字已讀；34圖（含重複引用）、共用嵌入未取，L0保留。TD004-DB-SECURITY-01 真SQLite file DB/獨立連線、原生authorizer與受限view/trigger、四方法驗匯入/審閱/轉入角色與拒絕報告；非SQL Server login/SSMS或真Auth/production，不重做PG RLS ACL。待媒體及原生環境、不阻其他單元。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

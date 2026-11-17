@@ -780,3 +780,7 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 
 ## TD004-DB-IMPORT-01（2026-11-17；TEXT_PARTIAL / LOCAL_LAB_VERIFIED）
 - 使用者依核心準則續原2.2.9。原Markdown/SQL與Microsoft官方文件，採EP-01/05/13；SQLite 3.46.1 新class 3/3 PASS，23 assert sites，4筆資料5拒絕原因、4格式負例、收據失敗整批rollback、count/sum相同但逐值錯置負例。原10文字可讀/153未讀/13缺，L0保留；原圖/Excel/SSMS/樣本/SQL Server及真外部移轉未驗。更新原skill、測試與[原覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。前輪CI44044299687 exact519/519成功，瀏覽器啟動錯誤未再現但根因未確認。下一輪2.2.10 Security 新缺口，不重做既有RLS/ACL；核心及授權不變。
+
+
+## TD004-DB-SECURITY-01（2026-11-17；TEXT_PARTIAL / LOCAL_LAB_VERIFIED）
+- 使用者明示依核心準則續2.2.10，由Security主責，實讀原Markdown/SQL、Microsoft/SQLite官方及EP-03/05/13；SQLite3.46.1真檔案DB獨立連線4/4 PASS，23 assert sites、29 SQLITE_AUTH拒絕及業務拒絕、四表快照；新增受限匯入/審閱/轉入入口、封存/去敏感報告。非PG/SQL Server原生login或真Auth、來源digest/owner防竄改未驗；34圖/SSMS未取、11文字可讀/152未讀/13缺/L0保留。原技能、測試、矩陣、[原覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)增量；前輪CI44045288347 exact 519/519成功。下一輪原3.1.2與3.1.1前置、未驗SQL語意，原權限不變。

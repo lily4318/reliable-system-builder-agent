@@ -32,3 +32,7 @@ Architect 建立角色與所有權矩陣，Security 核 exposed schema、GRANT�
 
 ### GAS 入口、執行者及訪客權限（GAS-DIAG-002）
 access 與 executeAs 分開，USER_DEPLOYING 的 effective user 不代表訪客；ActiveUser email 空白時需識別的操作拒絕，禁止 fallback 到部署者、client email/role。核准匿名非特權入口不等於管理功能公開；每個 server RPC/route 校驗角色及資料範圍，隱藏 UI 不能代替 ACL。USER_ACCESSING 查 granular OAuth scope、Workspace 政策/資源 ACL，不盲升 scope、不公開 Sheet/Drive、不傳 OAuth token；暫時 user key 作診斷而非登入證明。真角色正負測、未預期公開存取立即安全 HOLD，保留 C3/UAT。詳 [GAS-DIAG-002](../../../docs/training/reviews/2026-11-16-gas-diagnosis.md)。
+
+
+### TD-004｜資料匯入的受限入口與錯誤診斷隔離（TD004-DB-SECURITY-01）
+先定資料分類及批次權責，分收件/封存批准/正式轉入/審閱；不給一般匯入或審閱者直接DML權，受限入口核來源與封存狀態、允許的欄位/批次，拒絕覆寫、OR REPLACE/IGNORE造成靜默異常及既有目標衝突。審閱只讀必要批次/欄/固定原因碼；不得直接暴露raw、SQL exception或敏感日誌，資料最小化不等於匿名。SQLite authorizer由可信host設置、操作與schema/source預設拒絕及可信檔案邊界，非DB login/RLS；不得暴露原始可解除限制的連線或檔案，owner仍可改資料。正式系統另驗真身分、動態scope/撤權、approval digest/版本、競寫、資源上限及所有錯誤路徑，SQL Server view/ownership chaining/角色需真原生驗證。見[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

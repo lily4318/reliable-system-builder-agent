@@ -479,4 +479,166 @@ class StagedImportLesson(unittest.TestCase):
         self.assertEqual(self.db.execute('SELECT code,score FROM target WHERE code IN (\'A\',\'B\') ORDER BY code').fetchall(),[('A',10),('B',20)])
         self.assertEqual(self.db.execute('PRAGMA foreign_key_check').fetchall(),[])
 
+class ImportSecurityLesson(unittest.TestCase):
+    def setUp(self):
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        self.path = Path(tmp.name) / 'import.sqlite'
+        self.owner = self.connect()
+        self.owner.executescript('''
+          CREATE TABLE manifest(batch TEXT PRIMARY KEY, state TEXT NOT NULL);
+          INSERT INTO manifest VALUES ('A','OPEN'),('B','OPEN');
+          CREATE TABLE stage(batch TEXT NOT NULL, n INTEGER NOT NULL, raw TEXT NOT NULL, PRIMARY KEY(batch,n));
+          CREATE TABLE target(batch TEXT, n INTEGER, score INTEGER, PRIMARY KEY(batch,n));
+          INSERT INTO target VALUES ('B',1,99);
+          CREATE TABLE rejection(batch TEXT,n INTEGER,reason TEXT,raw TEXT);
+          INSERT INTO rejection VALUES ('A',1,'SCORE','synthetic-private-A'),('B',1,'SCORE','synthetic-private-B');
+          CREATE VIEW incoming_a AS SELECT n,raw FROM stage WHERE batch='A';
+          CREATE TRIGGER receive_a INSTEAD OF INSERT ON incoming_a BEGIN
+            SELECT CASE WHEN (SELECT state FROM manifest WHERE batch='A') IS NOT 'OPEN' THEN RAISE(ABORT,'BATCH_CLOSED') END;
+            SELECT CASE WHEN EXISTS(SELECT 1 FROM stage WHERE batch='A' AND n=NEW.n) THEN RAISE(ABORT,'ROW_EXISTS') END;
+            INSERT INTO stage VALUES ('A',NEW.n,NEW.raw);
+          END;
+          CREATE VIEW report_a AS SELECT batch,n,reason FROM rejection WHERE batch='A';
+          CREATE VIEW result_a AS SELECT batch,n,score FROM target WHERE batch='A';
+          CREATE VIEW promote_a AS SELECT 1 AS request WHERE 0;
+          CREATE TRIGGER commit_a INSTEAD OF INSERT ON promote_a BEGIN
+            SELECT CASE WHEN NEW.request IS NOT 1 OR (SELECT state FROM manifest WHERE batch='A') IS NOT 'SEALED' THEN RAISE(ABORT,'NOT_APPROVED') END;
+            SELECT CASE WHEN NOT EXISTS(SELECT 1 FROM stage WHERE batch='A') OR EXISTS(SELECT 1 FROM stage WHERE batch='A' AND (CAST(CAST(raw AS INTEGER) AS TEXT) != raw OR CAST(raw AS INTEGER) NOT BETWEEN 0 AND 100)) THEN RAISE(ABORT,'INVALID_BATCH') END;
+            SELECT CASE WHEN EXISTS(SELECT 1 FROM target WHERE batch='A') THEN RAISE(ABORT,'TARGET_EXISTS') END;
+            INSERT INTO target SELECT batch,n,CAST(raw AS INTEGER) FROM stage WHERE batch='A';
+            UPDATE manifest SET state='COMMITTED' WHERE batch='A';
+          END;
+        ''')
+
+    def connect(self):
+        db = sqlite3.connect(self.path, cached_statements=0)
+        self.addCleanup(db.close)
+        db.execute('PRAGMA trusted_schema=OFF')
+        return db
+
+    def restricted(self, role):
+        db = self.connect()
+        def authorize(action, table, column, schema, source):
+            allow = False
+            if action in (sqlite3.SQLITE_SELECT, sqlite3.SQLITE_TRANSACTION):
+                allow = True
+            elif schema == 'main' and role == 'uploader':
+                if action == sqlite3.SQLITE_INSERT:
+                    allow = (table,source) in (('incoming_a',None),('stage','receive_a'))
+                elif action == sqlite3.SQLITE_READ:
+                    allow = (source == 'receive_a' and (table,column) in (('manifest','state'),('manifest','batch'),('stage','batch'),('stage','n'),('incoming_a','n'),('incoming_a','raw')))
+            elif schema == 'main' and role == 'promoter':
+                if action == sqlite3.SQLITE_INSERT:
+                    allow = (table,source) in (('promote_a',None),('target','commit_a'))
+                elif action == sqlite3.SQLITE_UPDATE:
+                    allow = (table,column,source) == ('manifest','state','commit_a')
+                elif action == sqlite3.SQLITE_READ:
+                    allow = source == 'commit_a' and (table,column) in (('promote_a','request'),('manifest','state'),('manifest','batch'),('stage','batch'),('stage','n'),('stage','raw'),('target','batch'))
+            elif schema == 'main' and role == 'reviewer' and action == sqlite3.SQLITE_READ:
+                allow = ((source is None and table in ('report_a','result_a') and column in ('batch','n','reason','score')) or
+                         (source == 'report_a' and table == 'rejection' and column in ('batch','n','reason')) or
+                         (source == 'result_a' and table == 'target' and column in ('batch','n','score')))
+            return sqlite3.SQLITE_OK if allow else sqlite3.SQLITE_DENY
+        db.set_authorizer(authorize)
+        return db
+
+    def snapshot(self):
+        return tuple(self.owner.execute('SELECT * FROM '+t+' ORDER BY 1,2').fetchall() for t in ('manifest','stage','target','rejection'))
+
+    def denied(self, db, sql):
+        before = self.snapshot()
+        with self.assertRaises(sqlite3.DatabaseError) as caught, db:
+            db.execute(sql).fetchall()
+        self.assertEqual(caught.exception.sqlite_errorcode, sqlite3.SQLITE_AUTH)
+        self.assertEqual(self.snapshot(),before)
+
+    def test_uploader_append_only_and_sealed_batch(self):
+        db = self.restricted('uploader')
+        with db:
+            db.execute('INSERT INTO incoming_a VALUES (?,?)',(1,'synthetic-input'))
+        self.assertEqual(self.owner.execute('SELECT * FROM stage').fetchall(),[('A',1,'synthetic-input')])
+        for sql in ("INSERT INTO stage VALUES ('B',2,'x')",'SELECT raw FROM stage','SELECT raw FROM incoming_a',
+                    "UPDATE stage SET raw='changed'",'DELETE FROM stage',"UPDATE manifest SET state='OPEN'",
+                    "INSERT INTO target VALUES ('A',1,10)","DELETE FROM target",'DROP TRIGGER receive_a',
+                    'PRAGMA writable_schema=ON','INSERT INTO promote_a VALUES (1)',"ATTACH DATABASE ':memory:' AS extra"):
+            with self.subTest(sql=sql): self.denied(db,sql)
+        before = self.snapshot()
+        for conflict in ('REPLACE','IGNORE'):
+            with self.assertRaisesRegex(sqlite3.IntegrityError,'ROW_EXISTS'), db:
+                db.execute('INSERT OR '+conflict+" INTO incoming_a VALUES (1,'changed')")
+            self.assertEqual(self.snapshot(),before)
+        with self.owner:
+            self.owner.execute("UPDATE manifest SET state='SEALED' WHERE batch='A'")
+        before = self.snapshot()
+        with self.assertRaisesRegex(sqlite3.IntegrityError,'BATCH_CLOSED'), db:
+            db.execute("INSERT INTO incoming_a VALUES (2,'late')")
+        self.assertEqual(self.snapshot(),before)
+
+    def test_reviewer_projection_scope_and_no_write(self):
+        db = self.restricted('reviewer')
+        self.assertEqual(db.execute('SELECT * FROM report_a').fetchall(),[('A',1,'SCORE')])
+        self.assertEqual(db.execute('SELECT * FROM result_a').fetchall(),[])
+        for sql in ('SELECT raw FROM rejection','SELECT * FROM rejection','SELECT * FROM stage','SELECT * FROM target',
+                    'SELECT * FROM manifest',"UPDATE rejection SET reason='OK'",'DELETE FROM rejection',
+                    'CREATE TEMP VIEW report_a AS SELECT raw FROM rejection', 'PRAGMA table_info(rejection)',
+                    "INSERT INTO incoming_a VALUES (2,'reviewer')",'INSERT INTO promote_a VALUES (1)'):
+            with self.subTest(sql=sql): self.denied(db,sql)
+        self.assertEqual(db.execute("SELECT * FROM report_a WHERE batch='B'").fetchall(),[])
+
+    def test_trusted_promotion_and_untrusted_diagnostics(self):
+        uploader = self.restricted('uploader')
+        reviewer = self.restricted('reviewer')
+        promoter = self.restricted('promoter')
+        with uploader:
+            uploader.execute('INSERT INTO incoming_a VALUES (?,?)',(2,'42'))
+        before = self.snapshot()
+        with self.assertRaisesRegex(sqlite3.IntegrityError,'NOT_APPROVED'), promoter:
+            promoter.execute('INSERT INTO promote_a VALUES (1)')
+        self.assertEqual(self.snapshot(),before)
+        with self.owner:
+            self.owner.execute("UPDATE manifest SET state='SEALED' WHERE batch='A'")
+        for sql in ("INSERT INTO target VALUES ('B',2,42)","UPDATE manifest SET state='SEALED'",'SELECT raw FROM stage','DELETE FROM target'):
+            self.denied(promoter,sql)
+        with promoter:
+            promoter.execute('INSERT INTO promote_a VALUES (1)')
+        self.assertEqual(self.owner.execute("SELECT state FROM manifest WHERE batch='A'").fetchone(),('COMMITTED',))
+        self.assertEqual(reviewer.execute('SELECT * FROM result_a').fetchall(),[('A',2,42)])
+        self.assertEqual(self.owner.execute('SELECT * FROM target ORDER BY batch,n').fetchall(),[('A',2,42),('B',1,99)])
+        self.denied(reviewer,"UPDATE target SET score=0")
+        self.denied(uploader,"UPDATE target SET score=0")
+        # This trusted host maps database exceptions to a fixed client diagnostic.
+        # The raw exception itself is not a supported public response contract.
+        def client_insert(value):
+            try:
+                with uploader:
+                    uploader.execute('INSERT INTO incoming_a VALUES (?,?)',(3,value))
+            except sqlite3.DatabaseError:
+                return {'code':'IMPORT_REJECTED'}
+            return {'code':'ACCEPTED'}
+        before = self.snapshot()
+        self.assertEqual(client_insert('synthetic-private-input'),{'code':'IMPORT_REJECTED'})
+        self.assertEqual(self.snapshot(),before)
+        self.assertEqual(reviewer.execute('SELECT * FROM report_a').fetchall(),[('A',1,'SCORE')])
+
+    def test_invalid_or_colliding_batch_never_promotes(self):
+        uploader = self.restricted('uploader')
+        promoter = self.restricted('promoter')
+        with uploader:
+            uploader.execute('INSERT INTO incoming_a VALUES (?,?)',(1,'42x'))
+        with self.owner:
+            self.owner.execute("UPDATE manifest SET state='SEALED' WHERE batch='A'")
+        before = self.snapshot()
+        with self.assertRaisesRegex(sqlite3.IntegrityError,'INVALID_BATCH'), promoter:
+            promoter.execute('INSERT OR IGNORE INTO promote_a VALUES (1)')
+        self.assertEqual(self.snapshot(),before)
+        # Admin-only setup of a separate negative fixture; not an allowed uploader edit.
+        with self.owner:
+            self.owner.execute("UPDATE stage SET raw='42' WHERE batch='A'")
+            self.owner.execute("INSERT INTO target VALUES ('A',1,7)")
+        before = self.snapshot()
+        with self.assertRaisesRegex(sqlite3.IntegrityError,'TARGET_EXISTS'), promoter:
+            promoter.execute('INSERT OR REPLACE INTO promote_a VALUES (1)')
+        self.assertEqual(self.snapshot(),before)
+
 if __name__ == '__main__': unittest.main(verbosity=2)

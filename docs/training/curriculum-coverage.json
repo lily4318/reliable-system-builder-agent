@@ -1002,12 +1002,19 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "architect",
+        "qa-uat",
+        "security"
+      ],
       "skill": "debug-and-repair",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.1.2",
+        "3.2.4"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-SQL-DEBUG-01：原教材入口不可達，UNREAD/source_sha256=null/L0；PG官方規格與真引擎四方法36 assertion sites，NATIVE_CI_PENDING；原T-SQL/圖/完整習得/真遷移待驗。前置暫列SQL/Select，正文後核。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

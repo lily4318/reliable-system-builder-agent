@@ -92,3 +92,7 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### TD-004｜函式回傳、穩定性及索引真值驗收（TD004-SQL-FUNCTION-01）
 固定逐人/觀測ID及值oracle，scalar零列與NULL、SET空列/同分多列、STRICT versus CALLED ON NULL、CROSS/LEFT LATERAL及count非NULL鍵/值、原表不變。以真長存活PREPARE跨另一連線修改設定，對照舊plan/新query、修正標記後重建plan並再改設定。VOLATILE副作用核實表、STRICT NULL跳過、STABLE違規DML拒絕及同敘述snapshot差異。故意錯IMMUTABLE建立expression index，固定真EXPLAIN路徑與逐鍵結果比較index/seq、刻意更設定再驗；修復錯索引和函式、純固定版本索引兩路徑等價及來源不變。GUC只在隔離驗收，不以計畫匹配為效能證明；非T-SQL/正式資料庫/研究政策/獨立能力。原始CI狀態依原覆盤。
+
+
+### TD-004｜SQL診斷與修復的獨立真值驗收（TD004-SQL-DEBUG-01）
+測同SQLSTATE不同constraint及正確診斷欄、錯誤ON CONFLICT零回列卻漏合法新id，限定constraint後其他衝突必須浮現，合法輸入逐列核實；正式重播payload另驗。用相同合成分布取EXPLAIN ANALYZE JSON/估算actual rows及loops/buffers，核stats前後固定實際數及不相容條件；集合重寫用獨立逐鍵oracle驗所有母群、缺失與源資料，觀測scan減少不當延遲倍率；避免固定時間門檻、未授權EXPLAIN ANALYZE寫入和輸出敏感日誌。受控timeout/其他錯誤分類與session恢復，按真CI原始日誌驗收，非正式效能/SLA或真資料。

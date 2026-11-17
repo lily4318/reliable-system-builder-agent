@@ -85,3 +85,7 @@ Agent 先以授權工具核 C4/C5：同一 HTTPS URL＋已固定 artifact digest
 
 ## 2026-11-17｜後續明示確認及實際 M3-1 查核
 使用者已確認 R1 並授權 C0–C2；前述未確認為形成時狀態，不再有效。C1 BLOCKED/C2 PARTIAL、2/6，M3-1 已授權續補，完成停 C3；A07 source-only 及其他原安全門檻維持。詳[實際查核](2026-11-17-m3-predeployment.md)。長期真任務學習提案仍 PROPOSED，不接管外部專案。
+
+
+## 2026-11-17｜M3-1 完成固定版本準備，待 C3
+原 R1 仍有效。C0-C2 prepared at pinned 6cdd6fe1042505143234623d95eef028a4866e00，C1 本人 Pages UI 證明 disabled/None，C2 同版 CI 44010391221 真 raw 517/517 及原 archive identity；三包完成，M2-2 PARTIAL。C3 具體方案及當前 head/CI/費用/設定再核硬門檻詳[原 M3-1 查核](2026-11-17-m3-predeployment.md)；未授權/未部署、不取消 A07、B10、C6 或 M4，長期提案待確認。

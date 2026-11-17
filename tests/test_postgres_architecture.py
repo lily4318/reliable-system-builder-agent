@@ -857,3 +857,156 @@ class PostgresArchitectureTests(unittest.TestCase):
             self.assertEqual(c(good),("00000","2"))
         self.assertEqual(self.sql("SELECT count(*),sum(base) FROM fnlesson.item"),"100|5050")
 
+    def debug_setup(self):
+        self.sql("""
+            DROP SCHEMA IF EXISTS debuglesson CASCADE;
+            CREATE SCHEMA debuglesson;
+            REVOKE ALL ON SCHEMA debuglesson FROM PUBLIC;
+        """)
+
+    def debug_plan(self, query):
+        import json
+        # Only fixed synthetic SELECTs are passed to this helper.
+        return json.loads(self.sql("EXPLAIN (ANALYZE, BUFFERS, TIMING OFF, FORMAT JSON) "
+                                   +query))[0]["Plan"]
+
+    def debug_nodes(self, node):
+        yield node
+        for child in node.get("Plans", []):
+            yield from self.debug_nodes(child)
+
+    def test_pg_debug_sqlstate_constraint_context_and_silent_conflict(self):
+        self.debug_setup()
+        self.sql("""
+            CREATE TABLE debuglesson.registration(
+              id integer, alias text,
+              CONSTRAINT reg_id PRIMARY KEY(id),
+              CONSTRAINT reg_alias UNIQUE(alias));
+            INSERT INTO debuglesson.registration VALUES(1,'fixture-a');
+            CREATE FUNCTION debuglesson.try_insert(p_id integer,p_alias text)
+                RETURNS jsonb LANGUAGE plpgsql AS $$
+            DECLARE s text; ns text; tbl text; con text; detail text; ctx text;
+            BEGIN
+                INSERT INTO debuglesson.registration VALUES(p_id,p_alias);
+                RETURN jsonb_build_object('code','OK');
+            EXCEPTION WHEN unique_violation THEN
+                GET STACKED DIAGNOSTICS s=RETURNED_SQLSTATE,ns=SCHEMA_NAME,
+                    tbl=TABLE_NAME,con=CONSTRAINT_NAME,detail=PG_EXCEPTION_DETAIL,
+                    ctx=PG_EXCEPTION_CONTEXT;
+                -- Inspect sensitive fields only inside the synthetic fixture.
+                -- The diagnostic output contains presence/shape, not raw values.
+                RETURN jsonb_build_object('code',s,'schema',ns,'table',tbl,
+                    'constraint',con,'detail_present',length(detail)>0,
+                    'context_matches',position('try_insert' in ctx)>0);
+            END;
+            $$;
+            REVOKE ALL ON FUNCTION debuglesson.try_insert(integer,text) FROM PUBLIC;
+        """)
+        import json
+        for expr, constraint in (("1,'fixture-b'","reg_id"),
+                                 ("2,'fixture-a'","reg_alias")):
+            actual=json.loads(self.sql("SELECT debuglesson.try_insert("+expr+")"))
+            self.assertEqual(actual,dict(code="23505",schema="debuglesson",
+                table="registration",constraint=constraint,detail_present=True,
+                context_matches=True))
+        self.assertEqual(self.sql("SELECT id,alias FROM debuglesson.registration"),"1|fixture-a")
+        # Bad import treats all unique violations as harmless duplicates.
+        self.assertEqual(self.sql("INSERT INTO debuglesson.registration VALUES(2,'fixture-a') "
+                                  "ON CONFLICT DO NOTHING RETURNING id"),"")
+        self.assertEqual(self.sql("SELECT count(*) FROM debuglesson.registration"),"1")
+        with self.live_session() as c:
+            # Target only the intended conflict, surface a different constraint.
+            fixed="INSERT INTO debuglesson.registration VALUES"
+            tail=" ON CONFLICT ON CONSTRAINT reg_id DO NOTHING RETURNING id"
+            self.assertEqual(c(fixed+"(2,'fixture-a')"+tail)[0],"23505")
+            self.assertEqual(c(fixed+"(1,'fixture-a')"+tail),("00000",""))
+            self.assertEqual(c(fixed+"(2,'fixture-b')"+tail),("00000","2"))
+        self.assertEqual(self.sql("SELECT id,alias FROM debuglesson.registration ORDER BY id"),
+                         "1|fixture-a\n2|fixture-b")
+        self.assertEqual(json.loads(self.sql("SELECT debuglesson.try_insert(3,'fixture-c')")),
+                         {"code":"OK"})
+        print("PG-DEBUG-CONSTRAINT: same 23505, reg_id vs reg_alias; broad conflict suppressed new row; targeted conflict surfaces alias",flush=True)
+
+    def test_pg_debug_actual_cardinality_and_extended_statistics(self):
+        self.debug_setup()
+        self.sql("""
+            CREATE TABLE debuglesson.measurement(a integer,b integer);
+            INSERT INTO debuglesson.measurement
+              SELECT g%100,g%100 FROM generate_series(1,10000) g;
+            ALTER TABLE debuglesson.measurement ALTER COLUMN a SET STATISTICS 1000;
+            ALTER TABLE debuglesson.measurement ALTER COLUMN b SET STATISTICS 1000;
+            ANALYZE debuglesson.measurement;
+        """)
+        query="SELECT a,b FROM debuglesson.measurement WHERE a=7 AND b=7"
+        old=self.debug_plan(query)
+        self.assertEqual(old["Actual Rows"],100)
+        self.assertLess(old["Plan Rows"],10)
+        self.assertEqual(old["Actual Loops"],1)
+        self.assertIn("Shared Hit Blocks",old)
+        self.sql("CREATE STATISTICS debuglesson.measurement_dep (dependencies) "
+                 "ON a,b FROM debuglesson.measurement; ANALYZE debuglesson.measurement;")
+        new=self.debug_plan(query)
+        self.assertEqual(new["Actual Rows"],100)
+        self.assertLessEqual(abs(new["Plan Rows"]-100),10)
+        self.assertLess(abs(new["Plan Rows"]-100),abs(old["Plan Rows"]-100))
+        self.assertEqual(self.sql("SELECT count(*),sum(a),sum(b) FROM debuglesson.measurement"),
+                         "10000|495000|495000")
+        # Dependencies fix some estimates, not arbitrary impossible combinations.
+        self.assertEqual(self.debug_plan("SELECT a,b FROM debuglesson.measurement WHERE a=7 AND b=8")["Actual Rows"],0)
+        print("PG-DEBUG-CARDINALITY:",old["Plan Rows"],new["Plan Rows"],new["Actual Rows"],flush=True)
+
+    def test_pg_debug_repeated_scan_and_set_based_repair(self):
+        self.debug_setup()
+        self.sql("""
+            CREATE TABLE debuglesson.person(id integer PRIMARY KEY);
+            INSERT INTO debuglesson.person SELECT g FROM generate_series(1,200) g;
+            CREATE TABLE debuglesson.observation(person integer, score integer);
+            INSERT INTO debuglesson.observation
+                SELECT (g%199)+1, CASE WHEN g%5=0 THEN NULL ELSE g%7 END
+                FROM generate_series(1,2000) g;
+            ANALYZE debuglesson.person;
+            ANALYZE debuglesson.observation;
+        """)
+        bad="""SELECT p.id,(SELECT count(o.score) FROM debuglesson.observation o
+                 WHERE o.person=p.id) AS n FROM debuglesson.person p ORDER BY p.id"""
+        fixed="""SELECT p.id,coalesce(o.n,0) AS n FROM debuglesson.person p
+                 LEFT JOIN (SELECT person,count(score) AS n FROM debuglesson.observation
+                            GROUP BY person) o ON o.person=p.id ORDER BY p.id"""
+        before=self.debug_plan(bad)
+        after=self.debug_plan(fixed)
+        def scans(plan):
+            return [n for n in self.debug_nodes(plan) if n.get("Relation Name")=="observation"]
+        b,a=scans(before),scans(after)
+        self.assertEqual(len(b),1)
+        self.assertEqual(len(a),1)
+        self.assertEqual(b[0]["Actual Loops"],200)
+        self.assertEqual(a[0]["Actual Loops"],1)
+        self.assertEqual(b[0]["Node Type"],"Seq Scan")
+        self.assertEqual(a[0]["Node Type"],"Seq Scan")
+        self.assertGreater(b[0]["Shared Hit Blocks"],a[0]["Shared Hit Blocks"])
+        old_rows=self.sql(bad)
+        new_rows=self.sql(fixed)
+        expected={i:0 for i in range(1,201)}
+        for g in range(1,2001):
+            if g%5:
+                expected[(g%199)+1]+=1
+        self.assertEqual(old_rows,new_rows)
+        self.assertEqual(new_rows,"\n".join(f"{i}|{n}" for i,n in expected.items()))
+        self.assertEqual(self.sql("SELECT count(*),count(score) FROM debuglesson.observation"),"2000|1600")
+        self.assertEqual(new_rows.splitlines()[-1],"200|0")
+        print("PG-DEBUG-SCAN:",b[0]["Actual Loops"],a[0]["Actual Loops"],
+              "buffer_hits",b[0]["Shared Hit Blocks"],a[0]["Shared Hit Blocks"],flush=True)
+
+    def test_pg_debug_bounded_timeout_and_error_classification(self):
+        self.debug_setup()
+        with self.live_session() as c:
+            self.assertEqual(c("SET statement_timeout='40ms'")[0],"00000")
+            self.assertEqual(c("SELECT pg_sleep(0.5)")[0],"57014")
+            self.assertEqual(c("SET statement_timeout=0")[0],"00000")
+            self.assertEqual(c("SELECT 1/0")[0],"22012")
+            self.assertEqual(c("SELECT 1 FROM debuglesson.missing")[0],"42P01")
+            self.assertEqual(c("SELECT 1"),("00000","1"))
+        self.assertEqual(self.sql("SELECT count(*) FROM information_schema.tables "
+                                  "WHERE table_schema='debuglesson'"),"0")
+        print("PG-DEBUG-TIMEOUT: bounded 57014; 22012 and 42P01 distinct; connection recovered",flush=True)
+

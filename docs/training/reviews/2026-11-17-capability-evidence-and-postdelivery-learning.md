@@ -53,3 +53,24 @@ TD-001 既有平台/按需角色技能/共用空間/覆盤，TD-002 真來源及
 
 ## 2026-11-17｜後續明示確認及實際 M3-1 查核
 使用者已確認 R1 並授權 C0–C2；前述未確認為形成時狀態，不再有效。C1 BLOCKED/C2 PARTIAL、2/6，M3-1 已授權續補，完成停 C3；A07 source-only 及其他原安全門檻維持。詳[實際查核](2026-11-17-m3-predeployment.md)。長期真任務學習提案仍 PROPOSED，不接管外部專案。
+
+
+## 2026-11-17｜正式確認：TD-004／TD-005 交付後雙軌持續能力深化（POSTDELIVERY_DUAL_TRACK_CONFIRMED_DEFERRED / NOT_RUN）
+使用者明示決策：「我確認首版交付後採用真實任務與教材深度學習雙軌並進的訓練方向，請保存正式決策與八位專家的能力成長標準，不提前執行長期訓練或接管其他專案。」
+依原提案 §1–5（本文件），正式採納雙軌方向、八專家能力成長標準、原七階段／L0–L6、最小證據追蹤與不重複學習原則；原提案形成時 PROPOSED 的狀態已由本節取代，歷史保留。決策屬首版實際交付後的長期訓練，現不啟動兩軌，不新增首版 gate 或新訓練台帳、不新增角色／技能、不接管其他專案、不建立排程、不觸發付費模型或外部資源。未逐項選定實作任務或固定跨領域先後，待交付後由使用者依真需求、前置依賴、可讀教材、風險及獨立授權決定。首版仍優先完成 M2-2 殘缺、M3-2 與 M4；不取消 A07/B10、安全、零支出、真人驗收及正式發布門檻。C3 仍未授權。
+
+### 正式能力成長標準（沿用 §3 既有 8 角色／15 技能）
+| 角色及原技能 | 未來成長之有效實證 |
+|---|---|
+| PM（project-scope / project-control / delivery-review） | 真實 scope、修訂、替代方案、成本與停止決策，以及按同風險同等難度比較的需求遺漏、重工及必要人工負擔；安全與既定驗收不得被效率抵銷。 |
+| System Lead（project-intake / task-planning / resume-project） | 陌生真需求確認、依賴／分工／交接產物、版本與授權追溯、來源獨立接續；核實不重工、錯 repo、過期 scope 或越權，不能以自述 GATE PASS。 |
+| Architect（requirements-spec / architecture-design） | 真實限制下的替代技術取捨、ADR、研究 protocol／資料字典、相容遷移和一致性證據；研究方法與科學效度由適格研究者核准。 |
+| Developer（implement-feature / debug-and-repair） | 陌生必要功能實作、可重現故障、定位因果、最小修復、獨立 oracle 正反測與回歸、在不同實作邊界的遷移；不得以已成功的同例重新計分。 |
+| QA/UAT（test-and-acceptance） | 可追溯需求與預先固定 oracle、適用正負測、競寫／異常／恢復、真資料格式與 UI／遠端證據；科學測量依真設備與研究規格，非自訂科學標準。 |
+| DevOps/SRE（deployment） | 真平台選型／帳號／成本／最小權限、可核版本與 artifact、HTTPS 更新／回退、未知結果對帳、備份復原和監控的實際證據；本機成功不替代 provider 驗收。 |
+| Security（security-review） | 真資料最小化、權限／角色／研究範圍隔離及外洩負測、適用 Auth／RLS、保存刪除與同意界線；REC/IRB 等科學倫理由適格人核，越權不得以其他通過項抵銷。 |
+| Learning Evaluator（learn-from-feedback / knowledge-distillation） | 實際來源與因果核實、失敗／修復／適用限制及必要人審、原技能案例增量，在另一真任務驗證採用／拒絕與遷移；未有新證據不升級、不假稱閱讀或完成。 |
+
+雙軌共用原 TD-004 七階段與逐單元逐角色 L0–L6（L1 原理、L2 取捨、L3 實作正反測、L4 真故障修復、L5 陌生遷移、L6 跨角色可追溯整體驗收）。保留每單元唯一主責與必要協作、教材完整覆蓋承諾、原 curriculum-coverage.json 單一矩陣；缺檔／引用內容未核、PARTIAL 176/163/13、units=[]，不冒稱教材已學或精通。以原任務結案紀錄／證據 ID、實際人工操作與必要核准、已確認需求首輪通過／可驗需求總數、重工／同類缺陷復發／適用機會、實際修復前後與陌生遷移證據衡量，欠分母／可比情境標 unknown，不設任意數值 KPI 或角色平均分。區分真工程、受控模型、正式產品、管理治理、陌生遷移、獨立盲測；相同證據可溯源引用但不重複計分。既有 private holdout 若另授權才作嚴格版本增益比較，不是首版必需、不宣稱權重提升或八獨立模型。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。
+
+本輪僅正式決策及原提案、主檔索引同步，未讀新教材／執行深度訓練／安排新專案或新增驗收；C0–C2 pinned 6cdd6fe1042505143234623d95eef028a4866e00、3/6，M2-2 PARTIAL、C3_NOT_AUTHORIZED，零額預算、R1、A07/B10/C6、M4 及原管理日期保留。下次真正執行 C3 前重核最新 exact head/CI、程式及平台狀態。來源基準 77f5874f5c9c32518311d08188f20166046167d6 tree fe21ed27e7a1843a27f4b4923765307f54cfe8e9；CI 44015390360 completed/success（僅 run metadata，未重跑或讀原始 log）；原主檔、決策、本覆盤 §1–7、AGENTS、START_HERE、skill catalog、curriculum matrix、原 M3-1 查核皆重新定位讀取。寫後回讀與例行 CI 分開。

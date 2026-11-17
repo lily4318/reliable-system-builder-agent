@@ -40,3 +40,7 @@ Agent 出具已核准範圍/可用 APP/版本/URL/操作及維護方式/限制�
 
 ## 2026-11-17｜方案核准與執行狀態（PLAN_CONFIRMED / A07_AWAITING_FRESH_DIALOGUE）
 使用者已明示確認整體方案及授權 M2-2 剩餘驗收，先 A07 再 APP 真人與適用 B10；原方案中的未核准標記為形成時歷史，現僅 M2-2 有實際執行授權。現行只提供 A07 新對話操作：Temporary → Unpersonalized（[最新官方說明](https://help.openai.com/en/articles/8914046-temporary-chat-in-chatgpt)，非個人化不用 memory/custom instructions/plugins；有限安全上下文與工具可用性仍有界線）。首答/環境證據尚未取得，不標驗收通過。只讀原 GitHub 並記錄授權，未執行真人測試或 APP 新操作，不改程式/外部部署/main/release；2/6、M2-2 partial、原 B10 條件及其他獨立授權不變。詳原決策紀錄。
+
+
+## 2026-11-17｜A07 首答評閱（CONTENT_CORROBORATED / SOURCE_ONLY_PARTIAL）
+使用者回報真新非個人化暫時聊天，提供 task-only 首答。評閱真核候選 3adf61ba6ea1afcc3920c7e6eb051886d8e0ff36、main/PR #8、CI 43997739513 / 43730072106 completed/success exact head、三 APP 檔兩版內容及 blob 一致，回覆內容及授權/進度相符。首答同時自述部分先前對話背景，未定是否含本專案，沒有另一對話原始工具/環境證據；不可將內容正確或使用者模式回報視 source-only PASS。A07 PARTIAL 非產品 FAIL；只補原對話仍可得的來源/背景分類證據，不重跑；如原對話已關閉或仍不可隔離，保留 gate 並請使用者決定替代或另行確認先驗 APP 的順序。依本輪條件尚不開始 APP/B10；6包2完成、無新部署/發布。詳原決策。

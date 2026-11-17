@@ -56,3 +56,7 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### TD-004｜受限匯入角色與診斷負測（TD004-DB-SECURITY-01）
 在實際引擎以各自非管理受限連線驗合法收件/讀取/轉入，禁止直接查改基表、跨批次、偽裝TEMP view、修改schema/PRAGMA/ATTACH、caller繞過封存或透過OR REPLACE/IGNORE覆寫；核拒絕原始錯誤碼與所有相應表前後快照，正例其他批次保持不變。拒絕報告核欄位與範圍而非只看UI隱藏，外部錯誤固定代碼與原始日誌另測。SQLite固定scope/authorizer為可信host的連線級實驗，不能冒稱真身份登入、任意程式隔離、全部資訊洩漏防護、真研究安全或PG/SQL Server測試。
+
+
+### TD-004｜SQL修改意圖與副作用驗收（TD004-SQL-SEMANTICS-01）
+刻意測預覽未涵蓋的年份/NULL、其他scope、過期版本、已非允許狀態及不存在鍵，核實際受影響鍵、欄值、最終持久資料；WHERE存在不代表精確，RETURNING/rowcount成功也非完整副作用或commit。以AFTER trigger故障注入核回傳與真SELECT不同並回滾，固定全資料行oracle；SQL集合查核另測NOT IN含NULL、NOT EXISTS、EXCEPT/INTERSECT、UNION與UNION ALL、兩向集合相等但重複筆數不同。勿把自建演練當產品事故或實際併發；跨引擎原生語意、真ACL/競寫與大型負載另驗。

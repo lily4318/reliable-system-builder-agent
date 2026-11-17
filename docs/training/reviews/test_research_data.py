@@ -641,4 +641,74 @@ class ImportSecurityLesson(unittest.TestCase):
             promoter.execute('INSERT OR REPLACE INTO promote_a VALUES (1)')
         self.assertEqual(self.snapshot(),before)
 
+class SqlSemanticsLesson(unittest.TestCase):
+    def test_case_scope_and_exact_approved_keys(self):
+        with sqlite3.connect(':memory:') as db:
+            db.executescript('''CREATE TABLE payment(study TEXT, id TEXT, year INTEGER, amount INTEGER, PRIMARY KEY(study,id));
+              INSERT INTO payment VALUES ('A','1',2004,100),('A','2',2010,100),('A','3',2020,100),('A','4',NULL,100),('B','1',2004,100);''')
+            snapshot = lambda: db.execute('SELECT * FROM payment ORDER BY study,id').fetchall()
+            before = snapshot()
+            approved = db.execute("SELECT id FROM payment WHERE study='A' AND year BETWEEN 2001 AND 2015 ORDER BY id").fetchall()
+            self.assertEqual(approved,[('1',),('2',)])
+            db.execute('SAVEPOINT unsafe')
+            c = db.execute("UPDATE payment SET amount=CASE WHEN year BETWEEN 2001 AND 2005 THEN amount*2 WHEN year BETWEEN 2006 AND 2015 THEN amount+50 END WHERE study='A'")
+            self.assertEqual(c.rowcount,4)
+            self.assertEqual(db.execute("SELECT id,amount FROM payment WHERE study='A' ORDER BY id").fetchall(),[('1',200),('2',150),('3',None),('4',None)])
+            db.execute('ROLLBACK TO unsafe')
+            db.execute('RELEASE unsafe')
+            self.assertEqual(snapshot(),before)
+            changed = db.execute("UPDATE payment SET amount=CASE WHEN year BETWEEN 2001 AND 2005 THEN amount*2 WHEN year BETWEEN 2006 AND 2015 THEN amount+50 ELSE amount END WHERE study=? AND year BETWEEN ? AND ? RETURNING id,amount",('A',2001,2015)).fetchall()
+            self.assertEqual(sorted(changed),[('1',200),('2',150)])
+            self.assertEqual(snapshot(),[('A','1',2004,200),('A','2',2010,150),('A','3',2020,100),('A','4',None,100),('B','1',2004,100)])
+
+    def test_per_record_version_and_returning_boundary(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            a = sqlite3.connect(Path(tmp)/'lesson.sqlite')
+            b = sqlite3.connect(Path(tmp)/'lesson.sqlite')
+            try:
+                a.executescript('''CREATE TABLE review(study TEXT, id TEXT, version INTEGER NOT NULL, status TEXT, PRIMARY KEY(study,id));
+                  INSERT INTO review VALUES ('A','1',1,'draft'),('A','2',1,'draft'),('B','1',1,'draft');''')
+                sql = "UPDATE review SET status=?,version=version+1 WHERE study=? AND id=? AND version=? AND status='draft' RETURNING study,id,version,status"
+                old = b.execute("SELECT version FROM review WHERE study='A' AND id='1'").fetchone()[0]
+                with a:
+                    self.assertEqual(a.execute(sql,('approved','A','1',old)).fetchall(),[('A','1',2,'approved')])
+                with b:
+                    self.assertEqual(b.execute(sql,('approved','A','1',old)).fetchall(),[])
+                    self.assertEqual(b.execute(sql,('approved','A','1',2)).fetchall(),[])
+                    self.assertEqual(b.execute(sql,('approved','A','missing',1)).fetchall(),[])
+                    self.assertEqual(b.execute(sql,('approved','A',"1' OR 1=1 --",1)).fetchall(),[])
+                    self.assertEqual(b.execute(sql,('approved','A','2',1)).fetchall(),[('A','2',2,'approved')])
+                self.assertEqual(a.execute('SELECT * FROM review ORDER BY study,id').fetchall(),[('A','1',2,'approved'),('A','2',2,'approved'),('B','1',1,'draft')])
+                # RETURNING reports the direct statement, not subsequent AFTER trigger effects or commit.
+                a.execute("CREATE TRIGGER after_review AFTER UPDATE ON review WHEN NEW.study='B' BEGIN UPDATE review SET status='flagged' WHERE study=NEW.study AND id=NEW.id; END")
+                with self.assertRaisesRegex(ValueError,'unexpected final state'), a:
+                    rows = a.execute(sql,('approved','B','1',1)).fetchall()
+                    self.assertEqual(rows,[('B','1',2,'approved')])
+                    self.assertEqual(a.execute("SELECT status FROM review WHERE study='B'").fetchone(),('flagged',))
+                    raise ValueError('unexpected final state')
+                self.assertEqual(b.execute("SELECT version,status FROM review WHERE study='B'").fetchone(),(1,'draft'))
+                c = a.execute("UPDATE review SET status=status WHERE study='B'")
+                self.assertEqual(c.rowcount,1)
+                a.rollback()
+                self.assertEqual(b.execute("SELECT version,status FROM review WHERE study='B'").fetchone(),(1,'draft'))
+            finally:
+                a.close(); b.close()
+
+    def test_set_multiplicity_and_null_anti_join(self):
+        with sqlite3.connect(':memory:') as db:
+            db.executescript('''CREATE TABLE expected(id TEXT NOT NULL); INSERT INTO expected VALUES ('A'),('B'),('C');
+              CREATE TABLE observed(id TEXT); INSERT INTO observed VALUES ('A'),('A'),('B'),(NULL);''')
+            self.assertEqual(db.execute('SELECT id FROM expected WHERE id NOT IN (SELECT id FROM observed)').fetchall(),[])
+            self.assertEqual(db.execute('SELECT e.id FROM expected e WHERE NOT EXISTS (SELECT 1 FROM observed o WHERE e.id=o.id) ORDER BY e.id').fetchall(),[('C',)])
+            self.assertEqual(db.execute('SELECT id FROM expected EXCEPT SELECT id FROM observed').fetchall(),[('C',)])
+            self.assertEqual(db.execute('SELECT id FROM observed INTERSECT SELECT id FROM expected ORDER BY id').fetchall(),[('A',),('B',)])
+            self.assertEqual(db.execute('SELECT COUNT(*) FROM (SELECT id FROM expected UNION SELECT id FROM observed)').fetchone(),(4,))
+            self.assertEqual(db.execute('SELECT COUNT(*) FROM (SELECT id FROM expected UNION ALL SELECT id FROM observed)').fetchone(),(7,))
+            self.assertEqual(db.execute('SELECT id,count(*) FROM observed GROUP BY id HAVING count(*)>1').fetchall(),[('A',2)])
+            self.assertEqual(db.execute('SELECT count(*) FROM observed WHERE id IS NULL').fetchone(),(1,))
+            # EXCEPT is distinct; equal sets can conceal different multiplicities.
+            self.assertEqual(db.execute("SELECT id FROM observed WHERE id IS NOT NULL EXCEPT SELECT id FROM expected WHERE id<>'C'").fetchall(),[])
+            self.assertEqual(db.execute("SELECT id FROM expected WHERE id<>'C' EXCEPT SELECT id FROM observed WHERE id IS NOT NULL").fetchall(),[])
+            self.assertEqual(db.execute('SELECT count(*) FROM observed WHERE id IS NOT NULL').fetchone(),(3,))
+
 if __name__ == '__main__': unittest.main(verbosity=2)

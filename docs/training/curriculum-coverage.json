@@ -655,15 +655,17 @@
       "id": "3.1.1",
       "title": "建立範例資料庫",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_demo_db",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "a36d2bcb5326be084aaedc4bb72cc660b43e31decdbfa7ccf02ff337fdd41fe7",
+      "access": "READABLE",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "qa-uat"
+      ],
       "skill": "implement-feature",
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "實讀1541字元Markdown；6圖、共用embed、SQLDemoTable/SQLDemoData兩preview未取得（原頁open失敗、授權備份名稱搜尋無匹配）。自寫隔離SQLite fixture非原sqldb或SSMS建置。L0保留。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -671,15 +673,19 @@
       "id": "3.1.2",
       "title": "結構化查詢語言",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_sql",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "b9fdd4df141cf073b615346472366e77d60cfffb9d6b5ab10ce7336f425527ea",
+      "access": "READABLE",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "qa-uat"
+      ],
       "skill": "implement-feature",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.1.1"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "實讀5899字元原Markdown，5圖/共用embed未取得；SQL歷史、關聯/集合、標準與方言、DDL/DML/DCL/TCL；TD004-SQL-SEMANTICS-01 集合與NULL、RETURNING及語意差異局部實證，非歷史各項查核或原生T-SQL。L0。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -703,15 +709,19 @@
       "id": "3.2.2",
       "title": "Update 語法",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_sql_update",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "114696864d061c7bf01d7e06a14e26544a87671ec35817be3a844df5d016b2c5",
+      "access": "READABLE",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "qa-uat"
+      ],
       "skill": "implement-feature",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.1.2"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "實讀8562字元原Markdown/SQL，20圖/共用embed未取得；TD004-SQL-SEMANTICS-01 依§3.1 CASE無ELSE且UPDATE範圍比SELECT廣之缺陷，在SQLite合成資料再現及修正；逐列版本/RETURNING/trigger邊界，非原sqldb/SQL Server。L0保留；未驗JOIN非唯一及DEFAULT等全部範例。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

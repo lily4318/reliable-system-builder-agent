@@ -31,3 +31,7 @@ tryLock 失敗不寫、finally release，鎖內重新查 id/receipt/容量；Spr
 
 ### TD-004｜資料匯入暫存與原子推進（TD004-DB-IMPORT-01）
 依已確認的編碼、標頭/欄位映射、格式、唯一性及新增/更新政策，保留來源bytes/hash與版本，界定大小/筆數、暫存解析值及可追溯邏輯列號；不預設清表、刪除重複或強制ANSI。分開staging與target promotion，在權限/一致性保護的交易內重驗暫存與現有資料、拒絕或寫入全部核准列，逐值對帳及成功收據/狀態同交易；拒絕報告可獨立留存但應最小揭露。不能以bulk命令成功、MAXERRORS、批次已提交或總額相同代替驗收。原SQLite小型實作見[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)；正式匯入需另驗來源不可變/角色ACL/資料留存、上限與大量效能、未知提交對帳及引擎bulk特殊約束，不能套用小樣本全表載入。
+
+
+### TD-004｜精確SQL更新與集合語意（TD004-SQL-SEMANTICS-01）
+預覽與mutation必核一致predicate及明確scope/主鍵；CASE應依核定條件涵蓋ELSE與NULL語意，WHERE比預覽廣會意外修改範圍外資料。WHERE帶可信範圍、記錄身份、預期版本及允許原狀態，使用參數化SQL，逐列版本而非一律全庫revision。零列不等於單一原因、回傳受影響鍵不等於commit或AFTER trigger最終狀態；未知結果先唯讀對帳，不盲重送。集合比較需分NULL、distinct與重複次數，非NULL expected key的NOT EXISTS可避免NOT IN受NULL影響，雙向EXCEPT不能驗bag multiplicity。依實際引擎核定rowcount/RETURNING/OUTPUT及交易語意。原SQLite新3方法見[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)，非正式身分授權、真競寫或T-SQL實機。

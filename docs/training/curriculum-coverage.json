@@ -956,12 +956,19 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "architect",
+        "security",
+        "qa-uat"
+      ],
       "skill": "implement-feature",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.1.2",
+        "3.2.2"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-SQL-PROCEDURE-01：原正文和授權備份未取，保持UNREAD/source_sha256=null/L0；官方PG/Microsoft規格已讀，真原生PG四測試已寫入並啟動CI，CI_RUNNING_NATIVE_VERIFICATION_PENDING。前置暫列SQL/DML，正文後核；SQL Server、圖、完整習得/真遷移待驗。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

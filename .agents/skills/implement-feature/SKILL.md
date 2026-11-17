@@ -59,3 +59,7 @@ tryLock 失敗不寫、finally release，鎖內重新查 id/receipt/容量；Spr
 
 ### TD-004｜多列Trigger及有界同步副作用（TD004-SQL-TRIGGER-01）
 先核引擎粒度：SQLite逐列OLD/NEW，SQL Server DML逐敘述inserted/deleted集合，聚合舊/新delta至完整業務鍵；UPDATE OF/UPDATE(column)不等於值改變，NULL-safe判斷按引擎，實測拼錯欄位/無操作。優先約束及清楚顯式交易；Trigger只承擔可驗證同步副作用，避免依賴觸發順序、無界遞迴及觸發外部郵件/API；外部副作用採交易outbox/提交後處理。核遞迴設定、收斂及界限；SQLite3.46.1深度錯誤實留未提交部分異動，FAIL/ABORT/ROLLBACK範圍不同，按交易契約rollback及所有表回讀，未知提交先唯讀對帳。審計同交易會隨回滾撤銷，不是不可竄改或完整拒絕日誌。原T-SQL/真權限/並發/研究政策另驗；[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。
+
+
+### TD-004｜預存程序與明確交易所有權（TD004-SQL-PROCEDURE-01）
+以實際引擎明示參數類型、NULL/預設/值域、具名與輸出欄序/業務代碼；PG CALL/INOUT/OUT與SQL Server EXEC/OUTPUT/return/resultset不同，不用SQLite或SELECT函式冒稱程序。錯誤分類與業務拒絕/已提交狀態分離，避免catch吞錯後以SQL成功判業務成功；PG子交易exception rollback不清區域變數。明示caller或procedure擁有交易；PG頂層CALL內COMMIT可部分持久化，外部BEGIN/SECURITY DEFINER/attached SET限制內部交易控制。原子業務優先caller交易、無任意內部commit，UNKNOWN先唯讀對帳。僅必要EXECUTE，撤PUBLIC，審核非superuser/no-login definer、最小grant、固定search_path及完整schema限定、可信actor範圍，真driver bind/JWT另驗。SQL Server THROW/XACT_ABORT/交易狀態按原生引擎驗。四個原生PG候選方法與狀態見[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)，原教材正文未取。

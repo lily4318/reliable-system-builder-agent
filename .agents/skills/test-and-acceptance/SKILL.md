@@ -84,3 +84,7 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### TD-004｜Trigger多列與跨表原子性驗收（TD004-SQL-TRIGGER-01）
 固定多列同組/跨組逐列OLD/NEW、原明細聚合與衍生統計oracle，測重複/no-op、NULL→0/0→NULL及拼錯UPDATE OF欄位；核全部相關業務表、審計與先前交易marker而非rowcount。受控深度重現遞迴錯誤，實查交易active及未提交部分異動，再顯式rollback驗恢復；合法有界收斂另測。刻意第二列巢狀審計拒絕，比FAIL/ABORT/ROLLBACK各scope，查正例commit與拒絕後完整狀態；不把錯誤、DDL成功或已寫audit當已commit。SQL Server集合delta及真引擎錯誤/鎖/權限、外部副作用與不可竄改審計另驗。詳原覆盤，原教材正文未取得。
+
+
+### TD-004｜程序輸出、異常及提交邊界驗收（TD004-SQL-PROCEDURE-01）
+真CREATE PROCEDURE/CALL與catalog prokind驗，測具名、NULL/非法、OUT/INOUT、舊版/跨actor與固定輸出；查逐值和所有相關表，不以SQLSTATE或result row成功冒稱業務成功。真獨立低權限連線測EXECUTE-only、INVOKER/DEFINER、direct DML、PUBLIC/其他actor與temp shadow。捕捉例外後核局部變數與子交易資料差異及caller marker；頂層/外部transaction、DEFINER與SET限制、先commit後故障，另一連線查持久化部分；非所有錯誤一律rollback或盲重試。按實際CI原始日誌標示PASS、非本地缺引擎/SQLite mock、非T-SQL/正式ACL；詳原覆盤，原教材未取。

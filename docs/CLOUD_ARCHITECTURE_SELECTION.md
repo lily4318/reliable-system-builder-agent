@@ -93,3 +93,7 @@ C1 必須依 [完全新手引導](BEGINNER_ACCOUNT_ONBOARDING.md) 先辨識必�
 
 ### GAS/Sheets 研究交易、配額及復原（GAS-DATA-003）
 沿 EP-03/13 與 [深度覆盤](training/reviews/2026-11-16-gas-data-integrity.md)；原 CLOUD-B 真驗收不變。ScriptLock 僅同 script 合作 writer；單 workbook atomic batch 非通用 DB isolation/CAS；先核所有寫入者、持久 receipt、unknown-inflight fence 與外部 outbox，資料不明 stop/reconcile。API 配額、timeout/payload、Apps Script/Mail/Drive 限額、實際帳戶流量及 billing 須於使用前讀當時正式來源與真帳戶核對；bounded backoff 不重送未知操作。原精確配額及 2026-09-03/late 2026 超額計費說法因缺可核正文撤回，不作成本依據；未知即停，NT$0，不得自動升配額/付費。版本歷史/backup 先唯讀與隔離 copy、核完整資料+receipt+audit+pending+outbox+後續合法寫入；原部署權限、ACL、C3/真 UAT 不變。離線故障模型 18/18，並未實際呼叫 Google API 或測真 restore。
+
+
+### 2026-11-17｜來源補查（僅兩頁，非追認歷史已讀）
+此前 EVIDENCE-PROVENANCE-CORRECTION-007 仍有效。本輪真讀 https://developers.google.com/apps-script/guides/support/troubleshooting 和 https://developers.google.com/workspace/sheets/api/limits ；確認 multi-login 不支援、單帳號/私密 session 建議，後者頁更新 2026-09-03、quota 與原子 request、180s、建議2MB、描述標準免費及計畫 later 2026 超限收費（非已生效/實際帳戶費用）。其他官方連結仍待查，根因/真 GAS/真配額未證。詳本輪 M3-1 覆盤。

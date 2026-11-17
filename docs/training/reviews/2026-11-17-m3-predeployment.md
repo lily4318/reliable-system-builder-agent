@@ -1,0 +1,32 @@
+# TD-005 R1 M3-1｜部署前實際查核（2026-11-17）
+R1_CONFIRMED / M3_PACKAGE1_AUTHORIZED / C0_ADR_PREPARED / C1_BLOCKED_ACCOUNT_READBACK / C2_PARTIAL / NOT_DEPLOYED。使用者明示核准 R1、合併離線與線上真人使用、保留 A07 未驗及安全要求、授權 C0–C2，另要求規劃交付後真任務及檢討驗收。長期建議詳[既有完整能力證據與學習提案](2026-11-17-capability-evidence-and-postdelivery-learning.md)，不另建計畫，不接管外部專案。其前一筆「R1 未確認」屬舊狀態，本決策優先，長期提案仍 PROPOSED。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。
+原查核基準 c5d721da97db2d2aef32e1a1505e66431445141c tree 755e9d3098a63b6fecf23c6dda94e719226c9396；寫前發現同分支進到 b8aff5a7f19a0d47de2058fafb76c9276ff58077 tree f8cd9041e4ecbb4bac28e1d21041dc6532aa71b2，實讀 compare 與最新主檔/決策/方案/覆盤，變更僅相關 docs/skills/EP，原 APP/workflow 未變，保留並行的能力證據及來源更正、以新 head/blob CAS 增量寫入，不重複同一覆盤。新 head CI 44008276187 in_progress（查時）；不將舊 CI 冒稱本 head。main c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57。
+
+## C0 選型 ADR
+原唯一公開合成雙組分派/seed/模擬/CSV 靜態 APP，無真人資料/DB/login/交易/自訂域、NT$0。線上為首版，file:// NOT_TESTED/NOT_PROMISED。Pages-first 理由僅三相對路徑靜態檔與既有 repo/CI；GAS/Sheets、Workers/D1、Supabase 對本案增加不必要後端或帳戶/權限/配額，留真需求再核。擬同 repo project site（預定 https://lily4318.github.io/reliable-system-builder-agent/，僅預測，不是可達網站）。不發布整個原 repo root/docs，僅三原檔；使用 Pages Actions allowlist packaging 為優先評估，但 default branch 目前無該 workflow，須核安全可觸發路徑，禁止擅改 main。也可另評估只含三檔的專用發布分支，C3 以前不建立分支或配置來源；選型及方法待實際 C1/C2 確定。Provider 記錄訪客 IP，APP 本身不收集不等同 provider 無日誌。只用合成資料；C3 需明確同一 repo/公開測試範圍/有效期/更新/回退/清理/零費用。
+
+## C1 实際查核與缺口
+GET repo id 1455152922 owner lily4318 public/private=false、has_pages=false、default_branch main、admin/maintain/push/triage/pull=true。非 Pages 寫 scope 或帳戶費用證明。GET /pages、/actions/permissions、/actions/workflows、/deployments、/environments 連接工具 allowlist HTTP400，非 provider 404 或站點不存在。工具清單未見專用 Pages/billing 讀寫端點；不假設能代做設定。真查 recursive tree 未截斷，只有 .github/workflows/agent-ci.yml f9a54baeb58ceb0c056de35931ae29efada4719a；標準 ubuntu-latest、contents:read、無部署 job、既有 public-policy-evaluation artifact retention 14日。
+本輪實讀 GitHub 官方文件（2026-11-17）：
+- https://docs.github.com/en/pages/getting-started-with-github-pages/github-pages-limits （公有 repo 可用 Free、published ≤1GB、soft 100GB/month、部署 timeout10min，custom Actions 不受10 builds/h軟限制、非商業/SaaS敏感交易）。
+- https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages （project site path、訪客 IP logging）。
+- https://docs.github.com/en/billing/concepts/product-billing/github-actions （public 標準 runner 免費，larger runner 仍計費；artifact/Packages storage 共用、Free 500MB 名義額度非實剩、storage 與 compute 不同，既有帳戶實際使用及付費風險未核）。
+- https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages （gzip tar、無 symlink/hardlink；deploy job pages:write/id-token:write/environment/needs）；https://docs.github.com/en/pages/getting-started-with-github-pages/configuring-a-publishing-source-for-your-github-pages-site （admin/maintainer、source branch root/docs 自動發布與 custom workflow）。
+- https://docs.github.com/en/billing/how-tos/products/view-productlicense-use 和 https://docs.github.com/en/billing/how-tos/set-up-budgets （個人 billing overview、Actions 使用量、budget stop 和單純通知不同）。
+目前 C1 BLOCKED：實際 plan/Actions+Packages 已用及剩餘共用 storage allowance、付費阻擋、實際 Pages source/Actions 設定待核。不以 public 或綠 CI 推定 NT$0。唯一當前人工：登入原 repo owner 帳號 https://github.com/settings/billing，查看 Actions/Packages 用量與方案、已用/包含額度（可回傳遮蔽支付資料之畫面，不提供 secrets），若找不到回報畫面，不改任何設定、不加卡、不啟用 Pages。後續必要時唯讀核 budgets/Pages UI。若無足夠 zero-cost 路徑則停止提替代，不自動升配額/購買。此次候選文件更新可能依現有 PR workflow 正常觸發，沒有手動觸發或建立付費資源；帳戶真累積 storage 成本未知，不保證帳戶費用已為零。
+
+## C2 真成品預備與 CI
+實讀 CI 44007315919 job 133785669791 raw 257006 chars；517 tests in 79.924s，RESEARCH-METHODS-BROWSER_PASS 375/1280 each100 CSV rows3161bytes、EDITORIAL_BROWSER_PASS，privacy/quality gate 等 steps success；checkout 259e0013bf87f84f52c65349722c917c5c12b9c7 merge parents main+原基準 candidate，tree 755e9d3098a63b6fecf23c6dda94e719226c9396 相等。CI marker report SHA256 18c588e7b5b08be163d34dda19cc7e431be94158fce4d7bbd44d2d160e319b7c，未下載 report bytes，非簽章。未重新觸發 CI。
+| file | Git blob | bytes | SHA256 |
+|---|---|---:|---|
+| index.html | 2254022d7b8eccdaa63b0a9d026b2d53da7c0c57 | 3625 | af06a46babe85dbcc1019533e68161a6fc25e8dec3ba22bcf1e97e6013549a63 |
+| style.css | 644e3481d307ec1e7d2afec822b709b562bd09ae | 2729 | ca91108d98e86d1d47668b63727d35f1ce0ae708b169c8208aa8d4a86ae1ab37 |
+| app.js | df98563e19bea4b5919ee52b23316eaaaaa2c6b6 | 4157 | fd182ef72f587f8a69e4fa847a95fa9b4dc8736b93b225e221a2a38d52e53589 |
+實際 fetched UTF8 bytes 長度符合 tree；JS in-memory 生成 USTAR（上述順序、regular mode0644、uid/gid/mtime=0、header checksum、512 padding、1024 end bytes）+gzip（mtime0 OS255 單 stored DEFLATE block CRC32/ISIZE），SHA256 abc 及 CRC32 123456789 known vectors 過；tar 14336 bytes SHA256 b28315cccd3cd86bca5342e89b920c0287eb59d9fbd3e05b7575c53ad7a568c5；gzip 14359 bytes SHA256 963a633a6eea2df701b1d31c2e34ede7dfc3c7bd4a5fd7b46e618b02df4a2bb8。實際解析 stored block/CRC/ISIZE/tar headers/白名單三正規檔、content digest/end markers；同實作驗證非獨立標準工具。封裝未持久化或上傳，不能交付檔案或聲稱 provider-accepted。Container DNS 不可用，不繞過。相對引用只有 CSS/JS、無匹配 external URLs/network/storage APIs/CSS import/url 或常見 secret pattern；CSP default-src none、自身 script/style、connect-src none、base-uri none/form-action none，JS textContent、Blob 本機下載。靜態掃描非全面資安證明。原 CI 功能證據限定 loopback、不冒稱遠端。
+C2 尚待 C1 後按 exact SHA 在 fresh staging 白名單重建並持久化成品、標準解包/核三 SHA/無 link/無其他檔；新 head exact CI 及實用發布路徑/權限/設定/復原可行性驗證。不要新增 APP 功能；v1=原三檔，v2 另核最小可辨識版本標記而不變學術規則，回退 pinned v1；C3 分開明示具體範圍、來源/目標、期限、操作、費用、受眾、清理/回退。尚非可執行 C3 請求。禁未授權 push/PR 自動部署、改 main/Release、建立 Pages 或另建 repo；不刪現有資源。C4–C6 尚未做。
+
+## 外部來源證據更正之本輪新讀結果
+並行更新之 EVIDENCE-PROVENANCE-CORRECTION-007 保留：原回合未取得可核證正文，官方已讀標記撤回，真本機/模型實驗與使用者回報有效；本輪確實重新讀 https://developers.google.com/apps-script/guides/support/troubleshooting （last updated 2026-09-15；multi-login 不支援，建議單帳號或 private session；不能證 Cookie 根因），及 https://developers.google.com/workspace/sheets/api/limits （last updated 2026-09-03；各讀寫 quota 300/min/project、60/min/user/project，batch 算一次、request atomic、180s、建議2MB；頁文說 standard use no additional cost 及計畫 later 2026 超限收費，非生效日/實際費率或帳戶驗證）。僅本輪兩個具體 subclaims 真實來源覆核，不追認歷史已讀，其他 MDN/W3C/Apps Script/實驗時序引用未逐查。採用前仍查新正文及真帳戶資料。
+
+## 結論與停止
+C0 ADR prepared，C1 BLOCKED_ACCOUNT_READBACK，C2 PARTIAL，M3-1 未完成；2/6，M2-2 PARTIAL、A07 source-only 未驗/B10/一次 C6 真人使用待驗，原 M4、NT$0、11/22與11/29目標保持。R1 confirmed，已授權工作包補證後繼續、到 C3 前停；不另要求重新批准同一 C0–C2。長期訓練路線仍提案，由原 [能力證據重整](2026-11-17-capability-evidence-and-postdelivery-learning.md) 記錄，不新增示範案、不接管其他專案。沒有產品程式/工作流/main/正式版本/外部資源修改或部署。候選紀錄與例行 CI 分開。

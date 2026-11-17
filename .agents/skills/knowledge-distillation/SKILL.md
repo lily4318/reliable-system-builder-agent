@@ -23,3 +23,6 @@ description: "整理學到的事、蒸餾。learning-evaluator 角色；交付 k
 
 ### 必要角色及研究交接蒸餾（TD-005）
 按 catalog 逐技能保留原實證、適用範圍、真缺口及下一步；不要用角色文件、測試數或重疊負例當成熟度。EP-01/04/11 的語意版本、失效與獨立解析路徑可遷移至研究字典交接；保存自寫對照及實際執行記錄，非獨立盲測、L6 或私人記憶。見 docs/training/reviews/2026-11-16-research-handoff.md。
+
+### 既有技能的證據覆核（CAPABILITY-CONVERGENCE-005）
+沿原 catalog 與已存在的覆盤增量對照各 skill 的真實測試方法、raw log、精確 run/checkout/tree、適用限制與是否為 same source。共享方法只計一次；15/15 skill 有 evidence entry 不等同獨立評測或 L6，review lab 不在 CI discover 範圍時保留各自執行紀錄、確認 blob，不自動重跑。缺口若不阻礙原 MUST 或屬未來獨立授權/真人驗收，明示延後而非製造合成訓練。詳 [15 項原始日誌對照](../../../docs/training/reviews/2026-11-16-research-handoff.md)。

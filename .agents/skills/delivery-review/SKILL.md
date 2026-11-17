@@ -12,3 +12,6 @@ description: 依交付約定與獨立驗收證據判斷階段完成、阻塞或�
 
 ### 研究資料交付的語意一致性（TD-005）
 PM 核已確認 scope/字典與架構、實作、QA、匯出版本；各自 PASS 不代表同一契約。要求固定預期值的內容驗證與零筆資料仍可追溯的 manifest，未核准遷移/科學政策不得以交付期限放行。合成 lab 只為訓練，不當真人或正式交付驗收。見 docs/training/reviews/2026-11-16-research-handoff.md。
+
+### 訓練停點不等於交付驗收（CAPABILITY-CONVERGENCE-005）
+分開報必要技能 evidence-converged 建議、M2-2 等工作包真實完成、A07/B10/真人 UAT、C3/M3/M4。尚缺獨立證據即保持原 gate；不因已有 28 個測試方法支持 15 skills 或同 tree CI 全綠而代替真正使用、部署與人審。使用者未確認下一階段，不要求提前真人操作。詳 [原能力收斂覆盤](../../../docs/training/reviews/2026-11-16-research-handoff.md)。

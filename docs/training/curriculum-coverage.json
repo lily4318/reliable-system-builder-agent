@@ -932,12 +932,20 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "architect",
+        "security",
+        "qa-uat"
+      ],
       "skill": "implement-feature",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.2.2",
+        "3.2.3",
+        "3.2.4"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-SQL-TRIGGER-01：原教材正文/下載及原備份未取得，保持UNREAD/source_sha256=null/L0。官方SQLite/Microsoft規格及4真SQLite方法通過：多列delta與審計、遞迴部分異動rollback、巢狀FAIL/ABORT/ROLLBACK、錯欄/NULL-safe。前置暫列DML，待原正文核對；原生T-SQL、圖及完整習得/遷移未驗，不重做新lab。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

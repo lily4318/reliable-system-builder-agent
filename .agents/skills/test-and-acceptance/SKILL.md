@@ -80,3 +80,7 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### TD-004｜View契約相容與負測（TD004-SQL-VIEW-01）
 以固定欄序、逐鍵值、scope與NULL/0作oracle，增底層敏感欄測SELECT *漏出；直接測合法/禁止的底表與view入口（唯讀非ACL），DML拒絕後核底表完整快照。刻意破壞欄名/相依consumer，實查下游失敗，再按引擎交易回滾核舊結果、相容替換提交後重驗。普通view即時更新不證快照；測試不能只看CREATE成功或行數，亦不把SQLite受控實驗當SQL Server/RLS/真研究驗收。原教材正文未取得，官方證據見原覆盤。
+
+
+### TD-004｜Trigger多列與跨表原子性驗收（TD004-SQL-TRIGGER-01）
+固定多列同組/跨組逐列OLD/NEW、原明細聚合與衍生統計oracle，測重複/no-op、NULL→0/0→NULL及拼錯UPDATE OF欄位；核全部相關業務表、審計與先前交易marker而非rowcount。受控深度重現遞迴錯誤，實查交易active及未提交部分異動，再顯式rollback驗恢復；合法有界收斂另測。刻意第二列巢狀審計拒絕，比FAIL/ABORT/ROLLBACK各scope，查正例commit與拒絕後完整狀態；不把錯誤、DDL成功或已寫audit當已commit。SQL Server集合delta及真引擎錯誤/鎖/權限、外部副作用與不可竄改審計另驗。詳原覆盤，原教材正文未取得。

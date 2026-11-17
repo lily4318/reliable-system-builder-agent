@@ -817,3 +817,7 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 
 ## TD004-SQL-VIEW-01（2026-11-17；OFFICIAL_SOURCE_LOCAL_LAB_VERIFIED / CURRICULUM_TEXT_UNREAD）
 - 使用者要求核對最新進度並續訓，依原主檔3.4.1及核心準則，無新正式方向。原教材HackMD網址及download未能讀，原備份未在可存取檔案檢索找到；不替代教材、不升L0。核讀SQLite與Microsoft官方規格，真SQLite三方法18斷言位置，固定投影、底表權限非View、欄名失配及DDL回滾實測。原主檔、原兩技能、原矩陣UNREAD備註及[原覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)增量，23文字/140未讀/13缺仍保留。基準ce651854bc7634856c937b339137134b411a09f7，CI44090938505 completed/success（metadata）；未讀原日誌、不聲稱525/525。新CI另核。下一單元3.4.2 Trigger，先核原授權正文；3.4.1缺件另補。非新研究/部署/權重訓練，REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。未改main/release、外部專案、費用或授權。
+
+
+## TD004-SQL-TRIGGER-01（2026-11-17；OFFICIAL_SOURCE_LOCAL_LAB_VERIFIED / CURRICULUM_TEXT_UNREAD）
+- 使用者明示續3.4.2，Developer主責，Architect/Security/QA觀點協作。原HackMD網頁/下載不可達，歷史授權備份未能定位；23正文/140未讀/13缺、176 L0不變。核讀SQLite CREATE TRIGGER/ON CONFLICT及Microsoft多列/巢狀觸發官方規格，新真SQLite 4/4、29 assert sites，首次遞迴錯誤oracle錯（實際未提交部分異動）修正後PASS。多列delta、跨表審計、FAIL/ABORT/ROLLBACK及錯欄名/NULL負測；原技能、矩陣、主檔、[原覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)增量。前輪exact 63c642447416c8069b57a16bc63949540134fded CI44096663927 job134085467238 raw528 tests OK/28步；本輪CI另核。非SQL Server實機、真研究/ACL/獨立模型驗收；未改main/release、外部專案、部署、費用或方向。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。下一原3.4.3 StoreProcedure，先核正式來源；如來源持續受阻不重複同方法、不宣稱原課程完成。

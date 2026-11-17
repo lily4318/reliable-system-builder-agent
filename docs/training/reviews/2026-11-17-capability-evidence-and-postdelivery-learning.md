@@ -356,3 +356,16 @@ Python3.13.5 SQLite3.46.1，`python /tmp/view_lesson/test_sql_view_lesson.py`，
 3. 真交易DROP/CREATE相依view，刻意把value改名且移除scope，consumer查詢真no such column；rollback恢復舊列；再由交易重建相容明確欄位、範圍，commit後下游仍2列。不能以CREATE成功當完整驗收；核欄名、順序、粒度、範圍、NULL、原值、下游消費者及實際引擎DDL原子性；回滾跨平台不保證。非正式產品缺陷或L4聲稱。
 ### 接續
 原教材仍23文字可讀/140未讀/13缺/176 L0；matrix原3.4.1 UNREAD、source hash null，僅備註本次官方lab與缺項，下一輪先核原3.4.2 Trigger，缺3.4.1正文不阻獨立單元。原技能/主檔/決策增量；無舊lab重跑，無真人、外部資料、部署、付費、真獨立Agent/盲測或正式發布。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。
+
+
+## TD004-SQL-TRIGGER-01｜多列delta、遞迴及原子審計（2026-11-17；OFFICIAL_SOURCE_LOCAL_LAB_VERIFIED / CURRICULUM_TEXT_UNREAD）
+### 開工與來源
+基準63c642447416c8069b57a16bc63949540134fded；核心準則、主檔、決策、角色、implement-feature/test-and-acceptance及EP-13引擎權限邊界；沿原語意/交易知識，不重做View/CRUD/RETURNING。前輪CI44096663927/job134085467238 completed/success，raw258804 chars、28步、528 tests in80.783s、View三方法ok，EDITORIAL_BROWSER_PASS 375/1280，checkout a2c7e584889c11e1e32d218818b3034daf65a1eb、report SHA256 98f1687eb73d41fb6abcb57c882d0633caf7e557fca10cdd1d98414e6f630218；未另核merge tree/下載artifact bytes，原Chrome故障未再現但根因未明。原教材https://hackmd.io/@johnsonnote/sqlds_sql_trigger 與/download不可達，搜尋無命中，歷史授權備份未能定位；不保存私人位置或捏造正文。核讀 https://www.sqlite.org/lang_createtrigger.html §2/5/6、https://www.sqlite.org/lang_conflict.html、https://learn.microsoft.com/en-us/sql/relational-databases/triggers/create-dml-triggers-to-handle-multiple-rows-of-data?view=sql-server-ver17、https://learn.microsoft.com/en-us/sql/relational-databases/triggers/create-nested-triggers。SQLite逐列OLD/NEW，SQL Server DML逐敘述inserted/deleted集合（聚合delta而非單列任取）；遞迴配置與深度限制分引擎，Microsoft規格非本地T-SQL實測。SQLite UPDATE OF表示SET涉及欄位、不保證值真的變更，拼錯可靜默；BEFORE修改正在異動的列有未定義風險；RAISE的錯誤範圍不可一概而論。
+### 本地實證
+Python3.13.5 SQLite3.46.1，`python /tmp/trigger_lesson/test_sql_trigger_lesson.py`，4/4 OK in0.004s，29 assert sites（巢狀三subcases），腳本SHA256 ce97676fb025635b42a28593f799bfd39c2b22a5206f3481dbe1959edab2cec5 / Git blob c75f3d1046b251e3e1fcdf986f9bef1dc8639b13。初次3/4：遞迴深度錯誤後錯預計數器0，實9；獨立查詢確認8筆trace及交易仍active，再明確rollback恢復0/空。修正oracle加入未提交部分狀態與回滾驗收，不是修產品bug。腳本tests/test_sql_trigger_lesson.py。
+1. 合成A組10/20、B組7；錯誤AFTER UPDATE只加NEW導致A=62而真合計32。rollback後改扣舊組加新組，一敘述搬兩列A→B且11/21，A=0/B=39、兩新舊值audit、原明細SUM=39；no-op不新增audit，commit後總額一致。固定非NULL金額、既存組的示例，非任意schema/INSERT DELETE/並發或所有權限。
+2. recursive_triggers=ON、depth=8；不收斂觸發器每次+1且寫trace，原生OperationalError too many levels，實際同連線未提交counter=9、trace 1..8、in_transaction=true；rollback後counter=0且trace空。改WHEN NEW.n<3 AND NEW.n IS NOT OLD.n，從1收斂3、trace 1/2、no-op不增。此為指定引擎版本與控制環境，不能推廣所有錯誤或平台、亦不把深度限制當收斂策略。
+3. item AFTER INSERT→audit INSERT→audit AFTER INSERT在id=2 RAISE。單次VALUES(1),(2),(3)，FAIL保留item/audit各1,2及先前marker9，ABORT撤本敘述但marker9仍在，ROLLBACK三表空且交易終止。顯式rollback後全空；重新合法(1,3)提交後audit正確。審計是已提交業務記錄而非不可竄改或拒絕事件持久日誌；外部副作用不得靠DB rollback補償。
+4. UPDATE OF socre拼錯欄位建立成功但更新score=7未寫audit；回滾及改真欄score、WHEN OLD.score IS NOT NEW.score後NULL→0、0→NULL各一筆，原值不變不增。DDL成功不可取代實際行為測試。
+### 蒸餾/接續
+約束優先純DB不變量；Trigger只承擔清楚且可驗證的同步副作用，複雜業務顯式交易，外部通知採交易outbox/提交後處理。查核原引擎具體錯誤語意、scope、每一受影響表及audit；拒絕後明確依交易契約rollback、回讀與未知提交对帳。原技能增量與原矩陣備註，不升L0、不假稱原教材/SQL Server/真研究/獨立多Agent或正式發布。23文字/140未讀/13缺/176 L0。下一3.4.3 StoreProcedure，原正文不通不反覆同方法，選安全獨立證據；未授權外部資源與部署，0使用者操作/新增費用。

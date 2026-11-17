@@ -55,3 +55,7 @@ tryLock 失敗不寫、finally release，鎖內重新查 id/receipt/容量；Spr
 
 ### TD-004｜檢視表作為具版本的查詢契約（TD004-SQL-VIEW-01）
 固定核准欄名/順序/型別、欄位投影與列scope，不用SELECT *公開報表；普通view不是資料快照或獨立備份。底表新增/改名/刪欄或更換view時，核下游所有消費者、資料粒度、NULL/真0及逐鍵值，必要時版本化相容介面、按引擎驗DDL與rollback。SQLite ordinary view預設唯讀，但底表仍可讀寫；SQL Server部分view可更新，CHECK OPTION只約束經view寫、SCHEMABINDING與refresh各有前提。實際權限/owner/invoker/底表grant另驗，不用view替代RLS；不套用SQLite migration語意到其他引擎。原3.4.1教材未讀，官方實測見[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。
+
+
+### TD-004｜多列Trigger及有界同步副作用（TD004-SQL-TRIGGER-01）
+先核引擎粒度：SQLite逐列OLD/NEW，SQL Server DML逐敘述inserted/deleted集合，聚合舊/新delta至完整業務鍵；UPDATE OF/UPDATE(column)不等於值改變，NULL-safe判斷按引擎，實測拼錯欄位/無操作。優先約束及清楚顯式交易；Trigger只承擔可驗證同步副作用，避免依賴觸發順序、無界遞迴及觸發外部郵件/API；外部副作用採交易outbox/提交後處理。核遞迴設定、收斂及界限；SQLite3.46.1深度錯誤實留未提交部分異動，FAIL/ABORT/ROLLBACK範圍不同，按交易契約rollback及所有表回讀，未知提交先唯讀對帳。審計同交易會隨回滾撤銷，不是不可竄改或完整拒絕日誌。原T-SQL/真權限/並發/研究政策另驗；[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

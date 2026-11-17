@@ -1010,3 +1010,148 @@ class PostgresArchitectureTests(unittest.TestCase):
                                   "WHERE table_schema='debuglesson'"),"0")
         print("PG-DEBUG-TIMEOUT: bounded 57014; 22012 and 42P01 distinct; connection recovered",flush=True)
 
+    def isolation_setup(self, count=2):
+        self.assertIn(count,(2,3))
+        self.sql("""
+            DROP SCHEMA IF EXISTS isolesson CASCADE;
+            CREATE SCHEMA isolesson;
+            REVOKE ALL ON SCHEMA isolesson FROM PUBLIC;
+            CREATE TABLE isolesson.reviewer(id integer PRIMARY KEY, active boolean NOT NULL);
+            CREATE TABLE isolesson.change_log(id integer PRIMARY KEY);
+            INSERT INTO isolesson.reviewer SELECT g,true FROM generate_series(1,"""
+            +str(count)+""") g;
+        """)
+
+    def isolation_begin(self, session, level):
+        self.assertIn(level,("REPEATABLE READ","SERIALIZABLE"))
+        self.assertEqual(session("SET statement_timeout='5s'")[0],"00000")
+        self.assertEqual(session("BEGIN ISOLATION LEVEL "+level)[0],"00000")
+        self.assertEqual(session("SHOW transaction_isolation"),
+                         ("00000",level.lower()))
+        code,pid=session("SELECT pg_backend_pid()")
+        self.assertEqual(code,"00000")
+        return int(pid)
+
+    def test_pg_isolation_repeatable_read_write_skew(self):
+        self.isolation_setup()
+        count="SELECT count(*) FROM isolesson.reviewer WHERE active"
+        with self.live_session() as a,self.live_session() as b:
+            pa=self.isolation_begin(a,"REPEATABLE READ")
+            pb=self.isolation_begin(b,"REPEATABLE READ")
+            self.assertNotEqual(pa,pb)
+            self.assertEqual(a(count),("00000","2"))
+            self.assertEqual(b(count),("00000","2"))
+            self.assertEqual(self.sql("SELECT count(*) FROM pg_stat_activity "
+                f"WHERE pid IN ({pa},{pb}) AND state='idle in transaction'"),"2")
+            # Both locally valid decisions write different rows.
+            for session,i in ((a,1),(b,2)):
+                self.assertEqual(session(f"UPDATE isolesson.reviewer SET active=false "
+                    f"WHERE id={i} RETURNING id"),("00000",str(i)))
+                self.assertEqual(session("INSERT INTO isolesson.change_log VALUES"
+                    f"({i})")[0],"00000")
+                self.assertEqual(session(count),("00000","1"))
+            self.assertEqual(self.sql(count),"2")
+            self.assertEqual(a("COMMIT")[0],"00000")
+            self.assertEqual(b("COMMIT")[0],"00000")
+        self.assertEqual(self.sql(count),"0")
+        self.assertEqual(self.sql("SELECT id,active FROM isolesson.reviewer ORDER BY id"),
+                         "1|f\n2|f")
+        self.assertEqual(self.sql("SELECT id FROM isolesson.change_log ORDER BY id"),"1\n2")
+        print("PG-ISOLATION-RR: overlapping distinct backends; both commit; active=0",flush=True)
+
+    def test_pg_isolation_serializable_full_retry_recomputes_decision(self):
+        count="SELECT count(*) FROM isolesson.reviewer WHERE active"
+        # Two reviewers: retry must deny. Three: retry can safely succeed.
+        for initial in (2,3):
+            with self.subTest(initial=initial):
+                self.isolation_setup(initial)
+                with self.live_session() as a,self.live_session() as b:
+                    pa=self.isolation_begin(a,"SERIALIZABLE")
+                    pb=self.isolation_begin(b,"SERIALIZABLE")
+                    self.assertNotEqual(pa,pb)
+                    for session in (a,b):
+                        self.assertEqual(session(count),("00000",str(initial)))
+                    self.assertEqual(self.sql("SELECT count(*) FROM pg_stat_activity "
+                        f"WHERE pid IN ({pa},{pb}) AND state='idle in transaction'"),"2")
+                    statuses={}
+                    # Capture conflict at either write or COMMIT; never interpret
+                    # COMMIT on an already-aborted transaction as success.
+                    for session,i in ((a,1),(b,2)):
+                        code,_=session(f"UPDATE isolesson.reviewer SET active=false "
+                                       f"WHERE id={i} RETURNING id")
+                        if code=="00000":
+                            code,_=session(f"INSERT INTO isolesson.change_log VALUES({i})")
+                        self.assertIn(code,("00000","40001"))
+                        statuses[i]=code
+                    for session,i in ((a,1),(b,2)):
+                        if statuses[i]=="00000":
+                            statuses[i]=session("COMMIT")[0]
+                        else:
+                            self.assertEqual(session("ROLLBACK")[0],"00000")
+                        self.assertIn(statuses[i],("00000","40001"))
+                    self.assertEqual(sorted(statuses.values()),["00000","40001"])
+                winner=next(i for i,s in statuses.items() if s=="00000")
+                loser=next(i for i,s in statuses.items() if s=="40001")
+                self.assertEqual(self.sql(count),str(initial-1))
+                self.assertEqual(self.sql("SELECT id FROM isolesson.change_log"),str(winner))
+                self.assertEqual(self.sql(f"SELECT active FROM isolesson.reviewer WHERE id={loser}"),"t")
+                # A known rollback permits a bounded, complete new transaction;
+                # recompute the decision rather than reissue the old UPDATE.
+                with self.live_session() as retry:
+                    self.isolation_begin(retry,"SERIALIZABLE")
+                    code,remaining=retry(count)
+                    self.assertEqual(code,"00000")
+                    self.assertEqual(int(remaining),initial-1)
+                    if int(remaining)>1:
+                        self.assertEqual(retry(f"UPDATE isolesson.reviewer SET active=false "
+                            f"WHERE id={loser} RETURNING id"),("00000",str(loser)))
+                        self.assertEqual(retry(f"INSERT INTO isolesson.change_log VALUES({loser})")[0],"00000")
+                        decision="ALLOWED"
+                    else:
+                        decision="DENIED"
+                    self.assertEqual(retry("COMMIT")[0],"00000")
+                self.assertEqual(decision,"DENIED" if initial==2 else "ALLOWED")
+                self.assertEqual(self.sql(count),"1")
+                self.assertEqual(self.sql("SELECT id FROM isolesson.change_log ORDER BY id"),
+                    str(winner) if initial==2 else "1\n2")
+                print("PG-ISOLATION-SSI:",initial,"statuses",statuses,
+                      "fresh retry",decision,"active=1",flush=True)
+
+    def test_pg_isolation_savepoint_locks_snapshot_and_sequence(self):
+        self.isolation_setup()
+        self.sql("""
+            CREATE TABLE isolesson.notes(id integer PRIMARY KEY, note text NOT NULL);
+            INSERT INTO isolesson.notes VALUES(1,'a'),(2,'b');
+            CREATE SEQUENCE isolesson.number_seq;
+        """)
+        with self.live_session() as a,self.live_session() as b:
+            pa=self.isolation_begin(a,"REPEATABLE READ")
+            code,pb=b("SELECT pg_backend_pid()")
+            self.assertEqual(code,"00000")
+            self.assertNotEqual(pa,int(pb))
+            self.assertEqual(a("UPDATE isolesson.notes SET note='kept' WHERE id=1")[0],"00000")
+            self.assertEqual(a("SAVEPOINT item")[0],"00000")
+            self.assertEqual(a("UPDATE isolesson.notes SET note='discarded' WHERE id=2")[0],"00000")
+            self.assertEqual(a("SELECT nextval('isolesson.number_seq')"),("00000","1"))
+            self.assertEqual(b("SELECT id FROM isolesson.notes WHERE id=2 FOR UPDATE NOWAIT")[0],"55P03")
+            self.assertEqual(a("INSERT INTO isolesson.notes VALUES(2,'duplicate')")[0],"23505")
+            self.assertEqual(a("SELECT 1")[0],"25P02")
+            self.assertEqual(a("ROLLBACK TO SAVEPOINT item")[0],"00000")
+            self.assertEqual(a("SELECT id,note FROM isolesson.notes ORDER BY id"),("00000","1|kept\n2|b"))
+            # The pre-savepoint lock survives; the later one is released.
+            self.assertEqual(b("SELECT id FROM isolesson.notes WHERE id=1 FOR UPDATE NOWAIT")[0],"55P03")
+            self.assertEqual(b("SELECT id FROM isolesson.notes WHERE id=2 FOR UPDATE NOWAIT"),
+                             ("00000","2"))
+            self.assertEqual(b("UPDATE isolesson.notes SET note='external' WHERE id=2")[0],"00000")
+            # Rolling back a savepoint doesn't obtain a fresh RR snapshot.
+            self.assertEqual(a("SELECT note FROM isolesson.notes WHERE id=2"),("00000","b"))
+            self.assertEqual(self.sql("SELECT id,note FROM isolesson.notes ORDER BY id"),"1|a\n2|external")
+            self.assertEqual(a("SELECT nextval('isolesson.number_seq')"),("00000","2"))
+            self.assertEqual(a("RELEASE SAVEPOINT item")[0],"00000")
+            self.assertEqual(a("COMMIT")[0],"00000")
+            self.assertEqual(b("SELECT id FROM isolesson.notes WHERE id=1 FOR UPDATE NOWAIT"),
+                             ("00000","1"))
+        self.assertEqual(self.sql("SELECT id,note FROM isolesson.notes ORDER BY id"),"1|kept\n2|external")
+        self.assertEqual(self.sql("SELECT last_value FROM isolesson.number_seq"),"2")
+        print("PG-ISOLATION-SAVEPOINT: later lock released, earlier retained; RR snapshot unchanged; sequence gap retained",flush=True)
+

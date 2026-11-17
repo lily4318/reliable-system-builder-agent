@@ -51,3 +51,7 @@ tryLock 失敗不寫、finally release，鎖內重新查 id/receipt/容量；Spr
 
 ### TD-004｜排名與研究母群契約（TD004-SQL-RANKING-01）
 先確定分析粒度、合資格母群/缺失政策、完整分區鍵、排名方向與同分處理。固定筆數用ROW_NUMBER加核准次排序唯一鍵；RANK依分數peer且跳號、DENSE_RANK依不同值等級，保留同分時不得把ID加入名次ORDER BY；外層展示另明示穩定排序。排名前後篩選不能互換；跨研究/組別分區非ACL、ROW_NUMBER非持久識別或跨版本固定名單。NTILE近似均分列，可拆同分及產生少於N個非空組，非分位數切點或隨機分派；研究資格及tie-break需核准，不以資料庫預設代替研究設計。詳[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)；SQLite合成實驗非SQL Server或真研究。
+
+
+### TD-004｜檢視表作為具版本的查詢契約（TD004-SQL-VIEW-01）
+固定核准欄名/順序/型別、欄位投影與列scope，不用SELECT *公開報表；普通view不是資料快照或獨立備份。底表新增/改名/刪欄或更換view時，核下游所有消費者、資料粒度、NULL/真0及逐鍵值，必要時版本化相容介面、按引擎驗DDL與rollback。SQLite ordinary view預設唯讀，但底表仍可讀寫；SQL Server部分view可更新，CHECK OPTION只約束經view寫、SCHEMABINDING與refresh各有前提。實際權限/owner/invoker/底表grant另驗，不用view替代RLS；不套用SQLite migration語意到其他引擎。原3.4.1教材未讀，官方實測見[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

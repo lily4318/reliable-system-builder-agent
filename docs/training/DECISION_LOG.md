@@ -813,3 +813,7 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 
 ## TD004-SQL-RANKING-01（2026-11-17；TEXT_PARTIAL / LOCAL_LAB_VERIFIED）
 - 使用者明示續原3.3.6，核心與授權不變。TD004-SQL-RANKING-01 (2026-11-17): 3.3.6原Markdown正文；SQLite3.46.1新3/3、22斷言位置，首次rank跳號oracle錯修正後通過；雙索引同分top-N實際差異及穩定鍵修正、ROW_NUMBER/RANK/DENSE_RANK、排名資格/分區、NTILE同分拆組與小組。23文字/140未讀/13缺/176 L0；[原覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)，tests/test_sql_ranking_lesson.py已寫入且hash一致；原CI44088177957 exact522/522，CursorPivotLesson三項納入CI。新CI另核。 原兩技能、矩陣、主檔及原覆盤增量；未重做舊lab。首次PR metadata暫回舊head，停止寫入並回讀分支/PR確認已更新後續作，未重送。無新角色、外部專案、正式部署或真研究驗收。原生SQL Server/25圖/embed及獨立遷移未驗；下一輪3.4.1 View。
+
+
+## TD004-SQL-VIEW-01（2026-11-17；OFFICIAL_SOURCE_LOCAL_LAB_VERIFIED / CURRICULUM_TEXT_UNREAD）
+- 使用者要求核對最新進度並續訓，依原主檔3.4.1及核心準則，無新正式方向。原教材HackMD網址及download未能讀，原備份未在可存取檔案檢索找到；不替代教材、不升L0。核讀SQLite與Microsoft官方規格，真SQLite三方法18斷言位置，固定投影、底表權限非View、欄名失配及DDL回滾實測。原主檔、原兩技能、原矩陣UNREAD備註及[原覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)增量，23文字/140未讀/13缺仍保留。基準ce651854bc7634856c937b339137134b411a09f7，CI44090938505 completed/success（metadata）；未讀原日誌、不聲稱525/525。新CI另核。下一單元3.4.2 Trigger，先核原授權正文；3.4.1缺件另補。非新研究/部署/權重訓練，REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。未改main/release、外部專案、費用或授權。

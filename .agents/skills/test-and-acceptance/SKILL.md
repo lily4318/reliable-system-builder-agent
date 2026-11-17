@@ -76,3 +76,7 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### TD-004｜排名與分層的逐鍵驗收（TD004-SQL-RANKING-01）
 固定oracle比較ROW_NUMBER/RANK/DENSE_RANK及top-N入選ID與人數，特別測邊界同分、跳號、加ID破壞peer及兩種索引路徑下無tie-break的反例；反例計畫依引擎，不將未指定排序當固定契約。測資格過濾先後、跨研究同局部鍵/同組名、真0與NULL、合資格與有效分母；NTILE驗不能均分、小母群、同分拆組、非法N及原事件不變。結果與分析母群、排序及版本一起追溯；不把排名或NTILE當真隨機分派/百分位數驗證，實際研究規格與引擎另驗。詳[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。
+
+
+### TD-004｜View契約相容與負測（TD004-SQL-VIEW-01）
+以固定欄序、逐鍵值、scope與NULL/0作oracle，增底層敏感欄測SELECT *漏出；直接測合法/禁止的底表與view入口（唯讀非ACL），DML拒絕後核底表完整快照。刻意破壞欄名/相依consumer，實查下游失敗，再按引擎交易回滾核舊結果、相容替換提交後重驗。普通view即時更新不證快照；測試不能只看CREATE成功或行數，亦不把SQLite受控實驗當SQL Server/RLS/真研究驗收。原教材正文未取得，官方證據見原覆盤。

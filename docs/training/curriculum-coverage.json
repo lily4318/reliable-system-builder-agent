@@ -911,12 +911,17 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "architect",
+        "security"
+      ],
       "skill": "implement-feature",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.2.4"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-SQL-VIEW-01：原Markdown正文此次未取得，保持UNREAD/source_sha256=null/L0；官方SQLite/Microsoft已讀，新增3真SQLite view-contract methods（固定投影/schema drift、直接底表存取、DDL rollback）PASS；待原正文/圖/範例依賴及原生T-SQL/遷移驗證，不重做上述lab。前置暫列3.2.4，待原正文核對。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

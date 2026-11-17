@@ -344,3 +344,15 @@ Python3.13.5 SQLite3.46.1 :memory:；tests/test_sql_ranking_lesson.py 本機等�
 3. NTILE(4) A組10列得3/3/2/2，90分三人被分在1/1/2；B組2列只得1/2組，同分rank皆1。NTILE(0)真OperationalError。分層近似等人數不是統計分位數切點、不是同分保全，更不是隨機分派；合法分層方案須研究者確定。固定ID是演示的tie-break，不是科學適合性。無大規模效能、精確百分位數、真正獨立模型/跨任務或正式研究驗證。
 ### 蒸餾與接續
 增量原implement-feature/test-and-acceptance、原matrix/主檔/決策；23 READABLE文字/140 UNREAD/13缺、176 L0，圖/原生/完整習得與真任務未驗，無舊lab重跑，0使用者操作/額外費用，無新管理體系/角色、main/Release/外部專案/部署。R2、3/6、Pages、A07/B10、C4-C6/M4限制保留。下一輪原3.4.1 View，由Developer主責協作Architect/Security，先核正文及前置，優先查詢契約、欄位投影、底層變更/資料範圍與可更新性引擎差異，不重做原PG RLS或JOIN/Ranking；新exact CI另核。
+
+
+## TD004-SQL-VIEW-01｜查詢投影、即時報表與schema相容（2026-11-17；OFFICIAL_SOURCE_LOCAL_LAB_VERIFIED / CURRICULUM_TEXT_UNREAD）
+### 來源與邊界
+原主檔下一步3.4.1，Developer主責、Architect/Security觀點協作。核讀核心準則、原決策、角色及implement-feature/test-and-acceptance，採EP-05的欄位契約與EP-13的引擎/權限界線，不重跑原PG RLS。原HackMD https://hackmd.io/@johnsonnote/sqlds_sql_view 及download工具不可達；當前Project/Library及歷史來源檢索未找回原備份，不認證原教材圖/正文/完整學習。實讀 https://www.sqlite.org/lang_createview.html §2 及 https://learn.microsoft.com/en-us/sql/t-sql/statements/create-view-transact-sql 的CHECK OPTION、SCHEMABINDING、updatable views、ORDER BY與refresh規則；SQLite view預設不可DML，SQL Server在特定條件可更新，不能互相套用。普通query view不是持久快照；SQL Server的CHECK OPTION僅約束透過view的寫入，不能管底表直接修改；索引view另有條件，不在本lab。當前候選ce651854bc7634856c937b339137134b411a09f7，CI44090938505 completed/success（僅metadata）。
+### 新實測與蒸餾
+Python3.13.5 SQLite3.46.1，`python /tmp/view_lesson/test_sql_view_lesson.py`，3/3 OK in0.004s，18 assertion sites（循環負例執行3次），SHA256 31ef8c4d6947eb32f162dc1858cf9c0ec77695be0126aa39f360abd129c7885c。新腳本tests/test_sql_view_lesson.py，所有資料合成。
+1. 欄位契約：四觀測列，A核准資料固定投影為(id,value)=(1,0),(2,NULL)；真ALTER ADD new_private後unsafe SELECT * view新增隱私欄，固定投影未增加；底表更新到17即讀到新值，非凍結快照；真RENAME COLUMN後SQLite改寫view引用，明確alias保留消費介面。此為SQLite版本行為，SQL Server依schema binding/refresh等另驗。
+2. 三種DML對普通view真拒絕，底表完整快照不變；底表直接查到B私人欄、直接修改A核准狀態成功，報表只剩(2,NULL)，COUNT(*)=1、COUNT(value)=0。說明唯讀與資料權限不同，不宣稱真ACL/RLS或研究核准。
+3. 真交易DROP/CREATE相依view，刻意把value改名且移除scope，consumer查詢真no such column；rollback恢復舊列；再由交易重建相容明確欄位、範圍，commit後下游仍2列。不能以CREATE成功當完整驗收；核欄名、順序、粒度、範圍、NULL、原值、下游消費者及實際引擎DDL原子性；回滾跨平台不保證。非正式產品缺陷或L4聲稱。
+### 接續
+原教材仍23文字可讀/140未讀/13缺/176 L0；matrix原3.4.1 UNREAD、source hash null，僅備註本次官方lab與缺項，下一輪先核原3.4.2 Trigger，缺3.4.1正文不阻獨立單元。原技能/主檔/決策增量；無舊lab重跑，無真人、外部資料、部署、付費、真獨立Agent/盲測或正式發布。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。

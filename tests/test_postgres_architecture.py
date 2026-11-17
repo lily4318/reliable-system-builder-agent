@@ -489,3 +489,196 @@ class PostgresArchitectureTests(unittest.TestCase):
                          "CANCELLED",("00000","RESERVED"))
         self.assertEqual(self.shared_state(),"0|3")
         self.assertEqual(self.sql("SELECT owner FROM sharedlab.bookings WHERE active"),"lab_bob")
+
+    def procedure_setup(self):
+        # Synthetic schema, using the same disposable cluster and psql helper.
+        # No public EXECUTE, no new role or external database.
+        self.sql("""
+            DROP SCHEMA IF EXISTS procdemo CASCADE;
+            CREATE SCHEMA procdemo;
+            REVOKE ALL ON SCHEMA procdemo FROM PUBLIC;
+            CREATE TABLE procdemo.record(
+                id integer PRIMARY KEY, actor name NOT NULL,
+                note text NOT NULL, revision integer NOT NULL CHECK (revision>0));
+            INSERT INTO procdemo.record VALUES
+                (1,'lab_alice','old-a',1),(2,'lab_bob','old-b',1);
+            CREATE TABLE procdemo.audit(id integer NOT NULL, revision integer NOT NULL);
+            CREATE TABLE procdemo.stage(n integer PRIMARY KEY);
+            GRANT USAGE ON SCHEMA procdemo TO lab_alice,lab_bob,lab_writer;
+            GRANT SELECT (id,actor,revision), UPDATE(note,revision)
+                ON procdemo.record TO lab_writer;
+            GRANT INSERT ON procdemo.audit TO lab_writer;
+            CREATE PROCEDURE procdemo.revise(
+                IN p_id integer, IN p_note text, INOUT p_revision integer, OUT outcome text)
+            LANGUAGE plpgsql SECURITY DEFINER SET search_path=pg_catalog,pg_temp AS $$
+            DECLARE new_rev integer;
+            BEGIN
+                IF p_id IS NULL OR p_id<=0 OR p_revision IS NULL OR p_revision<=0
+                   OR p_note IS NULL OR btrim(p_note)='' OR char_length(p_note)>40 THEN
+                    RAISE EXCEPTION USING ERRCODE='22023', MESSAGE='invalid input';
+                END IF;
+                UPDATE procdemo.record AS r SET note=p_note,revision=r.revision+1
+                  WHERE r.id=p_id AND r.actor=session_user AND r.revision=p_revision
+                  RETURNING r.revision INTO new_rev;
+                IF NOT FOUND THEN
+                    RAISE EXCEPTION USING ERRCODE='P0002', MESSAGE='record unavailable';
+                END IF;
+                INSERT INTO procdemo.audit VALUES(p_id,new_rev);
+                p_revision:=new_rev;
+                outcome:='UPDATED';
+            END;
+            $$;
+            GRANT CREATE ON SCHEMA procdemo TO lab_writer;
+            ALTER PROCEDURE procdemo.revise(integer,text,integer) OWNER TO lab_writer;
+            REVOKE CREATE ON SCHEMA procdemo FROM lab_writer;
+            REVOKE ALL ON PROCEDURE procdemo.revise(integer,text,integer) FROM PUBLIC;
+            GRANT EXECUTE ON PROCEDURE procdemo.revise(integer,text,integer) TO lab_alice;
+            CREATE PROCEDURE procdemo.invoker_read(IN p_id integer, OUT result text)
+                LANGUAGE plpgsql SECURITY INVOKER AS $$
+                BEGIN
+                    SELECT note INTO result FROM procdemo.record WHERE id=p_id;
+                END;
+                $$;
+            REVOKE ALL ON PROCEDURE procdemo.invoker_read(integer) FROM PUBLIC;
+            GRANT EXECUTE ON PROCEDURE procdemo.invoker_read(integer) TO lab_alice;
+        """)
+
+    def procedure_snapshot(self):
+        return self.sql("""SELECT jsonb_build_array(
+            (SELECT jsonb_agg(to_jsonb(r) ORDER BY id) FROM procdemo.record r),
+            (SELECT jsonb_agg(to_jsonb(a) ORDER BY id,revision) FROM procdemo.audit a),
+            (SELECT jsonb_agg(n ORDER BY n) FROM procdemo.stage));""")
+
+    def test_pg_procedure_named_inputs_output_and_errors(self):
+        self.procedure_setup()
+        self.assertEqual(self.sql("""SELECT prokind::text,array_to_string(proargmodes,',')
+            FROM pg_proc WHERE oid='procdemo.revise(integer,text,integer)'::regprocedure"""),
+            "p|i,i,b,o")
+        before=self.procedure_snapshot()
+        with self.live_session("lab_alice") as call:
+            for cmd in ("CALL procdemo.revise(NULL,'x',1,NULL)",
+                        "CALL procdemo.revise(1,NULL,1,NULL)",
+                        "CALL procdemo.revise(1,'   ',1,NULL)",
+                        "CALL procdemo.revise(1,repeat('x',41),1,NULL)",
+                        "CALL procdemo.revise(1,'x',0,NULL)",
+                        "CALL procdemo.revise(1,'x',NULL,NULL)"):
+                with self.subTest(cmd=cmd):
+                    self.assertEqual(call(cmd)[0], "22023")
+                    self.assertEqual(self.procedure_snapshot(),before)
+            for cmd in ("CALL procdemo.revise(2,'x',1,NULL)",
+                        "CALL procdemo.revise(99,'x',1,NULL)",
+                        "CALL procdemo.revise(1,'x',9,NULL)"):
+                self.assertEqual(call(cmd)[0],"P0002")
+                self.assertEqual(self.procedure_snapshot(),before)
+            # Named parameters may appear in a different order. OUT placeholder is NULL.
+            self.assertEqual(call("CALL procdemo.revise(p_note=>'new',p_id=>1,"
+                                  "p_revision=>1,outcome=>NULL)"),("00000","2|UPDATED"))
+            self.assertEqual(call("CALL procdemo.revise(1,'a''; SELECT 99;--',2,NULL)"),
+                             ("00000","3|UPDATED"))
+        self.assertEqual(self.sql("SELECT id,note,revision FROM procdemo.record ORDER BY id"),
+                         "1|a'; SELECT 99;--|3\n2|old-b|1")
+        self.assertEqual(self.sql("SELECT id,revision FROM procdemo.audit ORDER BY revision"),
+                         "1|2\n1|3")
+
+    def test_pg_procedure_execute_only_role_and_invoker_boundary(self):
+        self.procedure_setup()
+        before=self.procedure_snapshot()
+        with self.live_session("lab_alice") as alice:
+            self.assertEqual(alice("SELECT note FROM procdemo.record")[0],"42501")
+            self.assertEqual(alice("UPDATE procdemo.record SET note='bad'")[0],"42501")
+            self.assertEqual(alice("INSERT INTO procdemo.audit VALUES(1,99)")[0],"42501")
+            self.assertEqual(alice("CALL procdemo.invoker_read(1,NULL)")[0],"42501")
+            self.assertEqual(alice("SET ROLE lab_writer")[0],"42501")
+            self.assertEqual(self.procedure_snapshot(),before)
+            self.assertEqual(alice("CREATE TEMP TABLE record(id int, note text)")[0],"00000")
+            self.assertEqual(alice("INSERT INTO record VALUES(1,'decoy')")[0],"00000")
+            self.assertEqual(alice("CALL procdemo.revise(1,'legit',1,NULL)"),
+                             ("00000","2|UPDATED"))
+            self.assertEqual(alice("SELECT note FROM record"),("00000","decoy"))
+        after=self.procedure_snapshot()
+        for actor in ("lab_bob","lab_anon"):
+            with self.live_session(actor) as denied:
+                self.assertEqual(denied("CALL procdemo.revise(2,'bad',1,NULL)")[0],"42501")
+                self.assertEqual(self.procedure_snapshot(),after)
+        self.assertEqual(self.sql("SELECT id,note,revision FROM procdemo.record ORDER BY id"),
+                         "1|legit|2\n2|old-b|1")
+        self.assertEqual(self.sql("""SELECT rolname,rolsuper,rolbypassrls FROM pg_roles
+            WHERE rolname='lab_writer'"""),"lab_writer|f|f")
+        self.assertEqual(self.sql("""SELECT pg_get_userbyid(proowner),prosecdef FROM pg_proc
+            WHERE oid='procdemo.revise(integer,text,integer)'::regprocedure"""),
+            "lab_writer|t")
+
+    def test_pg_procedure_caught_exception_subtransaction_output(self):
+        self.procedure_setup()
+        self.sql("""
+            CREATE PROCEDURE procdemo.stage_one(
+                IN requested_failure boolean, OUT result text, OUT attempted integer)
+            LANGUAGE plpgsql AS $$
+            BEGIN
+                result:='OK';
+                attempted:=0;
+                BEGIN
+                    INSERT INTO procdemo.stage VALUES(7);
+                    attempted:=1;
+                    IF requested_failure THEN
+                        RAISE EXCEPTION USING ERRCODE='23514',MESSAGE='fixture refusal';
+                    END IF;
+                EXCEPTION WHEN check_violation THEN
+                    GET STACKED DIAGNOSTICS result=RETURNED_SQLSTATE;
+                END;
+            END;
+            $$;
+            REVOKE ALL ON PROCEDURE procdemo.stage_one(boolean) FROM PUBLIC;
+        """)
+        with self.live_session() as call:
+            self.assertEqual(call("BEGIN")[0],"00000")
+            self.assertEqual(call("INSERT INTO procdemo.stage VALUES(9)")[0],"00000")
+            # SQL command success does not mean business success. Local variable
+            # survives the caught subtransaction, while inserted row 7 rolls back.
+            self.assertEqual(call("CALL procdemo.stage_one(true,NULL,NULL)"),
+                             ("00000","23514|1"))
+            self.assertEqual(call("SELECT n FROM procdemo.stage ORDER BY n"),("00000","9"))
+            self.assertEqual(call("COMMIT")[0],"00000")
+            self.assertEqual(self.sql("SELECT n FROM procdemo.stage ORDER BY n"),"9")
+            self.assertEqual(call("CALL procdemo.stage_one(false,NULL,NULL)"),
+                             ("00000","OK|1"))
+            self.assertEqual(self.sql("SELECT n FROM procdemo.stage ORDER BY n"),"7\n9")
+
+    def test_pg_procedure_transaction_control_is_not_atomic_call(self):
+        self.procedure_setup()
+        self.sql("""
+            CREATE PROCEDURE procdemo.segmented()
+            LANGUAGE plpgsql AS $$
+            BEGIN
+                INSERT INTO procdemo.stage VALUES(1);
+                COMMIT;
+                INSERT INTO procdemo.stage VALUES(2);
+                RAISE EXCEPTION USING ERRCODE='22023',MESSAGE='late failure';
+            END;
+            $$;
+            CREATE PROCEDURE procdemo.definer_commit()
+            LANGUAGE plpgsql SECURITY DEFINER AS $$
+            BEGIN COMMIT; END;
+            $$;
+            CREATE PROCEDURE procdemo.configured_commit()
+            LANGUAGE plpgsql SET search_path=pg_catalog AS $$
+            BEGIN COMMIT; END;
+            $$;
+            REVOKE ALL ON PROCEDURE procdemo.segmented() FROM PUBLIC;
+            REVOKE ALL ON PROCEDURE procdemo.definer_commit() FROM PUBLIC;
+            REVOKE ALL ON PROCEDURE procdemo.configured_commit() FROM PUBLIC;
+        """)
+        with self.live_session() as call:
+            self.assertEqual(call("BEGIN")[0],"00000")
+            self.assertEqual(call("CALL procdemo.segmented()")[0],"2D000")
+            self.assertEqual(call("SELECT 1")[0],"25P02")
+            self.assertEqual(call("ROLLBACK")[0],"00000")
+            self.assertEqual(self.sql("SELECT n FROM procdemo.stage"),"")
+            self.assertEqual(call("CALL procdemo.definer_commit()")[0],"2D000")
+            self.assertEqual(call("CALL procdemo.configured_commit()")[0],"2D000")
+            # Top-level CALL may commit internally. Later error cannot undo
+            # first committed segment, verified from a fresh connection.
+            self.assertEqual(call("CALL procdemo.segmented()")[0],"22023")
+            self.assertEqual(self.sql("SELECT n FROM procdemo.stage ORDER BY n"),"1")
+            self.assertEqual(call("SELECT n FROM procdemo.stage ORDER BY n"),("00000","1"))
+

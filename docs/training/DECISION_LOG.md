@@ -681,3 +681,12 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 - 使用者要求將離線 APP 真人驗收與後續線上使用驗收合併，減少人工，維持 Agent 原訓練目標及安全標準，先提供修訂方案不提前部署。此輪是規劃授權，尚未核准實際依賴變更或 M3/C3/M4。基準 d2ac32105ca93c12abebc253cc402ea84694791a，CI 44006773485 completed/success（metadata），原主檔/決策/方案、APP 指南、C0–C6、B10、release checklist 已核。
 - 詳[原驗收方案 R1 增量](reviews/2026-11-17-first-delivery-acceptance-plan.md#2026-11-17修訂提案-acceptance-plan-006-r1proposed--not_approved--not_run)。以線上為首版交付，離線 file:// 未驗/不作首版承諾（待確認，不虛稱線上驗證離線）。M2-2 保持 PARTIAL、A07 source-only 未證且原 session 關閉；提議只調整依賴允許另准 M3-1 先行 C0–C2，並在 C3 明示准許時若 A07 只剩獨立性證據缺口可進受控合成案例部署，不弱化來源、scope、安全、成本或未知結果守門。C4/C5 真遠端功能/版本/更新回退由 Agent 查驗，C6 完成一次整合真人使用（開網址、生成、下載、理解度回報；必要缺證才補人測），同證據回填 M2-2；適用 B10 與使用者核准/啟用分開；A07/B10 限制依原規則，正式發布不得在必要 gate 未滿時放行。M4 原獨立審查、治理與另授權完整保留。M3-1 完成停在 C3，M3-2 完成停在 M4；不提前標 M2-2 完成。無新功能/訓練/外部專案/付費，6包2完成、NT$0、原日期目標不變。
 - 原方案保留歷史，修訂為待確認，不直接覆蓋 NEXT_ACTION 或原有效決策。僅增量三個原文件，未執行真人測試、C0–C2 實作、部署、main/release 或 APP 變更；寫後回讀及例行 CI 分開。下一步等使用者確認 R1 及明示 M3-1（若確認才實際切換依賴）。
+
+
+## TD-001–005｜首版驗收證據與交付後真任務學習（2026-11-17；PROPOSED_NOT_RUN）
+- 使用者要求以原 Agent 目標重整驗收、提出精簡，並規劃交付後由真正研究/實驗/教學網站任務提升八專家，禁止再擴展示 APP、提前接管其他專案。基準 c5d721da97db2d2aef32e1a1505e66431445141c / CI 44007315919 completed/success（metadata）。查原主檔、決策、R1、原 M1/M2、15 skill 證據矩陣、A01–A07、B01–B10、C0–C6、原 recovery/holdout/TD-004 教材矩陣。詳[整體覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。分技術、遷移、產品、治理；已執行工程保留，不把案例成功、測試數、教材清單、治理審核當全角色精通。真任務與教材兩路共用原技能、案例及單一矩陣；每次按需求選必要主責，L5/L6 依實際陌生遷移與真交接，不自評升級。提案採可比任務的可驗需求、重工/缺陷復發、人工操作及真遷移證據追蹤，非新增首版門檻、模型權重增益、另造台帳。
+- 建議先確認 R1 並另授權 M3-1，維持一次 C6 真人 UAT、A07/B10 限制及原 C3/M4 守門；長期按實際獨立授權真任務、原確認 TD-004 延後教材補齊分工執行。無新需求不重複造 lab。R1 尚 PROPOSED、原 NEXT_ACTION 保留，2/6、M2-2 PARTIAL、NT$0、11/22/29 目標不變；不新增功能、接管/讀寫其他專案、外部資源、部署、正式發布或真測。
+ 
+## 證據來源更正 EVIDENCE-PROVENANCE-CORRECTION-007（2026-11-17；REFERENCE_LINKS_UNVERIFIED）
+- 本輪覆核長期能力證據發現先前 GAS-ACCESS-SESSION-001、GAS-DIAG-002、GAS-DATA-003、TRIAL-RECOVERY-004、A07 Temporary Chat 說明的外部工具未提供可核讀正文，將 URL/原理當作實讀/官方佐證並非有效來源。撤回 OFFICIAL_SOURCE_READ/OFFICIAL_DOC_CORROBORATED 等受影響肯定標籤；原文留歷史，本更正優先。原來源連結只是待核參考，Sheets 2026-09-03、later 2026 超額計費、精確配額作實讀現況宣稱撤回；採用前按當時官方/實際帳戶/費用重新核，未知不做。timing 文獻完整原文閱讀亦待核，不把 URL 算學習完成。不一概否定其他歷史實讀。
+- 原 USER_REPORTED_RECOVERY root cause 未獨立重現、GAS JS strict28/28 及18/18、trial SQLite/Chromium 9/9、timing 11PASS/1SKIP 等受控實驗證據不撤銷，原已核實 CI/APP 事實保持。A07 使用者回報與原核對保留，source-only PARTIAL 不升級，不靠官方政策推定環境。主檔、原覆盤、CLOUD guide、EP 索引及直接宣稱的兩 skill 更新來源標記與過時數字，保留安全邏輯/原權限與行為。未實際新外部閱讀或重測；詳本輪覆盤 §6。寫後回讀及 CI 分開。

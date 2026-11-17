@@ -1,5 +1,7 @@
 # 多平台免費架站選型與雲端工程實戰｜TP-006/1
 
+> 證據更正（2026-11-17，EVIDENCE-PROVENANCE-CORRECTION-007）：此前外部來源閱讀/官方佐證標記缺少可核讀正文，原列 URL 僅參考連結（REFERENCE_LINKS_UNVERIFIED）；相關實讀/官方佐證肯定宣稱撤回。保留一般工程原則及原實際實驗結果，實際採用前另查當前產品規則。詳細見原決策紀錄及能力證據重整覆盤。
+
 ## 目的、範圍、證據層級
 使用者 2026-11-15 明確採用 GitHub 共同工程基礎及四平台選型能力、實戰與驗收路徑；外部部署需另確認授權。此指南是候選技能擴充，**不含各帳戶的建置、任何部署或真人資料**。不改 WEB-EDITORIAL-01/v0.1 本機確認規格，不以雲端訓練取代 A07 fresh-dialogue gate。TD-001/002、原 scope/engineering_workflow/正式 release 機制維持。REPO_NATIVE，單 Agent 按角色工作。資料限公開合成、去識別工程證據。沒有實際帳號、算力或服務性能證據時不稱已掌握真部署。
 
@@ -87,7 +89,7 @@ C1 必須依 [完全新手引導](BEGINNER_ACCOUNT_ONBOARDING.md) 先辨識必�
 正式版 /exec 與 deploymentId/version/access/executeAs 先唯讀查核；ANYONE 為已登入、ANYONE_ANONYMOUS 才含未登入。Google 明示 multi-login 不支援 Web App；部署者能開而其他帳號不能時，先以乾淨無痕或獨立 Chrome profile 用同 URL 測符合要求的匿名或單一非部署者帳號。無痕預設可能阻擋第三方 Cookie；單帳號、另一設定檔亦可比對。若乾淨 session 成功，優先排除登入衝突，必要時告知登出及網站資料損失風險、取得知情同意再清除相關網站 Cookie；若仍失敗，查 Workspace/OAuth/ACL/doGet/後端權限；不盲改部署或公開 Sheet，不用公開入口代替管理功能負測。實際預期角色正反測與版本回讀分開記錄；不擴大原 CLOUD-B 私有研究系統的匿名權限。來源：https://developers.google.com/apps-script/guides/support/troubleshooting?hl=zh-tw；https://developers.google.com/apps-script/manifest/web-app-api-executable?hl=zh-tw；https://support.google.com/chrome/answer/95647?hl=zh-Hant 。使用者真實恢復回報及限制見 [原決策](training/DECISION_LOG.md) GAS-ACCESS-SESSION-001。非本輪獨立雲端驗收；C3 仍獨立授權。
 
 ### GAS 多層診斷與版本同步（GAS-DIAG-002）
-先查 [專業深度覆盤、官方來源、唯讀順序與 QA 矩陣](training/reviews/2026-11-16-gas-diagnosis.md)。六層：browser/session；script/deployment URL；Git/HEAD/version/active/runtime；access/executeAs/visitor/OAuth；doGet/RPC；下游 resource/quota/log。以同一角色及可比較環境隔離；部署者/頁面200/HEAD 或 build marker 不代替實際角色正反測和完整 content readback。updateContent 全量替換、原 deployment 指向新 version、未知寫入只讀對帳、空訪客需識別時 fail closed。離線 28 案通過非雲端 UAT，真 GAS/C3 尚未授權。原 GAS-ACCESS-SESSION-001 與 EP-06/14 保留，不將 CLOUD-B 變成匿名研究系統。
+先查 [專業深度覆盤、待核參考連結、唯讀順序與 QA 矩陣](training/reviews/2026-11-16-gas-diagnosis.md)。六層：browser/session；script/deployment URL；Git/HEAD/version/active/runtime；access/executeAs/visitor/OAuth；doGet/RPC；下游 resource/quota/log。以同一角色及可比較環境隔離；部署者/頁面200/HEAD 或 build marker 不代替實際角色正反測和完整 content readback。updateContent 全量替換、原 deployment 指向新 version、未知寫入只讀對帳、空訪客需識別時 fail closed。離線 28 案通過非雲端 UAT，真 GAS/C3 尚未授權。原 GAS-ACCESS-SESSION-001 與 EP-06/14 保留，不將 CLOUD-B 變成匿名研究系統。
 
 ### GAS/Sheets 研究交易、配額及復原（GAS-DATA-003）
-沿 EP-03/13 與 [深度覆盤](training/reviews/2026-11-16-gas-data-integrity.md)；原 CLOUD-B 真驗收不變。ScriptLock 僅同 script 合作 writer；單 workbook atomic batch 非通用 DB isolation/CAS；先核所有寫入者、持久 receipt、unknown-inflight fence 與外部 outbox，資料不明 stop/reconcile。API 讀寫各300/min/project、60/min/user/project、180s timeout、2MB建議，另查 Apps Script及Mail/Drive限額、實際帳戶整體流量，bounded backoff 不重送未知操作。2026-09-03 Sheets limits 頁提及 later 2026 超額計費計畫，NT$0 需實際核最新 billing、不得自動升配額/付費。版本歷史/backup 先唯讀與隔離 copy、核完整資料+receipt+audit+pending+outbox+後續合法寫入；原部署權限、ACL、C3/真 UAT 不變。離線故障模型 18/18，並未實際呼叫 Google API 或測真 restore。
+沿 EP-03/13 與 [深度覆盤](training/reviews/2026-11-16-gas-data-integrity.md)；原 CLOUD-B 真驗收不變。ScriptLock 僅同 script 合作 writer；單 workbook atomic batch 非通用 DB isolation/CAS；先核所有寫入者、持久 receipt、unknown-inflight fence 與外部 outbox，資料不明 stop/reconcile。API 配額、timeout/payload、Apps Script/Mail/Drive 限額、實際帳戶流量及 billing 須於使用前讀當時正式來源與真帳戶核對；bounded backoff 不重送未知操作。原精確配額及 2026-09-03/late 2026 超額計費說法因缺可核正文撤回，不作成本依據；未知即停，NT$0，不得自動升配額/付費。版本歷史/backup 先唯讀與隔離 copy、核完整資料+receipt+audit+pending+outbox+後續合法寫入；原部署權限、ACL、C3/真 UAT 不變。離線故障模型 18/18，並未實際呼叫 Google API 或測真 restore。

@@ -77,3 +77,7 @@ Agent 先以授權工具核 C4/C5：同一 HTTPS URL＋已固定 artifact digest
  
 ### R1 決策及下一步
 建議確認以上 R1（包括取消離線相容性首版承諾、A07 未證狀態下只允許另准安全準備/受控部署而非完整通過、共享 UAT 與逐包關閉）。另明示 M3-1 才執行 C0–C2，完成即停；若不同意改依賴，原 006 仍有效。此次只提供修訂方案，不執行實際驗收、APP 重包、平台/帳號設定、C0–C2 實作/成本調查、C3、部署、正式發布或其他專案；不改 source/runtime/workflows/main/release。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。原主檔只索引待確認提案，原 NEXT_ACTION 保持，寫後回讀與例行 CI 分開。
+
+
+## 2026-11-17｜證據來源補正
+證據更正（2026-11-17，EVIDENCE-PROVENANCE-CORRECTION-007）：此前外部來源閱讀/官方佐證標記缺少可核讀正文，原列 URL 僅參考連結（REFERENCE_LINKS_UNVERIFIED）；相關實讀/官方佐證肯定宣稱撤回。保留一般工程原則及原實際實驗結果，實際採用前另查當前產品規則。詳細見原決策紀錄及能力證據重整覆盤。 暫時聊天原官方閱讀宣稱撤回，不影響原真新對話回報與 source-only PARTIAL。原 R1 仍待確認，不影響既定授權。

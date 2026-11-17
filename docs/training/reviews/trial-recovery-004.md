@@ -1,4 +1,6 @@
 # 心理實驗 Trial 持久化及中斷復原（TRIAL-RECOVERY-004，2026-11-17 台灣日期可能跨日；本輪接續 11-16 訓練）
+
+> 證據更正（2026-11-17，EVIDENCE-PROVENANCE-CORRECTION-007）：此前外部來源閱讀/官方佐證標記缺少可核讀正文，原列 URL 僅參考連結（REFERENCE_LINKS_UNVERIFIED）；相關實讀/官方佐證肯定宣稱撤回。保留一般工程原則及原實際實驗結果，實際採用前另查當前產品規則。詳細見原決策紀錄及能力證據重整覆盤。
  
 ## 範圍、原證據及取捨
 使用者明示依最新主檔將 GAS-DATA-003 應用至 Trial 恢復，合成資料、本機真瀏覽器，實測蒸餾同步，不重做/部署/真人驗收。基準 PR #8 351f90023057d73337d276dcdf309d3aa43fcfe0、CI 43898561110 completed/success（run metadata）。主檔 097be981f845e57f89a798644af0468b4359c8f7、決策 99b028cdb004126ab9692c09e97f6a20ffda1025；原 timing lab 7dfc5339de6b6e6c151c7b2706c0e3a8ffeb64f4 為 11 PASS/1 SKIP 無持久化；GAS-DATA-003 18/18 是模型，原 research-data 10/10 真 SQLite 快照、EP-03/06/11 已有交易與 UI 原則。新切片只驗跨文件生命週期中止、attempt/原資料、重試/收據及單調原點，不重做計時精度/CSV/通用 DB。Architect、Developer、QA、DevOps/SRE、Learning Evaluator 依角色分工；REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。自定合成規格單一 logical trial、F/J、明示中斷後才能重開 pending；真研究重試、有效性及缺失值政策另由研究者確認。

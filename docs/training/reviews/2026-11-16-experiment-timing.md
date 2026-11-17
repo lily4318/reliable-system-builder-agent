@@ -1,5 +1,7 @@
 # 線上心理實驗｜刺激與反應時間、生命週期（2026-11-16）
 
+> 證據更正（2026-11-17，EVIDENCE-PROVENANCE-CORRECTION-007）：此前外部來源閱讀/官方佐證標記缺少可核讀正文，原列 URL 僅參考連結（REFERENCE_LINKS_UNVERIFIED）；相關實讀/官方佐證肯定宣稱撤回。保留一般工程原則及原實際實驗結果，實際採用前另查當前產品規則。詳細見原決策紀錄及能力證據重整覆盤。 此篇 timing 來源完整原文閱讀待再核，不影響實測。
+
 ## 正式來源、範圍與前置知識
 使用者明示優先必要心理實驗專業深化，不提前真人驗收、部署。原 PR #8 head 981550439f3d88495bccb54a1e28784c5daa9988；CI 43783442109 completed/success（run metadata，未重跑全 CI）；主檔 9da31c9a0d879bf74d021206d1ae3f724c096e21、決策 bd4631df025f7093f5a6753a8a00e5cc033f2898。核對原 research-methods/app.js blob df98563e19bea4b5919ee52b23316eaaaaa2c6b6 及 tests/test_research_methods_app.py 07893f553009db1b9a44b166df1e6886e072dd6e，已有固定 seed、無偏模數抽樣的合成隨機分派、實際 DOM/CSV；不是受試者 RT 實驗。原 [研究資料](2026-11-16-research-data.md)、[研究交接](2026-11-16-research-handoff.md) 與 EP-06/11 相關：保留實際瀏覽器及固定 oracle 分層，不重做原教學 APP、資料庫、CSV 或任務池。選必要不同垂直切片：單一視覺刺激、response window、abort、focus/visibility、trial record。Developer 主責、Architect/QA 協作，同一 Agent 按角色分工（REPO_NATIVE / SINGLE_AGENT_ROLE_WORK），無獨立子代理、私人工作台或模型權重訓練。合成規格 400ms、F/J、valid/missing/invalid 是訓練自訂，不代表使用者研究方法。
 

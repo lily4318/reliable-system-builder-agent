@@ -14,7 +14,7 @@ description: "功能壞了、幫我除錯。developer 角色；交付 repair。"
 若確認後的資料仍可修改，將確認綁定當前內容；任何編輯、改選或取消都要讓舊確認及其可見預覽失效。空白草稿拒絕確認、非空白重新啟用，但不能自動核准。分開檢查核心狀態與介面事件，以固定的真實正反例重現原缺陷、最小修復並重跑相同檢查。案例見原決策紀錄 NATIVE-TRANSFER-002 及 NATIVE-UI-003；不把本機 DOM 成功或 literal True 當成人類操作或外部權限證明。
 
 ### GAS Web App 公開存取與瀏覽器工作階段（GAS-ACCESS-SESSION-001）
-已開放存取但非部署者無法開啟時，不先重部署、改程式或放寬 ACL。先唯讀核正式 /exec、deploymentId/version、access（ANYONE=已登入，ANYONE_ANONYMOUS=含未登入）、executeAs；使用同一 URL 在乾淨無痕／獨立瀏覽器設定檔測所需匿名或僅一個合法非部署者帳號，另驗不應有權限的管理與資料功能。官方明示 GAS Web App 不支援多重登入；若乾淨 session 成功而原環境失敗，先排 session/multi-login，單帳號或獨立 profile 優先，再知情同意下清除相關網站 Cookie/資料（可能登出、清掉偏好）；無痕也可能受第三方 Cookie 限制，不單以此判定部署失敗。都失敗再查 Workspace、OAuth、應用層/後端 ACL 與實際錯誤。不接受 cookie/token、不公開資料源、不盲重部署或誤升權。依 [原案例及官方來源](../../../docs/training/DECISION_LOG.md#gas-access-session-001gas-已開放存取但其他帳號無法開啟2026-11-16user_reported_recovery--official_doc_corroborated--index_candidate)；使用者回報清除 Cookie 後其他帳號恢復，根因未獨立重現；不可當正式跨帳號 UAT。
+已開放存取但非部署者無法開啟時，不先重部署、改程式或放寬 ACL。先唯讀核正式 /exec、deploymentId/version、access（ANYONE=已登入，ANYONE_ANONYMOUS=含未登入）、executeAs；使用同一 URL 在乾淨無痕／獨立瀏覽器設定檔測所需匿名或僅一個合法非部署者帳號，另驗不應有權限的管理與資料功能。多帳號工作階段為待核來源的排查假說（原官方實讀宣稱已撤回，使用前查當前正式文檔）；若乾淨 session 成功而原環境失敗，先排 session/multi-login，單帳號或獨立 profile 優先，再知情同意下清除相關網站 Cookie/資料（可能登出、清掉偏好）；無痕也可能受第三方 Cookie 限制，不單以此判定部署失敗。都失敗再查 Workspace、OAuth、應用層/後端 ACL 與實際錯誤。不接受 cookie/token、不公開資料源、不盲重部署或誤升權。依 [原案例及待核參考連結](../../../docs/training/DECISION_LOG.md#gas-access-session-001gas-已開放存取但其他帳號無法開啟2026-11-16user_reported_recovery--official_doc_corroborated--index_candidate)；使用者回報清除 Cookie 後其他帳號恢復，根因未獨立重現；不可當正式跨帳號 UAT。
 
 ## 交付與接續
 保存實際工作成果到已授權私人工作區並以 `handoff` 登錄 repair；產物應包含需求來源、實際完成、驗證結果、未決與下一步。透過 `context` 回讀產物，下一技能讀內容而非只讀完成旗標。只有真實驗證才可稱完成；角色未被實際啟動時標記單 Agent 協作。外部寫入、正式部署與發布另需授權。

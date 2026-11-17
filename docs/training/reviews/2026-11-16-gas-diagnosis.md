@@ -1,5 +1,7 @@
 # GAS 網頁應用程式多層診斷｜2026-11-16（GAS-DIAG-002）
 
+> 證據更正（2026-11-17，EVIDENCE-PROVENANCE-CORRECTION-007）：此前外部來源閱讀/官方佐證標記缺少可核讀正文，原列 URL 僅參考連結（REFERENCE_LINKS_UNVERIFIED）；相關實讀/官方佐證肯定宣稱撤回。保留一般工程原則及原實際實驗結果，實際採用前另查當前產品規則。詳細見原決策紀錄及能力證據重整覆盤。
+
 ## 目的、來源與既有證據
 使用者明確授權深入學習 GAS 部署、跨帳號、權限、同步與 browser session，蒸餾原技能，禁止修改真實網站或部署。基準 Draft PR #8 970c97666ea676d51ee0c075fc85f222f9277d3a；核主檔 2802f2bb5ac4006a835cecc1a3eeabda8449c5ea、決策 06d6d25fa8c396bf766276190a8d88edb0f34064、原 GAS-ACCESS-SESSION-001、CLOUD-B、EP-06/14 及 deployment/debug/security/QA 的既有契約。基準 CI 43834885841 查時 in_progress，未宣稱成功。DevOps/SRE 主責，Developer/Security/QA 協作，REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。已有 multi-login/清 Cookie 排除及真實使用者回報，已有一般版本、權限、未知 mutation 守門；本輪避免重做 cookie 案例與 DB/rollback lab，專攻 GAS 不同層的證據錯配。原 trial 持久化 NEXT_ACTION 不變。
 

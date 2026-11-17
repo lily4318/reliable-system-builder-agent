@@ -36,3 +36,7 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### Trial 持久化 QA（TRIAL-RECOVERY-004）
 真 reload/close/reopen + 獨立資料讀回，核原 pending/terminal row、parent、新時間原點、null 與 receipt；注入 commit 後 UNKNOWN 和 transaction rollback，重放同 payload 不變、不同 payload 拒絕，舊分頁 finish STALE、雙 tab 只一開始。host binding 非 HTTP、同步 callback 非真競寫鎖等待；browser origin storage 受限須標未驗而非偽造成功，不改安全政策。詳 [9/9 本機替代實測及限制](../../../docs/training/reviews/trial-recovery-004.md)。
+
+
+### TD-004｜資料語意的負測（TD004-DB-KEYTYPE-01）
+移轉驗收除行數/FK/唯一限制外，使用固定來源識別及期望的目的父子資料核對語意，刻意測「FK合法但指錯人/項」；拒絕重複業務鍵/穩定鍵及孤兒，核實副作用。型別核前導零、精確小單位值、起點/末秒/次日午夜、非法值及資料不變；相同合計不代表行內容正確。原 SQLite lab 僅支持固定格式 UTC 與本機型別限制，尚須按實際 API/DB 驗字串 coercion、bool、任意時間有效性、時區/DST、T-SQL、交易衝突及研究政策；不把自建故障對照當產品 bug 或真盲測。

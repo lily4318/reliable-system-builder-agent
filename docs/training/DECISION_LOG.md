@@ -759,3 +759,7 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 
 ## TP-010-AUDIT-01｜原團隊範本完整功能對照（2026-11-17；AUDIT / PROPOSED）
 - 使用者要求逐項對照原九技能、共享目錄、手冊、學習及覆盤與現8角色15技能，保存來源依據且不公開私人資料。實讀來源與最新候選 CI 44024790864 raw 519/519、18 方法及 exact tree；詳[原覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。本輪無新增正式決策，已確認 TP010/R2 不變；私人日常記憶、真正跨任務遵循及成效回饋闭環是剩餘缺口。建議用原位置與下一實際任務驗證，不另建系統；專業教材雙軌繼續。無私人內容/原文/來源識別碼公開、未執行新功能或部署。
+
+
+## TD004-DB-KEYTYPE-01（2026-11-17；USER_CONFIRMED_CONTINUATION / LOCAL_LAB_VERIFIED）
+- 使用者確認 TP-010-AUDIT-01 之專業優先、原教材與真工作成效閉環，不新增管理架構/知識庫。沿原 R2/TP010，實讀2.2.1–4 Markdown、官方型別，採用 EP-01/13；本輪兩真 SQLite lab 方法通過、17 assertion sites，教材圖/嵌入及真 T-SQL 未驗故全 L0。新原矩陣6 READABLE/157 UNREAD/13 BLOCKED_SOURCE，原176初步主責不變。新增原技能與測試、原覆盤詳[TD004-DB-KEYTYPE-01](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。無私人資料、無需主人操作、無舊 lab 重跑；下一輪正規化及完整可讀課程，不重開 Pages，不把此作獨立LLM遷移或正式發布。

@@ -58,3 +58,7 @@ description: "設計架構、比較方案。architect 角色；交付 architectu
 
 ### Trial 跨文件持久化及重試契約（TRIAL-RECOVERY-004）
 研究者核准後區分 logical trial 與 attempt ID，持久 pending 再呈現刺激，reload 先讀狀態而非跨 timeOrigin 續算；原 attempt 保留 interrupted/null，明示重試生成 parent 關聯與新 doc/time origin。版本、當前 attempt、原點與 receipt 同步守門；真研究缺失/重試政策、資料耐久/倫理獨立核。IndexedDB 與 server storage 權責分開，不把 unload/best effort 或 SQLite 交易冒充 GAS 遠端承諾；詳 [覆盤](../../../docs/training/reviews/trial-recovery-004.md)。
+
+
+### TD-004｜資料身份、型別與跨庫映射（TD004-DB-KEYTYPE-01）
+辨認業務鍵、local surrogate、跨來源 stable identity 與授權是不同契約；依穩定度、分布、查詢與整合選自然鍵/整數/原生UUID或混合，另保業務唯一約束。跨庫匯入以可追溯來源鍵→目的鍵映射、交易及固定預期父子語意驗收，FK 合法不代表資料對。欄位以核定資料字典的單位、語意、值域、精度、時區選型（非數字識別碼保留 leading zeros；精確定點用途適用原生decimal或有範圍的縮放整數）。實際查詢用起點包含/終點排除，時區及精度以實際契約驗；SQL Server rowversion/timestamp 非日期時間，datetime2 表示精度非物理測量準確度。原教材 SQL Server 特定建議不得泛化；用原有命名與 schema，不為風格重命名。參見[原實證](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)與既有 test_research_data.py 新 class，SQLite 局部證據，非 T-SQL 實機/UUID效能/完整教材或正式研究。

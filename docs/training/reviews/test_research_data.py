@@ -139,4 +139,64 @@ class MissingValueLesson(unittest.TestCase):
             self.assertEqual(db.execute('SELECT COUNT(slots), SUM(slots) FROM capacity').fetchone(), (2,4))
             self.assertEqual(db.execute('SELECT COUNT(slots), SUM(slots) FROM capacity WHERE slots IS NULL').fetchone(), (0,None))
 
+class IdentityAndTypeLesson(unittest.TestCase):
+    def test_cross_database_identity_and_semantic_relation(self):
+        source = sqlite3.connect(':memory:')
+        target = sqlite3.connect(':memory:')
+        for db in (source, target):
+            db.execute('PRAGMA foreign_keys=ON')
+            db.executescript('''CREATE TABLE item (local_id INTEGER PRIMARY KEY, stable_id TEXT NOT NULL UNIQUE, code TEXT NOT NULL UNIQUE);
+                CREATE TABLE detail (id INTEGER PRIMARY KEY, item_id INTEGER NOT NULL REFERENCES item(local_id));''')
+        source.execute('INSERT INTO item VALUES (1,?,?)', ('source-A','001'))
+        source.execute('INSERT INTO detail VALUES (7,1)')
+        target.execute('INSERT INTO item VALUES (1,?,?)', ('other-B','002'))
+        target.execute('INSERT INTO item VALUES (2,?,?)', ('source-A','001'))
+        # Deliberately unsafe transfer: an existing number satisfies FK but refers to the wrong item.
+        target.execute('INSERT INTO detail VALUES (7,1)')
+        self.assertEqual(target.execute('PRAGMA foreign_key_check').fetchall(), [])
+        self.assertEqual(target.execute('SELECT stable_id FROM detail JOIN item ON item_id=local_id').fetchone(), ('other-B',))
+        expected = source.execute('SELECT stable_id FROM detail JOIN item ON item_id=local_id WHERE detail.id=7').fetchone()
+        self.assertNotEqual(expected, ('other-B',))
+        # Correctly translate the source identity to the destination local key.
+        target.execute('UPDATE detail SET item_id=(SELECT local_id FROM item WHERE stable_id=?) WHERE id=7', expected)
+        self.assertEqual(target.execute('SELECT stable_id FROM detail JOIN item ON item_id=local_id').fetchone(), ('source-A',))
+        target.execute('UPDATE item SET code=? WHERE stable_id=?', ('003','source-A'))
+        self.assertEqual(target.execute('SELECT code FROM detail JOIN item ON item_id=local_id').fetchone(), ('003',))
+        target.commit()
+        before = target.execute('SELECT * FROM item ORDER BY local_id').fetchall()
+        for row in ((3,'source-A','004'),(3,'new-C','003')):
+            with self.subTest(duplicate=row), self.assertRaises(sqlite3.IntegrityError), target:
+                target.execute('INSERT INTO item VALUES (?,?,?)', row)
+        self.assertEqual(target.execute('SELECT * FROM item ORDER BY local_id').fetchall(), before)
+        with self.assertRaises(sqlite3.IntegrityError), target:
+            target.execute('INSERT INTO detail VALUES (8,999)')
+        self.assertEqual(target.execute('PRAGMA foreign_key_check').fetchall(), [])
+        source.close()
+        target.close()
+
+    def test_identifiers_exact_amounts_and_half_open_time_window(self):
+        with sqlite3.connect(':memory:') as db:
+            db.executescript('''CREATE TABLE legacy (code INTEGER, amount REAL);
+              CREATE TABLE observation (code TEXT PRIMARY KEY NOT NULL,
+                amount_minor INTEGER NOT NULL CHECK(amount_minor BETWEEN 0 AND 999999),
+                occurred_utc TEXT NOT NULL) STRICT;''')
+            db.executemany('INSERT INTO legacy VALUES (?,?)', [('001',0.1),('1',0.2)])
+            self.assertEqual(db.execute('SELECT COUNT(DISTINCT code) FROM legacy').fetchone(), (1,))
+            self.assertNotEqual(db.execute('SELECT SUM(amount) FROM legacy').fetchone()[0], 0.3)
+            db.executemany('INSERT INTO observation VALUES (?,?,?)', [
+                ('001',10,'2026-01-01T00:00:00.000Z'),
+                ('1',20,'2026-01-01T23:59:59.999Z'),
+                ('002',40,'2026-01-02T00:00:00.000Z')])
+            self.assertEqual(db.execute('SELECT COUNT(DISTINCT code) FROM observation').fetchone(), (3,))
+            start, end = '2026-01-01T00:00:00.000Z','2026-01-02T00:00:00.000Z'
+            self.assertEqual(db.execute('SELECT SUM(amount_minor) FROM observation WHERE occurred_utc BETWEEN ? AND ?', (start,end)).fetchone(), (70,))
+            self.assertEqual(db.execute('SELECT code,amount_minor FROM observation WHERE occurred_utc>=? AND occurred_utc<? ORDER BY occurred_utc',(start,end)).fetchall(), [('001',10),('1',20)])
+            self.assertEqual(db.execute('SELECT SUM(amount_minor) FROM observation WHERE occurred_utc>=? AND occurred_utc<?',(start,end)).fetchone(), (30,))
+            db.commit()
+            before = db.execute('SELECT * FROM observation ORDER BY code').fetchall()
+            for amount in (-1,1000000,10.5,None):
+                with self.subTest(amount=amount), self.assertRaises(sqlite3.IntegrityError), db:
+                    db.execute('INSERT INTO observation VALUES (?,?,?)', ('bad',amount,start))
+            self.assertEqual(db.execute('SELECT * FROM observation ORDER BY code').fetchall(), before)
+
 if __name__ == '__main__': unittest.main(verbosity=2)

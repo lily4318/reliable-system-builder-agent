@@ -35,3 +35,7 @@ tryLock 失敗不寫、finally release，鎖內重新查 id/receipt/容量；Spr
 
 ### TD-004｜精確SQL更新與集合語意（TD004-SQL-SEMANTICS-01）
 預覽與mutation必核一致predicate及明確scope/主鍵；CASE應依核定條件涵蓋ELSE與NULL語意，WHERE比預覽廣會意外修改範圍外資料。WHERE帶可信範圍、記錄身份、預期版本及允許原狀態，使用參數化SQL，逐列版本而非一律全庫revision。零列不等於單一原因、回傳受影響鍵不等於commit或AFTER trigger最終狀態；未知結果先唯讀對帳，不盲重送。集合比較需分NULL、distinct與重複次數，非NULL expected key的NOT EXISTS可避免NOT IN受NULL影響，雙向EXCEPT不能驗bag multiplicity。依實際引擎核定rowcount/RETURNING/OUTPUT及交易語意。原SQLite新3方法見[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)，非正式身分授權、真競寫或T-SQL實機。
+
+
+### TD-004｜資料粒度、關聯與統計口徑（TD004-SQL-JOIN-01）
+先確認輸出一列代表受試者、事件、報酬或其他業務粒度，按完整範圍鍵、關聯基數與真實身份聯結。保留母群時將右表資格條件放ON或先篩右資料；WHERE加OR NULL也不能補回已有不合格匹配的左列。多個1:N子表先各自聚合至同一目標粒度，再JOIN，或只查存在性時用EXISTS；COUNT DISTINCT或SUM DISTINCT不能普遍修復fan-out（同額合法事件被消除），明確區分受試者/事件等權平均及缺失值、母群/有效分母。INSERT SELECT以目標粒度唯一鍵與明示欄位驗收；刪除重複必依核定事件身份、留存及授權，不能以同分或名稱判重。原SQLite見[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)，非SQL Server或真研究推論/權限。

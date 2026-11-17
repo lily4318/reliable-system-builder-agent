@@ -60,3 +60,7 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### TD-004｜SQL修改意圖與副作用驗收（TD004-SQL-SEMANTICS-01）
 刻意測預覽未涵蓋的年份/NULL、其他scope、過期版本、已非允許狀態及不存在鍵，核實際受影響鍵、欄值、最終持久資料；WHERE存在不代表精確，RETURNING/rowcount成功也非完整副作用或commit。以AFTER trigger故障注入核回傳與真SELECT不同並回滾，固定全資料行oracle；SQL集合查核另測NOT IN含NULL、NOT EXISTS、EXCEPT/INTERSECT、UNION與UNION ALL、兩向集合相等但重複筆數不同。勿把自建演練當產品事故或實際併發；跨引擎原生語意、真ACL/競寫與大型負載另驗。
+
+
+### TD-004｜聯結與研究統計的真值驗收（TD004-SQL-JOIN-01）
+固定oracle逐鍵與每人的測量、報酬；刻意設多個合法child、同額/同分、只有不合資格右列、無右列、跨scope同ID。驗ON/WHERE/OR NULL/HAVING篩選是否保全目標母群，核COUNT(*)與非NULL child key、實測人數/事件數、SUM DISTINCT負例、分別預聚合後逐欄與原子表直接總和。平均的觀測單位與缺失分母依規格而非SQL結果筆數；衍生名單重複鍵應拒絕、修正後來源不變。去重負例保留真正獨立事件，禁止未授權物理刪除。受控假資料3/3不等於真資料、併發、效能或完整引擎驗收。

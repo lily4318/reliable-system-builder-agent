@@ -693,15 +693,20 @@
       "id": "3.2.1",
       "title": "Insert 語法",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_sql_insert",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "4c6ffa7183a7d8a25749091fd411fae000228cf673d5957c5526eb8883b1152d",
+      "access": "READABLE",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "qa-uat",
+        "architect"
+      ],
       "skill": "implement-feature",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.1.2"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "原Markdown/SQL正文5399字元，9圖/共用embed未取；§6.2 INSERT SELECT衍生名單完整鍵/存在性避免膨脹；真SQLite練習非SQL Server IDENTITY_INSERT/GO或原sqldb。L0。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -729,15 +734,20 @@
       "id": "3.2.3",
       "title": "Delete 語法",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_sql_delete",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "08536161b9092f723f117817c564168ebdd63de8cb1dc804554d4b2098b25382",
+      "access": "READABLE",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "qa-uat",
+        "architect"
+      ],
       "skill": "implement-feature",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.1.2"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "原Markdown/SQL 10693字元、32圖/共用embed未取；§4.3 MIN ID去重不可推廣到合法重複測量，真SQLite誤刪與回復負測；不授權真刪除，非T-SQL/SSMS。L0。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -745,15 +755,20 @@
       "id": "3.2.4",
       "title": "Select 語法",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_sql_select",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "3956c7cb97737cb967ba1ad53cde5974ef80166a56bb028c5263f75b9334c24b",
+      "access": "READABLE",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "qa-uat",
+        "architect"
+      ],
       "skill": "implement-feature",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.1.2"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "原Markdown/SQL 15983字元、44圖/共用embed/原範例庫未取；GROUP BY/HAVING/COUNT/AVG/SUM與分母粒度實測，其他範例待驗。L0。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -761,15 +776,20 @@
       "id": "3.3.1",
       "title": "Join 語法",
       "source_url": "https://hackmd.io/@johnsonnote/sqlds_sql_join",
-      "source_sha256": null,
-      "access": "UNREAD",
+      "source_sha256": "3ca13980e50ec22d63bb37bfa09fee78d97df48fc1772f233583cccbcf5ed8ca",
+      "access": "READABLE",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "qa-uat",
+        "architect"
+      ],
       "skill": "implement-feature",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.2.4"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "原Markdown/SQL 12777字元、50圖/共用embed/原範例庫未取；§2.4、3.8–9 LEFT JOIN篩選、非唯一fan-out、計數、HAVING及預聚合真SQLite三方法；非全部JOIN類型/性能/SSMS實測。L0。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

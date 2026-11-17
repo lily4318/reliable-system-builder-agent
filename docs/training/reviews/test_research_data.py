@@ -711,4 +711,62 @@ class SqlSemanticsLesson(unittest.TestCase):
             self.assertEqual(db.execute("SELECT id FROM expected WHERE id<>'C' EXCEPT SELECT id FROM observed WHERE id IS NOT NULL").fetchall(),[])
             self.assertEqual(db.execute('SELECT count(*) FROM observed WHERE id IS NOT NULL').fetchone(),(3,))
 
+class JoinGrainLesson(unittest.TestCase):
+    def setUp(self):
+        self.db = sqlite3.connect(':memory:')
+        self.addCleanup(self.db.close)
+        self.db.executescript('''CREATE TABLE participant(study TEXT, id TEXT, PRIMARY KEY(study,id));
+          INSERT INTO participant VALUES ('A','P1'),('A','P2'),('A','P3'),('A','P4'),('B','P1');
+          CREATE TABLE measurement(study TEXT, id TEXT, mid INTEGER PRIMARY KEY, phase TEXT, score INTEGER);
+          INSERT INTO measurement VALUES ('A','P1',1,'post',10),('A','P1',2,'post',10),('A','P2',3,'post',40),('A','P3',4,'pre',20),('B','P1',5,'post',90);
+          CREATE TABLE payment(study TEXT,id TEXT,payid INTEGER PRIMARY KEY, amount INTEGER);
+          INSERT INTO payment VALUES ('A','P1',1,100),('A','P1',2,100),('A','P1',3,200),('A','P2',4,50),('B','P1',5,900);''')
+
+    def test_outer_join_filter_count_and_missingness(self):
+        base = ' FROM participant p LEFT JOIN measurement m ON p.study=m.study AND p.id=m.id '
+        self.assertEqual(self.db.execute('SELECT p.id,m.mid'+base+"WHERE p.study='A' AND m.phase='post' ORDER BY p.id,m.mid").fetchall(), [('P1',1),('P1',2),('P2',3)])
+        self.assertEqual(self.db.execute('SELECT p.id,m.mid'+base+"WHERE p.study='A' AND (m.phase='post' OR m.mid IS NULL) ORDER BY p.id,m.mid").fetchall(), [('P1',1),('P1',2),('P2',3),('P4',None)])
+        eligible = base+"AND m.phase='post' WHERE p.study='A' "
+        self.assertEqual(self.db.execute('SELECT p.id,m.mid'+eligible+'ORDER BY p.id,m.mid').fetchall(), [('P1',1),('P1',2),('P2',3),('P3',None),('P4',None)])
+        self.assertEqual(self.db.execute('SELECT p.id,COUNT(*),COUNT(m.mid),AVG(m.score)'+eligible+'GROUP BY p.id ORDER BY p.id').fetchall(), [('P1',2,2,10.0),('P2',1,1,40.0),('P3',1,0,None),('P4',1,0,None)])
+        self.assertEqual(self.db.execute('SELECT COUNT(DISTINCT p.id),COUNT(m.mid),COUNT(DISTINCT CASE WHEN m.mid IS NOT NULL THEN p.id END)'+eligible).fetchone(), (4,3,2))
+        self.assertEqual(self.db.execute('SELECT p.id,SUM(m.score)'+eligible+'GROUP BY p.id HAVING SUM(m.score) IS NOT NULL ORDER BY p.id').fetchall(), [('P1',20),('P2',40)])
+        self.assertEqual(self.db.execute('SELECT p.id FROM participant p LEFT JOIN measurement m ON p.id=m.id AND m.phase=\'post\' WHERE p.study=\'A\' AND m.study=\'B\'').fetchall(), [('P1',)])
+
+    def test_multi_child_fanout_and_preaggregation(self):
+        joined = ''' FROM participant p JOIN measurement m ON p.study=m.study AND p.id=m.id AND m.phase='post'
+          JOIN payment q ON p.study=q.study AND p.id=q.id WHERE p.study='A' '''
+        self.assertEqual(self.db.execute('SELECT p.id,COUNT(*),SUM(q.amount),SUM(m.score)'+joined+'GROUP BY p.id ORDER BY p.id').fetchall(), [('P1',6,800,60),('P2',1,50,40)])
+        self.assertEqual(self.db.execute('SELECT COUNT(*),COUNT(DISTINCT p.id),SUM(q.amount),SUM(DISTINCT q.amount)'+joined).fetchone(), (7,2,850,350))
+        wrong_avg = self.db.execute('SELECT AVG(m.score)'+joined).fetchone()[0]
+        self.assertAlmostEqual(wrong_avg,100/7)
+        query = '''WITH m AS (SELECT study,id,COUNT(*) n,AVG(score) mean FROM measurement WHERE phase='post' GROUP BY study,id),
+          q AS (SELECT study,id,COUNT(*) n,SUM(amount) paid FROM payment GROUP BY study,id)
+          SELECT p.id,COALESCE(m.n,0),m.mean,COALESCE(q.n,0),q.paid
+          FROM participant p LEFT JOIN m ON p.study=m.study AND p.id=m.id
+          LEFT JOIN q ON p.study=q.study AND p.id=q.id WHERE p.study='A' ORDER BY p.id'''
+        rows = self.db.execute(query).fetchall()
+        self.assertEqual(rows,[('P1',2,10.0,3,400),('P2',1,40.0,1,50),('P3',0,None,0,None),('P4',0,None,0,None)])
+        self.assertEqual(self.db.execute('SELECT COUNT(*),SUM(amount) FROM payment WHERE study=\'A\'').fetchone(), (4,450))
+        self.assertEqual(sum(r[4] for r in rows if r[4] is not None),450)
+        self.assertEqual(self.db.execute("SELECT COUNT(*),AVG(score) FROM measurement WHERE study='A' AND phase='post'").fetchone(), (3,20.0))
+        self.assertEqual(sum(r[2] for r in rows if r[2] is not None)/2,25.0)
+        self.assertEqual(self.db.execute("SELECT p.id FROM participant p WHERE p.study='A' AND EXISTS(SELECT 1 FROM measurement m WHERE m.study=p.study AND m.id=p.id AND m.phase='post') ORDER BY p.id").fetchall(), [('P1',),('P2',)])
+
+    def test_insert_select_and_dedup_at_correct_grain(self):
+        self.db.execute('CREATE TABLE cohort(study TEXT,id TEXT,PRIMARY KEY(study,id))')
+        before = self.db.execute('SELECT * FROM measurement ORDER BY mid').fetchall()
+        with self.assertRaises(sqlite3.IntegrityError):
+            self.db.execute("INSERT INTO cohort SELECT p.study,p.id FROM participant p JOIN measurement m ON p.study=m.study AND p.id=m.id WHERE p.study='A' AND m.phase='post'")
+        self.assertEqual(self.db.execute('SELECT * FROM cohort').fetchall(),[])
+        self.db.execute("INSERT INTO cohort(study,id) SELECT p.study,p.id FROM participant p WHERE p.study='A' AND EXISTS(SELECT 1 FROM measurement m WHERE m.study=p.study AND m.id=p.id AND m.phase='post')")
+        self.assertEqual(self.db.execute('SELECT * FROM cohort ORDER BY id').fetchall(),[('A','P1'),('A','P2')])
+        self.assertEqual(self.db.execute('SELECT * FROM measurement ORDER BY mid').fetchall(),before)
+        self.db.execute('SAVEPOINT wrong_dedup')
+        deleted = self.db.execute('DELETE FROM measurement WHERE mid NOT IN (SELECT MIN(mid) FROM measurement GROUP BY study,id,phase,score) RETURNING mid').fetchall()
+        self.assertEqual(deleted,[(2,)])  # same score is a legitimate separate event
+        self.db.execute('ROLLBACK TO wrong_dedup')
+        self.db.execute('RELEASE wrong_dedup')
+        self.assertEqual(self.db.execute('SELECT * FROM measurement ORDER BY mid').fetchall(),before)
+
 if __name__ == '__main__': unittest.main(verbosity=2)

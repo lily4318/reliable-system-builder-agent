@@ -788,3 +788,7 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 
 ## TD004-SQL-SEMANTICS-01（2026-11-17；TEXT_PARTIAL / LOCAL_LAB_VERIFIED）
 - 依使用者指令、TD-006續3.1.1/3.1.2及3.2.2原Markdown；SQLite真3/3新方法30斷言位置，重現CASE scope缺陷、逐列版本/RETURNING trigger邊界、NULL反集合與重複列；原14文字/149未讀/13缺/176 L0、原圖/preview/SSMS與真陌生任務未驗。更新原技能、測試、matrix及[覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。前輪CI44046296216唯一Chrome DevToolsActivePort再現，真根因未明；不重啟APP驗收。下一輪原DML/Join新缺口，授權及核心不變。
+
+
+## TD004-SQL-JOIN-01（2026-11-17；TEXT_PARTIAL / LOCAL_LAB_VERIFIED）
+- 依核心準則及使用者指令，讀3.2.1/3.2.3/3.2.4/3.3.1原正文；SQLite3/3實測22斷言位置，LEFT JOIN右條件、fan-out、平均分母、INSERT SELECT/合法重複誤刪。18文字/145未讀/13缺/176 L0，原圖、原sqldb及SQL Server未驗。原技能/測試/矩陣及[覆盤](reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)增量；前輪CI44047731069 28步success、519 tests，Chrome根因未明。下一輪3.3.2/3.3.3新缺口，核心與授權不變。

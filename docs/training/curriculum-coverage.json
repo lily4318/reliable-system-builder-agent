@@ -1037,7 +1037,7 @@
       ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "TD004-SQL-TRANSACTION-01：原指定正文不可達，UNREAD/source_sha256=null/L0；PG官方隔離與savepoint規格，三原生方法59 assertion sites，NATIVE_CI_PENDING；前置暫列SQL/DML，原正文後核；原T-SQL/圖/完整習得及真遷移待驗。",
+      "next_action": "TD004-SQL-TRANSACTION-01：原正文入口不可達，UNREAD/source_sha256=null/L0；PG官方規格，三原生方法已驗（CI44122344470 547/547、exact2311c79、原覆盤），前置暫列SQL/DML；原T-SQL/圖/完整習得及真遷移待驗，不重做已驗實驗。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

@@ -74,3 +74,30 @@ TD-001 既有平台/按需角色技能/共用空間/覆盤，TD-002 真來源及
 雙軌共用原 TD-004 七階段與逐單元逐角色 L0–L6（L1 原理、L2 取捨、L3 實作正反測、L4 真故障修復、L5 陌生遷移、L6 跨角色可追溯整體驗收）。保留每單元唯一主責與必要協作、教材完整覆蓋承諾、原 curriculum-coverage.json 單一矩陣；缺檔／引用內容未核、PARTIAL 176/163/13、units=[]，不冒稱教材已學或精通。以原任務結案紀錄／證據 ID、實際人工操作與必要核准、已確認需求首輪通過／可驗需求總數、重工／同類缺陷復發／適用機會、實際修復前後與陌生遷移證據衡量，欠分母／可比情境標 unknown，不設任意數值 KPI 或角色平均分。區分真工程、受控模型、正式產品、管理治理、陌生遷移、獨立盲測；相同證據可溯源引用但不重複計分。既有 private holdout 若另授權才作嚴格版本增益比較，不是首版必需、不宣稱權重提升或八獨立模型。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。
 
 本輪僅正式決策及原提案、主檔索引同步，未讀新教材／執行深度訓練／安排新專案或新增驗收；C0–C2 pinned 6cdd6fe1042505143234623d95eef028a4866e00、3/6，M2-2 PARTIAL、C3_NOT_AUTHORIZED，零額預算、R1、A07/B10/C6、M4 及原管理日期保留。下次真正執行 C3 前重核最新 exact head/CI、程式及平台狀態。來源基準 77f5874f5c9c32518311d08188f20166046167d6 tree fe21ed27e7a1843a27f4b4923765307f54cfe8e9；CI 44015390360 completed/success（僅 run metadata，未重跑或讀原始 log）；原主檔、決策、本覆盤 §1–7、AGENTS、START_HERE、skill catalog、curriculum matrix、原 M3-1 查核皆重新定位讀取。寫後回讀與例行 CI 分開。
+
+
+## 2026-11-17｜TD-005-R2｜專業能力優先、解除首版驗收阻塞（CONFIRMED；新訓練尚未執行）
+上文「首版實際交付後才開始雙軌」與相應順序被取代；原標準、門檻、歷史成果不變。詳原[決策紀錄](../DECISION_LOG.md)。
+
+### 八角色證據盤點（不是新實作、不是整體角色評分）
+沿原 [15 skill / 28 method 證據矩陣](2026-11-16-research-handoff.md)、原 8 角色 catalog、curriculum-coverage.json 與既有專項實證。原候選 ffdfb7af86bc3d30063c0af403d98f8a8f2935b9，CI 44016059942/job 133814152466 先前實讀 517/517、完整 gate、tree 一致。新文檔 CI 另核。各欄為既有工程證據與待深化的實際缺口，非逐章教材成熟度、模型權重提升或八個獨立子代理。
+
+| 原角色/技能 | 已有證據 | 待深化及驗收 |
+|---|---|---|
+| PM project-scope/control/delivery-review | scope/stale/人審測試、本案零成本部署與停止決策 | 本案反覆人工補證、目標偏航；先蒸餾阻塞分類、兩次無新證據停點及獨立續作；不同任務驗不錯置 gate、不越權、不反覆操作。 |
+| System Lead project-intake/task-planning/resume-project | 13題/6場景、DAG/revision、A07 history-assisted | 陌生需求、獨立來源接續與工具能力前置；真需求修訂後正確重排依賴，A07 仍部分未證。 |
+| Architect requirements-spec/architecture-design | 規格審閱、13/13 受控 JS 字典、PG 真 RLS/交易/遷移 | 學術 protocol、可重現資料契約、平台取捨/失效及跨裝置持久化；具體新條件驗 ADR/資料復原，不重跑原 PG 練習；研究者核准科學規格。 |
+| Developer implement-feature/debug-and-repair | APP/CRUD、HTTP red-green、SQLite/PG、trial；GAS 28/28、18/18 受控模型 | 真瀏覽器端持久化/中斷復原、跨平台故障及真 GAS/Sheets 待工具與授權；只選未覆蓋且可測的新缺口。 |
+| QA/UAT test-and-acceptance | 本機 Chromium/CSV/正負測、精確 CI；timing 11PASS/1SKIP | 獨立 oracle、研究資料/跨裝置/中斷驗收；預先核 runner 網路及 CORS/瀏覽器能力，區分 tool blocked 與 product fail，科學硬體/真人另驗。 |
+| DevOps/SRE deployment | 真 artifact bytes、本機 activation rollback、Pages C3 | 遠端版本更新/回退、可觀測性、成本/權限與實際工具能力前置；待適用真任務補，不復活示範 APP。 |
+| Security security-review | 真 PG RLS/ACL、HTTP 拒絕、研究範圍隔離 | 真雲端 Auth、研究資料最小權限/撤回/保存、外洩與跨身份負測；在具體安全條件深化，不搬真人資料。 |
+| Learning Evaluator learn-from-feedback/knowledge-distillation | 案例去重/人審、validator、EP 索引 | 原教材按實際章節進單一 matrix，區分來源/閱讀/實作/遷移，本案失敗蒸餾；可比新任務證據，無獨立盲測不宣稱增益。 |
+
+### 實際訓練順序（已規劃，未執行）
+- P0 PM＋System Lead＋Learning Evaluator（QA/SRE 協作）：核原 project-control/resume-project/test-and-acceptance/deployment 守門，以本案跨源 helper 失敗、Work 工具缺席做真失敗覆盤；已有規則就不重寫，缺「工具存在與可達性前置／無進展停止／獨立阻塞不阻學習」才最小增量並真負測。交付可核修訂或不修改理由、正負測及 exact CI；不再測 Pages。
+- P1 Learning Evaluator 主責、Architect 協作，可與 P0 獨立續作：原 matrix inventory PARTIAL、176 expected_ids、原記錄163對應/13缺、units=[]。找合法既有備份及章節索引，核檔名/可讀全文/版本/引用、缺件名單；按真內容唯一主責/前置/skill 更新原 curriculum-coverage.json 並跑既有 validator；缺檔只阻該單元，不公開教材全文、不編章名或 L1，不把盤點算學習。
+- P2 Architect 主責、Security/Developer/QA 協作：依實際章節及依賴選資料模型、研究資料契約及權限一致性的第一個尚未覆蓋基礎單元；先核 PG/HTTP/SQLite 既有實證及替代方案。完整七階段、正負測、故障修復與不同情境遷移；以教材實際前置調整。
+- P3 Developer/QA 分別主責不同單元：瀏覽器資料持久化/研究 trial 中斷與重現、計時/CSV、可及性及跨裝置；先核 9/9 trial、11PASS/1SKIP timing，僅未覆蓋缺口；不把模擬當物理精度、真服務。
+- P4 Security/DevOps 分別主責不同單元：身分/最小權限、真平台資料及版本復原、可觀測/成本；需要工具、真雲端或外部授權者列獨立前置，不阻可安全學習。
+- P5 全團隊按另獲授權的真研究/實驗/教學任務，依真需求選用單元，實際交付、覆盤、驗陌生遷移；缺真任務授權則持續教材路徑，不接管。首版餘項獨立延期；未來有工具及授權才補，不作前提。
+每單元遵守原七階段及 L0–L6；原來源真讀、原理/限制、對應既有技能、可重現實作+正負測、不同情境遷移及交接；未完成不升級。逐包保留出處、原因、實際證據、未驗限制；不新增台帳、排程、角色、技能、展示網站、外部項目。原交付管理日期留歷史，不承諾正式交付；後續按真進展與使用者決策重估。

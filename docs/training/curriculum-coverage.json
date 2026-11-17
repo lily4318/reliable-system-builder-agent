@@ -1014,7 +1014,7 @@
       ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "TD004-SQL-DEBUG-01：原教材入口不可達，UNREAD/source_sha256=null/L0；PG官方規格與真引擎四方法36 assertion sites，NATIVE_CI_PENDING；原T-SQL/圖/完整習得/真遷移待驗。前置暫列SQL/Select，正文後核。",
+      "next_action": "TD004-SQL-DEBUG-01：原正文不可達UNREAD/source_sha256=null/L0；原生PG四新方法全ok（CI44116174148，exact c4137ae，完整CI544 tests/1舊browser error，原覆盤）；原T-SQL/圖/完整習得及真遷移待驗，原品質守門不降。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

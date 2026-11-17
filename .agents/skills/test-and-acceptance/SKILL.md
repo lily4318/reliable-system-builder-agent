@@ -96,3 +96,7 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### TD-004｜SQL診斷與修復的獨立真值驗收（TD004-SQL-DEBUG-01）
 測同SQLSTATE不同constraint及正確診斷欄、錯誤ON CONFLICT零回列卻漏合法新id，限定constraint後其他衝突必須浮現，合法輸入逐列核實；正式重播payload另驗。用相同合成分布取EXPLAIN ANALYZE JSON/估算actual rows及loops/buffers，核stats前後固定實際數及不相容條件；集合重寫用獨立逐鍵oracle驗所有母群、缺失與源資料，觀測scan減少不當延遲倍率；避免固定時間門檻、未授權EXPLAIN ANALYZE寫入和輸出敏感日誌。受控timeout/其他錯誤分類與session恢復，按真CI原始日誌驗收，非正式效能/SLA或真資料。
+
+
+### TD-004｜真重疊交易、SSI及SAVEPOINT驗收（TD004-SQL-TRANSACTION-01）
+以兩獨立backend pid/同時active transaction及交錯讀寫證明重疊，非以thread數或順序測冒稱競寫。固定至少一位active的跨列真值，RR兩筆各自合法仍皆commit而0，SSI允許40001在write/commit且只一筆成功；核另一連線的每列與變更log，完整fresh replay重新判斷兩人拒絕/三人可成功，非盲DML retry。SAVEPOINT真NOWAIT前後55P03、23505/25P02恢復、保存點前後逐列及鎖、RR舊快照與fresh值、sequence空洞及commit後釋鎖；不以rollback訊息或rowcount當完整真值。保留原CI正反證據及未驗混合隔離、高併發、driver/正式效能；不降品質gate。

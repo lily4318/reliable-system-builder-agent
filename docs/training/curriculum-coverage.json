@@ -1025,12 +1025,19 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "architect",
-      "collaborators": [],
+      "collaborators": [
+        "developer",
+        "qa-uat"
+      ],
       "skill": "architecture-design",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.1.2",
+        "3.2.2",
+        "3.2.4"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-SQL-TRANSACTION-01：原指定正文不可達，UNREAD/source_sha256=null/L0；PG官方隔離與savepoint規格，三原生方法59 assertion sites，NATIVE_CI_PENDING；前置暫列SQL/DML，原正文後核；原T-SQL/圖/完整習得及真遷移待驗。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

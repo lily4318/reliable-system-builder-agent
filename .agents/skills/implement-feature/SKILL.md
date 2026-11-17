@@ -67,3 +67,7 @@ tryLock 失敗不寫、finally release，鎖內重新查 id/receipt/容量；Spr
 
 ### TD-004｜函式粒度、NULL與volatility契約（TD004-SQL-FUNCTION-01）
 明示scalar唯一列/首列選擇、SETOF/RETURNS TABLE粒度及元素型別；空集合、全NULL、真0、合法同值多筆分開，LATERAL選擇按核准母群。STRICT遇NULL跳過函式，不能用內部COALESCE補預設；必要時CALLED ON NULL INPUT。PG IMMUTABLE只給同參數永遠同值的無副作用計算；依資料/設定讀取適用STABLE，寫入或可變值VOLATILE，禁止為效能錯標。STABLE/volatile snapshot不同；SELECT可有副作用，不能假定固定呼叫次數或順序，敏感業務用明確受限入口、顯式權限與交易。依賴外部設定的錯IMMUTABLE會折疊prepared plan或把舊值存入expression index；修正分類並盤點索引/相依與重建、結果一致性，固定參數/版本的純函式僅在業務契約確認後採用。COST/ROWS是planner估算非限制；不把測試GUC當上線調參。PG與T-SQL規格分別確認；詳原覆盤，原教材未讀。
+
+
+### TD-004｜交易重試及局部復原（TD004-SQL-TRANSACTION-01）
+對實際引擎設定隔離等級，界定完整transaction與結果分類；SSI 40001可能在statement或COMMIT，已知abort先清理，再有界重試整筆（含讀取、決策、SQL及參數），不可只重送舊DML或把已aborted transaction的COMMIT/ROLLBACK回應當成功。真業務拒絕停止，未知commit依EP-03查durable結果；外部副作用獨立處理。SAVEPOINT只用於已確定可局部復原的錯誤，核保留/撤銷資料、後取普通鎖釋放、先取鎖保留；RR snapshot不刷新、sequence值不回收。避免放任直接DML繞過不變量；真driver/pool/權限與重試耗盡另驗。原生案例見原覆盤，非正式T-SQL。

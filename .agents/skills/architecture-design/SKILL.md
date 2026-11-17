@@ -70,3 +70,7 @@ description: "設計架構、比較方案。architect 角色；交付 architectu
 
 ### TD-004｜依工作負載設計索引（TD004-DB-INDEX-01）
 先固定資料與實際filter/join/order/projection及讀寫比例、分布、既有索引與統計；比較無額外索引、單欄、合理複合鍵順序及覆蓋索引。等值後範圍在本情境可降低搜尋及排序成本，不泛化為所有查詢；反序SEARCH仍可能很慢。保留原始行語意/排序，核索引維護、寫入、空間及缺覆蓋欄位；不因增加索引個數或命中SEARCH放行。SQL Server heap仍可有nonclustered、PK不必clustered、clustered邏輯順序非磁碟物理保證，INCLUDE與SQLite covering機制不同。使用實際引擎的計畫及量測，先核冗餘索引再加，真資料庫DDL/鎖/回退另核授權。見原覆盤2.2.6真SQLite結果，非正式負載/SQL Server實機效能。
+
+
+### TD-004｜跨列業務不變量與隔離策略（TD004-SQL-TRANSACTION-01）
+先明示不變量、範圍/所有讀寫入口與序列化後合法行為，優先可宣告式constraint；普通單列CHECK非跨列計數約束。PG RR快照穩定仍可能write skew（不同列各自合法而共同失守）；比較共同鎖定資源後重讀（依隔離語意）、SSI監測與重試成本，勿全域盲升隔離。SSI需各相關交易單獨正確且所有相關路徑共同遵守，結果須commit後才認定。40001已知失敗完整重讀重算、有界重試及退避，業務拒絕不重試、未知提交EP-03唯讀對帳；非交易外副作用不隨rollback，sequence不保證連號。SAVEPOINT局部復原不刷新RR snapshot、不是SSI retry替代或獨立commit。真引擎兩backend/不變量oracle及限制見[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)，原教材/T-SQL/正式工作負載另驗。

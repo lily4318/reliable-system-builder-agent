@@ -968,7 +968,7 @@
       ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "TD004-SQL-PROCEDURE-01：原正文和授權備份未取，保持UNREAD/source_sha256=null/L0；官方PG/Microsoft規格已讀，真原生PG四測試已寫入並啟動CI，CI_RUNNING_NATIVE_VERIFICATION_PENDING。前置暫列SQL/DML，正文後核；SQL Server、圖、完整習得/真遷移待驗。",
+      "next_action": "TD004-SQL-PROCEDURE-01：原正文/授權備份未取，保持UNREAD/source_sha256=null/L0；官方PG/Microsoft已讀，真原生PG四方法已驗（CI44099847438 536/536，exact dffa0bda，原覆盤）；原T-SQL、圖、完整習得/真任務待驗；不重做此lab。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

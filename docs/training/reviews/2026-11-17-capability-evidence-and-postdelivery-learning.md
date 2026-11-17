@@ -383,3 +383,8 @@ Python3.13.5 SQLite3.46.1，`python /tmp/trigger_lesson/test_sql_trigger_lesson.
 4. transaction_control_is_not_atomic_call：顯式BEGIN下含COMMIT程序2D000、後續25P02，ROLLBACK後空；DEFINER與SET-attached各2D000；頂層CALL第一列commit、第二列後22023，fresh connection只見1，不將單次CALL等同原子交易。不是重做generic rollback，重點原生程序的控制契約。
 ### 蒸餾與接續
 沿原implement-feature/test-and-acceptance增量、原matrix/主檔/決策保存；CI_RUNNING_NATIVE_VERIFICATION_PENDING，只按真CI結果標示。23文字/140未讀/13缺/176 L0；原教材/SQL Server/production driver/正式ACL/負載/獨立模型與真任務遷移未驗、合成CI非真研究驗收。先核 exact dffa0bda707209d55e5953264c8ddb257543c6d5 / CI44099847438 原始日誌與四新方法；若有實際失敗先最小修正回讀、不降gate，取得精確真引擎實證後接續原3.4.4 Function（函式回傳契約、NULL、volatility、集合函式與副作用）。 REPO_NATIVE / SINGLE_AGENT_ROLE_WORK，NT$0、無main/release/外部專案/部署或權限擴張。
+
+
+### TD004-SQL-PROCEDURE-01 最終原生驗收（NATIVE_POSTGRES_FULL_CI_VERIFIED）
+TD004-SQL-PROCEDURE-01 最終實證：exact dffa0bda707209d55e5953264c8ddb257543c6d5 / CI44099847438 job134096599479 completed/success，raw260220 chars，PG18.6 private Unix socket/TCP disabled，新增四native CALL方法皆ok（含42 assertEqual sites），Ran 536 tests in 95.397s OK；EDITORIAL_BROWSER_PASS 375/1280，checkout bc48642d9c9c995f5fe5e131060723cf4774521f，report SHA256 920610b17ff36e2f31295376f376895e88d0274ec1de37ef83cf8d2127f120cb；checkout tree aff51942b1832b65b22195b7d395c29386030ebb，與測試候選tree 一致。真實驗證INOUT/OUT具名與負例、EXECUTE-only/DEFINER/INVOKER/跨actor/temp、捕捉exception輸出23514|1而內層列回滾、頂層CALL先commit而後22023仍留第一列、外部BEGIN及DEFINER/SET內COMMIT拒絕。未驗artifact下載、原T-SQL、真driver/JWT、production ACL/負載、陌生任務與原教材。首次CI即綠，無虛構red。
+本次綠測證明受控PostgreSQL程序契約，不代替教材習得或獨立能力評級。下一3.4.4 Function，區分VOLATILE/STABLE/IMMUTABLE、STRICT/NULL、scalar/set-returning、錯誤與副作用，實測新知識不重做本lab。原授權不變。

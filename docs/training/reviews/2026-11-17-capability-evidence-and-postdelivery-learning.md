@@ -137,3 +137,61 @@ C. 完整複製原範本的文件結構或強迫本機工作台（不建議，�
 - 真 P1 commit baad08299c37665c8be82355de5157d576c47f97/tree 0e4b20783218b50685d1b1f4a81e2a2f52400bfd，CI 44024463577/job133841381872 全步驟成功，raw 257380 chars，test_live_matrix_valid_during_future_progress 與兩新增方法皆 ok，519 tests in 71.678s / OK；checkout 21f06008e235b01743e897d65fc2c590c181e1f9 parents main+P1/tree 完全相等，report marker SHA256 24c1fb1a6dfbcb747c88717e62cfdf75c6654988f58d0a034de137569707a71c。矩陣結構驗證非教材源完整/實力證明；review lab 另外在 container SQLite 3.46.1 實際執行新增 class 1/1（12 assertions），非 CI discover 的測試，不把 519 冒稱重跑該 lab；原無關 10 tests 不重跑。
 - 遠端 P0 14檔 diff、P1 5檔 diff；合併 16 個原檔 blob/完整 recursive tree 回讀 16/16（truncated=false），主檔/決策/覆盤、matrix/source/test/lab 7 份全文工具另讀。main c8be8c80a326bebd1d9a6abc9ad52e18cc9f7e57、Pages v1 b732a50171aacebfab6d99b34c8568bb6dc0ea0d 不變；repo API 真讀 has_pages=false（未由 Agent 寫 Pages、無 owner UI 獨立證據，URL 失效未驗），保留分支、C4 partial/C5/C6 not run/A07/B10/M4/3-of-6，不要求重新部署或真人測試、不影響專業學習。先前兩次 Code Mode 呼叫上限在 ref 更新前中止，真查舊 head 不變及 commit/parent/tree 再一次 CAS 快進，非盲重送；不聲稱原本地 checkout 可用。此補證為紀錄更新，不把原程式 CI 冒稱新文件 exact CI；保留真 SHA，不因每個證據文檔追加而無限重跑。
 - 下一步：P0 程式跨不同 task/skill/query/subprocess/SQLite 隔離及衝突驗證完成，真正 LLM 在新真任務的遵循與遷移仍待證；P1 先深讀依賴與可完整取得的不同教材單元，媒體/缺檔阻塞僅限單元。原 176 初步分工按題名須正文核對，不認證 mastery。保留 NT$0、R2、原角色/技能、無額外排程或外部專案授權。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。
+
+
+## TP-010-AUDIT-01｜原團隊範本完整功能對照（2026-11-17；AUDIT / PROPOSED）
+
+### 來源、方法與限制
+使用者明示要求完整稽核原九技能、共享目錄、品牌手冊、學習及覆盤對照現八角色十五技能，保存差異分析，不公開私人資料。實際重開原第一天學員包的啟動說明及 AGENTS、九個 SKILL：brand-handbook、case-card、learn、threads-research、pick-topic、write-posts、check-post、make-cards、plan-week；逐項取得 17 個 references（訪談問題/產業紅線、案例卡/靈感庫格式、選題庫/筆記/報告/受眾庫格式、選題卡格式、開頭/寫法/寫完自檢/四種目的、紅線詞/檢查表、任務單/每週覆盤格式）和一個 HTML 圖卡 asset（靜態讀取，未執行）。原八共享目錄已各列檔；讀取市調、產物、週任務、案例四份通用說明；品牌手冊只檢查十章結構，不保存個人內容。原資料夾目前已含使用者工作資料，未讀真個案/留言/貼文/私有素材內容、未審實際發布成效、未修改原範本。公共 repo 僅保存以下原創概念差異與工程證據，無私人 Drive 連結/識別碼、手冊填值、帳號、原文/程式/圖或臨床資料。原範本精確私有來源由本輪對話及授權原目錄追溯；本報告不是授權搬運教材。
+候選基準 49b2ffaa72e285aad7493900207d7f431e7201e6 / tree 2c6df2da8b25fd147d5c574a7368666bc720a518。讀 START_HERE、AGENTS、最新正式主檔/決策、catalog（1bc4f3711237694b4bb82f3c38e100ac143d9d03）、TEAM_WORKBENCH（1d84ea8a845b7f916c9366111cf257f9223f9ce0）、八角色、15 SKILL 與總入口 reliable-system-builder（不另計第16核心技能）、workbench 三原程式的可用函式及前輪已讀實作、EP 索引、原 11/16 research-handoff 15技能/28方法盤點。非全程式逐行資安審查。最新 CI 44024790864 job133842415564 28/28 steps success，raw 257377 chars，519 tests in 80.829s，實讀 18 個判定方法各恰一 ok（含兩 TP-010、matrix），真 Chromium RESEARCH-METHODS 375/1280及 editorial；checkout 3d4c2fd7a876ee6fde05c2be47f248cb7d9f84e8 parents main+基準，tree 相同，marker adc70fa25733a3823c2ddfd1c805092f8e5c288b7e00539cf5bbcb00c3877cde。未重跑測試、未下載 CI artifact；本次是來源與既有證據稽核。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。
+四狀態：A 已落實（具實際可核操作或受控程式證據，注明層級）；R 僅有行為規則而缺相應證據；D 已實作但目前日常環境不運作或無常態證據；M 未發現對應完整功能。域外功能標不適用而非缺陷。各功能可同時有 A/R/D，不將 evidence entry 等同成熟度。
+
+### 九技能逐項（原技能名稱僅用於來源索引）
+| 原技能 | 工程對應 | A 已落實 | R/D/M 及取捨 |
+|---|---|---|---|
+| brand-handbook | Lead project-intake、Architect requirements-spec、PM project-scope、Evaluator learn-from-feedback | 13題、明示/推導/未決、可編輯審閱、scope前置及 TP010 preference 正反測 | R 共同開工必讀；D 私人偏好日常持久化；M 工程版一次訪談、可人審的可用工作輪廓（在既有授權位置，不要新台帳）。原英雄旅程/受眾行銷不照搬。 |
+| case-card | Evaluator learn-from-feedback、Developer debug-and-repair、Security security-review | 原工程 case、EP、事故/修復及真紅綠；feedback candidate 去重 | D 私人案例常態新增與採用；R 同次回饋分類/原來源追溯；M 真實個案的公開同意流程不移植到工程。工程需另核資料及去識別。 |
+| learn | Evaluator learn-from-feedback、knowledge-distillation，Lead resume-project | remember、distill、resolve、case context/cite、跨程序及偏好衝突；原 EP 蒸餾 | D 私人偏好長期運作及下一真任務採用；R 每次收藏/回饋及精簡落實；M 持續收集已授權真使用回饋→有據改善→後續成效的完整閉環證據；無自動事件監聽。不採新日期一律勝出。 |
+| threads-research | Architect architecture-design、Lead project-intake/task-planning、Evaluator knowledge-distillation | 原官方技術探索、平台選型、教材盤點、證據及限制；公開 case 索引 | R 真任務按來源找案例、適度調研；M 跨任務的已驗技術問題→候選改善自動或常態回流、用統一真使用回饋來源生成待辦（可用原池，不必自動化）。社群搜尋/七題/六類受眾不適用。 |
+| pick-topic | PM project-scope/project-control、Lead task-planning/resume-project、Architect requirements-spec | 工作包/需求識別、DAG、current/revision、失效及未決阻塞測試；主檔 NEXT_ACTION | D 私人任務池日常持續領取；R 按真實來源選下一項並採用相關經驗；沒有必要複製選題卡或另建 active pointer。 |
+| write-posts | Developer implement-feature/debug-and-repair、Architect requirements-spec、QA test-and-acceptance | 真 APP/CRUD/HTTP/SQLite/PG、red-green、需求改版失效 | R 跨真任務依長期偏好修改最小範圍；D 私人偏好回流。三種貼文/固定行銷格式不適用。 |
+| check-post | QA test-and-acceptance、Security security-review、PM delivery-review | 真 DOM/CSV、負向oracle、RLS/ACL、版本及真人gate | R 新情境原有效規則採用；未完成真新手 B10、真人UAT、外部遠端/獨立模型；原發布同意不可降格成一般自述。 |
+| make-cards | Developer implement-feature、Architect architecture-design、QA test-and-acceptance | 已有可操作 HTML 教學 APP、下載 CSV、可編輯規格UI、真 viewport/DOM | M 通用可重用、資料與呈現分離的視覺/報表模板交付能力尚未證成完整功能；現有樣板可按真需求深化，不搬原 Canvas/PNG、外部字型依賴，不新增展示APP。社群圖卡不適用。 |
+| plan-week | PM project-scope/project-control/delivery-review、Lead task-planning/resume-project、Evaluator learn-from-feedback/knowledge-distillation | 原池和 revision、阻礙隔離、決策、CI及專項覆盤，原真偏航已保存 | D 私人任務池及事件長期運作；R 按工作成果覆盤；M 原任務/實際使用回饋/可比工程效果/決策後下輪驗效的常態閉環，未見正式週期成效流程；優先從真工作事件實施，非新增週報或排程。 |
+
+### 八角色十五核心技能反向核對（A 是局部工程證據，不是完整角色成熟）
+| 主責/技能 | 原範本功能 | 最新真 CI 方法（test_ 前綴）或原實證 | 剩餘 |
+|---|---|---|---|
+| PM project-scope | brand-handbook/pick-topic/plan-week | pm_handoff_reuses_workspace_and_stale_scope_blocks_delivery | R 真新專案協商效果/科學規格 |
+| PM project-control | plan-week/pick-topic | revised_requirement_invalidates_downstream；真本案 R2 止偏航 | R 真持續遵循停點；D 日常私人池 |
+| PM delivery-review | check-post/plan-week | release_with_all_green_still_requires_real_uat_and_human | R 真交付使用回饋與獨立UAT待證 |
+| Lead project-intake | brand-handbook/pick-topic | bootstrap_13_questions_6_examples_prefill_no_gold | R 長期工作輪廓訪談；B10待證 |
+| Lead task-planning | pick-topic/plan-week | conflict_and_competition | D 真工作隊列常態；R 避免重作採用 |
+| Lead resume-project | pick-topic/plan-week/learn | real_content_handoff_and_resume；本輪實讀GitHub | D 私人接續；A07 source-only待證 |
+| Architect requirements-spec | brand-handbook/pick-topic | all_six_exports_apply_edits_and_exclude_rejected | R 陌生真需求/工作偏好適用 |
+| Architect architecture-design | threads-research/make-cards | pg_shared_migration_preserves_v1_history_and_old_contract | R 真跨平台取捨、完整教材 |
+| Developer implement-feature | write-posts/make-cards | academic_app_real_browser_and_download | R 真跨任務最小修改；M 通用模板能力未完整 |
+| Developer debug-and-repair | write-posts/learn/case-card | http_framing_incomplete_valid_json_has_no_mutation | R 真新事故案例採用及避免重犯 |
+| QA test-and-acceptance | check-post | ci_must_match_exact_code_and_test_sha；真DOM | R 獨立真人與實體環境、真任務 oracle |
+| SRE deployment | check-post/plan-week 的交付界線（工程新增） | matching_files_and_identity；C3 歷史真部署 | C4 partial、C5/C6未驗；R 工具預檢 |
+| Security security-review | check-post/case-card | pg_shared_identity_rls_function_acl_and_foreign_cancel | R 真雲端身分/實際研究資料治理 |
+| Evaluator learn-from-feedback | learn/case-card | feedback_candidate_and_dedup；confirmed_work_preference_across_unrelated_tasks；preference_conflict_candidate_resolution_and_budget | D 私人日常；R 真學習遷移 |
+| Evaluator knowledge-distillation | learn/plan-week/threads-research | learning_dedup_conflict_review_and_history；test_live_matrix_valid_during_future_progress | D 私人精簡；M 真成效回流閉環；L0矩陣不得當學習完成 |
+八角色指令成立，非八個實際員工程序；原第一天範本的三位員工也是文件角色，未獨立核其 runtime。現 Agent 的總入口不算第16核心技能。八角色的共享資料/產物合同優於單純固定格式，但人類實際工作結果尚未普遍驗證。
+
+### 八個共享目錄與品牌手冊十章
+| 來源目錄序號/用途 | 對應原工程位置 | 狀態與缺口 |
+|---|---|---|
+| 01 使用者脈絡＋收藏 | 原主檔有效決策、AGENTS、private remember、EP | A 正式決策/偏好測試；D 真私人記憶；M 統一可讀工作輪廓與真採用閉環 |
+| 02 原始調研、報告、選題庫 | reviews、工程索引、原工作包與可選 tasks | A 真原工程證據、D 私人池；M 真使用問題回流尚未完整 |
+| 03 當前題目與交付產物 | 原 repo spec/code/test、commit、artifact、current/revision | A 真交付與版本、D 私人 handoff 常態。不要另建副本 |
+| 04 週任務/覆盤 | 原主檔 NEXT_ACTION、PM紀錄、reviews、workbench_tasks | A 進度與專項覆盤、D 私人池；M 可比真成效回流閉合 |
+| 05 產業知識 | EP、原技能、curriculum matrix | A 工程索引與結構，教材深度未完成；R 每次採用 |
+| 06 真使用者原始回饋 | 原需求/驗收/工單、明示回饋 candidate | A 需求/測試機制、D 私人 feedback；M 多真任務的具來源回饋與採用結果閉環。不得移入真人資料 |
+| 07 一事一案例 | CASES/TRAINING_CASES、EP、原 reviews | A 原案例及真證據，D 私人 case/cite |
+| 08 發布後成效 | 原 CI、真 deployment/驗收、PM進度、reviews | A 工程驗收紀錄；M 可比真使用效果/重工/人工負擔資料與後續效果驗證，不需通用儀表板 |
+手冊十章對應：1定位→TD005-R2/START_HERE（A）；2服務→catalog及授權界線（A）；3個人旅程→不適用，工程案例歷史（A）；4三層受眾→研究/教學使用者需求（R、真需求依個別spec）；5三大支柱→專業能力/可靠交付/安全（A契約與局部工程測試，非品牌宣稱）；6語氣→工作偏好/人機協作（R/D）；7紅線→AGENTS/policy/安全gate（A）；8素材→原案例/EP（A）、私人收藏（D）；9未知→BLOCKERS/NEXT_ACTION/未決（A）；10學到的事→DECISION_LOG/原技能/私人記憶（A公開決策、D私人日常，M跨任務成效閉環）。不保存原手冊任何個人填值。
+
+### 學習、成效與優先改善（建議，不變更現決策）
+原範本明示回饋即記、逐次先讀、定期精簡、收藏觀察/因地制宜/原理、個案與受眾反饋轉任務、發布後固定時點對比與覆盤調整。重點是以真資料改下一次工作，不是增加關卡。TP010 已修偏好漏檢且真 519 PASS，不重寫；公開正式決策已在本輪真接續（history-assisted，不是 source-only）；私人工作台已有實作卻未常態使用。原 20 行提醒、每類上限、以日期直接取代衝突、特定行銷觀測窗/樣本或流量倍數只適用來源情境，工程不可照搬；需保留安全與歷史、同一口徑的可比較真任務結果。原範本本身存在操作文字不一致：總說明要求改稿記語氣段、write-posts指定學習段；案例目錄說明與 write-posts/check-post 對未同意案例草稿的使用有差異；不把原規範當獨立執行事實，也不移植對臨床資料的例外。圖卡 asset 有外部字型請求，不能假稱完全離線，不複製至研究APP。
+建議 A（優先，沿已確認 TP010/R2）：下一個已授權真任務中最短讀取原有效決策/必要skill/EP並展示採用與結果，記本輪返工或人工介入、原因及下一任務是否改善，只用原 decision/review 或既存私有位置；不造新任務池/評測器/儀表板，不再代替正常專業學習。建議 B（有真私人位置及授權才做）：在原私人 workspace 完整保存/讀回通用工作偏好並以不同真任務驗證；沒有現成位置不要求安裝或公開。建議 C：持續教材深度路徑，現176初派/4文字/13缺、L0保留，先依最新 NEXT_ACTION；新缺才改善必要技能。尚無真陌生任務、自動週期覆盤、獨立多代理/模型增益證據；不得用程式測試、CI數或原範本資料夾存在證明常態成效。僅本次稽核及記錄，未批准/執行上述新功能、未新建任何台帳/排程、未改APP、code、main、release、Pages 或其他專案；R2專業能力最高優先及原未驗限制不變。

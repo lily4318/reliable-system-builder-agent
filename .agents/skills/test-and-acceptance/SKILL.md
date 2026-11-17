@@ -88,3 +88,7 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### TD-004｜程序輸出、異常及提交邊界驗收（TD004-SQL-PROCEDURE-01）
 真CREATE PROCEDURE/CALL與catalog prokind驗，測具名、NULL/非法、OUT/INOUT、舊版/跨actor與固定輸出；查逐值和所有相關表，不以SQLSTATE或result row成功冒稱業務成功。真獨立低權限連線測EXECUTE-only、INVOKER/DEFINER、direct DML、PUBLIC/其他actor與temp shadow。捕捉例外後核局部變數與子交易資料差異及caller marker；頂層/外部transaction、DEFINER與SET限制、先commit後故障，另一連線查持久化部分；非所有錯誤一律rollback或盲重試。按實際CI原始日誌標示PASS、非本地缺引擎/SQLite mock、非T-SQL/正式ACL；詳原覆盤，原教材未取。
+
+
+### TD-004｜函式回傳、穩定性及索引真值驗收（TD004-SQL-FUNCTION-01）
+固定逐人/觀測ID及值oracle，scalar零列與NULL、SET空列/同分多列、STRICT versus CALLED ON NULL、CROSS/LEFT LATERAL及count非NULL鍵/值、原表不變。以真長存活PREPARE跨另一連線修改設定，對照舊plan/新query、修正標記後重建plan並再改設定。VOLATILE副作用核實表、STRICT NULL跳過、STABLE違規DML拒絕及同敘述snapshot差異。故意錯IMMUTABLE建立expression index，固定真EXPLAIN路徑與逐鍵結果比較index/seq、刻意更設定再驗；修復錯索引和函式、純固定版本索引兩路徑等價及來源不變。GUC只在隔離驗收，不以計畫匹配為效能證明；非T-SQL/正式資料庫/研究政策/獨立能力。原始CI狀態依原覆盤。

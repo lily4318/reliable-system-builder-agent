@@ -63,3 +63,7 @@ tryLock 失敗不寫、finally release，鎖內重新查 id/receipt/容量；Spr
 
 ### TD-004｜預存程序與明確交易所有權（TD004-SQL-PROCEDURE-01）
 以實際引擎明示參數類型、NULL/預設/值域、具名與輸出欄序/業務代碼；PG CALL/INOUT/OUT與SQL Server EXEC/OUTPUT/return/resultset不同，不用SQLite或SELECT函式冒稱程序。錯誤分類與業務拒絕/已提交狀態分離，避免catch吞錯後以SQL成功判業務成功；PG子交易exception rollback不清區域變數。明示caller或procedure擁有交易；PG頂層CALL內COMMIT可部分持久化，外部BEGIN/SECURITY DEFINER/attached SET限制內部交易控制。原子業務優先caller交易、無任意內部commit，UNKNOWN先唯讀對帳。僅必要EXECUTE，撤PUBLIC，審核非superuser/no-login definer、最小grant、固定search_path及完整schema限定、可信actor範圍，真driver bind/JWT另驗。SQL Server THROW/XACT_ABORT/交易狀態按原生引擎驗。四個原生PG候選方法與狀態見[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)，原教材正文未取。
+
+
+### TD-004｜函式粒度、NULL與volatility契約（TD004-SQL-FUNCTION-01）
+明示scalar唯一列/首列選擇、SETOF/RETURNS TABLE粒度及元素型別；空集合、全NULL、真0、合法同值多筆分開，LATERAL選擇按核准母群。STRICT遇NULL跳過函式，不能用內部COALESCE補預設；必要時CALLED ON NULL INPUT。PG IMMUTABLE只給同參數永遠同值的無副作用計算；依資料/設定讀取適用STABLE，寫入或可變值VOLATILE，禁止為效能錯標。STABLE/volatile snapshot不同；SELECT可有副作用，不能假定固定呼叫次數或順序，敏感業務用明確受限入口、顯式權限與交易。依賴外部設定的錯IMMUTABLE會折疊prepared plan或把舊值存入expression index；修正分類並盤點索引/相依與重建、結果一致性，固定參數/版本的純函式僅在業務契約確認後採用。COST/ROWS是planner估算非限制；不把測試GUC當上線調參。PG與T-SQL規格分別確認；詳原覆盤，原教材未讀。

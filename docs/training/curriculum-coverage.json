@@ -979,12 +979,19 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "architect",
+        "qa-uat",
+        "security"
+      ],
       "skill": "implement-feature",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.1.2",
+        "3.2.4"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-SQL-FUNCTION-01：原教材指定入口不可達，保持UNREAD/source_sha256=null/L0；PG/Microsoft官方規格與原生PG四方法55斷言，NATIVE_CI_PENDING。前置暫列SQL/Select，待原正文核對；原T-SQL、圖、完整習得/真遷移待驗。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

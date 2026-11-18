@@ -1080,7 +1080,7 @@
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "TD004-DEV-ENV-01：原指定正文不可達，UNREAD/source_sha256=null/L0；VSCode/Python/Node/npm官方文件及隔離環境三新方法本機實測通過；LOCAL_TOOLCHAIN_VERIFIED_CI_PENDING，CI44213804650，原覆盤；GUI/Windows/原正文及完整習得待驗，前置暫定，原正文後核。",
+      "next_action": "TD004-DEV-ENV-01：原正文不可達，UNREAD/source_sha256=null/L0；官方規格及本機與CI不同版本Linux三新方法皆真實通過（CI44213804650 553/553，exact04e43d0，原覆盤），原正文、GUI、Windows及獨立遷移仍待驗；不重做已驗工具鏈案例。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -1100,7 +1100,7 @@
       ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "TD004-DEV-ENV-01：原指定正文不可達，UNREAD/source_sha256=null/L0；VSCode/Python/Node/npm官方文件及隔離環境三新方法本機實測通過；LOCAL_TOOLCHAIN_VERIFIED_CI_PENDING，CI44213804650，原覆盤；GUI/Windows/原正文及完整習得待驗，前置暫定，原正文後核。",
+      "next_action": "TD004-DEV-ENV-01：原正文不可達，UNREAD/source_sha256=null/L0；官方規格及本機與CI不同版本Linux三新方法皆真實通過（CI44213804650 553/553，exact04e43d0，原覆盤），原正文、GUI、Windows及獨立遷移仍待驗；不重做已驗工具鏈案例。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

@@ -100,3 +100,7 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### TD-004｜真重疊交易、SSI及SAVEPOINT驗收（TD004-SQL-TRANSACTION-01）
 以兩獨立backend pid/同時active transaction及交錯讀寫證明重疊，非以thread數或順序測冒稱競寫。固定至少一位active的跨列真值，RR兩筆各自合法仍皆commit而0，SSI允許40001在write/commit且只一筆成功；核另一連線的每列與變更log，完整fresh replay重新判斷兩人拒絕/三人可成功，非盲DML retry。SAVEPOINT真NOWAIT前後55P03、23505/25P02恢復、保存點前後逐列及鎖、RR舊快照與fresh值、sequence空洞及commit後釋鎖；不以rollback訊息或rowcount當完整真值。保留原CI正反證據及未驗混合隔離、高併發、driver/正式效能；不降品質gate。
+
+
+### TD-004｜研究資料端到端獨立數值與安全真值（TD004-SQL-HOMEWORK-01）
+建立逐study/person/wave/attempt/version的常量oracle及每組planned/submitted/complete/sum；至少含同值合法重測、真0、部分缺答、全缺答、未提交、跨研究重複ID及同原答不同version。核原版報表不漂移、不同版不混合、受限身份只得scope，direct raw、版本/狀態篡改、跨研究/不存在及anon拒絕且全表不變。真late check failure（先更新狀態）及外層rollback逐表核，長存活讀快照與另一提交交叉驗，同一訪視雙連線實查blocking及競爭不同payload只一份定稿。逐鍵oracle而非僅rowcount/CI分數；真CSV、正式研究工具效度/權限/資料治理與獨立Agent評分另驗。原課程作業未讀，原覆盤記證據限制。

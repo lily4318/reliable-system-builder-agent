@@ -1048,12 +1048,21 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "qa-uat",
-      "collaborators": [],
+      "collaborators": [
+        "architect",
+        "developer"
+      ],
       "skill": "test-and-acceptance",
-      "prerequisites": [],
+      "prerequisites": [
+        "3.2.4",
+        "3.3.1",
+        "3.4.1",
+        "3.4.4",
+        "3.4.6"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-SQL-HOMEWORK-01：原指定作業入口不可達，UNREAD/source_sha256=null/L0；PG官方規格及獨立研究計分DB整合三方法57 assertion sites，NATIVE_CI_PENDING，原覆盤；前置暫列select/join/view/function/transaction，原正文後核；原作業/T-SQL/完整習得及真遷移待驗。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

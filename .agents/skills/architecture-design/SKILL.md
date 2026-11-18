@@ -74,3 +74,7 @@ description: "設計架構、比較方案。architect 角色；交付 architectu
 
 ### TD-004｜跨列業務不變量與隔離策略（TD004-SQL-TRANSACTION-01）
 先明示不變量、範圍/所有讀寫入口與序列化後合法行為，優先可宣告式constraint；普通單列CHECK非跨列計數約束。PG RR快照穩定仍可能write skew（不同列各自合法而共同失守）；比較共同鎖定資源後重讀（依隔離語意）、SSI監測與重試成本，勿全域盲升隔離。SSI需各相關交易單獨正確且所有相關路徑共同遵守，結果須commit後才認定。40001已知失敗完整重讀重算、有界重試及退避，業務拒絕不重試、未知提交EP-03唯讀對帳；非交易外副作用不隨rollback，sequence不保證連號。SAVEPOINT局部復原不刷新RR snapshot、不是SSI retry替代或獨立commit。真引擎兩backend/不變量oracle及限制見[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)，原教材/T-SQL/正式工作負載另驗。
+
+
+### TD-004｜版本化研究計分的整體資料架構（TD004-SQL-HOMEWORK-01）
+先核研究者確認之量表/計分/缺失/重測與資料倫理；以study+person+wave+attempt等完整業務鍵及原答per-item、規則版本FK、預規劃母群、定稿及提交紀錄，分開原始事件與衍生報表。普通app不可改歷史規則或訪視版本，可信admin的版本發布/更正/不可變治理另設；比較固定版本動態計分與物化，不能引用當前rule重算歷史或跨版本混合。缺答/未提交/真零/同值重測分開，報表明示訪視或受試者分母。採受限提交與授權read projection，原生身份與JWT/pool不得互代；已定稿不可覆寫，原答/定稿/log同交易。合成案例/原生正反測狀態見原覆盤，非真量表、完整研究系統或原作業完成。

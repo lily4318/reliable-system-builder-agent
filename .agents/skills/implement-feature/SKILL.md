@@ -71,3 +71,7 @@ tryLock 失敗不寫、finally release，鎖內重新查 id/receipt/容量；Spr
 
 ### TD-004｜交易重試及局部復原（TD004-SQL-TRANSACTION-01）
 對實際引擎設定隔離等級，界定完整transaction與結果分類；SSI 40001可能在statement或COMMIT，已知abort先清理，再有界重試整筆（含讀取、決策、SQL及參數），不可只重送舊DML或把已aborted transaction的COMMIT/ROLLBACK回應當成功。真業務拒絕停止，未知commit依EP-03查durable結果；外部副作用獨立處理。SAVEPOINT只用於已確定可局部復原的錯誤，核保留/撤銷資料、後取普通鎖釋放、先取鎖保留；RR snapshot不刷新、sequence值不回收。避免放任直接DML繞過不變量；真driver/pool/權限與重試耗盡另驗。原生案例見原覆盤，非正式T-SQL。
+
+
+### TD-004｜版本化研究資料從提交到報表（TD004-SQL-HOMEWORK-01）
+在核准資料契約下，用完整scope鍵固定規則版本、題號與值域，保持NULL缺答及合法重測，不以同值去重。受限入口先驗身份與visit範圍，鎖該定稿對象再判狀態，原答/狀態/log同交易且late constraint錯誤整體復原；ALREADY_FINAL只表示禁止覆寫，不等於成功重放或unknown ack對帳。report明示列粒度、母群/有效分母/版本，讀一致性及匯出來源版本依核准契約；不為簡單將歷史改套current配置。普通角色無底表寫/原答直讀，固定search_path/撤PUBLIC、實際授權分層；session_user只適用獨立DB登入，真driver/JWT/審計治理另驗。見原SQL例與覆盤。

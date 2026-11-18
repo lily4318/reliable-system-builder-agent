@@ -39,3 +39,7 @@ description: "部署、處理 CI 或版本。devops-sre 角色；交付 deployme
 
 ### TD-004｜瀏覽器程序就緒與有限診斷（TD004-CHROME-STARTUP-01）
 區分spawn（cwd/exe/uid/env）、子程序存活、ready receipt、loopback HTTP/CDP、真頁面與下載五層；DevToolsActivePort缺檔是症狀，不是同一根因。確認實際版本與執行身分、獨立暫存profile、絕對路徑/明示cwd、最少環境變數；Chrome136起非預設profile才可遠端偵錯（正式Chrome），不接管真人profile、不公開port、不為方便新增--no-sandbox。CI原15秒deadline內查退出碼、缺/無效receipt與埠範圍，持續排空stderr但只輸出有限固定分類，不打印環境/argv/raw stderr/token；DBus等訊息本身非必然致命。原HTTP/CDP、真UI與CSV、CSP、安全與quality gates不得降級。失敗只清理本次擁有的程序/profile、保留去敏證據；不得殺全部Chrome或盲目重跑。隔離Linux root拒絕已實測，普通uid可達CDP但本地navigation失敗、遠端原偶發根因未證；exact ef74dea1ab700ae62e12785b8b87bfefdfa78e12候選診斷補強已回讀，完整CI另核。見[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。
+
+
+### TD-004｜IDE設定範圍、外掛固定版本及復原（TD004-VSCODE-EXTENSION-01）
+先確認實際IDE/commit/OS/architecture、profile、local/remote host與workspace scope；一般workspace覆蓋user，但語言專用設定跨scope優先，最後組織policy；區分含註解JSONC、multi-root、remote與profiles，不能將簡化模型等同IDE。先用內建功能，必要外掛核publisher.extension@version、engine/platform、相依與可信獨立digest/簽章，推薦清單不是lock；auto-update/Settings Sync與remote各自確認。未授權不安裝。核准隔離試驗可用分離user-data-dir/extensions-dir/profile與合成workspace，Portable Mode例外；不等於OS sandbox，不盲--force或關簽章/Trust。禁用外掛是診斷，不撤銷既有檔案、設定、登入或外部寫入；保存前後bytes與權限，確認停止本次擁有的程序，未知/內容drift先唯讀對帳，明確恢復已知after-image再核實際功能，不整個清除使用者設定。原本機合成實證與限制見[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

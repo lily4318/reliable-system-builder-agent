@@ -6,6 +6,7 @@ import os
 from pathlib import Path
 import shutil
 import subprocess
+import sys
 import tempfile
 import threading
 import time
@@ -18,6 +19,71 @@ ROOT = Path(__file__).resolve().parents[1] / "examples/research-methods"
 ASSETS = {"/index.html": ("index.html", "text/html; charset=utf-8"),
           "/style.css": ("style.css", "text/css; charset=utf-8"),
           "/app.js": ("app.js", "text/javascript; charset=utf-8")}
+
+
+# Public CI logs retain fixed diagnostic codes, never raw stderr, argv or env values.
+class _ChromeStartupLog:
+    _markers = (
+        (b"Running as root without --no-sandbox", "ROOT_SANDBOX_REFUSAL"),
+        (b"No usable sandbox", "SANDBOX_UNAVAILABLE"),
+        (b"DevTools listening on", "DEVTOOLS_LISTENING"),
+        (b"Failed to connect to the bus", "DBUS_UNAVAILABLE"),
+        (b"SingletonLock", "PROFILE_LOCK"),
+        (b"Permission denied", "PERMISSION_DENIED"),
+        (b"No space left on device", "NO_SPACE"),
+        (b"chrome_crashpad_handler", "CRASHPAD_DIAGNOSTIC"),
+    )
+
+    def __init__(self, pipe):
+        self.codes = set()
+        self.lock = threading.Lock()
+        def drain():
+            tail = b""
+            try:
+                with pipe:
+                    while chunk := pipe.read1(4096):
+                        data = tail + chunk
+                        with self.lock:
+                            self.codes.update(code for marker, code in self._markers
+                                              if marker in data)
+                        tail = data[-128:]
+            except (OSError, ValueError):
+                with self.lock:
+                    self.codes.add("STDERR_READ_FAILED")
+        self.thread = threading.Thread(target=drain, daemon=True)
+        self.thread.start()
+
+    def summary(self):
+        with self.lock:
+            return ",".join(sorted(self.codes)) or "NO_RECOGNIZED_MARKER"
+
+
+def _wait_devtools_port(proc, portfile, diagnostics, timeout=15):
+    deadline = time.monotonic() + timeout
+    state = "PORT_FILE_MISSING"
+    while True:
+        if proc.poll() is not None:
+            diagnostics.thread.join(.2)
+            raise RuntimeError(f"CHROME_EARLY_EXIT rc={proc.returncode} "
+                               f"state={state} stderr_codes={diagnostics.summary()}")
+        try:
+            lines = portfile.read_text(encoding="utf-8").splitlines()
+        except FileNotFoundError:
+            state = "PORT_FILE_MISSING"
+        except (OSError, UnicodeError):
+            state = "PORT_FILE_UNREADABLE"
+        else:
+            state = "PORT_FILE_INVALID"
+            if (len(lines) == 2 and lines[0].isascii() and lines[0].isdigit()
+                    and len(lines[0]) <= 5 and 1 <= int(lines[0]) <= 65535
+                    and lines[1].startswith("/devtools/browser/")):
+                if proc.poll() is None:
+                    return int(lines[0])
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            raise RuntimeError(f"CHROME_READINESS_TIMEOUT state={state} "
+                               f"stderr_codes={diagnostics.summary()}")
+        time.sleep(min(.1, remaining))
 
 
 class ResearchMethodsTest(unittest.TestCase):
@@ -49,6 +115,7 @@ class ResearchMethodsTest(unittest.TestCase):
                 thread.start()
                 proc = None
                 cdp = None
+                diagnostics = None
                 try:
                     profile = root / "profile"
                     proc = subprocess.Popen([exe,"--headless","--no-sandbox","--disable-dev-shm-usage",
@@ -57,13 +124,9 @@ class ResearchMethodsTest(unittest.TestCase):
                         "--host-resolver-rules=MAP * ~NOTFOUND, EXCLUDE 127.0.0.1",
                         "--no-proxy-server","--remote-debugging-address=127.0.0.1",
                         "--remote-debugging-port=0","--user-data-dir="+str(profile),"about:blank"],
-                        stdout=subprocess.DEVNULL,stderr=subprocess.DEVNULL)
-                    deadline = time.monotonic()+15
-                    portfile = profile/"DevToolsActivePort"
-                    while not portfile.exists() and time.monotonic()<deadline:
-                        if proc.poll() is not None: self.fail("Chrome closed")
-                        time.sleep(.1)
-                    port = int(portfile.read_text().splitlines()[0])
+                        cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+                    diagnostics = _ChromeStartupLog(proc.stderr)
+                    port = _wait_devtools_port(proc, profile/"DevToolsActivePort", diagnostics)
                     with urlopen(f"http://127.0.0.1:{port}/json/list",timeout=5) as response:
                         pages = json.load(response)
                     cdp = CDP(next(p["webSocketDebuggerUrl"] for p in pages if p["type"]=="page"))
@@ -142,4 +205,39 @@ class ResearchMethodsTest(unittest.TestCase):
                         proc.terminate()
                         try: proc.wait(timeout=5)
                         except subprocess.TimeoutExpired: proc.kill();proc.wait()
+                    if diagnostics is not None: diagnostics.thread.join(.5)
                     server.shutdown();thread.join(5)
+
+    def test_chrome_startup_failure_is_classified_without_raw_stderr(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            portfile = Path(tmp) / "DevToolsActivePort"
+            # Real owned subprocess, deliberate early exit; not a Chromium root-cause claim.
+            proc = subprocess.Popen([sys.executable, "-c",
+                "import sys; sys.stderr.write('Permission denied SYNTHETIC_PRIVATE_SENTINEL'); sys.exit(17)"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+            diagnostics = _ChromeStartupLog(proc.stderr)
+            try:
+                with self.assertRaisesRegex(RuntimeError, "CHROME_EARLY_EXIT rc=17") as failure:
+                    _wait_devtools_port(proc, portfile, diagnostics, timeout=2)
+                self.assertIn("PERMISSION_DENIED", str(failure.exception))
+                self.assertNotIn("SYNTHETIC_PRIVATE_SENTINEL", str(failure.exception))
+            finally:
+                if proc.poll() is None: proc.kill()
+                proc.wait(timeout=2)
+                diagnostics.thread.join(.5)
+            # Alive subprocess, missing then malformed readiness receipt: fail closed.
+            proc = subprocess.Popen([sys.executable, "-c", "import time; time.sleep(10)"],
+                stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
+            diagnostics = _ChromeStartupLog(proc.stderr)
+            try:
+                with self.assertRaisesRegex(RuntimeError, "CHROME_READINESS_TIMEOUT state=PORT_FILE_MISSING"):
+                    _wait_devtools_port(proc, portfile, diagnostics, timeout=.15)
+                portfile.write_text("70000\n/devtools/browser/stale\n", encoding="utf-8")
+                with self.assertRaisesRegex(RuntimeError, "CHROME_READINESS_TIMEOUT state=PORT_FILE_INVALID"):
+                    _wait_devtools_port(proc, portfile, diagnostics, timeout=.15)
+                self.assertIsNone(proc.poll())
+            finally:
+                if proc.poll() is None: proc.terminate()
+                try: proc.wait(timeout=2)
+                except subprocess.TimeoutExpired: proc.kill(); proc.wait(timeout=2)
+                diagnostics.thread.join(.5)

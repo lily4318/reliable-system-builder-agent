@@ -1309,7 +1309,7 @@
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "TD004-DOTNET-CONSOLE-MVC-01：原正文不可達，UNREAD/L0保留；本機無.NET，1 native skipped；exact de2ed1cc / CI44311060607 待核真console/mvc生成、CLI與loopback HTTP正反測，不下載第三方。原覆盤及合法教材取得後再核。",
+      "next_action": "TD004-DOTNET-CONSOLE-MVC-01 HOSTED_NATIVE_CONSOLE_MVC_VERIFIED；CI44311060607 566/566，原生CLI及MVC HTTP/CSRF/validation/encoding/副作用正反例通過；原正文UNREAD/L0不變。詳原覆盤。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -1328,7 +1328,7 @@
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "TD004-DOTNET-CONSOLE-MVC-01：原正文不可達，UNREAD/L0保留；本機無.NET，1 native skipped；exact de2ed1cc / CI44311060607 待核真console/mvc生成、CLI與loopback HTTP正反測，不下載第三方。原覆盤及合法教材取得後再核。",
+      "next_action": "TD004-DOTNET-CONSOLE-MVC-01 HOSTED_NATIVE_CONSOLE_MVC_VERIFIED；CI44311060607 566/566，原生CLI及MVC HTTP/CSRF/validation/encoding/副作用正反例通過；原正文UNREAD/L0不變。詳原覆盤。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

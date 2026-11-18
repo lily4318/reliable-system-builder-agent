@@ -1,5 +1,5 @@
 """Owned MVC layering, real DI container and PRG; no external packages."""
-import http.client
+import http.client as http_client
 import json
 import os
 from pathlib import Path
@@ -191,7 +191,7 @@ class DotnetMvcLayersTests(unittest.TestCase):
                         headers={}
                         if fields is not None: headers["Content-Type"]="application/x-www-form-urlencoded"
                         if cookie: headers["Cookie"]=cookie
-                        c=http.client.HTTPConnection("127.0.0.1",port,timeout=5)
+                        c=http_client.HTTPConnection("127.0.0.1",port,timeout=5)
                         try:
                             c.request(method,path,body=urlencode(fields) if fields is not None else None,headers=headers)
                             r=c.getresponse()

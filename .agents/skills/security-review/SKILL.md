@@ -56,3 +56,7 @@ Context讀取不等於獲准傳輸：只選已分類核准的最少必要檔案/
 
 ### TD-004｜MVC輸入及狀態修改保護（TD004-DOTNET-CONSOLE-MVC-01）
 route constraint不等於resource authorization，FromRoute與窄DTO/FromForm排除不可信body/query覆寫；拒絕型別/值域/缺欄後核真副作用未發生。Cookie型瀏覽器form用正確antiforgery機制，分缺cookie、缺token、錯token與有效pair；CSRF不等於身分/ACL/idempotency。Razor預設HTML編碼不擴及所有JS/URL/raw輸出，勿對不可信資料Html.Raw；輸出與業務驗收分離。原合成in-memory計數非真研究資料、DB/並行/重播及完整資安驗收。詳原覆盤（CI待驗）。
+
+
+### TD-004｜請求生命週期與提交重播邊界（TD004-DOTNET-MVC-LAYERS-01）
+Singleton需thread-safe且無個別請求/使用者的敏感狀態，Scoped不得被長生命週期捕捉；scope validation只驗可辨識組裝錯誤。CSRF、PRG、身分與幂等分離；正式幂等key須綁可信actor/tenant/業務scope及內容版本、資料庫唯一約束與交易、遺失ack唯讀對帳，禁止用key/GUID/receipt id代替權限。單程序lock+memory fixture只證受測重播，不跨restart/multi-instance、不證真ACL或並行壓測；不得把receipt/count測試入口公開給真系統。重導向由可信route生成、不可直接採任意returnUrl。詳原覆盤（CI待驗）。

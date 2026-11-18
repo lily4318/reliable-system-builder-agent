@@ -52,3 +52,7 @@ Context讀取不等於獲准傳輸：只選已分類核准的最少必要檔案/
 
 ### TD-004｜範本供應鏈及生成後執行邊界（TD004-DOTNET-TEMPLATE-01）
 範本來源、參數、實際生成與postActions授權分離。未知範本先唯讀審完整內容/identity及版本，核source/target/rename、路徑、symlink、符號替換及清單/bytes；排除private/.env/obj/bin等不等於通用secret防護，copyOnly仍會複製既有資料，應先分類並禁止真敏感原檔。核每種postAction（restore、script、chmod、reference等）與args/condition，預設不要放行任意腳本，--allow-scripts no只針對script不是所有postActions或OS sandbox；生成後檔案存在不代表action成功，核可觀察副作用。受控可信fixture的一個marker正反對照不是任意程式執行安全證明；必要網路/實際資料/外部權限獨立授權，勿在有secret的CI跑陌生來源。原[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。
+
+
+### TD-004｜MVC輸入及狀態修改保護（TD004-DOTNET-CONSOLE-MVC-01）
+route constraint不等於resource authorization，FromRoute與窄DTO/FromForm排除不可信body/query覆寫；拒絕型別/值域/缺欄後核真副作用未發生。Cookie型瀏覽器form用正確antiforgery機制，分缺cookie、缺token、錯token與有效pair；CSRF不等於身分/ACL/idempotency。Razor預設HTML編碼不擴及所有JS/URL/raw輸出，勿對不可信資料Html.Raw；輸出與業務驗收分離。原合成in-memory計數非真研究資料、DB/並行/重播及完整資安驗收。詳原覆盤（CI待驗）。

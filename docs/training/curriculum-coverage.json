@@ -1233,7 +1233,7 @@
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "TD004-DOTNET-BUILD-01：原指定正文不可達，UNREAD/L0保留。本機真XML/JSON/FS正反測1 passed、原生.NET 1 skipped（無SDK）；exact7620764c / CI44299083894 待核預裝SDK原生結果，不下載安裝；非VS2022 GUI/workload或正式部署。詳原覆盤，原教材合法取得才補。",
+      "next_action": "TD004-DOTNET-BUILD-01 HOSTED_NATIVE_DOTNET_BUILD_VERIFIED；原正文UNREAD/L0不變，CI44299083894 563/563、28步、預裝.NET SDK10.0.404/net10.0 真restore/lock/build、專案相依輸出17→23。非Windows VS2022/workload安裝，無新增工具安裝；本機1 pass/1 skip，詳原覆盤。原教材合法取得才補。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -1252,7 +1252,7 @@
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "TD004-DOTNET-BUILD-01：原指定正文不可達，UNREAD/L0保留。本機真XML/JSON/FS正反測1 passed、原生.NET 1 skipped（無SDK）；exact7620764c / CI44299083894 待核預裝SDK原生結果，不下載安裝；非VS2022 GUI/workload或正式部署。詳原覆盤，原教材合法取得才補。",
+      "next_action": "TD004-DOTNET-BUILD-01 HOSTED_NATIVE_DOTNET_BUILD_VERIFIED；原正文UNREAD/L0不變，CI44299083894 563/563、28步、預裝.NET SDK10.0.404/net10.0 真restore/lock/build、專案相依輸出17→23。非Windows VS2022/workload安裝，無新增工具安裝；本機1 pass/1 skip，詳原覆盤。原教材合法取得才補。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

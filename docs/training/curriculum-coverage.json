@@ -1062,7 +1062,7 @@
       ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "TD004-SQL-HOMEWORK-01：原指定作業入口不可達，UNREAD/source_sha256=null/L0；PG官方規格及獨立研究計分DB整合三方法57 assertion sites，NATIVE_CI_PENDING，原覆盤；前置暫列select/join/view/function/transaction，原正文後核；原作業/T-SQL/完整習得及真遷移待驗。",
+      "next_action": "TD004-SQL-HOMEWORK-01：原作業入口不可達，UNREAD/source_sha256=null/L0；PG官方規格及合成心理研究DB端到端三方法已驗（CI44212760247 550/550、exactadc0f46、原覆盤），原題目、T-SQL、完整習得/真遷移仍待驗；不重做個別SQL實驗。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

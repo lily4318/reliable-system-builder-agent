@@ -35,3 +35,7 @@ description: "部署、處理 CI 或版本。devops-sre 角色；交付 deployme
 
 ### TD-004｜可重現開發工作區及工具鏈（TD004-DEV-ENV-01）
 設定與runtime分離：先核實際OS/CPU、cwd、解譯器/Node/npm版本、command path與IDE/terminal/task/debug各有效scope，不能只看VIRTUAL_ENV或IDE狀態。Python每project重建venv（不複製），以完整解譯器路徑及sys.executable/prefix/base_prefix、版本、套件來源檢查；注意PYTHONPATH/user site/目前目錄，-I只限其語意不是sandbox。Node核--env-file與既有process env順序、NODE_OPTIONS/preload；以明示最小env和trusted absolute tools避免繼承不必要設定，勿任意讀出.env或完整環境。npm ci核package.json/lockfile與實際runtime/flags，離線local dep測正反、拒絕drift，勿盲用install改lock/升版；陌生repo先review tasks/extensions/lifecycle並限制Workspace Trust，不把ignore-scripts/venv/offline等同安全沙箱。POSIX真實驗、原教材及GUI限制見原覆盤。未授權不修改使用者電腦或全域設定。
+
+
+### TD-004｜瀏覽器程序就緒與有限診斷（TD004-CHROME-STARTUP-01）
+區分spawn（cwd/exe/uid/env）、子程序存活、ready receipt、loopback HTTP/CDP、真頁面與下載五層；DevToolsActivePort缺檔是症狀，不是同一根因。確認實際版本與執行身分、獨立暫存profile、絕對路徑/明示cwd、最少環境變數；Chrome136起非預設profile才可遠端偵錯（正式Chrome），不接管真人profile、不公開port、不為方便新增--no-sandbox。CI原15秒deadline內查退出碼、缺/無效receipt與埠範圍，持續排空stderr但只輸出有限固定分類，不打印環境/argv/raw stderr/token；DBus等訊息本身非必然致命。原HTTP/CDP、真UI與CSV、CSP、安全與quality gates不得降級。失敗只清理本次擁有的程序/profile、保留去敏證據；不得殺全部Chrome或盲目重跑。隔離Linux root拒絕已實測，普通uid可達CDP但本地navigation失敗、遠端原偶發根因未證；exact ef74dea1ab700ae62e12785b8b87bfefdfa78e12候選診斷補強已回讀，完整CI另核。見[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

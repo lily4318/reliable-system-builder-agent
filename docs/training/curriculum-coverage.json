@@ -1225,12 +1225,15 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "devops-sre",
-      "collaborators": [],
+      "collaborators": [
+        "developer",
+        "security"
+      ],
       "skill": "deployment",
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-DOTNET-BUILD-01：原指定正文不可達，UNREAD/L0保留。本機真XML/JSON/FS正反測1 passed、原生.NET 1 skipped（無SDK）；exact7620764c / CI44299083894 待核預裝SDK原生結果，不下載安裝；非VS2022 GUI/workload或正式部署。詳原覆盤，原教材合法取得才補。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -1241,12 +1244,15 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "devops-sre",
-      "collaborators": [],
+      "collaborators": [
+        "developer",
+        "security"
+      ],
       "skill": "deployment",
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-DOTNET-BUILD-01：原指定正文不可達，UNREAD/L0保留。本機真XML/JSON/FS正反測1 passed、原生.NET 1 skipped（無SDK）；exact7620764c / CI44299083894 待核預裝SDK原生結果，不下載安裝；非VS2022 GUI/workload或正式部署。詳原覆盤，原教材合法取得才補。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

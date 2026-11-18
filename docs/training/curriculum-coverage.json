@@ -1147,12 +1147,15 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "devops-sre",
-      "collaborators": [],
+      "collaborators": [
+        "developer",
+        "security"
+      ],
       "skill": "deployment",
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-VSCODE-EXTENSION-01：原正文不可達，UNREAD/source_sha256=null/L0；官方規格與本機4/4真HTML Parser/JSON/ZIP/file正反例，exact3e25592c CI44235936487待核；未驗實際Emmet engine、VSCode GUI/Trust/外掛安裝啟用/Windows。詳原覆盤，不重做原工具鏈/Chrome。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -1163,12 +1166,15 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "devops-sre",
-      "collaborators": [],
+      "collaborators": [
+        "developer",
+        "security"
+      ],
       "skill": "deployment",
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-VSCODE-EXTENSION-01：原正文不可達，UNREAD/source_sha256=null/L0；官方規格與本機4/4真HTML Parser/JSON/ZIP/file正反例，exact3e25592c CI44235936487待核；未驗實際Emmet engine、VSCode GUI/Trust/外掛安裝啟用/Windows。詳原覆盤，不重做原工具鏈/Chrome。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

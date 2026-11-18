@@ -1111,12 +1111,14 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "devops-sre",
-      "collaborators": [],
+      "collaborators": [
+        "developer"
+      ],
       "skill": "deployment",
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-CHROME-STARTUP-01：原正文不可達，UNREAD/source_sha256=null/L0；Chrome啟動最小去敏診斷修補真CI44234468463 554/554、28步、兩真viewport/CSV及真子程序負測通過，歷史偶發根因、原正文、GUI/Windows及獨立遷移仍未驗；詳原覆盤，無需重做已驗回歸。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -1127,12 +1129,14 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "devops-sre",
-      "collaborators": [],
+      "collaborators": [
+        "developer"
+      ],
       "skill": "deployment",
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-CHROME-STARTUP-01：原正文不可達，UNREAD/source_sha256=null/L0；Chrome啟動最小去敏診斷修補真CI44234468463 554/554、28步、兩真viewport/CSV及真子程序負測通過，歷史偶發根因、原正文、GUI/Windows及獨立遷移仍未驗；詳原覆盤，無需重做已驗回歸。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

@@ -93,10 +93,12 @@ class DotnetTemplateTests(unittest.TestCase):
                    "NUGET_PACKAGES": str(root / "packages"), "NUGET_HTTP_CACHE_PATH": str(root / "http-cache"),
                    "DOTNET_CLI_TELEMETRY_OPTOUT": "1", "DOTNET_CLI_WORKLOAD_UPDATE_NOTIFY_DISABLE": "true",
                    "DOTNET_NOLOGO": "1", "DOTNET_GENERATE_ASPNET_CERTIFICATE": "false", "MSBUILDDISABLENODEREUSE": "1", "LC_ALL": "C.UTF-8"}
-            def run(*args, success=True, cwd=root):
+            def run(*args, success=True, cwd=root, expected_code=None):
                 p = subprocess.run([dotnet, *args], cwd=cwd, env=env, capture_output=True, text=True, timeout=45)
                 output = p.stdout + p.stderr
                 self.assertEqual(p.returncode == 0, success, output[-3000:])
+                if expected_code is not None:
+                    self.assertEqual(p.returncode, expected_code, output[-3000:])
                 return output
             versions = []
             for line in run("--list-sdks").splitlines():
@@ -120,20 +122,23 @@ class DotnetTemplateTests(unittest.TestCase):
             make_template(template)
             check_owned(template)
             original = snapshot(template)
-            def new(*args, success=True):
-                return run("new", *args, "--debug:custom-hive", str(root / "hive"), success=success)
+            def new(*args, success=True, expected_code=None):
+                return run("new", *args, "--debug:custom-hive", str(root / "hive"), success=success, expected_code=expected_code)
             new("install", str(template))
             self.assertIn(SHORT, new("list", SHORT))
-            def generate(output, *args, success=True):
-                return new(SHORT, "--name", "StudySite", "--output", str(output), "--no-update-check", *args, success=success)
+            def generate(output, *args, success=True, expected_code=None):
+                return new(SHORT, "--name", "StudySite", "--output", str(output), "--no-update-check", *args, success=success, expected_code=expected_code)
             preview = root / "preview"
             generate(preview, "--allow-scripts", "yes", "--dry-run")
             self.assertEqual(snapshot(preview), {})
             invalid = root / "invalid"
-            generate(invalid, "--mode", "unknown", "--allow-scripts", "no", success=False)
+            generate(invalid, "--mode", "unknown", "--allow-scripts", "no", success=False, expected_code=127)
             self.assertEqual(snapshot(invalid), {})
             basic = root / "basic"
-            generate(basic, "--allow-scripts", "no")
+            # Native .NET 10 reports partial success: generated files, denied post action.
+            denied = generate(basic, "--allow-scripts", "no", success=False, expected_code=105)
+            self.assertIn("Execution of 'Run script' post action is not allowed.", denied)
+            self.assertIn("was created successfully", denied)
             self.assertEqual(snapshot(basic), expected("StudySite", "basic"))
             extended = root / "extended"
             generate(extended, "--mode", "extended", "--includeNotes", "true", "--allow-scripts", "yes")
@@ -145,7 +150,7 @@ class DotnetTemplateTests(unittest.TestCase):
             collision.mkdir()
             (collision / "README.txt").write_text("existing content\n")
             before = snapshot(collision)
-            generate(collision, "--allow-scripts", "yes", success=False)
+            generate(collision, "--allow-scripts", "yes", success=False, expected_code=73)
             self.assertEqual(snapshot(collision), before)
             project = extended / "StudySite.csproj"
             run("restore", str(project), "--configfile", str(config), "--packages", str(root / "packages"), "--disable-build-servers", "-p:NuGetAudit=false")

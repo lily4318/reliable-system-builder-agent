@@ -44,3 +44,7 @@ Workspace Trust限制部分終端/task/debug/extension和workspace設定，但�
 
 ### TD-004｜AI上下文、工具與副作用邊界（TD004-AI-CODING-REVIEW-01）
 Context讀取不等於獲准傳輸：只選已分類核准的最少必要檔案/版本，校驗實際序列化payload、路徑/連結、來源SHA與byte cap；工具回傳/終端/URL會再進context，先審查分類與prompt injection，不以.gitignore/.aiexclude/content exclusion或MCP readOnlyHint當安全邊界。區分enabled、approval、OS隔離、網路出站及遠端ACL；核tool/target/arguments/before+after digest，過期或變更重新確認；拒絕未授權寫及未知副作用，不自動重送。合成canary測只證固定allowlist，不是通用secret scanner或真外傳防護；人審、實際provider政策/版別/資料保留、組織授權另核。不得用無訓練承諾等同不傳輸。原[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。
+
+
+### TD-004｜MSBuild及NuGet可執行供應鏈（TD004-DOTNET-BUILD-01）
+陌生project/solution/props/targets/rsp、父目錄自動匯入、SDK resolver、NuGet build/buildTransitive/analyzers與工具還原都可能執行程式；restore或IDE open不等唯讀。先讀來源與上下文，使用可信隔離暫存目錄、最少環境及專屬package cache，固定config source mapping（含transitive）、lock與來源/簽章，已在global cache的package可能不重新走mapping，metadata lookup亦另核。陌生碼不在有secret/網路的正式CI執行，不自動升級/下載；本次自製無程式碼marker/local feed且僅為避免網路的合成實驗停NuGetAudit及workload廣告通知，不推廣到正式專案、不宣稱OS出站隔離或已做漏洞掃描。靜態精確fixture checker非通用安全掃描，詳[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

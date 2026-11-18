@@ -1347,7 +1347,7 @@
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "TD004-DOTNET-MVC-LAYERS-01：原正文不可達，UNREAD/L0保留；本機無SDK，未於本機執行新test；exact 1f586ba4 / CI44330150070待核真DI生命週期/captive scope拒絕及PRG/重播/衝突原生HTTP；不下載第三方或改使用者PC。詳原覆盤。",
+      "next_action": "TD004-DOTNET-MVC-LAYERS-01：原正文UNREAD/L0；CI44330150070初次red，原生build/錯DI註冊拒絕通過，首HTTP前Python模組遮蔽；修正exact a32d2381 / CI44330834142待驗，未更改C#或門檻。詳原覆盤。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -1366,7 +1366,7 @@
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "TD004-DOTNET-MVC-LAYERS-01：原正文不可達，UNREAD/L0保留；本機無SDK，未於本機執行新test；exact 1f586ba4 / CI44330150070待核真DI生命週期/captive scope拒絕及PRG/重播/衝突原生HTTP；不下載第三方或改使用者PC。詳原覆盤。",
+      "next_action": "TD004-DOTNET-MVC-LAYERS-01：原正文UNREAD/L0；CI44330150070初次red，原生build/錯DI註冊拒絕通過，首HTTP前Python模組遮蔽；修正exact a32d2381 / CI44330834142待驗，未更改C#或門檻。詳原覆盤。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

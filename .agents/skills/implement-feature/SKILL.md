@@ -79,3 +79,7 @@ tryLock 失敗不寫、finally release，鎖內重新查 id/receipt/容量；Spr
 
 ### TD-004｜Emmet展開後的網站語意契約（TD004-VSCODE-EXTENSION-01）
 VSCode內建Emmet，先核語言模式、includeLanguages映射、syntaxProfiles輸出格式、Tab/建議與自訂snippet scope，不為快捷輸入盲裝外掛。理解 >、+、^、*、$、[]、{} 的樹/兄弟/返回/重複/編號/屬性/文字語意，屬性引用與語言語法分開；生成不等於功能。研究表單固定唯一id、name/label對應、正確input type與required、資料契約；驗實際HTML/DOM、鍵盤及提交，拒重複ID、錯label與錯name，不把HTMLParser token check當HTML5 DOM或完整可及性/功能。原合成手寫等價輸出之Parser正反例已跑，沒有真Emmet engine/IDE實證；[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。
+
+
+### TD-004｜.NET專案及建置契約（TD004-DOTNET-BUILD-01）
+區分SDK pin、TargetFramework/TargetFrameworks、RuntimeIdentifier、project reference與PackageReference/lock；SDK版本不等於目標API或runtime。先核實際解析與依賴閉包、build前restore、編譯及執行獨立oracle；ProjectReference變更需核下游重建/真正功能輸出，不以舊DLL或obj存在當通過。XML靜態預檢僅限受控fixture、不是MSBuild evaluation；條件/property/import/glob、跨target、Windows .NET Framework/ASP.NET等另用真引擎依版測。原訓練實驗見[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

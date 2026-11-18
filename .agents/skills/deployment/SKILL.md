@@ -47,3 +47,7 @@ description: "部署、處理 CI 或版本。devops-sre 角色；交付 deployme
 
 ### TD-004｜AI工具預算、用量未知與精確核准（TD004-AI-CODING-REVIEW-01）
 執行前核實際方案、provider計量單位/價格/配額與上限、是否有超額支出，提示一次可能引發多模型請求、Actions/外部工具另計，無授權預算不呼叫。保守預留每attempt最大單位，結果未知保留預留並停後續/重送，可信對帳後才釋放差額；重播/超額/錯型拒絕。合成整數budget僅single-process fixture，不是持久化計量、真API或供應商價格。平台budget hard stop及usage receipt仍應優先使用，付費/外部工具需另授權。工具變更核精確scope/review(before, after, target)，保留相關檔案與回讀、獨立功能驗收，unknown先唯讀對帳。詳[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。
+
+
+### TD-004｜.NET SDK、IDE工作負載及建置相依性（TD004-DOTNET-BUILD-01）
+先查實際dotnet --list-sdks/--list-runtimes、dotnet --version、exe/architecture/cwd、MSBuild版本、targeting/host packs及VS instance/workloads（Windows用官方vswhere等），不能用SDK代替IDE或runtime。global.json鎖SDK與rollForward/allowPrerelease，不鎖TFM或套件；CLI從cwd搜尋祖先，MSBuild resolver按solution/project位置，注意不同入口。.vsconfig為元件清單、不是完整版本鎖或安裝授權；安裝/修改工作負載涉及磁碟、管理權、重啟及授權，先核精確相容、生命週期、原配置與使用者批准，不偷裝。固定NuGet.Config/來源映射、packages.lock.json與真lock restore，在受控目錄用本地feed/獨立cache驗；build --no-restore分離restore驗收，不忽略失敗源或任意清全域cache。官方2026-11-18版本核對.NET8/9已EOL，VS2022不正式支援net10 targeting；合成舊target僅教學，非正式部署建議。詳原[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

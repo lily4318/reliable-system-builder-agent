@@ -83,3 +83,7 @@ VSCode內建Emmet，先核語言模式、includeLanguages映射、syntaxProfiles
 
 ### TD-004｜.NET專案及建置契約（TD004-DOTNET-BUILD-01）
 區分SDK pin、TargetFramework/TargetFrameworks、RuntimeIdentifier、project reference與PackageReference/lock；SDK版本不等於目標API或runtime。先核實際解析與依賴閉包、build前restore、編譯及執行獨立oracle；ProjectReference變更需核下游重建/真正功能輸出，不以舊DLL或obj存在當通過。XML靜態預檢僅限受控fixture、不是MSBuild evaluation；條件/property/import/glob、跨target、Windows .NET Framework/ASP.NET等另用真引擎依版測。原訓練實驗見[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。
+
+
+### TD-004｜可重用.NET範本與產物契約（TD004-DOTNET-TEMPLATE-01）
+先區分project/item/solution與dotnet new CLI/IDE host、identity/shortName/groupIdentity、來源版本與SDK/TFM相容。以runnable原始專案為範本，明示sourceName的檔名/內容替換與typed symbols choice/bool、default、replaces；host/user值可能覆蓋預設。sources/modifiers與條件控制產物，exclude/copyOnly/rename需辨別優先；自訂exclude不要誤丟原必要預設排除，literal資料勿誤替換。避免自由文字插入程式碼/路徑、先校驗型別和名稱；以固定選項的實際檔案清單、bytes、刪除負例、同參數重現（非所有含GUID/日期範本可byte相同）、生成專案build與真輸出oracle驗收，而非只看success。原[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

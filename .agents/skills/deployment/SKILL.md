@@ -61,3 +61,7 @@ description: "部署、處理 CI 或版本。devops-sre 角色；交付 deployme
 
 ### TD-004｜原生ASP.NET Core本機功能驗收（TD004-DOTNET-CONSOLE-MVC-01）
 預裝SDK需同時核.NET及ASP.NET Core ref pack/runtime，用SDK內建範本而非第三方下載；驗實際build與DLL，分launchSettings、ASPNETCORE_URLS、環境及實際binding，受控HTTP用127.0.0.1:0取得真port，不將localhost:0、port猜測或ready log當HTTP功能成功。固定owned process及逾時、真HTTP請求、finally只終止本次程序；合成HTTP非TLS/正式部署或安全sandbox。詳原覆盤（CI待驗）。
+
+
+### TD-004｜DI組裝前置及PRG驗收（TD004-DOTNET-MVC-LAYERS-01）
+不要依賴Development預設驗scope；應依實際host明示ValidateScopes/ValidateOnBuild、驗錯誤註冊在開始listen前拒絕及正常host真HTTP。DI驗證不涵蓋所有factory/open generic/動態解析，亦不等於完整dispose證據。303表示後續GET/HEAD查資源，RedirectToAction預設302、307/308保留method；顯式核Location、實際GET/刷新與state，不自動follow不可信外站。沿既有loopback、owned process、超時及版本守門。詳原覆盤（CI待驗）。

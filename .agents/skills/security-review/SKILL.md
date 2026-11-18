@@ -36,3 +36,7 @@ access 與 executeAs 分開，USER_DEPLOYING 的 effective user 不代表訪客�
 
 ### TD-004｜資料匯入的受限入口與錯誤診斷隔離（TD004-DB-SECURITY-01）
 先定資料分類及批次權責，分收件/封存批准/正式轉入/審閱；不給一般匯入或審閱者直接DML權，受限入口核來源與封存狀態、允許的欄位/批次，拒絕覆寫、OR REPLACE/IGNORE造成靜默異常及既有目標衝突。審閱只讀必要批次/欄/固定原因碼；不得直接暴露raw、SQL exception或敏感日誌，資料最小化不等於匿名。SQLite authorizer由可信host設置、操作與schema/source預設拒絕及可信檔案邊界，非DB login/RLS；不得暴露原始可解除限制的連線或檔案，owner仍可改資料。正式系統另驗真身分、動態scope/撤權、approval digest/版本、競寫、資源上限及所有錯誤路徑，SQL Server view/ownership chaining/角色需真原生驗證。見[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。
+
+
+### TD-004｜IDE外掛供應鏈與信任邊界（TD004-VSCODE-EXTENSION-01）
+Workspace Trust限制部分終端/task/debug/extension和workspace設定，但不能阻任意惡意extension；未知來源保持Restricted Mode，不信任大範圍父目錄、不覆寫extensions.supportUntrustedWorkspaces、不放寬signature verification。核發布者、版本、目標平台/engine、來源與簽章、可信獨立hash、main/browser/activation/contributes/extensionDependencies/extensionPack/capabilities與實際程式/網路/檔案/憑證權限；沒有main或宣告Trust支持不等於安全。VSIX預檢先固定bytes、限制archive/entry大小與路徑/重複/連結、核manifest及預期payload，不執行或抽取陌生程式；本例精確allowlist只適用兩檔合成snippet ZIP，不是通用VSIX安全掃描、真簽章或安裝授權。外掛停用/回退需核既有副作用及可能資料外傳，不清原資料、不以重裝或撤權宣稱外洩復原。原[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

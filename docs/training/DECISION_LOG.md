@@ -937,3 +937,8 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 
 
 - TD004-DOTNET-TEMPLATE-01 回歸對帳：修正exact2029614d697c54194a14cc215968a4135d2af1f5的CI44300528361已completed/cancelled，無job/日誌，不算測試失敗或通過。原候選文件commit1b385917c8cf9eb13a4e708f7fe1dfc1c9de5dbb與修正exact對照僅六個技能/訓練文件變更，程式及CI配置一致；其CI44300747752/job134789697929最新查核in_progress，尚無原生通過證據。優先讀這次完整原始日誌與checkout一致性，不重送被取消run。
+
+
+### TD004-DOTNET-TEMPLATE-01 最終原始CI回讀
+- TD004-DOTNET-TEMPLATE-01 最終實證（2026-11-18；HOSTED_NATIVE_TEMPLATE_VERIFIED / CURRICULUM_TEXT_UNREAD）：修正程式2029614d697c54194a14cc215968a4135d2af1f5 blob dfd753241ace12508b85ec588c104eb4faa341d2；文件commit1b385917c8cf9eb13a4e708f7fe1dfc1c9de5dbb與修正程式比較僅六文件，CI44300747752/job134789697929 success、28步、raw267595 chars、565 tests in106.620s OK無skip、兩DotnetTemplateTests ok、DOTNET-TEMPLATE-NATIVE-PASS SDK10.0.404；真CLI dry-run、invalid choice127、拒script105及完整生成snapshot無marker、允許script marker、sourceName/choice/bool/exclude/copyOnly、重複生成、collision73且原bytes未變、原範本不變、local restore/build/DLL輸出StudySite:extended及uninstall全部通過。原375/1280各100 CSV rows/3161 bytes、EDITORIAL_BROWSER_PASS及quality gate通過。checkout ffdf2e3ece0190cb6fcc2b9d510f65aefb3dd205 compare文件commit→merge files=[]；report SHA256 05435caefe34fbdbd05707d5cedd8b41924baa278bde6c9d89766404932ec695；未下載artifact bytes。保留初次red與取消run；非Windows IDE/任意範本sandbox或真網站/模型能力；4.3.1/4.3.2原正文UNREAD/L0，R2及授權不變。
+- 依使用者明示接續4.3.3主控台專案範本、4.3.4 MVC簡易專案範本，Developer主責、DevOps/Security協作；核教材、官方console/mvc、CLI輸入及返回碼、路由/Controller/View/Model Binding/驗證、loopback HTTP正反測；使用預裝SDK，不下載第三方、不改使用者電腦或部署。

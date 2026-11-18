@@ -51,3 +51,7 @@ description: "部署、處理 CI 或版本。devops-sre 角色；交付 deployme
 
 ### TD-004｜.NET SDK、IDE工作負載及建置相依性（TD004-DOTNET-BUILD-01）
 先查實際dotnet --list-sdks/--list-runtimes、dotnet --version、exe/architecture/cwd、MSBuild版本、targeting/host packs及VS instance/workloads（Windows用官方vswhere等），不能用SDK代替IDE或runtime。global.json鎖SDK與rollForward/allowPrerelease，不鎖TFM或套件；CLI從cwd搜尋祖先，MSBuild resolver按solution/project位置，注意不同入口。.vsconfig為元件清單、不是完整版本鎖或安裝授權；安裝/修改工作負載涉及磁碟、管理權、重啟及授權，先核精確相容、生命週期、原配置與使用者批准，不偷裝。固定NuGet.Config/來源映射、packages.lock.json與真lock restore，在受控目錄用本地feed/獨立cache驗；build --no-restore分離restore驗收，不忽略失敗源或任意清全域cache。官方2026-11-18版本核對.NET8/9已EOL，VS2022不正式支援net10 targeting；合成舊target僅教學，非正式部署建議。詳原[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。
+
+
+### TD-004｜範本註冊、隔離生成與安全恢復（TD004-DOTNET-TEMPLATE-01）
+先核現有SDK版本、template identity/來源與適用版本；dotnet new install本機目錄僅在授權隔離環境可用，隔離HOME與template hive（debug開關依版核對，非公共穩定API）、快取、cwd與輸出，關閉非必要更新，不下載第三方。dry-run看計畫不等於安全/功能驗收；實際生成到新目錄，碰撞不得盲用--force，保留既有bytes；核實postActions及分開restore/build。自製範本uninstall只解除註冊，不刪已生成專案或撤銷腳本副作用；未知/競寫依原唯讀對帳。只清理本次owned臨時目錄，無真人環境操作。詳原覆盤。

@@ -1185,12 +1185,16 @@
       "source_sha256": null,
       "access": "BLOCKED_SOURCE",
       "owner": "learning-evaluator",
-      "collaborators": [],
+      "collaborators": [
+        "developer",
+        "security",
+        "devops-sre"
+      ],
       "skill": "knowledge-distillation",
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "備份缺件；核原公開連結或合法補件後再學，暫不阻其他單元。",
+      "next_action": "TD004-AI-CODING-REVIEW-01：原備份缺件、指定正文不可達，BLOCKED_SOURCE/L0不變。官方規格與本機3/3離線正反測，exact ba9a360a / CI44237581123待核，非真AI模型/IDE、真資料外傳、費用或人工核准。詳原覆盤；合法新教材途徑才補，其他單元不阻。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -1201,12 +1205,16 @@
       "source_sha256": null,
       "access": "BLOCKED_SOURCE",
       "owner": "learning-evaluator",
-      "collaborators": [],
+      "collaborators": [
+        "developer",
+        "security",
+        "devops-sre"
+      ],
       "skill": "knowledge-distillation",
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "備份缺件；核原公開連結或合法補件後再學，暫不阻其他單元。",
+      "next_action": "TD004-AI-CODING-REVIEW-01：原備份缺件、指定正文不可達，BLOCKED_SOURCE/L0不變。官方規格與本機3/3離線正反測，exact ba9a360a / CI44237581123待核，非真AI模型/IDE、真資料外傳、費用或人工核准。官方個人版IDE/CLI自2026-06-18退場，Standard/Enterprise自2026-10-09不再新售；不沿歷史操作登入或安裝。詳原覆盤；合法新教材途徑才補，其他單元不阻。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

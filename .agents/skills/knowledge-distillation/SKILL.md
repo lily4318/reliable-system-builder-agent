@@ -30,3 +30,7 @@ description: "整理學到的事、蒸餾。learning-evaluator 角色；交付 k
 
 ### TP-010｜有效記憶精簡與遷移
 原 distill/resolve 處理同 topic 去重與衝突，candidate 不取代 user-stated，不用新日期覆蓋安全。主檔頂部維持有效規則與接續，歷史保留。用原案例及不同真任務的可比實際結果查採用/拒絕，未驗不升格。
+
+
+### TD-004｜AI程式建議、人工審查及獨立功能證據（TD004-AI-CODING-REVIEW-01）
+區分completion/chat/agent、模型自評、靜態檢查、真功能oracle、人工核准及正式發布。從核准需求先封存不由候選改寫的oracle、版本及錯例；保留truthful red和同oracle修正版green，檢查額外檔案/權限副作用。受控fixture通過不等於未知AI程式安全、真模型/人審或獨立holdout，不能直接在有secret/network的CI跑未審查模型碼。既有p1_restricted_functional為受限B003，非通用sandbox；本輪固定可信fixture真subprocess，不擴大執行權。核官方版別/退場/計價與資料政策，Gemini Code Assist個人版IDE/CLI自2026-06-18停止服務，Standard/Enterprise自2026-10-09不再新售；歷史技術原理保留，舊安裝流程不當現行指引。詳[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

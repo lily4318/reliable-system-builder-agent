@@ -48,3 +48,7 @@ Context讀取不等於獲准傳輸：只選已分類核准的最少必要檔案/
 
 ### TD-004｜MSBuild及NuGet可執行供應鏈（TD004-DOTNET-BUILD-01）
 陌生project/solution/props/targets/rsp、父目錄自動匯入、SDK resolver、NuGet build/buildTransitive/analyzers與工具還原都可能執行程式；restore或IDE open不等唯讀。先讀來源與上下文，使用可信隔離暫存目錄、最少環境及專屬package cache，固定config source mapping（含transitive）、lock與來源/簽章，已在global cache的package可能不重新走mapping，metadata lookup亦另核。陌生碼不在有secret/網路的正式CI執行，不自動升級/下載；本次自製無程式碼marker/local feed且僅為避免網路的合成實驗停NuGetAudit及workload廣告通知，不推廣到正式專案、不宣稱OS出站隔離或已做漏洞掃描。靜態精確fixture checker非通用安全掃描，詳[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。
+
+
+### TD-004｜範本供應鏈及生成後執行邊界（TD004-DOTNET-TEMPLATE-01）
+範本來源、參數、實際生成與postActions授權分離。未知範本先唯讀審完整內容/identity及版本，核source/target/rename、路徑、symlink、符號替換及清單/bytes；排除private/.env/obj/bin等不等於通用secret防護，copyOnly仍會複製既有資料，應先分類並禁止真敏感原檔。核每種postAction（restore、script、chmod、reference等）與args/condition，預設不要放行任意腳本，--allow-scripts no只針對script不是所有postActions或OS sandbox；生成後檔案存在不代表action成功，核可觀察副作用。受控可信fixture的一個marker正反對照不是任意程式執行安全證明；必要網路/實際資料/外部權限獨立授權，勿在有secret的CI跑陌生來源。原[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

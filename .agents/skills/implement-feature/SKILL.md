@@ -93,3 +93,7 @@ VSCode內建Emmet，先核語言模式、includeLanguages映射、syntaxProfiles
 
 ### TD-004｜主控台輸入及MVC伺服器端契約（TD004-DOTNET-CONSOLE-MVC-01）
 CLI分args/stdin/EOF，明示culture、型別/溢位/值域、stdout/stderr/exit code；MVC區分conventional/attribute routing、HTTP method、route constraint與業務存在性；明示FromRoute/FromQuery/FromForm，使用窄DTO而非直接綁持久化entity。一般MVC Controller須自行核ModelState.IsValid，錯轉型與業務驗證分離，無效輸入不得執行副作用；檢查實際Razor view/validation summary及編碼、HTTP狀態與可觀察副作用，不僅看200。原生實驗及限制見原覆盤（CI待驗）。
+
+
+### TD-004｜MVC服務分層、DI與PRG（TD004-DOTNET-MVC-LAYERS-01）
+Controller保留HTTP/ModelState/結果映射，領域規則放Service，即使DTO合法也須核業務條件；Data層封裝資料存取及原子性，單project分檔非compile-time架構隔離。明示constructor依賴與Transient/Scoped/Singleton，Scoped同request、Transient每resolve、Singleton全provider；避免singleton捕捉scoped，以實際實例及ValidateScopes/ValidateOnBuild測錯誤。成功POST後以303及本地Location查receipt，無效輸入留表單且無副作用，GET只查詢；PRG不保證重送幂等，独立key+內容契約，同key同payload返回已知receipt、不同payload409，不盲重送UNKNOWN。測真HTTP/實際count而非只看200。原生候選及限制見原覆盤（CI待驗）。

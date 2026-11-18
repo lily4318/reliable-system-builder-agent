@@ -1155,3 +1155,128 @@ class PostgresArchitectureTests(unittest.TestCase):
         self.assertEqual(self.sql("SELECT last_value FROM isolesson.number_seq"),"2")
         print("PG-ISOLATION-SAVEPOINT: later lock released, earlier retained; RR snapshot unchanged; sequence gap retained",flush=True)
 
+    def scoring_setup(self):
+        self.sql("DROP SCHEMA IF EXISTS scorelab CASCADE;")
+        self.sql((SQL/"research-scoring.sql").read_text())
+
+    def scoring_report(self, role="lab_alice"):
+        return self.sql("""SELECT study_id,person,wave,attempt,version,submitted,
+            recorded,valid,total FROM scorelab.report ORDER BY study_id,person,wave,attempt""",role)
+
+    def test_pg_scoring_integrated_versioned_cohort_and_access(self):
+        self.scoring_setup()
+        def submit(person,attempt,answers,study=1,wave=1,role="lab_alice"):
+            return self.sql(f"SELECT scorelab.submit({study},{person},{wave},{attempt},{answers})",role)
+        self.assertEqual(submit(1,1,"ARRAY[0,4,0]"),"SUBMITTED")
+        self.assertEqual(submit(1,2,"ARRAY[0,4,0]"),"SUBMITTED")  # legal equal-valued attempts
+        self.assertEqual(submit(2,1,"ARRAY[2,NULL,2]"),"SUBMITTED")
+        self.assertEqual(submit(3,1,"ARRAY[NULL,NULL,NULL]::integer[]"),"SUBMITTED")
+        self.assertEqual(submit(1,1,"ARRAY[4,0,4]",study=2,role="lab_bob"),"SUBMITTED")
+        initial="1|1|1|1|1|t|3|3|0\n1|1|1|2|1|t|3|3|0\n1|2|1|1|1|t|3|2|\n1|3|1|1|1|t|3|0|\n1|4|1|1|1|f|0|0|"
+        self.assertEqual(self.scoring_report(),initial)
+        self.assertEqual(self.scoring_report("lab_bob"),"2|1|1|1|1|t|3|3|12")
+        # New rule is added rather than overwriting the historical rule.
+        self.sql("""INSERT INTO scorelab.rule VALUES(2,2);
+            INSERT INTO scorelab.visit(study_id,person,wave,attempt,version)
+            VALUES(1,1,2,1,2),(1,2,2,1,2),(1,4,1,2,1)""")
+        self.assertEqual(submit(1,1,"ARRAY[2,2,2]",wave=2),"SUBMITTED")
+        self.assertEqual(submit(4,2,"ARRAY[2,2,2]"),"SUBMITTED")
+        # Literal expected values form an oracle independent of the SQL scoring expression.
+        expected="1|1|1|1|1|t|3|3|0\n1|1|1|2|1|t|3|3|0\n1|1|2|1|2|t|3|3|8\n1|2|1|1|1|t|3|2|\n1|2|2|1|2|f|0|0|\n1|3|1|1|1|t|3|0|\n1|4|1|1|1|f|0|0|\n1|4|1|2|1|t|3|3|6"
+        self.assertEqual(self.scoring_report(),expected)
+        self.assertEqual(self.sql("""SELECT study_id,wave,version,planned,submitted,complete,total_sum
+            FROM scorelab.summary ORDER BY study_id,wave,version""","lab_alice"),
+                         "1|1|1|6|5|3|6\n1|2|2|2|1|1|8")
+        self.assertEqual(self.sql("SELECT count(*) FROM scorelab.response"),"21")
+        self.assertEqual(self.sql("SELECT count(*) FROM scorelab.submission"),"7")
+        self.assertEqual(self.sql("SELECT count(*) FROM scorelab.visit"),"9")
+        self.assertEqual(self.sql("SELECT id,owner FROM scorelab.study ORDER BY id"),
+                         "1|lab_alice\n2|lab_bob")
+        with self.live_session("lab_alice") as a:
+            for q in ("SELECT * FROM scorelab.response",
+                      "UPDATE scorelab.rule SET reverse_weight=2 WHERE version=1",
+                      "UPDATE scorelab.visit SET version=2",
+                      "INSERT INTO scorelab.submission VALUES(2,1,1,1,'lab_alice')",
+                      "SELECT scorelab.submit(2,1,1,1,ARRAY[0,0,0])",
+                      "SELECT scorelab.submit(99,1,1,1,ARRAY[0,0,0])",
+                      "SET ROLE lab_writer"):
+                self.assertEqual(a(q)[0],"42501")
+            self.assertEqual(a("SELECT scorelab.submit(1,1,1,1,ARRAY[4,0,4])"),
+                             ("00000","ALREADY_FINAL"))
+        with self.live_session("lab_anon") as a:
+            self.assertEqual(a("SELECT * FROM scorelab.report")[0],"42501")
+            self.assertEqual(a("SELECT scorelab.submit(1,1,1,1,ARRAY[0,0,0])")[0],"42501")
+        self.assertEqual(self.scoring_report(),expected)
+        self.assertEqual(self.scoring_report("lab_bob"),"2|1|1|1|1|t|3|3|12")
+        self.assertEqual(self.sql("SELECT version,reverse_weight FROM scorelab.rule ORDER BY version"),"1|1\n2|2")
+        print("PG-SCORING-COHORT: 9 planned, 7 submitted, 21 answers; Alice v1=6 v2=8; Bob isolated",flush=True)
+
+    def test_pg_scoring_integrated_late_failure_and_snapshot(self):
+        self.scoring_setup()
+        before=self.scoring_report()
+        with self.live_session("lab_alice") as a:
+            for args,state in (("ARRAY[1,2]","22023"),("NULL::integer[]","22023"),
+                               ("ARRAY[[1,2,3]]","22023"),("ARRAY[2,5,2]","23514")):
+                self.assertEqual(a("SELECT scorelab.submit(1,1,1,1,"+args+")")[0],state)
+                self.assertEqual(self.scoring_report(),before)
+                self.assertEqual(self.sql("SELECT count(*) FROM scorelab.response"),"0")
+                self.assertEqual(self.sql("SELECT count(*) FROM scorelab.submission"),"0")
+            self.assertEqual(a("BEGIN")[0],"00000")
+            self.assertEqual(a("SELECT scorelab.submit(1,1,1,1,ARRAY[2,2,2])"),
+                             ("00000","SUBMITTED"))
+            self.assertEqual(a("SELECT total FROM scorelab.report WHERE person=1 AND attempt=1"),
+                             ("00000","6"))
+            self.assertEqual(self.scoring_report(),before)
+            self.assertEqual(a("ROLLBACK")[0],"00000")
+            self.assertEqual(self.scoring_report(),before)
+            self.assertEqual(self.sql("SELECT count(*) FROM scorelab.response"),"0")
+            self.assertEqual(self.sql("SELECT count(*) FROM scorelab.submission"),"0")
+            self.assertEqual(a("BEGIN ISOLATION LEVEL REPEATABLE READ READ ONLY")[0],"00000")
+            q="SELECT submitted,recorded,valid,total FROM scorelab.report WHERE person=1 AND attempt=1"
+            self.assertEqual(a(q),("00000","f|0|0|"))
+            self.assertEqual(self.sql("SELECT scorelab.submit(1,1,1,1,ARRAY[2,2,2])","lab_alice"),"SUBMITTED")
+            # The export reader stays pinned to its own committed snapshot.
+            self.assertEqual(a(q),("00000","f|0|0|"))
+            self.assertEqual(self.sql(q,"lab_alice"),"t|3|3|6")
+            self.assertEqual(a("COMMIT")[0],"00000")
+            self.assertEqual(a(q),("00000","t|3|3|6"))
+        self.assertEqual(self.sql("SELECT count(*) FROM scorelab.response"),"3")
+        self.assertEqual(self.sql("SELECT count(*) FROM scorelab.submission"),"1")
+        print("PG-SCORING-RECOVERY: invalid late insert restores state; rollback no rows; read snapshot consistent",flush=True)
+
+    def test_pg_scoring_integrated_competing_finalization(self):
+        self.scoring_setup()
+        first="SELECT scorelab.submit(1,1,1,1,ARRAY[0,4,0])"
+        second="SELECT scorelab.submit(1,1,1,1,ARRAY[4,0,4])"
+        with self.live_session("lab_alice") as a,self.live_session("lab_alice") as b:
+            self.assertEqual(a("BEGIN")[0],"00000")
+            ca,pa=a("SELECT pg_backend_pid()")
+            cb,pb=b("SELECT pg_backend_pid()")
+            self.assertEqual((ca,cb),("00000","00000"))
+            self.assertNotEqual(pa,pb)
+            self.assertEqual(a(first),("00000","SUBMITTED"))
+            self.assertEqual(b("SET statement_timeout='8s'")[0],"00000")
+            with ThreadPoolExecutor(max_workers=1) as pool:
+                pending=pool.submit(b,second)
+                try:
+                    deadline=time.monotonic()+4
+                    blocking=False
+                    while time.monotonic()<deadline:
+                        blocking=self.sql(f"SELECT {int(pa)}=ANY(pg_blocking_pids({int(pb)}))")=="t"
+                        if blocking or pending.done():
+                            break
+                        time.sleep(.03)
+                    self.assertTrue(blocking,"competing finalization must actually wait")
+                    self.assertFalse(pending.done())
+                    self.assertEqual(self.sql("SELECT count(*) FROM scorelab.response"),"0")
+                    self.assertEqual(a("COMMIT")[0],"00000")
+                    self.assertEqual(pending.result(timeout=10),("00000","ALREADY_FINAL"))
+                finally:
+                    a("ROLLBACK")
+        self.assertEqual(self.sql("SELECT item,value FROM scorelab.response ORDER BY item"),"1|0\n2|4\n3|0")
+        self.assertEqual(self.sql("SELECT actor FROM scorelab.submission"),"lab_alice")
+        self.assertEqual(self.sql("SELECT count(*) FROM scorelab.visit WHERE submitted"),"1")
+        self.assertEqual(self.sql("""SELECT submitted,recorded,valid,total
+            FROM scorelab.report WHERE person=1 AND attempt=1""","lab_alice"),"t|3|3|0")
+        print("PG-SCORING-CONCURRENCY: actual wait; competing form rejected; one immutable final submission",flush=True)
+

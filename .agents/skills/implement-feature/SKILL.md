@@ -75,3 +75,7 @@ tryLock 失敗不寫、finally release，鎖內重新查 id/receipt/容量；Spr
 
 ### TD-004｜版本化研究資料從提交到報表（TD004-SQL-HOMEWORK-01）
 在核准資料契約下，用完整scope鍵固定規則版本、題號與值域，保持NULL缺答及合法重測，不以同值去重。受限入口先驗身份與visit範圍，鎖該定稿對象再判狀態，原答/狀態/log同交易且late constraint錯誤整體復原；ALREADY_FINAL只表示禁止覆寫，不等於成功重放或unknown ack對帳。report明示列粒度、母群/有效分母/版本，讀一致性及匯出來源版本依核准契約；不為簡單將歷史改套current配置。普通角色無底表寫/原答直讀，固定search_path/撤PUBLIC、實際授權分層；session_user只適用獨立DB登入，真driver/JWT/審計治理另驗。見原SQL例與覆盤。
+
+
+### TD-004｜Emmet展開後的網站語意契約（TD004-VSCODE-EXTENSION-01）
+VSCode內建Emmet，先核語言模式、includeLanguages映射、syntaxProfiles輸出格式、Tab/建議與自訂snippet scope，不為快捷輸入盲裝外掛。理解 >、+、^、*、$、[]、{} 的樹/兄弟/返回/重複/編號/屬性/文字語意，屬性引用與語言語法分開；生成不等於功能。研究表單固定唯一id、name/label對應、正確input type與required、資料契約；驗實際HTML/DOM、鍵盤及提交，拒重複ID、錯label與錯name，不把HTMLParser token check當HTML5 DOM或完整可及性/功能。原合成手寫等價輸出之Parser正反例已跑，沒有真Emmet engine/IDE實證；[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

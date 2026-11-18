@@ -1271,7 +1271,7 @@
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "TD004-DOTNET-TEMPLATE-01：原正文UNREAD/L0保留；本機1 pass/1 skip，CI44300139451初次red，SDK真拒script但檔案生成提示與105，修正oracle exact2029614d / CI44300528361待驗，未降原門檻。詳原覆盤。",
+      "next_action": "TD004-DOTNET-TEMPLATE-01 HOSTED_NATIVE_TEMPLATE_VERIFIED；CI44300747752 565/565，原生生成/腳本105/覆寫拒絕/編譯通過；原正文UNREAD/L0不變。詳原覆盤。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -1290,7 +1290,7 @@
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "TD004-DOTNET-TEMPLATE-01：原正文UNREAD/L0保留；本機1 pass/1 skip，CI44300139451初次red，SDK真拒script但檔案生成提示與105，修正oracle exact2029614d / CI44300528361待驗，未降原門檻。詳原覆盤。",
+      "next_action": "TD004-DOTNET-TEMPLATE-01 HOSTED_NATIVE_TEMPLATE_VERIFIED；CI44300747752 565/565，原生生成/腳本105/覆寫拒絕/編譯通過；原正文UNREAD/L0不變。詳原覆盤。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

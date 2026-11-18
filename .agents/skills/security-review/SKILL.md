@@ -40,3 +40,7 @@ access 與 executeAs 分開，USER_DEPLOYING 的 effective user 不代表訪客�
 
 ### TD-004｜IDE外掛供應鏈與信任邊界（TD004-VSCODE-EXTENSION-01）
 Workspace Trust限制部分終端/task/debug/extension和workspace設定，但不能阻任意惡意extension；未知來源保持Restricted Mode，不信任大範圍父目錄、不覆寫extensions.supportUntrustedWorkspaces、不放寬signature verification。核發布者、版本、目標平台/engine、來源與簽章、可信獨立hash、main/browser/activation/contributes/extensionDependencies/extensionPack/capabilities與實際程式/網路/檔案/憑證權限；沒有main或宣告Trust支持不等於安全。VSIX預檢先固定bytes、限制archive/entry大小與路徑/重複/連結、核manifest及預期payload，不執行或抽取陌生程式；本例精確allowlist只適用兩檔合成snippet ZIP，不是通用VSIX安全掃描、真簽章或安裝授權。外掛停用/回退需核既有副作用及可能資料外傳，不清原資料、不以重裝或撤權宣稱外洩復原。原[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。
+
+
+### TD-004｜AI上下文、工具與副作用邊界（TD004-AI-CODING-REVIEW-01）
+Context讀取不等於獲准傳輸：只選已分類核准的最少必要檔案/版本，校驗實際序列化payload、路徑/連結、來源SHA與byte cap；工具回傳/終端/URL會再進context，先審查分類與prompt injection，不以.gitignore/.aiexclude/content exclusion或MCP readOnlyHint當安全邊界。區分enabled、approval、OS隔離、網路出站及遠端ACL；核tool/target/arguments/before+after digest，過期或變更重新確認；拒絕未授權寫及未知副作用，不自動重送。合成canary測只證固定allowlist，不是通用secret scanner或真外傳防護；人審、實際provider政策/版別/資料保留、組織授權另核。不得用無訓練承諾等同不傳輸。原[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

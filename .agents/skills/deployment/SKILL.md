@@ -55,3 +55,5 @@ description: "部署、處理 CI 或版本。devops-sre 角色；交付 deployme
 
 ### TD-004｜範本註冊、隔離生成與安全恢復（TD004-DOTNET-TEMPLATE-01）
 先核現有SDK版本、template identity/來源與適用版本；dotnet new install本機目錄僅在授權隔離環境可用，隔離HOME與template hive（debug開關依版核對，非公共穩定API）、快取、cwd與輸出，關閉非必要更新，不下載第三方。dry-run看計畫不等於安全/功能驗收；實際生成到新目錄，碰撞不得盲用--force，保留既有bytes；核實postActions及分開restore/build。自製範本uninstall只解除註冊，不刪已生成專案或撤銷腳本副作用；未知/競寫依原唯讀對帳。只清理本次owned臨時目錄，無真人環境操作。詳原覆盤。
+
+- TD004-DOTNET-TEMPLATE-01 實際紅測：.NET10 CLI可先生成檔案再報post-action 105（即使continueOnError=true），不得以非0推斷未寫入；明示核對exit/實際檔案與副作用，再決定是否只補已核准action，禁止盲重送或--force。實際最終回歸另核原覆盤。

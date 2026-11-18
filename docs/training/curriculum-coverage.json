@@ -1155,7 +1155,7 @@
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "TD004-VSCODE-EXTENSION-01：原正文不可達，UNREAD/source_sha256=null/L0；官方規格與本機4/4真HTML Parser/JSON/ZIP/file正反例，exact3e25592c CI44235936487待核；未驗實際Emmet engine、VSCode GUI/Trust/外掛安裝啟用/Windows。詳原覆盤，不重做原工具鏈/Chrome。",
+      "next_action": "TD004-VSCODE-EXTENSION-01 LOCAL_AND_CI_PREREQUISITES_VERIFIED；原教材UNREAD/L0不變。CI44235936487 558/558、四新方法及28步通過；本機4/4，非實際Emmet/IDE/外掛/Trust。保留原正文及GUI、Windows、獨立遷移未驗，詳原覆盤。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -1174,7 +1174,7 @@
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "TD004-VSCODE-EXTENSION-01：原正文不可達，UNREAD/source_sha256=null/L0；官方規格與本機4/4真HTML Parser/JSON/ZIP/file正反例，exact3e25592c CI44235936487待核；未驗實際Emmet engine、VSCode GUI/Trust/外掛安裝啟用/Windows。詳原覆盤，不重做原工具鏈/Chrome。",
+      "next_action": "TD004-VSCODE-EXTENSION-01 LOCAL_AND_CI_PREREQUISITES_VERIFIED；原教材UNREAD/L0不變。CI44235936487 558/558、四新方法及28步通過；本機4/4，非實際Emmet/IDE/外掛/Trust。保留原正文及GUI、Windows、獨立遷移未驗，詳原覆盤。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

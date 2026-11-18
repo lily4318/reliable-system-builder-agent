@@ -29,3 +29,7 @@ description: "功能壞了、幫我除錯。developer 角色；交付 repair。"
 
 ### TD-004｜開發環境差異與最小故障定位（TD004-DEV-ENV-01）
 同源程式在不同工作區失敗，先核實際exe/version/cwd、PATH順序、Python prefix/import及Node env-file/已有env、NODE_OPTIONS預載入與npm lock，再判原始碼問題。正反例同固定小輸入，帶空格路徑、錯venv、缺模組、污染import、版本不符、缺.env、lock drift；用明示exe/最小env/還原manifest最小修復，核輸出/lock bytes/副作用，禁止盲裝套件或刪全域設定。只輸出必要非敏感版本與分類，不記錄完整env/secret。CI或browser啟動不等於應用故障；查process/ready及有界去敏stderr，不盲拉timeout或重跑，不降gate。真VSCode GUI與Windows另驗，詳原覆盤。
+
+
+### TD-004｜啟動失敗不冒稱功能失敗（TD004-CHROME-STARTUP-01）
+IDE顯示/程序PID/portfile/HTTP與實際DOM、檔案副作用分層，缺receipt先查實際退出碼與安全分類日誌，在原deadline fail closed，勿直接讀不存在或格式錯誤的receipt。固定新profile與cwd，一次一變因；root拒絕改普通uid可修該環境的啟動層，不代表遠端根因；Chrome136資料目錄限制亦需核版本及實際適用。使用者真PC不動、不收raw env/argv/日誌，既有browser acceptance不降。保存red（包括測試器本身錯誤）及正例完整驗收；新候選測試真子程序退出/缺檔/非法port與去敏碼，完整CI待查。原[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

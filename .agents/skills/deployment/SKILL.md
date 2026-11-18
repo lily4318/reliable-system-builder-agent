@@ -43,3 +43,7 @@ description: "部署、處理 CI 或版本。devops-sre 角色；交付 deployme
 
 ### TD-004｜IDE設定範圍、外掛固定版本及復原（TD004-VSCODE-EXTENSION-01）
 先確認實際IDE/commit/OS/architecture、profile、local/remote host與workspace scope；一般workspace覆蓋user，但語言專用設定跨scope優先，最後組織policy；區分含註解JSONC、multi-root、remote與profiles，不能將簡化模型等同IDE。先用內建功能，必要外掛核publisher.extension@version、engine/platform、相依與可信獨立digest/簽章，推薦清單不是lock；auto-update/Settings Sync與remote各自確認。未授權不安裝。核准隔離試驗可用分離user-data-dir/extensions-dir/profile與合成workspace，Portable Mode例外；不等於OS sandbox，不盲--force或關簽章/Trust。禁用外掛是診斷，不撤銷既有檔案、設定、登入或外部寫入；保存前後bytes與權限，確認停止本次擁有的程序，未知/內容drift先唯讀對帳，明確恢復已知after-image再核實際功能，不整個清除使用者設定。原本機合成實證與限制見[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。
+
+
+### TD-004｜AI工具預算、用量未知與精確核准（TD004-AI-CODING-REVIEW-01）
+執行前核實際方案、provider計量單位/價格/配額與上限、是否有超額支出，提示一次可能引發多模型請求、Actions/外部工具另計，無授權預算不呼叫。保守預留每attempt最大單位，結果未知保留預留並停後續/重送，可信對帳後才釋放差額；重播/超額/錯型拒絕。合成整數budget僅single-process fixture，不是持久化計量、真API或供應商價格。平台budget hard stop及usage receipt仍應優先使用，付費/外部工具需另授權。工具變更核精確scope/review(before, after, target)，保留相關檔案與回讀、獨立功能驗收，unknown先唯讀對帳。詳[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。

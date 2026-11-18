@@ -1301,12 +1301,15 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "devops-sre",
+        "security"
+      ],
       "skill": "implement-feature",
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-DOTNET-CONSOLE-MVC-01：原正文不可達，UNREAD/L0保留；本機無.NET，1 native skipped；exact de2ed1cc / CI44311060607 待核真console/mvc生成、CLI與loopback HTTP正反測，不下載第三方。原覆盤及合法教材取得後再核。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -1317,12 +1320,15 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "devops-sre",
+        "security"
+      ],
       "skill": "implement-feature",
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-DOTNET-CONSOLE-MVC-01：原正文不可達，UNREAD/L0保留；本機無.NET，1 native skipped；exact de2ed1cc / CI44311060607 待核真console/mvc生成、CLI與loopback HTTP正反測，不下載第三方。原覆盤及合法教材取得後再核。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

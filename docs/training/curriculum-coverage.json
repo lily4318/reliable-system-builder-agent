@@ -1263,12 +1263,15 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "devops-sre",
+        "security"
+      ],
       "skill": "implement-feature",
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-DOTNET-TEMPLATE-01：原正文不可達，UNREAD/L0保留；本機可信範本FS/JSON正反測1 passed/1 native skipped（無SDK）；exact7da424f9 / CI44300139451待核原生生成/腳本及build結果，無第三方下載或電腦修改。詳原覆盤，原教材合法取得才補。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -1279,12 +1282,15 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "developer",
-      "collaborators": [],
+      "collaborators": [
+        "devops-sre",
+        "security"
+      ],
       "skill": "implement-feature",
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-DOTNET-TEMPLATE-01：原正文不可達，UNREAD/L0保留；本機可信範本FS/JSON正反測1 passed/1 native skipped（無SDK）；exact7da424f9 / CI44300139451待核原生生成/腳本及build結果，無第三方下載或電腦修改。詳原覆盤，原教材合法取得才補。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

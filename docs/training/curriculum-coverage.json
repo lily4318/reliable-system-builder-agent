@@ -1073,12 +1073,14 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "devops-sre",
-      "collaborators": [],
+      "collaborators": [
+        "developer"
+      ],
       "skill": "deployment",
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-DEV-ENV-01：原指定正文不可達，UNREAD/source_sha256=null/L0；VSCode/Python/Node/npm官方文件及隔離環境三新方法本機實測通過；LOCAL_TOOLCHAIN_VERIFIED_CI_PENDING，CI44213804650，原覆盤；GUI/Windows/原正文及完整習得待驗，前置暫定，原正文後核。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -1089,12 +1091,16 @@
       "source_sha256": null,
       "access": "UNREAD",
       "owner": "devops-sre",
-      "collaborators": [],
+      "collaborators": [
+        "developer"
+      ],
       "skill": "deployment",
-      "prerequisites": [],
+      "prerequisites": [
+        "4.1.1"
+      ],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "TD004-DEV-ENV-01：原指定正文不可達，UNREAD/source_sha256=null/L0；VSCode/Python/Node/npm官方文件及隔離環境三新方法本機實測通過；LOCAL_TOOLCHAIN_VERIFIED_CI_PENDING，CI44213804650，原覆盤；GUI/Windows/原正文及完整習得待驗，前置暫定，原正文後核。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

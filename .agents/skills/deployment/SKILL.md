@@ -31,3 +31,7 @@ description: "部署、處理 CI 或版本。devops-sre 角色；交付 deployme
 
 ### GAS 多層版本同步及唯讀對帳（GAS-DIAG-002）
 分開核目標 Git SHA/完整轉換後文件/HEAD/固定 versionNumber/deploymentConfig/WEB_APP URL+access+executeAs/真 runtime；先界定候選來源與 active release，HEAD 可合法未發布。getContent HEAD 與指定 version 分讀；deployment GET 核 scriptId、version、entryPoint；updateContent PUT 全量替換，非 patch，須完整 manifest+文件、備份、獨立授權、寫前與寫後對帳；未知結果停相關寫入。更新原 deployment 可維持 URL，禁止盲建新部署；原 owner 變更/跨網域與資料相容 rollback 另核。詳 [GAS-DIAG-002](../../../docs/training/reviews/2026-11-16-gas-diagnosis.md)，離線 advice 不代表真 GAS 操作或部署核准。
+
+
+### TD-004｜可重現開發工作區及工具鏈（TD004-DEV-ENV-01）
+設定與runtime分離：先核實際OS/CPU、cwd、解譯器/Node/npm版本、command path與IDE/terminal/task/debug各有效scope，不能只看VIRTUAL_ENV或IDE狀態。Python每project重建venv（不複製），以完整解譯器路徑及sys.executable/prefix/base_prefix、版本、套件來源檢查；注意PYTHONPATH/user site/目前目錄，-I只限其語意不是sandbox。Node核--env-file與既有process env順序、NODE_OPTIONS/preload；以明示最小env和trusted absolute tools避免繼承不必要設定，勿任意讀出.env或完整環境。npm ci核package.json/lockfile與實際runtime/flags，離線local dep測正反、拒絕drift，勿盲用install改lock/升版；陌生repo先review tasks/extensions/lifecycle並限制Workspace Trust，不把ignore-scripts/venv/offline等同安全沙箱。POSIX真實驗、原教材及GUI限制見原覆盤。未授權不修改使用者電腦或全域設定。

@@ -25,3 +25,7 @@ description: "功能壞了、幫我除錯。developer 角色；交付 repair。"
 
 ### TD-004｜SQL結構化除錯及實際計畫（TD004-SQL-DEBUG-01）
 先固定engine/version、schema與可重現輸入和獨立業務真值。分類SQLSTATE，不依本地化文字；同碼再看schema/table/constraint/column、GET STACKED DIAGNOSTICS detail/context與原callsite，欄位可空且可能含個資，僅授權內部診斷、公開/客戶端用安全代碼，不通用吞23505或把NOTHING/零列當成功。同ID重播另核payload/actor及未知結果先唯讀對帳。慢查詢先讀EXPLAIN，EXPLAIN ANALYZE真執行、有副作用或未授權不做；隔離測JSON實際與估算rows/loops、buffers、資料分布與stats，成本非毫秒、每loop平均別誤乘/重加。高度相關欄位可試extended statistics但不能推廣到所有條件。重複掃描可用集合重寫，核每個鍵/NULL/缺格、來源不變及前後真計畫，不盲加index或提高timeout；57014別一律判逾時/安全重試。保留最小失敗反例/修正及原始CI，限制與證據見[原覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。非正式負載或原T-SQL。
+
+
+### TD-004｜開發環境差異與最小故障定位（TD004-DEV-ENV-01）
+同源程式在不同工作區失敗，先核實際exe/version/cwd、PATH順序、Python prefix/import及Node env-file/已有env、NODE_OPTIONS預載入與npm lock，再判原始碼問題。正反例同固定小輸入，帶空格路徑、錯venv、缺模組、污染import、版本不符、缺.env、lock drift；用明示exe/最小env/還原manifest最小修復，核輸出/lock bytes/副作用，禁止盲裝套件或刪全域設定。只輸出必要非敏感版本與分類，不記錄完整env/secret。CI或browser啟動不等於應用故障；查process/ready及有界去敏stderr，不盲拉timeout或重跑，不降gate。真VSCode GUI與Windows另驗，詳原覆盤。

@@ -89,3 +89,7 @@ VSCode內建Emmet，先核語言模式、includeLanguages映射、syntaxProfiles
 先區分project/item/solution與dotnet new CLI/IDE host、identity/shortName/groupIdentity、來源版本與SDK/TFM相容。以runnable原始專案為範本，明示sourceName的檔名/內容替換與typed symbols choice/bool、default、replaces；host/user值可能覆蓋預設。sources/modifiers與條件控制產物，exclude/copyOnly/rename需辨別優先；自訂exclude不要誤丟原必要預設排除，literal資料勿誤替換。避免自由文字插入程式碼/路徑、先校驗型別和名稱；以固定選項的實際檔案清單、bytes、刪除負例、同參數重現（非所有含GUID/日期範本可byte相同）、生成專案build與真輸出oracle驗收，而非只看success。原[覆盤](../../../docs/training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。
 
 - TD004-DOTNET-TEMPLATE-01 實際紅測：.NET10 CLI可先生成檔案再報post-action 105（即使continueOnError=true），不得以非0推斷未寫入；明示核對exit/實際檔案與副作用，再決定是否只補已核准action，禁止盲重送或--force。實際最終回歸另核原覆盤。
+
+
+### TD-004｜主控台輸入及MVC伺服器端契約（TD004-DOTNET-CONSOLE-MVC-01）
+CLI分args/stdin/EOF，明示culture、型別/溢位/值域、stdout/stderr/exit code；MVC區分conventional/attribute routing、HTTP method、route constraint與業務存在性；明示FromRoute/FromQuery/FromForm，使用窄DTO而非直接綁持久化entity。一般MVC Controller須自行核ModelState.IsValid，錯轉型與業務驗證分離，無效輸入不得執行副作用；檢查實際Razor view/validation summary及編碼、HTTP狀態與可觀察副作用，不僅看200。原生實驗及限制見原覆盤（CI待驗）。

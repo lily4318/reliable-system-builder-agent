@@ -77,10 +77,11 @@ builder.Services.AddHealthChecks().AddCheck<ReleaseReadiness>("schema",tags:new[
     }
     await next();
 });
+// Only the public template wwwroot is served here; app/controller ACLs stay intact.
+app.UseStaticFiles();
 app.UseAuthentication();''',1).replace(
     'app.MapControllers();',
-    '''app.UseStaticFiles();
-app.MapHealthChecks("/health/live",new HealthCheckOptions{Predicate=_=>false}).AllowAnonymous();
+    '''app.MapHealthChecks("/health/live",new HealthCheckOptions{Predicate=_=>false}).AllowAnonymous();
 app.MapHealthChecks("/health/ready",new HealthCheckOptions{Predicate=c=>c.Tags.Contains("ready")}).AllowAnonymous();
 app.MapGet("/release",()=>Results.Text(label!)).AllowAnonymous();
 app.MapControllers();''',1)
@@ -262,6 +263,8 @@ class DotnetMvcPublishActivationTests(unittest.TestCase):
             self.assertEqual(request("GET","/health/ready")[:2],(200,"Healthy"))
             self.assertEqual(request("GET","/release")[:2],(200,"source"))
             self.assertEqual(request("GET","/release-marker.txt")[:2],(200,"SYNTHETIC MVC RELEASE\n"))
+            self.assertEqual(request("GET","/admin/studies/STUDY-A")[0],401)
+            self.assertIn(request("GET","/appsettings.json")[0],(401,404))
             _,badport=host("candidate","invalid_database",True)
             self.assertIsNone(badport)
             def submit(slot,name,q1):

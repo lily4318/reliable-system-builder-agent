@@ -1142,3 +1142,11 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 - NEXT_TRAINING：先驗證原工作台對「多服務的合成串接、人工確認閘、跨 session 唯讀接續、失敗／未明寫入唯讀核對」是否已真的可用；只補 **尚未被舊回歸覆蓋**的端到端情境及必要缺口，不重跑已完成實驗。再以具備適用外部工具與獨立授權的標準實例測真正 120 分鐘、最少人工干預、真服務連通和跨對話採用。區分新測試成功、實際 Agent 自主行為、真人 UAT、正式發布；目前不得宣稱已達 120 分鐘或已實際串接服務。
 - SOURCE：本輪使用者明示確認；候選 Draft PR #8 前置 HEAD 769020142cbdcf1532a3563eb475fadac1f9d4de；原 docs/AGENT_CAPABILITY_TRAINING.md、docs/training/DECISION_LOG.md、docs/training/CORE_TRAINING_PRINCIPLES.md、START_HERE.md、AGENTS.md、config/skill-catalog.json、docs/TEAM_WORKBENCH.md、既有 workbench_tasks 及原 tests，工作模式 REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。無 main merge、Release、外部部署、真私人資料、付費或新排程授權。
 - STATUS：USER_CONFIRMED；後續保存回讀／新測試／CI 需以各自 exact commit 驗，若無實證保留 PENDING。原既有驗收不因本決策改為 PASS。
+
+## TD007-DELIVERY-TRANSFER-01｜新核心成效目標的原生微型遷移（2026-11-21；IMPLEMENTED_PENDING_EXACT_CI）
+- 依本輪已確認 TD-007，在不另建管理引擎／記憶庫／第二主檔的前提下，新加純唯讀 `src/delivery_next_step.py`（commit a8ab3d2b0f32315fe3060c2b63473308dc3ea8d3，blob 617833d202b62be7d553581d6f1e06e4ecfd4d25），以原 task review 反映「有已授權 ready 就繼續、只當前必要 gate 才問、在途／需復原不接管、全 done 不算正式驗收」。不另賦寫入或部署權限。
+- 新 `tests/test_delivery_next_step.py`（commit 6c2c28f72dfb231b118b48600bb977c846e50fa3，blob bf438aacc9d8f43872303c8a23edd22f09fbd24d），3 方法涵蓋7階段合成網站／Sheets／GAS／LINE／QA／launch有界工作、分離兩次人工 gate、跨新 Python 程序只讀原 SQLite bytes、失敗重驗、獨立任務與舊 worker、無效快照 fail-close。程式／測試均已 GitHub 回讀內容完全一致；不把合成預約或進度旗標當成真第三方服務。
+- 原 `.agents/skills/resume-project/SKILL.md` commit 1f334380a084bacab76ed9a0843785b1ac53c4f1、`.agents/skills/project-control/SKILL.md` commit 9af41e1ae237256038ee60aa5abae325e7c34b45，兩份回讀完全一致。原既有15 skills/8 roles及TD-004/TD-005-R2/TP-010不變。
+- 已建[本輪覆盤及來源索引](reviews/2026-11-21-td007-minimal-interruption-transfer.md)（commit adf1d169abc62acca4e16813b4bee1c2b7a2776c；原文件blob 763f05ca0eb8b6d72ec06fc56c8b5ce72acb4806 已回讀）。
+- TEST_CI：最新功能版的 full CI/raw logs **尚未確證**；已觀察 Actions 44910697060（中途提交）pending，較早中途提交 cancelled、基線44878908760 SUCCESS 不得冒充新測試成功。後續核本文件版 exact HEAD/run/job/checkout/raw，失敗按根因最小修復，不降低安全／QA門檻。
+- REMOTE_VERIFY：上述 exact GitHub 程式／測試／技能與 review 寫後回讀成功，非本機原生 PASS、真用戶 Step-by-step、跨 ChatGPT 對話或真 LINE/GAS/Sheets/120分鐘達標。NO_DEPLOY、NO_MAIN_MERGE、NO_REAL_PRIVATE_DATA、NO_THIRD_PARTY_INSTALL。NEXT_ACTION 優先核最新候選 CI 並只對新 red 修復，同時保留原5.3.10/5.3.11專業主線。

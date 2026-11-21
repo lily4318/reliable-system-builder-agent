@@ -36,6 +36,7 @@ class _ChromeStartupLog:
 
     def __init__(self, pipe):
         self.codes = set()
+        self.bytes_seen = 0
         self.lock = threading.Lock()
         def drain():
             tail = b""
@@ -44,6 +45,7 @@ class _ChromeStartupLog:
                     while chunk := pipe.read1(4096):
                         data = tail + chunk
                         with self.lock:
+                            self.bytes_seen += len(chunk)
                             self.codes.update(code for marker, code in self._markers
                                               if marker in data)
                         tail = data[-128:]
@@ -55,7 +57,25 @@ class _ChromeStartupLog:
 
     def summary(self):
         with self.lock:
-            return ",".join(sorted(self.codes)) or "NO_RECOGNIZED_MARKER"
+            if self.codes:
+                return ",".join(sorted(self.codes))
+            return "UNCLASSIFIED_STDERR" if self.bytes_seen else "NO_STDERR"
+
+
+def _chrome_process_state(proc):
+    # Only a coarse local kernel state code, no raw /proc lines or argv in CI.
+    try:
+        stat = (Path("/proc") / str(proc.pid) / "stat").read_text()
+        code = stat.rsplit(")", 1)[1].split()[0]
+    except (OSError, IndexError):
+        return "UNAVAILABLE"
+    return {"R":"RUNNING", "S":"SLEEPING", "D":"IO_WAIT",
+            "T":"STOPPED", "Z":"ZOMBIE", "I":"IDLE"}.get(code,"OTHER")
+
+
+def _chrome_failure_state(proc, portfile):
+    profile = "PROFILE_PRESENT" if portfile.parent.is_dir() else "PROFILE_MISSING"
+    return f"process={_chrome_process_state(proc)} profile={profile}"
 
 
 def _wait_devtools_port(proc, portfile, diagnostics, timeout=15):
@@ -65,7 +85,8 @@ def _wait_devtools_port(proc, portfile, diagnostics, timeout=15):
         if proc.poll() is not None:
             diagnostics.thread.join(.2)
             raise RuntimeError(f"CHROME_EARLY_EXIT rc={proc.returncode} "
-                               f"state={state} stderr_codes={diagnostics.summary()}")
+                               f"state={state} {_chrome_failure_state(proc, portfile)} "
+                               f"stderr_codes={diagnostics.summary()}")
         try:
             lines = portfile.read_text(encoding="utf-8").splitlines()
         except FileNotFoundError:
@@ -82,6 +103,7 @@ def _wait_devtools_port(proc, portfile, diagnostics, timeout=15):
         remaining = deadline - time.monotonic()
         if remaining <= 0:
             raise RuntimeError(f"CHROME_READINESS_TIMEOUT state={state} "
+                               f"{_chrome_failure_state(proc, portfile)} "
                                f"stderr_codes={diagnostics.summary()}")
         time.sleep(min(.1, remaining))
 
@@ -221,6 +243,7 @@ class ResearchMethodsTest(unittest.TestCase):
                     _wait_devtools_port(proc, portfile, diagnostics, timeout=2)
                 self.assertIn("PERMISSION_DENIED", str(failure.exception))
                 self.assertNotIn("SYNTHETIC_PRIVATE_SENTINEL", str(failure.exception))
+                self.assertIn("profile=PROFILE_PRESENT", str(failure.exception))
             finally:
                 if proc.poll() is None: proc.kill()
                 proc.wait(timeout=2)
@@ -230,8 +253,11 @@ class ResearchMethodsTest(unittest.TestCase):
                 stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
             diagnostics = _ChromeStartupLog(proc.stderr)
             try:
-                with self.assertRaisesRegex(RuntimeError, "CHROME_READINESS_TIMEOUT state=PORT_FILE_MISSING"):
+                with self.assertRaisesRegex(RuntimeError, "CHROME_READINESS_TIMEOUT state=PORT_FILE_MISSING") as missing:
                     _wait_devtools_port(proc, portfile, diagnostics, timeout=.15)
+                self.assertIn("profile=PROFILE_PRESENT",str(missing.exception))
+                self.assertIn("stderr_codes=NO_STDERR",str(missing.exception))
+                self.assertRegex(str(missing.exception),r"process=(RUNNING|SLEEPING|IO_WAIT|STOPPED|ZOMBIE|IDLE|OTHER|UNAVAILABLE)")
                 portfile.write_text("70000\n/devtools/browser/stale\n", encoding="utf-8")
                 with self.assertRaisesRegex(RuntimeError, "CHROME_READINESS_TIMEOUT state=PORT_FILE_INVALID"):
                     _wait_devtools_port(proc, portfile, diagnostics, timeout=.15)

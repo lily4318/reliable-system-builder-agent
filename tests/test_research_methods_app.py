@@ -12,6 +12,8 @@ import threading
 import time
 import unittest
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from unittest.mock import patch
+from urllib.error import URLError
 from urllib.request import urlopen
 from src.editorial_browser_test import CDP
 
@@ -142,7 +144,60 @@ def _wait_devtools_port(proc, portfile, diagnostics, timeout=15):
         time.sleep(min(.1, remaining))
 
 
+def _wait_devtools_page(proc, portfile, diagnostics, timeout=15):
+    deadline = time.monotonic() + timeout
+    port = _wait_devtools_port(proc, portfile, diagnostics, timeout)
+    endpoint = f"http://127.0.0.1:{port}/json/list"
+    state = "TARGET_ENDPOINT_PENDING"
+    while proc.poll() is None:
+        remaining = deadline - time.monotonic()
+        if remaining <= 0:
+            break
+        try:
+            with urlopen(endpoint, timeout=min(2, remaining)) as response:
+                targets = json.load(response)
+        except (TimeoutError, URLError, ConnectionError):
+            state = "TARGET_ENDPOINT_UNAVAILABLE"
+        else:
+            if not isinstance(targets, list):
+                raise ValueError("Invalid DevTools target list")
+            for target in targets:
+                if target.get("type") == "page" and target.get("webSocketDebuggerUrl"):
+                    if proc.poll() is None:
+                        return target["webSocketDebuggerUrl"]
+                    break
+            state = "PAGE_TARGET_MISSING"
+        remaining = deadline - time.monotonic()
+        if remaining > 0:
+            time.sleep(min(.1, remaining))
+    raise RuntimeError(f"CHROME_TARGET_NOT_READY state={state} rc={proc.poll()} "
+                       f"{_chrome_failure_state(proc, portfile)} "
+                       f"stderr_codes={diagnostics.summary()}")
+
+
 class ResearchMethodsTest(unittest.TestCase):
+    def test_devtools_waits_for_http_and_page_target_after_portfile(self):
+        class Process:
+            @staticmethod
+            def poll():
+                return None
+
+        with tempfile.TemporaryDirectory() as tmp:
+            portfile = Path(tmp) / "DevToolsActivePort"
+            portfile.write_text("12345\n/devtools/browser/test\n", encoding="utf-8")
+            process = Process()
+            with patch(__name__ + ".urlopen", side_effect=[
+                TimeoutError("synthetic delayed HTTP response"),
+                io.BytesIO(b'[]'),
+                io.BytesIO(b'[{"type":"page","webSocketDebuggerUrl":"ws://127.0.0.1:12345/devtools/page/test"}]'),
+            ]) as fetch:
+                target = _wait_devtools_page(process, portfile, None)
+                self.assertEqual(target, "ws://127.0.0.1:12345/devtools/page/test")
+                self.assertEqual(fetch.call_count, 3)
+                for call in fetch.call_args_list:
+                    self.assertEqual(call.args, ("http://127.0.0.1:12345/json/list",))
+                    self.assertGreater(call.kwargs["timeout"], 0)
+                    self.assertLessEqual(call.kwargs["timeout"], 2)
     def test_academic_app_real_browser_and_download(self):
         exe = next((p for name in ("google-chrome","chromium","chromium-browser")
                     if (p := shutil.which(name))), None)
@@ -182,10 +237,8 @@ class ResearchMethodsTest(unittest.TestCase):
                         "--remote-debugging-port=0","--user-data-dir="+str(profile),"about:blank"],
                         cwd=ROOT, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE)
                     diagnostics = _ChromeStartupLog(proc.stderr)
-                    port = _wait_devtools_port(proc, profile/"DevToolsActivePort", diagnostics)
-                    with urlopen(f"http://127.0.0.1:{port}/json/list",timeout=5) as response:
-                        pages = json.load(response)
-                    cdp = CDP(next(p["webSocketDebuggerUrl"] for p in pages if p["type"]=="page"))
+                    page_url = _wait_devtools_page(proc, profile/"DevToolsActivePort", diagnostics)
+                    cdp = CDP(page_url)
                     def js(expression):
                         r=cdp.command("Runtime.evaluate",{"expression":expression,"returnByValue":True})["result"]
                         self.assertNotIn("exceptionDetails",r)

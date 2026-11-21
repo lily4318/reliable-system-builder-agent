@@ -30,3 +30,8 @@
 1. 先驗目前候選 PR #8 最新 HEAD、最後相符的 CI 完整原始日誌及三新測試；若紅燈，讀失敗原因最小修復，不下修 oracle 或反覆重跑其他已通過舊實驗。
 2. 在已確認來源及授權下實際以 `resume-project` 的 read-only 選擇器做另一次合成工作演練，觀察問句是否只在當前必要人類決策產生，並保留跨 Python process 真 DB 證據；對 LLM 在另一聊天獨立遵循仍標 UNVERIFIED。
 3. 未經獨立授權，不得連真 LINE/GAS/Google Sheets 或正式部署；未形成端到端時間與人工負擔的可比較真證據前，不宣稱「兩小時已達標」。專業原課程 5.3.10–11 仍可平行接續。
+
+## 原始日誌與修復接續（2026-11-21）
+- [CI 44911019927](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/44911019927)，job 136867550198，候選 `96252a7` 的三個新方法均通過。整體 591 項有 1 個錯誤，發生於既有 Chromium 首次 `GET /json/list` 等待回應。後續品質步驟在該跑次被跳過。
+- `7e0101402ea9c6d18f9b2763a375d54bcd6f8b31` 將頁面 target 查詢納入啟動期限，原功能驗收照常。新固定回歸覆蓋 TCP/HTTP 回應延遲（注入 TimeoutError）及空 target 名單後恢復。[CI 44912044275](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/44912044275) job 136869720465、checkout `f3516a6721dfc9865edbdaa3be05da0a0f822722`：592/592，真 Chromium DOM／CSV、三個 TD-007 方法及品質守門皆通過。歷史 runner 延遲根因、外部服務及真人驗收仍待證。
+- Windows 隔離環境另行實跑 Chrome 在期限內仍未收到本機 target 回應（`TARGET_ENDPOINT_UNAVAILABLE`，同時有 `DEVTOOLS_LISTENING`）；此項本機真瀏覽器結果保留失敗，Linux 託管 CI 的真 DOM／CSV 另有獨立通過證據。未確立兩環境延遲同一根因。

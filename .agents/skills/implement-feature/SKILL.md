@@ -119,3 +119,7 @@ Array.Length固定且Array.Resize替換陣列參考，不會改外部alias；Arr
 
 ### TD-004｜Constructor失敗隔離與確定性檔案資源所有權（TD004-CSHARP-CONSTRUCTOR-DISPOSAL-01）
 Constructor內取得多個IDisposable資源時，任何中途throw都要由constructor自己try/catch清理已取得的部分資源，外部的using無法接住未成功交付的owner。把兩個FileStream真正保留在唯一ResearchTempOwner並讓Dispose idempotent，清理時即使一個child關閉後拋IOException仍要嘗試所有child；using和manual try/finally均需有確定性關閉證據。以FileOptions.DeleteOnClose/真目錄剩餘檔及逐項ownership數量驗收，fail不代表DB rollback或真OS I/O故障。Finalizer非同步且執行時機不可預期，託管檔案交由IDisposable及SafeHandle而不是以GC.Collect/WaitForPendingFinalizers作清理策略；僅在合成probe測class ~Finalizer語法/Reflect與GC.SuppressFinalize路徑。新原生code84e5aaadfcf48517bda633ade0fc01fcf7a5bdaf CI44878317123 588/588/28 steps，39固定+576獨立oracle+3真正編譯器負例，無第三方NuGet。原5.3.8–9教材仍UNREAD/L0，詳原review。
+
+### C# 多載與跨檔宣告（TD004-CSHARP-OVERLOAD-PARTIAL-01）
+
+遇到可空輸入和數值擴寬，先列出實際呼叫端的靜態型別、允許的轉換與該走的處理方法。需要不同業務語意時可採明確命名的方法。原生正測逐個查路由與輸出，負測檢查模糊 null、缺少允許的數值轉換、跨檔可見度不一致與遺漏 partial。每次只變更一個條件，檢查編譯器診斷，還原後重建及重跑正例。部分宣告應在同一編譯中核對，並以實際呼叫證明跨檔私有成員與方法契約成立。

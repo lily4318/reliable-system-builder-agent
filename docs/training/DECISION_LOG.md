@@ -1157,3 +1157,14 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 - 選項與理由：建議保留約兩小時作為使用體驗的觀察參考，按案例記錄實際耗時、外部等待、人工介入、重工與復原，取消固定時間的合格門檻，避免因趕時間犧牲完整性。保留固定 120 分鐘目標為前版文字，待使用者確認此修訂後再同步主檔，保留歷史。
 - 影響與未決：本條只保存待確認共識；TD-004、TD-005-R2、TP-010、八角色十五技能及現有證據沿用。既有 TD007-DELIVERY-TRANSFER-01 已有候選實作與文件回讀；跨新對話、真服務及真人驗收須各以實際證據確認。待使用者就本版核心目標達成共識後續訓，外部部署、正式啟用、私人資料及費用依既有授權。
 - 來源：本輪使用者明示敘述；Draft PR #8 `01730df6776451dc54b4b8ac64312cc530a24ddb` 之原主檔、TD-007 與 TD007-DELIVERY-TRANSFER-01。
+
+## TD007-DELIVERY-TRANSFER-01 原始 CI 回讀與 Chromium 就緒修復（2026-11-21）
+- 證據：候選 `96252a75bbb9d2cfe887ef7dcd38bb855f512434`，原始 [CI 44911019927](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/44911019927) job 136867550198 於 PR merge checkout `6c1ab60` 執行 591 項，三項 delivery_next_step 方法均 ok。唯一錯誤是 `test_academic_app_real_browser_and_download` 在有效 DevToolsActivePort 出現後，首次唯讀 GET /json/list 等候回應逾時。該輪跳過後續門檻，未確認真服務、真人 UAT、跨新對話隔離與建置耗時。
+- 修復：候選 `7e0101402ea9c6d18f9b2763a375d54bcd6f8b31` 讓同一啟動期限涵蓋 port file、HTTP 回應與第一個 page target。只重試本機啟動期的唯讀探測，失敗仍逾時退出並保留階段診斷。真 DOM、鍵盤、375/1280 viewport 與 CSV 驗收皆沿用原判準。可重現回歸固定先逾時、再取得空 target 列表、最後取得頁面。此為就緒契約修復，尚無 runner 偶發延遲根因證據。
+- 驗收：本機新增就緒測試已通過。[CI 44912044275](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/44912044275) job 136869720465、checkout `f3516a6721dfc9865edbdaa3be05da0a0f822722`：592/592，真 Chromium DOM／CSV、三個 TD-007 方法及品質守門皆通過。TD-007 三測已驗；實際建站、LINE、GAS、Sheets、真人 UAT 及跨新對話獨立接續仍需實測。TD-007 最新的兩小時觀察參考提案保留原討論狀態。
+
+## TD004-CSHARP-OVERLOAD-PARTIAL-01｜原生多載與跨檔部分類別（2026-11-21）
+- 專業問題：合成計分 API 在數值擴寬及空值下能否維持呼叫端契約，跨檔宣告不一致是否會於編譯期被拒絕。Developer 依 Microsoft [多載解析規範](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/language-specification/expressions#1264-overload-resolution) 與[部分類別指南](https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/classes-and-structs/partial-classes-and-methods) 實作，QA 核固定路由與診斷碼。REPO_NATIVE / SINGLE_AGENT_ROLE_WORK。
+- 驗收：`tests/test_csharp_overload_partial.py` 在隔離目錄中以本機空套件來源還原，再編譯跨檔 public partial 類別，由私有共用 helper 保持輸出契約。實際執行八例含 short/int/long/decimal、明確型別的 null 和兩種 token。逐例編譯拒絕模糊 null CS0121、double 無隱含轉換 CS1503、跨檔可見度衝突 CS0262、缺 partial CS0260，還原原碼後重建並重驗相同輸出。
+- 證據：本機 .NET SDK 9.0.200 與 unittest 實跑通過，輸出 `runtime=8 compiler_rejections=4 restored=1`。GitHub 候選提交 CI 待核。指定 HackMD 教材正文未取得，原矩陣 5.3.10/5.3.11 維持 UNREAD／L0，另保存上述官方來源補充實證。原 TD-004、TD-005-R2、TP-010 與八角色十五技能沿用。
+- 蒸餾：合成資料 API 若面對 JSON 解碼、可空值或數值擴寬，先在輸入邊界得到明確型別，再使用多載或依語意命名的方法。跨檔私有成員共享及宣告一致性由原生編譯器驗證。回寫原 `implement-feature` 技能，後續按精確 CI 及實際遷移結果續作。

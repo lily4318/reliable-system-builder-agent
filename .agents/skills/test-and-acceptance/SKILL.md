@@ -104,3 +104,7 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### TD-004｜研究資料端到端獨立數值與安全真值（TD004-SQL-HOMEWORK-01）
 建立逐study/person/wave/attempt/version的常量oracle及每組planned/submitted/complete/sum；至少含同值合法重測、真0、部分缺答、全缺答、未提交、跨研究重複ID及同原答不同version。核原版報表不漂移、不同版不混合、受限身份只得scope，direct raw、版本/狀態篡改、跨研究/不存在及anon拒絕且全表不變。真late check failure（先更新狀態）及外層rollback逐表核，長存活讀快照與另一提交交叉驗，同一訪視雙連線實查blocking及競爭不同payload只一份定稿。逐鍵oracle而非僅rowcount/CI分數；真CSV、正式研究工具效度/權限/資料治理與獨立Agent評分另驗。原課程作業未讀，原覆盤記證據限制。
+
+
+### TD-004｜C#版號決策、短路副作用及原生負測（TD004-CSHARP-POLICY-BRANCHING-01）
+以獨立固定逐欄oracle核同一觀測在不同版門檻的不同結果；逐別測null/false/true consent、quality hold與insufficient的優先序、合法0與missing、未知version、bool/float/overflow/錯shape及重複JSON欄。驗證同一輸入兩文化輸出一致、來源bytes不變、拒絕無部分結果。短路/非短路呼叫數、括號優先序與nullable lifted結果用實際runtime；`const`變更、動態initializer及非bool if以真compiler code/無輸出DLL驗。驗同版SDK/ref/runtime、empty local NuGet feed/沒有第三方package，結合原生單元測試、全CI及精確checkout SHA，不拿新C# marker代替全局CI。首次CI44850341988因原Chrome就緒timeout而全局red；補限縮診斷後CI44851069296 581/581 green，但真Chrome根因未證。人工、Windows、真研究字典及外部部署另驗。

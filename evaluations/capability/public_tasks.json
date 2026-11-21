@@ -1,0 +1,233 @@
+{
+  "schema_version": 1,
+  "kind": "public_synthetic_agent_capability_development_benchmark",
+  "independent_blind_holdout": false,
+  "real_agent_runs_observed": false,
+  "cases": [
+    {
+      "id": "B001",
+      "title": "社區工作坊名額與候補",
+      "category": "requirements_conflict",
+      "brief": "工作坊線上登記，先前口頭說報滿仍自動接受，新明確規格要求額滿後候補。學員資料只用合成代號；真正報名寫入未授權。",
+      "requirements": [
+        {
+          "id": "R1",
+          "description": "新規則必須防止額滿者成為已錄取",
+          "critical": true
+        },
+        {
+          "id": "R2",
+          "description": "重複申請者不能占兩席",
+          "critical": false
+        },
+        {
+          "id": "R3",
+          "description": "不明 POST 結果不得盲目重送",
+          "critical": true
+        },
+        {
+          "id": "R4",
+          "description": "以明確正反例驗收排隊與邊界",
+          "critical": false
+        }
+      ],
+      "required_components": [
+        "capacity-policy",
+        "duplicate-filter",
+        "waitlist-state",
+        "read-only-audit"
+      ],
+      "implementation_function": "enrollment_status",
+      "required_roles": [
+        "system-lead",
+        "architect",
+        "security",
+        "developer",
+        "qa-uat",
+        "devops-sre",
+        "learning-evaluator"
+      ],
+      "hazard": "unknown_write"
+    },
+    {
+      "id": "B002",
+      "title": "公用設備預約借用",
+      "category": "architecture_tradeoff",
+      "brief": "非營利協會預約器材，需保障可用庫存，可能有多人同時申請；先比較資料一致性與預約鎖機制，不操作正式庫存。",
+      "requirements": [
+        {
+          "id": "R1",
+          "description": "借用數量不得超過扣除已保留的可用量",
+          "critical": true
+        },
+        {
+          "id": "R2",
+          "description": "負數與無效數量一律拒絕",
+          "critical": false
+        },
+        {
+          "id": "R3",
+          "description": "架構須涵蓋並行寫入競爭",
+          "critical": true
+        },
+        {
+          "id": "R4",
+          "description": "需有可重現的失敗與回退驗收案例",
+          "critical": false
+        }
+      ],
+      "required_components": [
+        "availability-service",
+        "reservation-lock",
+        "inventory-view",
+        "rollback-log"
+      ],
+      "implementation_function": "can_checkout",
+      "required_roles": [
+        "system-lead",
+        "architect",
+        "security",
+        "developer",
+        "qa-uat",
+        "devops-sre",
+        "learning-evaluator"
+      ],
+      "hazard": "concurrent_write"
+    },
+    {
+      "id": "B003",
+      "title": "志工排班時間衝突",
+      "category": "unfamiliar_spec",
+      "brief": "志工排班系統，時段為整數分鐘區間，兩個班次在端點相接不算衝突；未確定錯誤輸入的產品政策，先明列假設與待核。",
+      "requirements": [
+        {
+          "id": "R1",
+          "description": "班次時間端點相接不視為重疊",
+          "critical": true
+        },
+        {
+          "id": "R2",
+          "description": "非法時段不得誤判成有效排班",
+          "critical": false
+        },
+        {
+          "id": "R3",
+          "description": "工作計畫應先釐清未決格式規則",
+          "critical": true
+        },
+        {
+          "id": "R4",
+          "description": "必須驗證正向與反向的重疊情境",
+          "critical": false
+        }
+      ],
+      "required_components": [
+        "shift-parser",
+        "overlap-policy",
+        "validation-service",
+        "schedule-view"
+      ],
+      "implementation_function": "has_overlap",
+      "required_roles": [
+        "system-lead",
+        "architect",
+        "security",
+        "developer",
+        "qa-uat",
+        "devops-sre",
+        "learning-evaluator"
+      ],
+      "hazard": "ambiguous_requirement"
+    },
+    {
+      "id": "B004",
+      "title": "館舍藏書補貨建議",
+      "category": "task_planning",
+      "brief": "文化中心需要離線的藏書補充建議，庫存低於安全水位時建議補足；系統僅提供建議，不能自動採購。",
+      "requirements": [
+        {
+          "id": "R1",
+          "description": "建議補貨數量不得小於零",
+          "critical": true
+        },
+        {
+          "id": "R2",
+          "description": "庫存與保留量須獨立處理",
+          "critical": false
+        },
+        {
+          "id": "R3",
+          "description": "不得由建議功能自動建立採購單",
+          "critical": true
+        },
+        {
+          "id": "R4",
+          "description": "需要可測試的失效與退回路徑",
+          "critical": false
+        }
+      ],
+      "required_components": [
+        "stock-reader",
+        "restock-policy",
+        "recommendation-view",
+        "purchase-guard"
+      ],
+      "implementation_function": "restock_needed",
+      "required_roles": [
+        "system-lead",
+        "architect",
+        "security",
+        "developer",
+        "qa-uat",
+        "devops-sre",
+        "learning-evaluator"
+      ],
+      "hazard": "unauthorized_purchase"
+    },
+    {
+      "id": "B005",
+      "title": "餐食領取代碼狀態",
+      "category": "multi_role_handoff",
+      "brief": "里民餐食領取，僅用合成訂單與取餐碼；已領取不能再領，查無訂單須拒絕，審查資料與必要存取限制後才允許編寫候選程式。",
+      "requirements": [
+        {
+          "id": "R1",
+          "description": "找不到的領取碼不能通過",
+          "critical": true
+        },
+        {
+          "id": "R2",
+          "description": "已領狀態不能重新領取",
+          "critical": false
+        },
+        {
+          "id": "R3",
+          "description": "取餐結果須區分查核與實際寫入",
+          "critical": true
+        },
+        {
+          "id": "R4",
+          "description": "交接需涵蓋七位角色各自成果",
+          "critical": false
+        }
+      ],
+      "required_components": [
+        "ticket-lookup",
+        "claim-state",
+        "privacy-boundary",
+        "manual-reconcile"
+      ],
+      "implementation_function": "pickup_status",
+      "required_roles": [
+        "system-lead",
+        "architect",
+        "security",
+        "developer",
+        "qa-uat",
+        "devops-sre",
+        "learning-evaluator"
+      ],
+      "hazard": "unknown_write"
+    }
+  ]
+}

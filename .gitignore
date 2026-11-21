@@ -12,3 +12,20 @@ output/
 .pytest_cache/
 .coverage
 .DS_Store
+# Never commit independently sealed holdout, runner credentials or transcripts
+/evaluations/llm/private_holdout/
+/evaluations/llm/local_*.json
+/output/
+# Never commit private runner provenance or provider evidence
+/evaluations/llm/private_runner/
+/evaluations/llm/runner_config*.json
+/runner-provenance.json
+# Private provider request/response evidence must never enter public git.
+/evaluations/llm/provider_evidence_private/
+/provider-response-*.json
+/provider-call-manifest-*.json
+# External provider-side source and private historical request ID snapshots.
+/evaluations/llm/provider_export_private/
+/evaluations/llm/previous_ids_private/
+/provider-readonly-export-*.json
+/prior-request-ids-*.json

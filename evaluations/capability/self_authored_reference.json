@@ -1,0 +1,1137 @@
+{
+  "schema_version": 1,
+  "kind": "self_authored_public_reference_not_model_output",
+  "source": "self_authored",
+  "submissions": [
+    {
+      "task_id": "B001",
+      "requirements": [
+        {
+          "id": "R1",
+          "acceptance": "針對 新規則必須防止額滿者成為已錄取，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        },
+        {
+          "id": "R2",
+          "acceptance": "針對 重複申請者不能占兩席，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        },
+        {
+          "id": "R3",
+          "acceptance": "針對 不明 POST 結果不得盲目重送，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        },
+        {
+          "id": "R4",
+          "acceptance": "針對 以明確正反例驗收排隊與邊界，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        }
+      ],
+      "architecture": {
+        "components": [
+          {
+            "name": "capacity-policy",
+            "responsibility": "界定 capacity-policy 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          },
+          {
+            "name": "duplicate-filter",
+            "responsibility": "界定 duplicate-filter 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          },
+          {
+            "name": "waitlist-state",
+            "responsibility": "界定 waitlist-state 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          },
+          {
+            "name": "read-only-audit",
+            "responsibility": "界定 read-only-audit 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          }
+        ],
+        "links": [
+          {
+            "from": "capacity-policy",
+            "to": "duplicate-filter"
+          },
+          {
+            "from": "duplicate-filter",
+            "to": "waitlist-state"
+          },
+          {
+            "from": "waitlist-state",
+            "to": "read-only-audit"
+          }
+        ]
+      },
+      "plan": [
+        {
+          "id": "S1",
+          "owner": "system-lead",
+          "depends_on": [],
+          "requirement_ids": [
+            "R1"
+          ],
+          "deliverable": "交付第 1 階段 system-lead 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S2",
+          "owner": "architect",
+          "depends_on": [
+            "S1"
+          ],
+          "requirement_ids": [
+            "R2"
+          ],
+          "deliverable": "交付第 2 階段 architect 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S3",
+          "owner": "security",
+          "depends_on": [
+            "S2"
+          ],
+          "requirement_ids": [
+            "R3"
+          ],
+          "deliverable": "交付第 3 階段 security 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S4",
+          "owner": "developer",
+          "depends_on": [
+            "S3"
+          ],
+          "requirement_ids": [
+            "R4"
+          ],
+          "deliverable": "交付第 4 階段 developer 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S5",
+          "owner": "qa-uat",
+          "depends_on": [
+            "S4"
+          ],
+          "requirement_ids": [
+            "R1"
+          ],
+          "deliverable": "交付第 5 階段 qa-uat 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S6",
+          "owner": "devops-sre",
+          "depends_on": [
+            "S5"
+          ],
+          "requirement_ids": [
+            "R2"
+          ],
+          "deliverable": "交付第 6 階段 devops-sre 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S7",
+          "owner": "learning-evaluator",
+          "depends_on": [
+            "S6"
+          ],
+          "requirement_ids": [
+            "R3"
+          ],
+          "deliverable": "交付第 7 階段 learning-evaluator 的可查核產物及下一角色接收條件。"
+        }
+      ],
+      "implementation": {
+        "path": "src/capability_reference.py",
+        "function": "enrollment_status",
+        "source_type": "trusted_repository_reference_only"
+      },
+      "qa": [
+        {
+          "requirement_id": "R1",
+          "kind": "positive",
+          "expected": "針對 R1 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R1",
+          "kind": "negative",
+          "expected": "針對 R1 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R2",
+          "kind": "positive",
+          "expected": "針對 R2 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R2",
+          "kind": "negative",
+          "expected": "針對 R2 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R3",
+          "kind": "positive",
+          "expected": "針對 R3 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R3",
+          "kind": "negative",
+          "expected": "針對 R3 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R4",
+          "kind": "positive",
+          "expected": "針對 R4 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R4",
+          "kind": "negative",
+          "expected": "針對 R4 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        }
+      ],
+      "handoffs": [
+        {
+          "role": "system-lead",
+          "input": "輸入第 1 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 1 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "architect",
+          "input": "輸入第 2 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 2 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "security",
+          "input": "輸入第 3 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 3 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "developer",
+          "input": "輸入第 4 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 4 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "qa-uat",
+          "input": "輸入第 5 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 5 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "devops-sre",
+          "input": "輸入第 6 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 6 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "learning-evaluator",
+          "input": "輸入第 7 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 7 階段需審查的產物與下個專家角色交接規格。"
+        }
+      ],
+      "risk": {
+        "hazard": "unknown_write",
+        "unknown_write_action": "READ_ONLY_RECONCILE",
+        "human_release_review": true
+      },
+      "claims": {
+        "real_agent_invoked": false,
+        "model_weights_trained": false,
+        "system_deployed": false
+      }
+    },
+    {
+      "task_id": "B002",
+      "requirements": [
+        {
+          "id": "R1",
+          "acceptance": "針對 借用數量不得超過扣除已保留的可用量，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        },
+        {
+          "id": "R2",
+          "acceptance": "針對 負數與無效數量一律拒絕，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        },
+        {
+          "id": "R3",
+          "acceptance": "針對 架構須涵蓋並行寫入競爭，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        },
+        {
+          "id": "R4",
+          "acceptance": "針對 需有失敗與回退驗收，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        }
+      ],
+      "architecture": {
+        "components": [
+          {
+            "name": "availability-service",
+            "responsibility": "界定 availability-service 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          },
+          {
+            "name": "reservation-lock",
+            "responsibility": "界定 reservation-lock 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          },
+          {
+            "name": "inventory-view",
+            "responsibility": "界定 inventory-view 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          },
+          {
+            "name": "rollback-log",
+            "responsibility": "界定 rollback-log 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          }
+        ],
+        "links": [
+          {
+            "from": "availability-service",
+            "to": "reservation-lock"
+          },
+          {
+            "from": "reservation-lock",
+            "to": "inventory-view"
+          },
+          {
+            "from": "inventory-view",
+            "to": "rollback-log"
+          }
+        ]
+      },
+      "plan": [
+        {
+          "id": "S1",
+          "owner": "system-lead",
+          "depends_on": [],
+          "requirement_ids": [
+            "R1"
+          ],
+          "deliverable": "交付第 1 階段 system-lead 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S2",
+          "owner": "architect",
+          "depends_on": [
+            "S1"
+          ],
+          "requirement_ids": [
+            "R2"
+          ],
+          "deliverable": "交付第 2 階段 architect 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S3",
+          "owner": "security",
+          "depends_on": [
+            "S2"
+          ],
+          "requirement_ids": [
+            "R3"
+          ],
+          "deliverable": "交付第 3 階段 security 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S4",
+          "owner": "developer",
+          "depends_on": [
+            "S3"
+          ],
+          "requirement_ids": [
+            "R4"
+          ],
+          "deliverable": "交付第 4 階段 developer 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S5",
+          "owner": "qa-uat",
+          "depends_on": [
+            "S4"
+          ],
+          "requirement_ids": [
+            "R1"
+          ],
+          "deliverable": "交付第 5 階段 qa-uat 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S6",
+          "owner": "devops-sre",
+          "depends_on": [
+            "S5"
+          ],
+          "requirement_ids": [
+            "R2"
+          ],
+          "deliverable": "交付第 6 階段 devops-sre 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S7",
+          "owner": "learning-evaluator",
+          "depends_on": [
+            "S6"
+          ],
+          "requirement_ids": [
+            "R3"
+          ],
+          "deliverable": "交付第 7 階段 learning-evaluator 的可查核產物及下一角色接收條件。"
+        }
+      ],
+      "implementation": {
+        "path": "src/capability_reference.py",
+        "function": "can_checkout",
+        "source_type": "trusted_repository_reference_only"
+      },
+      "qa": [
+        {
+          "requirement_id": "R1",
+          "kind": "positive",
+          "expected": "針對 R1 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R1",
+          "kind": "negative",
+          "expected": "針對 R1 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R2",
+          "kind": "positive",
+          "expected": "針對 R2 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R2",
+          "kind": "negative",
+          "expected": "針對 R2 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R3",
+          "kind": "positive",
+          "expected": "針對 R3 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R3",
+          "kind": "negative",
+          "expected": "針對 R3 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R4",
+          "kind": "positive",
+          "expected": "針對 R4 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R4",
+          "kind": "negative",
+          "expected": "針對 R4 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        }
+      ],
+      "handoffs": [
+        {
+          "role": "system-lead",
+          "input": "輸入第 1 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 1 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "architect",
+          "input": "輸入第 2 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 2 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "security",
+          "input": "輸入第 3 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 3 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "developer",
+          "input": "輸入第 4 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 4 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "qa-uat",
+          "input": "輸入第 5 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 5 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "devops-sre",
+          "input": "輸入第 6 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 6 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "learning-evaluator",
+          "input": "輸入第 7 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 7 階段需審查的產物與下個專家角色交接規格。"
+        }
+      ],
+      "risk": {
+        "hazard": "concurrent_write",
+        "unknown_write_action": "READ_ONLY_RECONCILE",
+        "human_release_review": true
+      },
+      "claims": {
+        "real_agent_invoked": false,
+        "model_weights_trained": false,
+        "system_deployed": false
+      }
+    },
+    {
+      "task_id": "B003",
+      "requirements": [
+        {
+          "id": "R1",
+          "acceptance": "針對 端點相接不視為重疊，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        },
+        {
+          "id": "R2",
+          "acceptance": "針對 非法時段不得誤判成有效排班，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        },
+        {
+          "id": "R3",
+          "acceptance": "針對 工作計畫應先釐清未決格式規則，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        },
+        {
+          "id": "R4",
+          "acceptance": "針對 必須驗證正向與反向的重疊情境，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        }
+      ],
+      "architecture": {
+        "components": [
+          {
+            "name": "shift-parser",
+            "responsibility": "界定 shift-parser 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          },
+          {
+            "name": "overlap-policy",
+            "responsibility": "界定 overlap-policy 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          },
+          {
+            "name": "validation-service",
+            "responsibility": "界定 validation-service 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          },
+          {
+            "name": "schedule-view",
+            "responsibility": "界定 schedule-view 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          }
+        ],
+        "links": [
+          {
+            "from": "shift-parser",
+            "to": "overlap-policy"
+          },
+          {
+            "from": "overlap-policy",
+            "to": "validation-service"
+          },
+          {
+            "from": "validation-service",
+            "to": "schedule-view"
+          }
+        ]
+      },
+      "plan": [
+        {
+          "id": "S1",
+          "owner": "system-lead",
+          "depends_on": [],
+          "requirement_ids": [
+            "R1"
+          ],
+          "deliverable": "交付第 1 階段 system-lead 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S2",
+          "owner": "architect",
+          "depends_on": [
+            "S1"
+          ],
+          "requirement_ids": [
+            "R2"
+          ],
+          "deliverable": "交付第 2 階段 architect 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S3",
+          "owner": "security",
+          "depends_on": [
+            "S2"
+          ],
+          "requirement_ids": [
+            "R3"
+          ],
+          "deliverable": "交付第 3 階段 security 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S4",
+          "owner": "developer",
+          "depends_on": [
+            "S3"
+          ],
+          "requirement_ids": [
+            "R4"
+          ],
+          "deliverable": "交付第 4 階段 developer 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S5",
+          "owner": "qa-uat",
+          "depends_on": [
+            "S4"
+          ],
+          "requirement_ids": [
+            "R1"
+          ],
+          "deliverable": "交付第 5 階段 qa-uat 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S6",
+          "owner": "devops-sre",
+          "depends_on": [
+            "S5"
+          ],
+          "requirement_ids": [
+            "R2"
+          ],
+          "deliverable": "交付第 6 階段 devops-sre 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S7",
+          "owner": "learning-evaluator",
+          "depends_on": [
+            "S6"
+          ],
+          "requirement_ids": [
+            "R3"
+          ],
+          "deliverable": "交付第 7 階段 learning-evaluator 的可查核產物及下一角色接收條件。"
+        }
+      ],
+      "implementation": {
+        "path": "src/capability_reference.py",
+        "function": "has_overlap",
+        "source_type": "trusted_repository_reference_only"
+      },
+      "qa": [
+        {
+          "requirement_id": "R1",
+          "kind": "positive",
+          "expected": "針對 R1 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R1",
+          "kind": "negative",
+          "expected": "針對 R1 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R2",
+          "kind": "positive",
+          "expected": "針對 R2 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R2",
+          "kind": "negative",
+          "expected": "針對 R2 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R3",
+          "kind": "positive",
+          "expected": "針對 R3 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R3",
+          "kind": "negative",
+          "expected": "針對 R3 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R4",
+          "kind": "positive",
+          "expected": "針對 R4 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R4",
+          "kind": "negative",
+          "expected": "針對 R4 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        }
+      ],
+      "handoffs": [
+        {
+          "role": "system-lead",
+          "input": "輸入第 1 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 1 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "architect",
+          "input": "輸入第 2 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 2 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "security",
+          "input": "輸入第 3 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 3 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "developer",
+          "input": "輸入第 4 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 4 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "qa-uat",
+          "input": "輸入第 5 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 5 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "devops-sre",
+          "input": "輸入第 6 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 6 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "learning-evaluator",
+          "input": "輸入第 7 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 7 階段需審查的產物與下個專家角色交接規格。"
+        }
+      ],
+      "risk": {
+        "hazard": "ambiguous_requirement",
+        "unknown_write_action": "READ_ONLY_RECONCILE",
+        "human_release_review": true
+      },
+      "claims": {
+        "real_agent_invoked": false,
+        "model_weights_trained": false,
+        "system_deployed": false
+      }
+    },
+    {
+      "task_id": "B004",
+      "requirements": [
+        {
+          "id": "R1",
+          "acceptance": "針對 補貨量不得為負數，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        },
+        {
+          "id": "R2",
+          "acceptance": "針對 庫存與保留量須獨立處理，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        },
+        {
+          "id": "R3",
+          "acceptance": "針對 不可自動建立採購單，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        },
+        {
+          "id": "R4",
+          "acceptance": "針對 需要可測試的失效與退回路徑，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        }
+      ],
+      "architecture": {
+        "components": [
+          {
+            "name": "stock-reader",
+            "responsibility": "界定 stock-reader 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          },
+          {
+            "name": "restock-policy",
+            "responsibility": "界定 restock-policy 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          },
+          {
+            "name": "recommendation-view",
+            "responsibility": "界定 recommendation-view 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          },
+          {
+            "name": "purchase-guard",
+            "responsibility": "界定 purchase-guard 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          }
+        ],
+        "links": [
+          {
+            "from": "stock-reader",
+            "to": "restock-policy"
+          },
+          {
+            "from": "restock-policy",
+            "to": "recommendation-view"
+          },
+          {
+            "from": "recommendation-view",
+            "to": "purchase-guard"
+          }
+        ]
+      },
+      "plan": [
+        {
+          "id": "S1",
+          "owner": "system-lead",
+          "depends_on": [],
+          "requirement_ids": [
+            "R1"
+          ],
+          "deliverable": "交付第 1 階段 system-lead 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S2",
+          "owner": "architect",
+          "depends_on": [
+            "S1"
+          ],
+          "requirement_ids": [
+            "R2"
+          ],
+          "deliverable": "交付第 2 階段 architect 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S3",
+          "owner": "security",
+          "depends_on": [
+            "S2"
+          ],
+          "requirement_ids": [
+            "R3"
+          ],
+          "deliverable": "交付第 3 階段 security 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S4",
+          "owner": "developer",
+          "depends_on": [
+            "S3"
+          ],
+          "requirement_ids": [
+            "R4"
+          ],
+          "deliverable": "交付第 4 階段 developer 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S5",
+          "owner": "qa-uat",
+          "depends_on": [
+            "S4"
+          ],
+          "requirement_ids": [
+            "R1"
+          ],
+          "deliverable": "交付第 5 階段 qa-uat 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S6",
+          "owner": "devops-sre",
+          "depends_on": [
+            "S5"
+          ],
+          "requirement_ids": [
+            "R2"
+          ],
+          "deliverable": "交付第 6 階段 devops-sre 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S7",
+          "owner": "learning-evaluator",
+          "depends_on": [
+            "S6"
+          ],
+          "requirement_ids": [
+            "R3"
+          ],
+          "deliverable": "交付第 7 階段 learning-evaluator 的可查核產物及下一角色接收條件。"
+        }
+      ],
+      "implementation": {
+        "path": "src/capability_reference.py",
+        "function": "restock_needed",
+        "source_type": "trusted_repository_reference_only"
+      },
+      "qa": [
+        {
+          "requirement_id": "R1",
+          "kind": "positive",
+          "expected": "針對 R1 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R1",
+          "kind": "negative",
+          "expected": "針對 R1 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R2",
+          "kind": "positive",
+          "expected": "針對 R2 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R2",
+          "kind": "negative",
+          "expected": "針對 R2 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R3",
+          "kind": "positive",
+          "expected": "針對 R3 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R3",
+          "kind": "negative",
+          "expected": "針對 R3 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R4",
+          "kind": "positive",
+          "expected": "針對 R4 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R4",
+          "kind": "negative",
+          "expected": "針對 R4 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        }
+      ],
+      "handoffs": [
+        {
+          "role": "system-lead",
+          "input": "輸入第 1 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 1 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "architect",
+          "input": "輸入第 2 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 2 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "security",
+          "input": "輸入第 3 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 3 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "developer",
+          "input": "輸入第 4 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 4 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "qa-uat",
+          "input": "輸入第 5 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 5 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "devops-sre",
+          "input": "輸入第 6 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 6 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "learning-evaluator",
+          "input": "輸入第 7 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 7 階段需審查的產物與下個專家角色交接規格。"
+        }
+      ],
+      "risk": {
+        "hazard": "unauthorized_purchase",
+        "unknown_write_action": "READ_ONLY_RECONCILE",
+        "human_release_review": true
+      },
+      "claims": {
+        "real_agent_invoked": false,
+        "model_weights_trained": false,
+        "system_deployed": false
+      }
+    },
+    {
+      "task_id": "B005",
+      "requirements": [
+        {
+          "id": "R1",
+          "acceptance": "針對 找不到的領取碼不能通過，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        },
+        {
+          "id": "R2",
+          "acceptance": "針對 已領狀態不能重新領取，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        },
+        {
+          "id": "R3",
+          "acceptance": "針對 取餐結果須區分查核與實際寫入，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        },
+        {
+          "id": "R4",
+          "acceptance": "針對 交接需涵蓋七位角色各自成果，提供獨立的可觀察驗收與拒絕條件，不得依合成測試宣稱正式上線。"
+        }
+      ],
+      "architecture": {
+        "components": [
+          {
+            "name": "ticket-lookup",
+            "responsibility": "界定 ticket-lookup 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          },
+          {
+            "name": "claim-state",
+            "responsibility": "界定 claim-state 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          },
+          {
+            "name": "privacy-boundary",
+            "responsibility": "界定 privacy-boundary 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          },
+          {
+            "name": "manual-reconcile",
+            "responsibility": "界定 manual-reconcile 的資料流、相依性和安全責任，並保留可單元測試的介面。"
+          }
+        ],
+        "links": [
+          {
+            "from": "ticket-lookup",
+            "to": "claim-state"
+          },
+          {
+            "from": "claim-state",
+            "to": "privacy-boundary"
+          },
+          {
+            "from": "privacy-boundary",
+            "to": "manual-reconcile"
+          }
+        ]
+      },
+      "plan": [
+        {
+          "id": "S1",
+          "owner": "system-lead",
+          "depends_on": [],
+          "requirement_ids": [
+            "R1"
+          ],
+          "deliverable": "交付第 1 階段 system-lead 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S2",
+          "owner": "architect",
+          "depends_on": [
+            "S1"
+          ],
+          "requirement_ids": [
+            "R2"
+          ],
+          "deliverable": "交付第 2 階段 architect 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S3",
+          "owner": "security",
+          "depends_on": [
+            "S2"
+          ],
+          "requirement_ids": [
+            "R3"
+          ],
+          "deliverable": "交付第 3 階段 security 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S4",
+          "owner": "developer",
+          "depends_on": [
+            "S3"
+          ],
+          "requirement_ids": [
+            "R4"
+          ],
+          "deliverable": "交付第 4 階段 developer 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S5",
+          "owner": "qa-uat",
+          "depends_on": [
+            "S4"
+          ],
+          "requirement_ids": [
+            "R1"
+          ],
+          "deliverable": "交付第 5 階段 qa-uat 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S6",
+          "owner": "devops-sre",
+          "depends_on": [
+            "S5"
+          ],
+          "requirement_ids": [
+            "R2"
+          ],
+          "deliverable": "交付第 6 階段 devops-sre 的可查核產物及下一角色接收條件。"
+        },
+        {
+          "id": "S7",
+          "owner": "learning-evaluator",
+          "depends_on": [
+            "S6"
+          ],
+          "requirement_ids": [
+            "R3"
+          ],
+          "deliverable": "交付第 7 階段 learning-evaluator 的可查核產物及下一角色接收條件。"
+        }
+      ],
+      "implementation": {
+        "path": "src/capability_reference.py",
+        "function": "pickup_status",
+        "source_type": "trusted_repository_reference_only"
+      },
+      "qa": [
+        {
+          "requirement_id": "R1",
+          "kind": "positive",
+          "expected": "針對 R1 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R1",
+          "kind": "negative",
+          "expected": "針對 R1 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R2",
+          "kind": "positive",
+          "expected": "針對 R2 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R2",
+          "kind": "negative",
+          "expected": "針對 R2 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R3",
+          "kind": "positive",
+          "expected": "針對 R3 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R3",
+          "kind": "negative",
+          "expected": "針對 R3 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R4",
+          "kind": "positive",
+          "expected": "針對 R4 執行 positive 的獨立可重現斷言，確認拒絕或成功的條件。"
+        },
+        {
+          "requirement_id": "R4",
+          "kind": "negative",
+          "expected": "針對 R4 執行 negative 的獨立可重現斷言，確認拒絕或成功的條件。"
+        }
+      ],
+      "handoffs": [
+        {
+          "role": "system-lead",
+          "input": "輸入第 1 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 1 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "architect",
+          "input": "輸入第 2 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 2 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "security",
+          "input": "輸入第 3 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 3 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "developer",
+          "input": "輸入第 4 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 4 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "qa-uat",
+          "input": "輸入第 5 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 5 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "devops-sre",
+          "input": "輸入第 6 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 6 階段需審查的產物與下個專家角色交接規格。"
+        },
+        {
+          "role": "learning-evaluator",
+          "input": "輸入第 7 階段事先確認的需求及驗收證據。",
+          "output": "輸出第 7 階段需審查的產物與下個專家角色交接規格。"
+        }
+      ],
+      "risk": {
+        "hazard": "unknown_write",
+        "unknown_write_action": "READ_ONLY_RECONCILE",
+        "human_release_review": true
+      },
+      "claims": {
+        "real_agent_invoked": false,
+        "model_weights_trained": false,
+        "system_deployed": false
+      }
+    }
+  ]
+}

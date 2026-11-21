@@ -1,0 +1,10 @@
+{
+  "schema_version": 1,
+  "description": "Example structure ONLY. Do not fill this file with real holdout data; use a separate private path.",
+  "dataset_sha256": "REPLACE_WITH_ACTUAL_SHA256_OF_PRIVATE_DATASET",
+  "case_count": 0,
+  "independent_reviewer_attested": false,
+  "no_development_leakage_attested": false,
+  "reviewer_id": "",
+  "developer_id": ""
+}

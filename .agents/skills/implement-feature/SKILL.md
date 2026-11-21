@@ -113,3 +113,6 @@ Array.Length固定且Array.Resize替換陣列參考，不會改外部alias；Arr
 
 ### TD-004｜C# Enum與Inheritance狀態型別安全（TD004-CSHARP-ENUM-INHERITANCE-01）
 枚舉顯式wire值也可被強制轉成未定義值：要在byte/int底層型別縮窄**之前**檢查原始數值合法範圍，再做Enum.IsDefined，特別是0/default、gap及257→1截斷。不要把enum轉型當研究狀態授權或自動補未知值。對同一研究事件型別階層，把主體、序號、From/To和允許轉換保留在**非虛擬基底類別共同入口**，受控sealed衍生類別只處理自己的payload，未知kind與未核准轉換fail-closed。處理多步事件應先stage後publish，拒絕不得輸出部分狀態/trace；此不保證DB ACID、並發或對惡意擴充程式碼安全。原生CI44858480306 586/586（code08ea0e9aab8d6b280327179f4fd5846a1000189b），首RED CI44858000999為QA將真CS0266誤設CS0029，已依真compiler最小修正。QA42固定+512獨立oracle/3真編譯器負例；原HackMD5.3.4–5仍UNREAD/L0，合成state/QA token非正式研究規範；詳原review。
+
+### TD-004｜事件訂退與回呼副作用隔離（TD004-CSHARP-EVENT-ACCESS-01）
+真C#event只開放外部+=/減=，raise保留publisher；保留同一delegate身分才能確實unsubscribe。多訂閱者同步回呼若用GetInvocationList snapshot，回呼內新增/移除的訂閱要區分本次已快照與下次生效；同publisher同步重入以顯式_guard拒絕，但不可當多執行緒鎖。逐handler捕已預期異常可繼續其他handlers，throw前與其他handler的side effects仍存在，絕非資料庫交易rollback、真網路exactly-once或任意Exception皆可安全吞。外部跨類別private/protected不可直接讀，internal同assembly可用，access modifier不是反射安全沙箱。原合成專用native code exacta127155b1da830cd2fc5a88ac95e804299dfa34c，CI44862320136 587/587（固定43+Python獨立512+真compiler負例3），首RED CI44862277353因一筆非法self target測試資料已最小修復；原教材5.3.6–7仍UNREAD/L0，詳原review。

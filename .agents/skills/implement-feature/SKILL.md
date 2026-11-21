@@ -110,3 +110,6 @@ Array.Length固定且Array.Resize替換陣列參考，不會改外部alias；Arr
 
 ### TD-004｜OOP property不變量與研究資料防禦性快照（TD004-CSHARP-OOP-PROPERTY-SNAPSHOT-01）
 封裝不能只靠把setter設為private，若private array透過getter/readonly field或巢狀MutableMeta外洩，外部仍能竄改；constructor與公開屬性getter均需按資料所有權契約deep-copy巢狀集合，尤其是caller後續修改來源/已返回快照。先固定完整constructor/property invariants（null/真0/集合長度/值域/欄位重複），任何batch actions先在deep staged copy驗所有操作，再一次更新資料與revision/封存旗標，error不能發布部分狀態；記憶體rollback不等於資料庫交易或外部事件撤銷。原生驗收code605671ec557303d6b06282e3499e54fa1cfd7f83 +diagnostic-only ba7a418d98df635f0e4264b12cddecd2d0b707a5；CI44856735136 585/585，39固定/512 QA獨立Python逐欄oracle/3compiler負例；第一次Chrome red是獨立環境事件、根因未明。原HackMD 5.3.1–3不可讀L0，不把新合成Stage/Score/Tags當正式研究規則。詳原訓練主檔/覆盤。
+
+### TD-004｜C# Enum與Inheritance狀態型別安全（TD004-CSHARP-ENUM-INHERITANCE-01）
+枚舉顯式wire值也可被強制轉成未定義值：要在byte/int底層型別縮窄**之前**檢查原始數值合法範圍，再做Enum.IsDefined，特別是0/default、gap及257→1截斷。不要把enum轉型當研究狀態授權或自動補未知值。對同一研究事件型別階層，把主體、序號、From/To和允許轉換保留在**非虛擬基底類別共同入口**，受控sealed衍生類別只處理自己的payload，未知kind與未核准轉換fail-closed。處理多步事件應先stage後publish，拒絕不得輸出部分狀態/trace；此不保證DB ACID、並發或對惡意擴充程式碼安全。原生CI44858480306 586/586（code08ea0e9aab8d6b280327179f4fd5846a1000189b），首RED CI44858000999為QA將真CS0266誤設CS0029，已依真compiler最小修正。QA42固定+512獨立oracle/3真編譯器負例；原HackMD5.3.4–5仍UNREAD/L0，合成state/QA token非正式研究規範；詳原review。

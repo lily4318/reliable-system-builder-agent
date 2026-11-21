@@ -116,3 +116,6 @@ Array.Length固定且Array.Resize替換陣列參考，不會改外部alias；Arr
 
 ### TD-004｜事件訂退與回呼副作用隔離（TD004-CSHARP-EVENT-ACCESS-01）
 真C#event只開放外部+=/減=，raise保留publisher；保留同一delegate身分才能確實unsubscribe。多訂閱者同步回呼若用GetInvocationList snapshot，回呼內新增/移除的訂閱要區分本次已快照與下次生效；同publisher同步重入以顯式_guard拒絕，但不可當多執行緒鎖。逐handler捕已預期異常可繼續其他handlers，throw前與其他handler的side effects仍存在，絕非資料庫交易rollback、真網路exactly-once或任意Exception皆可安全吞。外部跨類別private/protected不可直接讀，internal同assembly可用，access modifier不是反射安全沙箱。原合成專用native code exacta127155b1da830cd2fc5a88ac95e804299dfa34c，CI44862320136 587/587（固定43+Python獨立512+真compiler負例3），首RED CI44862277353因一筆非法self target測試資料已最小修復；原教材5.3.6–7仍UNREAD/L0，詳原review。
+
+### TD-004｜Constructor失敗隔離與確定性檔案資源所有權（TD004-CSHARP-CONSTRUCTOR-DISPOSAL-01）
+Constructor內取得多個IDisposable資源時，任何中途throw都要由constructor自己try/catch清理已取得的部分資源，外部的using無法接住未成功交付的owner。把兩個FileStream真正保留在唯一ResearchTempOwner並讓Dispose idempotent，清理時即使一個child關閉後拋IOException仍要嘗試所有child；using和manual try/finally均需有確定性關閉證據。以FileOptions.DeleteOnClose/真目錄剩餘檔及逐項ownership數量驗收，fail不代表DB rollback或真OS I/O故障。Finalizer非同步且執行時機不可預期，託管檔案交由IDisposable及SafeHandle而不是以GC.Collect/WaitForPendingFinalizers作清理策略；僅在合成probe測class ~Finalizer語法/Reflect與GC.SuppressFinalize路徑。新原生code84e5aaadfcf48517bda633ade0fc01fcf7a5bdaf CI44878317123 588/588/28 steps，39固定+576獨立oracle+3真正編譯器負例，無第三方NuGet。原5.3.8–9教材仍UNREAD/L0，詳原review。

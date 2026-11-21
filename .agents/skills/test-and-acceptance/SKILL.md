@@ -108,3 +108,6 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### TD-004｜C#版號決策、短路副作用及原生負測（TD004-CSHARP-POLICY-BRANCHING-01）
 以獨立固定逐欄oracle核同一觀測在不同版門檻的不同結果；逐別測null/false/true consent、quality hold與insufficient的優先序、合法0與missing、未知version、bool/float/overflow/錯shape及重複JSON欄。驗證同一輸入兩文化輸出一致、來源bytes不變、拒絕無部分結果。短路/非短路呼叫數、括號優先序與nullable lifted結果用實際runtime；`const`變更、動態initializer及非bool if以真compiler code/無輸出DLL驗。驗同版SDK/ref/runtime、empty local NuGet feed/沒有第三方package，結合原生單元測試、全CI及精確checkout SHA，不拿新C# marker代替全局CI。首次CI44850341988因原Chrome就緒timeout而全局red；補限縮診斷後CI44851069296 581/581 green，但真Chrome根因未證。人工、Windows、真研究字典及外部部署另驗。
+
+### TD-004｜C#迴圈預算、參數副作用及例外隔離 QA（TD004-CSHARP-BOUNDED-METHODS-01）
+至少驗空資料、正好budget、超出budget、STOP於預算前/後、STOP尾端未讀、合法0/null、重複ID、錯shape/型別/值域；檢查status/inspected/valid/missing/sum逐欄，不只比總和，失敗不得回傳部分sum或動原輸入bytes。方法以獨立oracle比ReadOnlySpan純讀、變數ref修改、array alias寫入、out成功/失敗值；用會throw的真iterator驗finally清理及結果尚未提交，以break驗不多拉取。另以原生compiler檢loop scope/缺ref/未賦值out三負例與壞build無DLL，核.NET SDK、NuGet empty feed、不同文化及exact CI checkout。33固定/192獨立Python小域組合及CI44852671230 582/582 verified；此為合成host QA非真DB/網路IO/異步、完整JSON資源界限、原教材或盲測。不可把CI marker替代全局品質守門。

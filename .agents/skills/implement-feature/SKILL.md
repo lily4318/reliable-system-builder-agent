@@ -101,3 +101,6 @@ Controller保留HTTP/ModelState/結果映射，領域規則放Service，即使DT
 
 ### TD-004｜C#常數、版本化研究規則與分支（TD004-CSHARP-POLICY-BRANCHING-01）
 `const`只用於編譯期不會更改的結構性常數，政策版號/研究規則須具明確版本和未知版拒絕，不能靠改constant讓已編譯消費者自動更新；`readonly`並非深層不可變或自動版本管理。對合成觀測資料先核固定型別、值域及完整性，0和null分離，研究門檻、同意及品質旗標在同版決策；false/null/true需明確分支，不得把unknown != false當作已同意。`&&/||`可能短路，`&/|`仍會評估右側，避免驗證／授權函式藏在運算子副作用中；有混合條件加括號固定優先序。真規則與歷史重算需研究者核准，不能照抄自選合成版v1/v2。原生與完整限制見原訓練覆盤；新C# exact a946d1a2d56732a93ad36b6205527646b5178870 / final CI44851069296 581/581。原HackMD 5.1.7–9正文UNREAD/L0，非真研究或正式產品驗收。
+
+### TD-004｜C#有界迭代及方法輸出契約（TD004-CSHARP-BOUNDED-METHODS-01）
+研究資料的循環批次要先固定可信輸入字典、筆數/步數、缺失/真0、識別碼重複與STOP終止語意；在讀取下一筆前檢查budget，拒絕時不得回傳看似合法的部分合計。foreach/break/continue/while/do和yield finally需核實不同控制流與真正dispose；若後續資料不驗，必明示只在核准的終止契約下成立。以ReadOnlySpan<T>/純函式分離讀取與回寫，ref/out及可變陣列別名的副作用須顯式且失敗輸出具封閉語意；迭代器throw先暫存，全部完成才commit結果。原生CI44852671230 verified 582/582（code57fca56836186dbb317e987dc53bf1964d70bc97），但JSON先完整parse、研究規則/正式交易/真資源不在實驗範圍，教材5.1.10/11原HackMD UNREAD/L0；見原覆盤，非完整教材或真研究驗收。

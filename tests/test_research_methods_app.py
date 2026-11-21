@@ -73,9 +73,43 @@ def _chrome_process_state(proc):
             "T":"STOPPED", "Z":"ZOMBIE", "I":"IDLE"}.get(code,"OTHER")
 
 
+def _chrome_proc_wait_class(proc):
+    # Fixed kernel wait categories only; never expose wchan text or process detail.
+    try:
+        value = (Path("/proc") / str(proc.pid) / "wchan").read_text().strip()
+    except (OSError, ValueError):
+        return "UNAVAILABLE"
+    if "io_schedule" in value or "wait_on_page" in value:
+        return "KERNEL_IO_WAIT"
+    if "futex" in value:
+        return "KERNEL_FUTEX_WAIT"
+    return "OTHER"
+
+
+def _io_pressure_band(sample):
+    # /proc/pressure/io: host pressure is context, not a Chrome root-cause verdict.
+    try:
+        first = next(line for line in sample.splitlines() if line.startswith("some "))
+        avg10 = next(float(item[6:]) for item in first.split() if item.startswith("avg10="))
+        if not 0 <= avg10 <= 100:
+            return "UNAVAILABLE"
+        return "ELEVATED" if avg10 >= 10 else "NOT_ELEVATED"
+    except (StopIteration, ValueError, OverflowError):
+        return "UNAVAILABLE"
+
+
+def _host_io_pressure():
+    try:
+        return _io_pressure_band(Path("/proc/pressure/io").read_text())
+    except OSError:
+        return "UNAVAILABLE"
+
+
 def _chrome_failure_state(proc, portfile):
     profile = "PROFILE_PRESENT" if portfile.parent.is_dir() else "PROFILE_MISSING"
-    return f"process={_chrome_process_state(proc)} profile={profile}"
+    return (f"process={_chrome_process_state(proc)} profile={profile} "
+            f"wait_class={_chrome_proc_wait_class(proc)} "
+            f"host_io_pressure={_host_io_pressure()}")
 
 
 def _wait_devtools_port(proc, portfile, diagnostics, timeout=15):
@@ -229,6 +263,12 @@ class ResearchMethodsTest(unittest.TestCase):
                         except subprocess.TimeoutExpired: proc.kill();proc.wait()
                     if diagnostics is not None: diagnostics.thread.join(.5)
                     server.shutdown();thread.join(5)
+
+    def test_io_pressure_diagnostic_is_categorized_only(self):
+        self.assertEqual(_io_pressure_band("some avg10=0.00 avg60=0.01 total=25"),"NOT_ELEVATED")
+        self.assertEqual(_io_pressure_band("some avg10=14.20 avg60=0.01 total=25"),"ELEVATED")
+        for invalid in ("", "some avg10=malformed", "full avg10=99.00", "some avg10=nan"):
+            self.assertEqual(_io_pressure_band(invalid),"UNAVAILABLE")
 
     def test_chrome_startup_failure_is_classified_without_raw_stderr(self):
         with tempfile.TemporaryDirectory() as tmp:

@@ -423,7 +423,7 @@ class CsharpEventAccessSubscribersTests(unittest.TestCase):
             add(cfg(a="detach",at="C"),[on("A"),on("B"),emit(1)])
             add(cfg(a="attach",at="B"),[on("A"),emit(4),emit(1)])
             add(cfg(a="attach",at="B"),[on("A"),on("B"),emit(1)])
-            add(cfg(a="detach",at="A"),[on("B"),emit(4)])
+            add(cfg(a="detach",at="C"),[on("B"),emit(4)])
             add(cfg(a="reenter",b="throw"),[on("B"),on("A"),emit(4)])
             add(cfg(c="throw"),[on("C"),on("A"),emit(0),emit(5)])
             add(cfg(),[on("B"),off("B"),on("B"),emit(2)])

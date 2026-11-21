@@ -455,7 +455,7 @@ class CsharpEnumInheritanceEventsTests(unittest.TestCase):
             compiler_negative=[
               ('enum One { Ready=1 } enum Two { Ready=1 } '+
                'class Program { static void Main() { One x=Two.Ready; } }',
-               "CS0029"),
+               "CS0266"),
               ('sealed class Base { } class Child:Base { } '+
                'class Program { static void Main(){} }',
                "CS0509"),

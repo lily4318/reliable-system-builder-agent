@@ -104,3 +104,6 @@ Controller保留HTTP/ModelState/結果映射，領域規則放Service，即使DT
 
 ### TD-004｜C#有界迭代及方法輸出契約（TD004-CSHARP-BOUNDED-METHODS-01）
 研究資料的循環批次要先固定可信輸入字典、筆數/步數、缺失/真0、識別碼重複與STOP終止語意；在讀取下一筆前檢查budget，拒絕時不得回傳看似合法的部分合計。foreach/break/continue/while/do和yield finally需核實不同控制流與真正dispose；若後續資料不驗，必明示只在核准的終止契約下成立。以ReadOnlySpan<T>/純函式分離讀取與回寫，ref/out及可變陣列別名的副作用須顯式且失敗輸出具封閉語意；迭代器throw先暫存，全部完成才commit結果。原生CI44852671230 verified 582/582（code57fca56836186dbb317e987dc53bf1964d70bc97），但JSON先完整parse、研究規則/正式交易/真資源不在實驗範圍，教材5.1.10/11原HackMD UNREAD/L0；見原覆盤，非完整教材或真研究驗收。
+
+### TD-004｜C# Array/List與研究批次雙重真值（TD004-CSHARP-ARRAY-LIST-BATCH-01）
+Array.Length固定且Array.Resize替換陣列參考，不會改外部alias；Array.Copy/Clone、new List<T>(array)對class元素只複製參考，真快照須按契約逐層複製/證明不變性。List<T>.Count是有效筆數、Capacity只是目前內部存儲量，不能當業務上限；用獨立maxRows守容量，Add/RemoveAt後查移位及空槽。動態研究batch以全部study/person/wave/attempt或正式核准scope作唯一鍵，合法同分重測不去掉、0≠null；逐項shape/type/range/重複欄、超額、remove不存在時拒絕並禁止輸出部分成品。排序須完整複合tie-break，沒有指明時不可憑List.Sort的穩定性推導固定行序。原生QA40固定＋216獨立Python逐筆oracle、code8c65053aee025b96dcdafc29b80d5fef4cfe362a/CI44854742746 583/583 PASS；本例僅合成in-memory staging，不保證DB ACID或JSON parse前資源界限，原HackMD 5.2.3–4仍UNREAD/L0。詳原覆盤，不可直接套用為真研究規範。

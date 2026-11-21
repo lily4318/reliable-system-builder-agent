@@ -111,3 +111,6 @@ description: "測試網站、驗收功能。qa-uat 角色；交付 qa。"
 
 ### TD-004｜C#迴圈預算、參數副作用及例外隔離 QA（TD004-CSHARP-BOUNDED-METHODS-01）
 至少驗空資料、正好budget、超出budget、STOP於預算前/後、STOP尾端未讀、合法0/null、重複ID、錯shape/型別/值域；檢查status/inspected/valid/missing/sum逐欄，不只比總和，失敗不得回傳部分sum或動原輸入bytes。方法以獨立oracle比ReadOnlySpan純讀、變數ref修改、array alias寫入、out成功/失敗值；用會throw的真iterator驗finally清理及結果尚未提交，以break驗不多拉取。另以原生compiler檢loop scope/缺ref/未賦值out三負例與壞build無DLL，核.NET SDK、NuGet empty feed、不同文化及exact CI checkout。33固定/192獨立Python小域組合及CI44852671230 582/582 verified；此為合成host QA非真DB/網路IO/異步、完整JSON資源界限、原教材或盲測。不可把CI marker替代全局品質守門。
+
+### TD-004｜C#批次陣列／集合逐筆oracle與失敗不洩部分結果（TD004-CSHARP-ARRAY-LIST-BATCH-01）
+驗固定Array長度/Resize與舊alias、Array.Copy/Clone及List拷貝對可變元素淺複製、顯式逐元素deep clone；List的Capacity>=Count但不保證等於Count，刪除不應假設物理縮容。對新合成批次用不同語言/演算法的字典模型，按study/person/visit/attempt完整複合鍵逐列比對排序、增刪、合法同分不同attempt、null與真0；測空/滿/超限、先成功後失敗、錯型、JSON重複屬性、鍵撞及remove不存在，失敗status以外所有資料和容量欄均null。核原JSON bytes、en-US/de-DE輸出、SDK/ref/runtime與empty NuGet feed、不安裝任何三方packages及整個CI checkout SHA。精確tests/test_csharp_array_list_batches.py code8c65053aee025b96dcdafc29b80d5fef4cfe362a，CI44854742746/job136694182855 583/583、40固定+216獨立oracle、原全28步/Chromium/quality success；獨立模型/正式DB交易或真人研究者UAT不在驗證範圍。原教材兩章仍UNREAD/L0。

@@ -107,3 +107,6 @@ Controller保留HTTP/ModelState/結果映射，領域規則放Service，即使DT
 
 ### TD-004｜C# Array/List與研究批次雙重真值（TD004-CSHARP-ARRAY-LIST-BATCH-01）
 Array.Length固定且Array.Resize替換陣列參考，不會改外部alias；Array.Copy/Clone、new List<T>(array)對class元素只複製參考，真快照須按契約逐層複製/證明不變性。List<T>.Count是有效筆數、Capacity只是目前內部存儲量，不能當業務上限；用獨立maxRows守容量，Add/RemoveAt後查移位及空槽。動態研究batch以全部study/person/wave/attempt或正式核准scope作唯一鍵，合法同分重測不去掉、0≠null；逐項shape/type/range/重複欄、超額、remove不存在時拒絕並禁止輸出部分成品。排序須完整複合tie-break，沒有指明時不可憑List.Sort的穩定性推導固定行序。原生QA40固定＋216獨立Python逐筆oracle、code8c65053aee025b96dcdafc29b80d5fef4cfe362a/CI44854742746 583/583 PASS；本例僅合成in-memory staging，不保證DB ACID或JSON parse前資源界限，原HackMD 5.2.3–4仍UNREAD/L0。詳原覆盤，不可直接套用為真研究規範。
+
+### TD-004｜OOP property不變量與研究資料防禦性快照（TD004-CSHARP-OOP-PROPERTY-SNAPSHOT-01）
+封裝不能只靠把setter設為private，若private array透過getter/readonly field或巢狀MutableMeta外洩，外部仍能竄改；constructor與公開屬性getter均需按資料所有權契約deep-copy巢狀集合，尤其是caller後續修改來源/已返回快照。先固定完整constructor/property invariants（null/真0/集合長度/值域/欄位重複），任何batch actions先在deep staged copy驗所有操作，再一次更新資料與revision/封存旗標，error不能發布部分狀態；記憶體rollback不等於資料庫交易或外部事件撤銷。原生驗收code605671ec557303d6b06282e3499e54fa1cfd7f83 +diagnostic-only ba7a418d98df635f0e4264b12cddecd2d0b707a5；CI44856735136 585/585，39固定/512 QA獨立Python逐欄oracle/3compiler負例；第一次Chrome red是獨立環境事件、根因未明。原HackMD 5.3.1–3不可讀L0，不把新合成Stage/Score/Tags當正式研究規則。詳原訓練主檔/覆盤。

@@ -6,6 +6,8 @@
 
 **2026-11-17 使用者明示確認 TD-005-R2：Agent 專業能力提升最高優先，解除首版剩餘驗收對長期專業學習的依賴。原 TD-004 七階段、逐角色/單元 L0–L6、唯一主責、八角色十五技能、教材與真任務雙軌保留；真外部任務、部署、付費、私人資料、正式發布仍另行授權。首版 3/6、未驗門檻獨立延期，不視為通過或批准 Release；停止展示 APP 追加驗收、依原授權停用 Pages，保留分支和證據，最晚 2026-11-24 23:59 Asia/Taipei。停用待 owner UI 操作及回讀，不阻塞訓練。** 詳[決策紀錄](training/DECISION_LOG.md) TD-005-R2、[八角色缺口及實際訓練順序](training/reviews/2026-11-17-capability-evidence-and-postdelivery-learning.md)。以下被取代的原交付順序均留歷史，不作現行 NEXT_ACTION。
 
+- TD-007 CONFIRMED (2026-11-21; AUTONOMOUS_MINIMAL_INTERRUPTION_CROSS_DIALOGUE_DELIVERY): 使用者明示確認「高自主、低干擾、跨對話持續交付能力」為核心**成效**目標：就緒的標準網站＋LINE＋GAS＋Google Sheets 整合以120分鐘內端到端實作與真正驗收為目標（非普遍保證）；在既有授權內自主連續推進、只問必要決策／登入／授權／高風險項目、人工步驟提供精確UI與預期結果；每次有價值對話及實際工作增量保存原正式來源／決策／結果／版本／阻礙／接續點並回讀，下一對話先核真來源與狀態。以可驗證的真功能、完成時間、人工介入次數、錯誤復原及跨任務遷移為成效，不把合成CI等同真網站／真LINE／真人UAT。原TD-004、TD-005-R2、TP-010、八角色十五技能、已完5.3.8–9與後續5.3.10–11 NEXT_ACTION保持；無新增管理引擎、第二主檔、外部部署／真資料／公開／付費／main merge授權。實質訓練優先新合成多服務接續及必要閘／反例的能力遷移，再待另行授權真120分鐘端到端驗收。詳[原決策紀錄](training/DECISION_LOG.md) TD-007。
+
 - CORE_TRAINING_PRINCIPLES (2026-11-17; TD-006 / USER_REQUESTED_CANONICAL_GUIDE): 每輪訓練必讀[核心訓練準則](training/CORE_TRAINING_PRINCIPLES.md)，由原實戰營的啟動/總規則/九技能萃取八項原則，整合已確認 TD-001/002/004/005-R2/TP-010；專業能力與真工作回饋為主，不重做管理。本檔仍唯一正式訓練主檔；核心準則不記進度，不改原 NEXT_ACTION、安全或授權。
 
 - TASK_DOMAIN: RELIABLE_AGENT_ENGINEERING_CAPABILITY_TRAINING

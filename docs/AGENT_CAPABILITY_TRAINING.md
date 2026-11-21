@@ -8,6 +8,8 @@
 
 - TD-007 CONFIRMED (2026-11-21; AUTONOMOUS_MINIMAL_INTERRUPTION_CROSS_DIALOGUE_DELIVERY): 使用者明示確認「高自主、低干擾、跨對話持續交付能力」為核心**成效**目標：就緒的標準網站＋LINE＋GAS＋Google Sheets 整合以120分鐘內端到端實作與真正驗收為目標（非普遍保證）；在既有授權內自主連續推進、只問必要決策／登入／授權／高風險項目、人工步驟提供精確UI與預期結果；每次有價值對話及實際工作增量保存原正式來源／決策／結果／版本／阻礙／接續點並回讀，下一對話先核真來源與狀態。以可驗證的真功能、完成時間、人工介入次數、錯誤復原及跨任務遷移為成效，不把合成CI等同真網站／真LINE／真人UAT。原TD-004、TD-005-R2、TP-010、八角色十五技能、已完5.3.8–9與後續5.3.10–11 NEXT_ACTION保持；無新增管理引擎、第二主檔、外部部署／真資料／公開／付費／main merge授權。實質訓練優先新合成多服務接續及必要閘／反例的能力遷移，再待另行授權真120分鐘端到端驗收。詳[原決策紀錄](training/DECISION_LOG.md) TD-007。
 
+- TD007-DELIVERY-TRANSFER-01 (2026-11-21; SOURCE_AND_TEST_WRITTEN_CI_PENDING): TD-007 確認後，沿原 `workbench_tasks.review` 新增純唯讀 `src/delivery_next_step.py`（code a8ab3d2b0f32315fe3060c2b63473308dc3ea8d3）在有 ready 已授權工作時不提前要求人類同意，僅當下 gate 才提示，RUNNING/RECOVERY_REQUIRED 不接管，DONE 不冒稱真 UAT；新增 `tests/test_delivery_next_step.py`（test code 6c2c28f72dfb231b118b48600bb977c846e50fa3）三方法，合成網站→Sheets→GAS→LINE gate→QA→發布 gate、實際同庫跨Python程序唯讀對帳、失敗修復及在途 owner 隔離，兩檔 GitHub bytes 回讀成功；原 `resume-project`/ `project-control` 技能最小增量已回讀。**此為實質訓練寫入，不代表三項測試或完整 CI 已 PASS，更不代表實際120分鐘／真LINE/GAS/Sheets／LLM跨對話成效。** 實證及未驗詳[原創覆盤](training/reviews/2026-11-21-td007-minimal-interruption-transfer.md)，後續先查最新 HEAD 對應 exact full CI/raw log、修任何真 red；原TD-004 5.3.10/5.3.11及R2不變，不重跑舊實驗。
+
 - CORE_TRAINING_PRINCIPLES (2026-11-17; TD-006 / USER_REQUESTED_CANONICAL_GUIDE): 每輪訓練必讀[核心訓練準則](training/CORE_TRAINING_PRINCIPLES.md)，由原實戰營的啟動/總規則/九技能萃取八項原則，整合已確認 TD-001/002/004/005-R2/TP-010；專業能力與真工作回饋為主，不重做管理。本檔仍唯一正式訓練主檔；核心準則不記進度，不改原 NEXT_ACTION、安全或授權。
 
 - TASK_DOMAIN: RELIABLE_AGENT_ENGINEERING_CAPABILITY_TRAINING

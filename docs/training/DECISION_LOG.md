@@ -1150,3 +1150,10 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 - 已建[本輪覆盤及來源索引](reviews/2026-11-21-td007-minimal-interruption-transfer.md)（commit adf1d169abc62acca4e16813b4bee1c2b7a2776c；原文件blob 763f05ca0eb8b6d72ec06fc56c8b5ce72acb4806 已回讀）。
 - TEST_CI：最新功能版的 full CI/raw logs **尚未確證**；已觀察 Actions 44910697060（中途提交）pending，較早中途提交 cancelled、基線44878908760 SUCCESS 不得冒充新測試成功。後續核本文件版 exact HEAD/run/job/checkout/raw，失敗按根因最小修復，不降低安全／QA門檻。
 - REMOTE_VERIFY：上述 exact GitHub 程式／測試／技能與 review 寫後回讀成功，非本機原生 PASS、真用戶 Step-by-step、跨 ChatGPT 對話或真 LINE/GAS/Sheets/120分鐘達標。NO_DEPLOY、NO_MAIN_MERGE、NO_REAL_PRIVATE_DATA、NO_THIRD_PARTY_INSTALL。NEXT_ACTION 優先核最新候選 CI 並只對新 red 修復，同時保留原5.3.10/5.3.11專業主線。
+
+## TD-007｜兩小時經驗參考與核心目標共識｜2026-11-21（DISCUSSION / PROPOSED）
+- 問題與使用者澄清：第二天技能包曾在約兩小時完成網站、LINE、Google Apps Script 與 Google Sheets 全套設定。使用者明示兩小時是使用經驗，毋須硬性規定，並要求先對核心目標達成共識再續訓。
+- 待確認提案：沿用「高自主、低干擾、跨對話持續交付能力」。以實際跑通使用者所需的整合流程驗收；已授權且可安全執行的工作由 Agent 自主推進，僅在必要決策、本人登入驗證、授權或高風險變更時詢問。人工步驟提供當下操作路徑、欄位、預期結果及卡關的接續方式。每次對話將有保存價值的已確認需求、決策、版本、驗證、未完工作及下一步增量存至原授權位置並回讀；新對話用最新來源續作。
+- 選項與理由：建議保留約兩小時作為使用體驗的觀察參考，按案例記錄實際耗時、外部等待、人工介入、重工與復原，取消固定時間的合格門檻，避免因趕時間犧牲完整性。保留固定 120 分鐘目標為前版文字，待使用者確認此修訂後再同步主檔，保留歷史。
+- 影響與未決：本條只保存待確認共識；TD-004、TD-005-R2、TP-010、八角色十五技能及現有證據沿用。既有 TD007-DELIVERY-TRANSFER-01 已有候選實作與文件回讀；跨新對話、真服務及真人驗收須各以實際證據確認。待使用者就本版核心目標達成共識後續訓，外部部署、正式啟用、私人資料及費用依既有授權。
+- 來源：本輪使用者明示敘述；Draft PR #8 `01730df6776451dc54b4b8ac64312cc530a24ddb` 之原主檔、TD-007 與 TD007-DELIVERY-TRANSFER-01。

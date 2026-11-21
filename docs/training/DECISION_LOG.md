@@ -1168,3 +1168,8 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 - 驗收：`tests/test_csharp_overload_partial.py` 在隔離目錄中以本機空套件來源還原，再編譯跨檔 public partial 類別，由私有共用 helper 保持輸出契約。實際執行八例含 short/int/long/decimal、明確型別的 null 和兩種 token。逐例編譯拒絕模糊 null CS0121、double 無隱含轉換 CS1503、跨檔可見度衝突 CS0262、缺 partial CS0260，還原原碼後重建並重驗相同輸出。
 - 證據：本機 .NET SDK 9.0.200 與 unittest 實跑通過，輸出 `runtime=8 compiler_rejections=4 restored=1`。GitHub 候選提交 CI 待核。指定 HackMD 教材正文未取得，原矩陣 5.3.10/5.3.11 維持 UNREAD／L0，另保存上述官方來源補充實證。原 TD-004、TD-005-R2、TP-010 與八角色十五技能沿用。
 - 蒸餾：合成資料 API 若面對 JSON 解碼、可空值或數值擴寬，先在輸入邊界得到明確型別，再使用多載或依語意命名的方法。跨檔私有成員共享及宣告一致性由原生編譯器驗證。回寫原 `implement-feature` 技能，後續按精確 CI 及實際遷移結果續作。
+
+### 內建瀏覽器回讀與原生驗收
+- 2026-11-21。公開 [5.3.10 多載](https://hackmd.io/@johnsonnote/csharp_vsc_oop_overload) 正文含方法簽章、加法樣例及三種建構子呼叫，共 5 段程式。公開 [5.3.11 部分類別](https://hackmd.io/@johnsonnote/csharp_vsc_oop_partial) 正文含部分宣告合併、三個職責檔案與呼叫端，共 4 段程式。兩頁皆未要求登入。檢查當下分別有 2/6、1/3 附圖已載入，還未取得可固定的原始版本。更正本節前一筆「正文未取得」為當時的查詢結果。現行兩單元已讀可見正文和範例，矩陣狀態碼依原驗證器來源釘選契約暫留 UNREAD/L0，已補 next_action。
+- 原創判斷：多載需把隱含轉換與候選優劣納入判斷，不能只看參數型態完全相等。部分宣告的檔案長度與分拆門檻屬教材慣例，採用時依實際責任邊界。跨檔同名方法依整體類別的多載與簽章規則檢核。既有 `implement-feature` 的編譯正反測可直接追溯。
+- 候選 `03e1fa46eba73a4224d84591dcf6a7bcd81304bf` 的 [CI 44912613181](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/44912613181) job 136871424872、checkout `62343fe30fd3422cec59a852757ebad65d86fc3a` 原始日誌確認 593/593，C# 診斷碼、Chromium 真瀏覽器及品質門檻通過。網頁真服務整合、跨新對話隔離、真人 UAT 與建置實際耗時仍各自待驗。

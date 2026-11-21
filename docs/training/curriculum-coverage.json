@@ -1910,7 +1910,7 @@
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "2026-11-21 以內建瀏覽器公開讀到正文及 5 組程式段。附圖未完整載入，未取得可固定原始版本，故依矩陣規約保留 UNREAD/L0。內容涉及方法與建構子多載；參數隱含轉換、模糊 null 以官方規範和實際編譯器核對。若原始來源固定且補齊附圖，依既有實測更新成熟度，無須重跑已證案例。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },
@@ -1926,7 +1926,7 @@
       "prerequisites": [],
       "maturity": 0,
       "evidence": {},
-      "next_action": "按初步主責，讀完整正文、圖片、範例與必要引用，再核前置依賴與原工程證據；空前置目前為待正文核對，不代表無依賴。",
+      "next_action": "2026-11-21 以內建瀏覽器公開讀到正文及 4 組程式段。附圖未完整載入，未取得可固定原始版本，故依矩陣規約保留 UNREAD/L0。已核實語法與檔案組織慣例的界線；原生實證見 TD004-CSHARP-OVERLOAD-PARTIAL-01。補齊來源後再核剩餘教材階段。",
       "adoption": "UNDECIDED",
       "adoption_reason": null
     },

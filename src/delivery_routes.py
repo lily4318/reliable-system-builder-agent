@@ -1,10 +1,12 @@
-"""Read-only entry for website, booking, and follow-up work in an existing task pool."""
+"""Default delivery entry for a fresh or existing private workbench."""
 import argparse
 import json
 import sqlite3
+import tempfile
+from contextlib import suppress
 from pathlib import Path
 
-from . import delivery_next_step, website_discovery, workbench_tasks
+from . import delivery_next_step, team_workbench, website_discovery, workbench_learning, workbench_tasks
 
 INTENTS = {
     "做網站": "website",
@@ -25,6 +27,32 @@ ROUTES = {
     "resume": ("resume-project", "project-control"),
 }
 REVIEW_REQUIRED = "NEEDS_EXISTING_PROJECT_SCOPE"
+
+
+def initialize_workspace(path, label):
+    """Prepare the complete database privately and install it in a fresh folder."""
+    target = team_workbench.private_root(path)
+    if target.exists():
+        raise FileExistsError("choose a new workspace directory")
+    label = team_workbench._text(label, "project label", 120)
+    with tempfile.TemporaryDirectory(prefix=".rsb-init-", dir=target.parent) as stage:
+        initialized = team_workbench.initialize(Path(stage) / "prepared", label)
+        workbench_tasks.setup(initialized)
+        learning = workbench_learning.setup(initialized)
+        target.mkdir(mode=0o700)
+        try:
+            (initialized / "workbench.sqlite3").rename(target / "workbench.sqlite3")
+        except OSError:
+            with suppress(OSError):
+                target.rmdir()
+            raise
+    return {
+        "status": "WORKSPACE_INITIALIZED",
+        "workspace": str(target),
+        "seeded_case_keys": learning["seeded_case_keys"],
+        "authorization_granted": False,
+        "deployment_verified": False,
+    }
 
 
 def route(intent, snapshot, *, answers=None, stepwise=False):
@@ -82,11 +110,19 @@ def main():
     parser.add_argument("--workspace", type=Path, required=True)
     parser.add_argument("--answers", type=Path)
     parser.add_argument("--stepwise", action="store_true")
+    parser.add_argument("--label", help="Project label for init")
     args = parser.parse_args()
     try:
-        answers = json.loads(args.answers.read_text(encoding="utf-8-sig")) if args.answers else None
-        snapshot = workbench_tasks.review(args.workspace)
-        result = route(args.intent, snapshot, answers=answers, stepwise=args.stepwise)
+        if args.intent == "init":
+            if args.label is None or args.answers is not None or args.stepwise:
+                raise ValueError("init requires --label and a new workspace")
+            result = initialize_workspace(args.workspace, args.label)
+        else:
+            if args.label is not None:
+                raise ValueError("--label is only supported by init")
+            answers = json.loads(args.answers.read_text(encoding="utf-8-sig")) if args.answers else None
+            snapshot = workbench_tasks.review(args.workspace)
+            result = route(args.intent, snapshot, answers=answers, stepwise=args.stepwise)
     except (ValueError, KeyError, TypeError, OSError, sqlite3.Error) as exc:
         parser.exit(2, "DELIVERY_ROUTE_BLOCKED: " + str(exc) + "\n")
     print(json.dumps(result, ensure_ascii=False, indent=2))

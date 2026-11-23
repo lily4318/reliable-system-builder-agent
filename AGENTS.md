@@ -2,6 +2,10 @@
 
 適用此儲存庫。先讀 START_HERE.md、release/current_release.yaml、config/agent-policy.yaml，再讀工作所屬專案的最新正式來源。Agent 自身訓練、方向討論與改善先定位原 Draft PR #8 最新 head，讀該版本 docs/AGENT_CAPABILITY_TRAINING.md 頂部及 docs/training/DECISION_LOG.md；候選訓練不等於正式 main/release。
 
+## 新版預設工作路線
+
+面向使用者先走 [新版交付入口](docs/WEBSITE_BOOKING_DELIVERY.md) 的網站、預約、接續或修復路線，再調用適用技能。首次用全新專案建立乾淨工作區，可用 `src.delivery_routes init`。現有授權與原專案來源仍依以下共同規則。
+
 ## 核心訓練準則（每次必讀）
 
 所有 Agent 自身訓練、改善、方向討論及續作必先實讀 [CORE_TRAINING_PRINCIPLES.md](docs/training/CORE_TRAINING_PRINCIPLES.md)，再依最新主檔/決策、按需角色技能執行。用原準則檢查開工與結案是否真正增加專業能力或改善真工作；不增加管理關卡。此檔為原 TD-001/004、TD-005-R2、TP-010 的長期提煉，不是第二主檔，不擴大授權，不取代共同安全規則。

@@ -5,6 +5,10 @@
 **執行層**：實際工具／瀏覽器／CI／GAS API；沒工具就不能宣稱操作成功。
 **獨立驗證層**：QA、Security、Learning Evaluator 區分模擬與真實驗收。
 
+## 新版交付架構
+
+[單一預設入口](WEBSITE_BOOKING_DELIVERY.md) 選擇網站、預約、接續、修復，依原授權與階段取用八角色與十五項通用技能。首次用一個新工作區保存任務、決策、產物及驗收，既有正式專案仍以原專案來源為準。私人本機用 `src.delivery_routes init` 初始化，REPO_NATIVE 沿用原資料與版本。舊入口方法留於歷史文件及 Git，首次使用採新版交付路線。
+
 ## 自主系統開發能力訓練主軸（獨立候選）
 1. **System Lead** 把未知需求轉成編號條件及可觀察的驗收。**Architect** 規劃元件、相依、資料流與未決假設。**Developer** 提出程式候選。**QA/UAT** 用可重現正負測檢查行為，**DevOps/SRE** 製作回退／CI 計畫，**Security** 提供必要資料邊界，**Learning Evaluator** 比較新舊成果。
 2. 每一階段都能在結構化提交中留下可回讀的 artifact：`requirements`、`architecture`、`plan`、`implementation`、`qa`、`handoffs`、`risk`。任務相依須為無循環 DAG，QA 與程式需回指需求 ID。

@@ -56,7 +56,7 @@ public-context 不接受 --workspace，不建立、遷移、讀取或改寫私�
 ```powershell
 $work = Join-Path $env:LOCALAPPDATA "SystemBuilder-Synthetic-001"
 py -3 -m src.team_workbench skills
-py -3 -m src.team_workbench init --workspace "$work" --label "合成開發專案"
+py -3 -m src.delivery_routes init --workspace "$work" --label "合成開發專案"
 py -3 -m src.team_workbench context --workspace "$work" --skill project-intake
 ```
 

@@ -12,7 +12,9 @@
 
 - TD-007-R1 續作（2026-11-23）：使用者確認重構交付入口及網站／預約路線，沿用既有工程底層，暫不部署。已實跑同一合成學術預約的舊入口與候選 [新操作入口](WEBSITE_BOOKING_DELIVERY.md)。舊版保留 12 個已知答案、只缺 admin，且可跨程序讀回當前決策。新入口補足任務分流及同案端到端本機驗收。實驗、未驗及接續見[差異與實測](training/reviews/2026-11-21-td007-day2-architecture-gap.md)。[全架構換代候選](training/reviews/2026-11-23-full-architecture-candidate.md) 待確認。後續優先以不同合成案例驗移轉與實際新對話；外部服務與部署需另授權。
 
-- 全架構換代驗證（2026-11-23；SYNTHETIC_SQLITE_REHEARSAL_VERIFIED / CUTOVER_PENDING_USER）：合成副本的 SQLite 備份、邏輯匯入及切換前快照還原等價（11 表、39 筆），包含修訂、綁定、決策、驗收與接續守門。本機 4 項通過。已重現主檔複製漏 WAL 決策、遺漏綁定誤判有效、附件需另搬、舊 owner 雙寫、回退丟失切換後驗收及決策。全新 schema、切換後紀錄回補及真 ACL 待驗；全面換代由使用者決定。詳[原候選覆盤](training/reviews/2026-11-23-full-architecture-candidate.md)。
+- 新版乾淨啟用（2026-11-23；USER_APPROVED_CLEAN_START）：使用者表示舊代尚未開始使用，核准直接採用新版作為首次工作入口。Draft PR #8 已以[新版交付入口](WEBSITE_BOOKING_DELIVERY.md)接手，支援空白私人工作區一次初始化，再進網站、預約、接續、修復。原角色、技能、訓練歷史、權限與工程契約沿用。舊資料搬移、雙寫與回退演練按含使用中資料的歷史情境保存。本輪驗收詳[原覆盤](training/reviews/2026-11-23-full-architecture-candidate.md)；下一步是第一次實際使用的工作成果及獨立新對話驗收，正式發布另依原授權。
+
+- 全架構換代驗證（2026-11-23；SYNTHETIC_SQLITE_REHEARSAL_VERIFIED / HISTORICAL_MIGRATION_SCENARIO）：合成副本的 SQLite 備份、邏輯匯入及切換前快照還原等價（11 表、39 筆），包含修訂、綁定、決策、驗收與接續守門。本機 4 項通過。已重現主檔複製漏 WAL 決策、遺漏綁定誤判有效、附件需另搬、舊 owner 雙寫、回退丟失切換後驗收及決策。全新 schema、切換後紀錄回補及真 ACL 仍屬既有工作台遷移情境。首次使用決策以本段上方記錄為準。詳[原候選覆盤](training/reviews/2026-11-23-full-architecture-candidate.md)。
 
 - TD007-DELIVERY-TRANSFER-01 (2026-11-21; SOURCE_AND_TEST_WRITTEN_CI_PENDING): TD-007 確認後，沿原 `workbench_tasks.review` 新增純唯讀 `src/delivery_next_step.py`（code a8ab3d2b0f32315fe3060c2b63473308dc3ea8d3）在有 ready 已授權工作時不提前要求人類同意，僅當下 gate 才提示，RUNNING/RECOVERY_REQUIRED 不接管，DONE 不冒稱真 UAT；新增 `tests/test_delivery_next_step.py`（test code 6c2c28f72dfb231b118b48600bb977c846e50fa3）三方法，合成網站→Sheets→GAS→LINE gate→QA→發布 gate、實際同庫跨Python程序唯讀對帳、失敗修復及在途 owner 隔離，兩檔 GitHub bytes 回讀成功；原 `resume-project`/ `project-control` 技能最小增量已回讀。**此為實質訓練寫入，不代表三項測試或完整 CI 已 PASS，更不代表實際120分鐘／真LINE/GAS/Sheets／LLM跨對話成效。** 實證及未驗詳[原創覆盤](training/reviews/2026-11-21-td007-minimal-interruption-transfer.md)，後續先查最新 HEAD 對應 exact full CI/raw log、修任何真 red；原TD-004 5.3.10/5.3.11及R2不變，不重跑舊實驗。
 

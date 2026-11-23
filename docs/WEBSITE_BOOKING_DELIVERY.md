@@ -1,6 +1,6 @@
 # 網站與預約交付
 
-適用 Draft PR #8 的候選操作入口。先查原專案、版本、已確認規格、既有工作紀錄及當前權限。沿用共同規則、資料權責與發布門檻。
+適用 Draft PR #8 的新版預設操作入口。先查原專案、版本、已確認規格、既有工作紀錄及當前權限。沿用共同規則、資料權責與發布門檻。
 
 | 使用者的話 | 入口 | 交付證據 |
 | --- | --- | --- |
@@ -13,12 +13,13 @@
 自然語言由 Agent 解析，命令列接受表內字詞或英文入口 ID。在有授權的私人工作台，用已確認工作包中的 `website-`、`booking-` 或 `repair-` 任務 ID 明示分流。舊任務仍可走 resume。現有專案若只有原 repo，從原規格、版本及進度檔採用同一分流原則。
 
 ```text
+python -m src.delivery_routes init --workspace <新私人資料夾路徑> --label <專案名稱>
 python -m src.delivery_routes website --workspace <已授權工作區> --answers <現有答案.json>
 python -m src.delivery_routes booking --workspace <已授權工作區>
 python -m src.delivery_routes resume --workspace <已授權工作區> --stepwise
 ```
 
-命令唯讀回傳可先做的任務、當前需確認的事項及建議技能。施工仍使用工作台原 start／finish、權限驗證、相依與版本。新站無既有工作包時，入口以原訪談規格預填，只列未答欄位並保留整份規格審閱。接續時先讀既有 scope、已交付成品和狀態，驗證之後才選下個步驟。
+首次使用，在已有父目錄的私人位置選全新子資料夾，執行 init。成功回傳 WORKSPACE_INITIALIZED，並準備工作台、任務和學習紀錄。既有資料夾會拒絕初始化。website、booking、resume、repair 命令唯讀回傳可先做的任務、當前需確認的事項及建議技能。施工仍使用工作台原 start／finish、權限驗證、相依與版本。新站無既有工作包時，入口以原訪談規格預填，只列未答欄位並保留整份規格審閱。接續時先讀既有 scope、已交付成品和狀態，驗證之後才選下個步驟。
 
 ## 網站路線
 

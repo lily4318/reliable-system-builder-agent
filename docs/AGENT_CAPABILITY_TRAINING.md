@@ -22,6 +22,8 @@
 
 - TD004-CSHARP-OVERLOAD-PARTIAL-01（2026-11-21）：5.3.10／5.3.11 已新增離線合成計分 API 的原生實作及測試，由 .NET 編譯器驗八個實際結果、四項精確拒絕與還原後重新建置。本機 .NET SDK 9.0.200 與 unittest 實跑通過，輸出 `runtime=8 compiler_rejections=4 restored=1`。已比對 Microsoft C# 規範與指南，內建瀏覽器已公開讀到 5.3.10 與 5.3.11 的正文及程式段，無登入或授權需求。因部分附圖未載入、原始版本尚未固定，教材矩陣暫留原狀態碼與 L0，並更新每節的來源接續說明。 候選 `03e1fa46eba73a4224d84591dcf6a7bcd81304bf` 的 [CI 44912613181](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/44912613181) job 136871424872、checkout `62343fe30fd3422cec59a852757ebad65d86fc3a` 原始日誌確認 593/593，C# 診斷碼、Chromium 真瀏覽器及品質門檻通過。
 
+- TD-004 專業差距核對（2026-11-23）：使用者重申 C#、MVC、SQL 原教材之嚴謹程式與架構為核心。直接核對 60 單元有 12 READABLE、48 UNREAD、0 L3 以上；另有真 .NET／MVC／PostgreSQL／SQLite 的工程證據。待補指定教材逐章對照、原 T-SQL 原生及陌生完整專案實作與驗收。原矩陣等級未改，具體下一輪列建議。[差距覆盤](training/reviews/2026-11-23-csharp-mvc-sql-capability-gap.md)。
+
 - CORE_TRAINING_PRINCIPLES (2026-11-17; TD-006 / USER_REQUESTED_CANONICAL_GUIDE): 每輪訓練必讀[核心訓練準則](training/CORE_TRAINING_PRINCIPLES.md)，由原實戰營的啟動/總規則/九技能萃取八項原則，整合已確認 TD-001/002/004/005-R2/TP-010；專業能力與真工作回饋為主，不重做管理。本檔仍唯一正式訓練主檔；核心準則不記進度，不改原 NEXT_ACTION、安全或授權。
 
 - TASK_DOMAIN: RELIABLE_AGENT_ENGINEERING_CAPABILITY_TRAINING

@@ -24,6 +24,13 @@ jobs:
           python-version: "3.12"
       - name: Offline unit tests
         run: python -m unittest discover -s tests -v
+      - name: Synthetic waitlist HTTP and SQLite integration
+        env:
+          WAITLIST_TARGET_FRAMEWORK: net10.0
+        run: |
+          dotnet build examples/dotnet-waitlist/Waitlist.csproj -p:WaitlistTargetFramework=net10.0
+          python examples/dotnet-waitlist/verify_waitlist.py
+
       - name: List skill catalog (offline)
         run: python -m src.team_workbench skills
       - name: Public artifacts and privacy scan

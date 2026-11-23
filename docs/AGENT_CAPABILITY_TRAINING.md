@@ -978,3 +978,15 @@ CI 僅驗證離線題目產生與**合成**匯入協定；合成正例即使結�
 - 2026-11-17 使用者明示確認 TD-005-R2：Agent 專業能力提升最高優先，解除首版剩餘驗收對長期專業學習的依賴。原 TD-004 七階段、逐角色/單元 L0–L6、唯一主責、八角色十五技能、教材與真任務雙軌保留；真外部任務、部署、付費、私人資料、正式發布仍另行授權。首版 3/6、未驗門檻獨立延期，不視為通過或批准 Release；停止展示 APP 追加驗收、依原授權停用 Pages，保留分支和證據，最晚 2026-11-24 23:59 Asia/Taipei。停用待 owner UI 操作及回讀，不阻塞訓練。
 - C3 曾明示授權且已完成 v1 部署；專用 branch pages-td005-acceptance head b732a50171aacebfab6d99b34c8568bb6dc0ea0d/tree bcd8521164803fc23c2458d24e6382db672266e9，Pages run 44016972755 success，artifact 14299571063，先前實際下載 ZIP SHA256 72920dc0847523bfe23a352caafbc006945f2e8866a5b1f2d0b99205ba784ca4 及四檔一致。使用者 UI source saved/branch root/HTTPS。原 GET helper 2026-11-17T04:28:15.606Z 三資產及負路徑均 TypeError Failed to fetch，無 HTTP/body/hash；CORS 或網路原因未證，非網站故障結論。Work cloud browser 無操作工具。C4 PARTIAL/REMOTE_BROWSER_BLOCKED，線上 HTTPS/200、404、三資產 bytes、DOM/CSV、安全仍未完整驗；C5/C6 NOT_RUN，A07 source-only PARTIAL，B10 independent beginner pending，file:// NOT_TESTED/NOT_PROMISED，M4 未授權。M1/M2-1/M3-1 已完成，3/6。現查 repo has_pages=true、head 未變；owner 至 Settings→Pages→Deploy from a branch→Branch None→Save（若實際 UI 提供 Unpublish site，先核對同 repo 後停用），保留 branch。不推 v2、不刪分支、不改預算。查 has_pages/source 及公開 URL 是否仍可用；網路工具受限則分開標 URL 未證。停站待 owner 操作，無自動到期停用保證。
 - 八角色盤點及 P0–P5 詳原覆盤新增段落；本輪未執行新 lab、教材全文閱讀、外部任務或能力升級。
+
+## 2026-11-23｜確認五項核心訓練目標與優先序
+
+使用者正式確認以下優先序。
+
+1. 深入原 C#、MVC、SQL 教材，能用精確寫法處理正常、邊界和失敗條件。
+2. 分清請求、業務規則和資料責任，以陌生需求與中途規格改動驗證架構能否維護。
+3. 交付可驗收的完整網站及預約流程，包含需求所需的前後台與 LINE、GAS、Google Sheets。
+4. 由 Agent 依既有八角色十五技能自主完成可行工作，只在必要決策或授權時逐步引導使用者。
+5. 每次對話增量保存決策、版本、驗收、阻礙及下一步，使新對話能接續，並讓實質錯誤成為回歸案例。
+
+兩小時依 TD-007-R1 作經驗參照。第一段以合成候補遞補驗證 TD-004 的跨層應用，暫不部署。詳[實作與驗收覆盤](training/reviews/2026-11-23-waitlist-first-slice.md)。

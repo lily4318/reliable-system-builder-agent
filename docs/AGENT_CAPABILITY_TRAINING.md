@@ -990,3 +990,5 @@ CI 僅驗證離線題目產生與**合成**匯入協定；合成正例即使結�
 5. 每次對話增量保存決策、版本、驗收、阻礙及下一步，使新對話能接續，並讓實質錯誤成為回歸案例。
 
 兩小時依 TD-007-R1 作經驗參照。第一段以合成候補遞補驗證 TD-004 的跨層應用，暫不部署。詳[實作與驗收覆盤](training/reviews/2026-11-23-waitlist-first-slice.md)。
+
+[CI 45204122916](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/45204122916) job 137795101306 原始日誌核對：實作提交 `ffdb3d18d3f18ea22b3af4f46d0280f031f30a01` 與 PR merge checkout 的檔案差異為零。.NET 10 建置後真 HTTP／SQLite 五項全過，既有 602 項測試及品質守門通過。Windows .NET 9 直接呼叫控制器與 SQLite 的補充測試通過，HTTP 連線在該環境受限。三節教材正文的文字指紋增量記入原矩陣，合計 26 項文字可讀、137 未讀、13 缺件，三節維持 L0，附圖、原 SQL Server 及獨立能力驗收待驗。

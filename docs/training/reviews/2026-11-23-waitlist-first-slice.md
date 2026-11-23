@@ -12,4 +12,6 @@
 
 ASP.NET Core MVC POST `/bookings/{id}/cancel` 進入型別化介面，資料層用有條件的參數化 SQL、交易和每場唯一確認席次索引。取消回執讓重送回傳當時遞補結果，即使無人遞補也可辨識重送。[專案與測試](../../../examples/dotnet-waitlist/)
 
-驗證方法為先建置 `dotnet build examples/dotnet-waitlist/Waitlist.csproj`，再執行 `python examples/dotnet-waitlist/verify_waitlist.py`。合成案例涵蓋按序、同序取 ID、跳過不合格、無合格者、無效或非確認預約、同筆取消併發與在回執寫入處觸發回滾。Windows SDK 9.0.200 實際編譯零警告零錯誤，限制環境回送 HTTP 回報 WinError 10013，HTTP 成效待候選 CI 驗證。範圍是合成資料庫和本機 MVC 入口，正式資格覆核、後台登入、外部通知、部署及獨立能力驗收皆待各自驗證。
+驗證方法為先建置 `dotnet build examples/dotnet-waitlist/Waitlist.csproj`，再執行 `python examples/dotnet-waitlist/verify_waitlist.py`。合成案例涵蓋按序、同序取 ID、跳過不合格、無合格者、無效或非確認預約、同筆取消併發與在回執寫入處觸發回滾。Windows SDK 9.0.200 實際編譯零警告零錯誤，限制環境回送 HTTP 回報 WinError 10013，HTTP 以候選 CI 驗證。範圍是合成資料庫和本機 MVC 入口，正式資格覆核、後台登入、外部通知、部署及獨立能力驗收皆待各自驗證。
+
+[CI 45204122916](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/45204122916) job 137795101306 原始日誌核對：實作提交 `ffdb3d18d3f18ea22b3af4f46d0280f031f30a01` 與 PR merge checkout 的檔案差異為零。.NET 10 建置後真 HTTP／SQLite 五項全過，既有 602 項測試及品質守門通過。Windows .NET 9 直接呼叫控制器與 SQLite 的補充測試通過，HTTP 連線在該環境受限。三節教材正文的文字指紋增量記入原矩陣，合計 26 項文字可讀、137 未讀、13 缺件，三節維持 L0，附圖、原 SQL Server 及獨立能力驗收待驗。

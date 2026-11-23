@@ -6,13 +6,41 @@ public enum CancellationStatus { Completed, Missing, NotConfirmed }
 
 public sealed record CancellationResult(CancellationStatus Status, long? PromotedBookingId = null);
 
+public enum EligibilityReviewStatus { Updated, Missing, NotWaiting }
+
 public interface IWaitlistStore
 {
     CancellationResult CancelAndPromote(long bookingId);
+    EligibilityReviewStatus ReviewEligibility(long bookingId, bool eligible);
 }
 
 public sealed class SqliteWaitlistStore(string connectionString) : IWaitlistStore
 {
+    public EligibilityReviewStatus ReviewEligibility(long bookingId, bool eligible)
+    {
+        using var connection = new SqliteConnection(connectionString);
+        connection.Open();
+        using var transaction = connection.BeginTransaction(deferred: false);
+        using var command = connection.CreateCommand();
+        command.Transaction = transaction;
+        command.Parameters.AddWithValue("$id", bookingId);
+        command.Parameters.AddWithValue("$eligible", eligible ? 1 : 0);
+        command.CommandText = """
+            UPDATE booking SET eligible = $eligible
+            WHERE id = $id AND status = 'waiting'
+            """;
+        if (command.ExecuteNonQuery() == 1)
+        {
+            transaction.Commit();
+            return EligibilityReviewStatus.Updated;
+        }
+
+        command.CommandText = "SELECT 1 FROM booking WHERE id = $id";
+        return command.ExecuteScalar() is null
+            ? EligibilityReviewStatus.Missing
+            : EligibilityReviewStatus.NotWaiting;
+    }
+
     public CancellationResult CancelAndPromote(long bookingId)
     {
         using var connection = new SqliteConnection(connectionString);

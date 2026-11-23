@@ -22,15 +22,15 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - name: Publish and run the synthetic waitlist in isolated staging
+        run: |
+          stage="$RUNNER_TEMP/waitlist-staging"
+          dotnet publish examples/dotnet-waitlist/Waitlist.csproj -c Release -p:WaitlistTargetFramework=net10.0 --output "$stage"
+          cp examples/dotnet-waitlist/schema.sql "$stage/"
+          git rev-parse HEAD > "$stage/SOURCE_COMMIT"
+          WAITLIST_DLL="$stage/Waitlist.dll" python examples/dotnet-waitlist/verify_waitlist.py
       - name: Offline unit tests
         run: python -m unittest discover -s tests -v
-      - name: Synthetic waitlist HTTP and SQLite integration
-        env:
-          WAITLIST_TARGET_FRAMEWORK: net10.0
-        run: |
-          dotnet build examples/dotnet-waitlist/Waitlist.csproj -p:WaitlistTargetFramework=net10.0
-          python examples/dotnet-waitlist/verify_waitlist.py
-
       - name: List skill catalog (offline)
         run: python -m src.team_workbench skills
       - name: Public artifacts and privacy scan
@@ -78,6 +78,13 @@ jobs:
         run: python -m src.independent_acceptance evaluate --output output/recovery-acceptance.json
       - name: Candidate quality baseline and safety gate
         run: python -m src.quality_gate check --output output/quality-gate.json
+      - name: Retain verified waitlist staging package
+        uses: actions/upload-artifact@v4
+        with:
+          name: waitlist-staging-${{ github.sha }}
+          path: ${{ runner.temp }}/waitlist-staging/
+          if-no-files-found: error
+          retention-days: 14
       - name: Attach non-sensitive evaluation report
         if: always()
         uses: actions/upload-artifact@v4

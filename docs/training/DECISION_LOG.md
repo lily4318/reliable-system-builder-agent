@@ -1223,3 +1223,13 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 兩小時依 TD-007-R1 作經驗參照。第一段以合成候補遞補驗證 TD-004 的跨層應用，暫不部署。詳[實作與驗收覆盤](reviews/2026-11-23-waitlist-first-slice.md)。
 
 [CI 45204122916](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/45204122916) job 137795101306 原始日誌核對：實作提交 `ffdb3d18d3f18ea22b3af4f46d0280f031f30a01` 與 PR merge checkout 的檔案差異為零。.NET 10 建置後真 HTTP／SQLite 五項全過，既有 602 項測試及品質守門通過。Windows .NET 9 直接呼叫控制器與 SQLite 的補充測試通過，HTTP 連線在該環境受限。三節教材正文的文字指紋增量記入原矩陣，合計 26 項文字可讀、137 未讀、13 缺件，三節維持 L0，附圖、原 SQL Server 及獨立能力驗收待驗。
+
+## 2026-11-24｜候補資格覆核與取消遞補驗收
+
+使用者授權在合成候補專案加入管理員資格覆核、驗證競寫並部署最新進度。管理員 API `PUT /admin/bookings/{id}/eligibility` 以環境配置的管理金鑰限制存取，僅更新仍候補的預約。覆核和取消都在 SQLite 取得寫入權後讀寫，以交易順序為準。覆核先提交時，取消依最新資格遞補。取消先確認該候補者時，後到的覆核回應 409。既有取消回執持續以原結果回應重送。
+
+[GitHub Actions 45209255282](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/45209255282) job 137813278769 全部成功。實作提交 `0719d305fa8e223d87ca9d54e46d400ae8c195cf` 與實際合併檢查版本 `0a304401a3b14b418987ad01f5cc81b782b0bcb2` 的檔案差異為零。原始日誌確認隔離環境 .NET 10 Release 的真 HTTP／SQLite 9 項通過，含資格生效、撤銷、拒絕未授權或無效覆核、兩則同步請求的狀態與回執、既有回滾及重送案例。既有 602 項回歸及品質守門通過。
+
+通過後保存並成功取得 [發布套件](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/45209255282/artifacts/14835363248)（artifact 14835363248，GitHub ZIP SHA256 `4d62ede9f0d442fd8180b50357c97fef04f9df40cfdf90e1a73d5eced5c8c990`）。隔離環境啟動時使用合成資料，程序已隨驗收結束。repo 未配置此專案的常駐 .NET 部署目標，對外可用網址待目標確定。管理金鑰為隔離 API 的共用憑證，後台頁面、個別管理員身分與正式營運驗收待驗。
+
+詳[驗收覆盤](reviews/2026-11-23-waitlist-first-slice.md)。

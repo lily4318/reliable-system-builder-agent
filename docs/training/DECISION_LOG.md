@@ -1243,3 +1243,8 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 - **替代方案與理由**：B「全 GAS＋Sheets」可作極小低併發原型，但有執行與配額、交易與持久性邊界，不作可持續預約主系統的預設。C「原生 Android/iOS + 微服務」在尚無裝置原生需求／多獨立團隊與容量證據下增加交付、驗收及維護成本，暫不採。官方參考：Microsoft .NET 10 LTS（https://learn.microsoft.com/en-us/dotnet/core/releases-and-support）；ASP.NET Core 單體應用架構（https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/）；LINE webhook 驗簽／可能重送（https://developers.line.biz/en/docs/messaging-api/receiving-messages/）；Apps Script 配額（https://developers.google.com/apps-script/guides/services/quotas）。
 - **評估及後續**：先依實際 APP 功能、使用者／管理者角色、資料敏感度、離線／推播／裝置需求與預期成本精化；正式決策須使用者確認。優先以現有合成候補範例驗「UI／業務層／資料層／通知出站／回執」可交付切片與高自主接續，獨立檢查安全、負例、併發、對帳與不重問已知答案；現有 .NET 合成測試不重做。120 分鐘是效率經驗參照，非保證或發布門檻。無 main merge、外部部署、付費或真私人資料授權；本筆僅記錄提案。
 
+### 2026-11-25｜使用者澄清：先做功能與頁面架構，不先做技術選型
+- 使用者明確澄清本次「APP 開發架構」是撰寫程式前的基本系統設計圖：有哪些頁面、給誰使用、每頁提供什麼功能；不是先選語言、框架、資料庫或部署。前一筆技術架構僅為未核准參考，不是本輪交付需求，保留歷史。
+- 建議由 Architect 沿原 requirements-spec / architecture-design，先從目標與角色→使用案例→功能分解→頁面樹／導覽→角色權限矩陣→主要與例外操作流程→頁面規格與驗收條件；確認必要規格後才做資料與技術設計。功能不必一對一對應頁面，按角色任務與業務責任分組，不強迫所有 APP 有會員、後台或預約功能。這是本輪工作範圍澄清；是否升為所有專案固定產物及其粒度仍待確認，不改現行八角色十五技能或 TD-004/TD-005-R2/TD-007-R1。
+- 目前未指定實際 APP 用途及對象，僅以通用框架和合成預約案例示例；未擅自確定頁面、角色、技術或產品範圍。下一步以使用者提供的一句 APP 目標及必要限制產出初版角色—功能—頁面架構圖，將未知列為可調整假設，避免逐項追問。無部署、正式發布或外部專案寫入。
+

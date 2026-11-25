@@ -1233,3 +1233,13 @@ NATIVE-DEVOPS-025 最終驗收：精確候選 c8639498064a0138f1da22dca614e28345
 通過後保存並成功取得 [發布套件](https://github.com/lily4318/reliable-system-builder-agent/actions/runs/45209255282/artifacts/14835363248)（artifact 14835363248，GitHub ZIP SHA256 `4d62ede9f0d442fd8180b50357c97fef04f9df40cfdf90e1a73d5eced5c8c990`）。隔離環境啟動時使用合成資料，程序已隨驗收結束。repo 未配置此專案的常駐 .NET 部署目標，對外可用網址待目標確定。管理金鑰為隔離 API 的共用憑證，後台頁面、個別管理員身分與正式營運驗收待驗。
 
 詳[驗收覆盤](reviews/2026-11-23-waitlist-first-slice.md)。
+
+## 2026-11-25｜APP 開發參考架構提案（DISCUSSION / NOT_APPROVED）
+
+- **問題與假設**：使用者要求「依目前 Agent 訓練建議 APP 開發架構」，尚未指定 APP 的實際用途、平台、多人規模或是否指 Agent 管理介面。本筆以「需具網站／預約／LINE／GAS／Sheets 整合的業務 APP」作為可調整的參考情境；若指 Agent 操作 APP，採獨立開發控制層，並非混合正式業務資料與公開 Agent repo。此為架構建議、非使用者核准或已實作。
+- **已核來源**：原唯一訓練主檔 docs/AGENT_CAPABILITY_TRAINING.md（TD-004、TD-005-R2、TD-007-R1，2026-11-23 五項核心目標）、原決策紀錄、docs/training/CORE_TRAINING_PRINCIPLES.md、docs/ARCHITECTURE.md、docs/WEBSITE_BOOKING_DELIVERY.md、2026-11-23 的 C#／MVC／SQL 差距及候補範例覆盤。Draft PR #8 候選未合併 main，原生 .NET／SQLite 真 HTTP／交易測試不能視為外部 APP 已交付或新對話獨立能力已驗。
+- **建議 A（首選，未核准）**：第一階段使用可維護的**模組化單體**。響應式 Web／PWA、ASP.NET Core 10 MVC（後台）與必要的版本化 API（表單／手機）；程式分 Presentation / Application use-cases / Domain / Infrastructure，業務功能按模組界線（身分權限、預約、通知、報表、稽核）拆分；正式交易主資料放 PostgreSQL，受控本機案例可用 SQLite，透過 migration、約束與交易保護；LINE webhook 驗簽、事件去重、持久化回條／outbox／背景 worker；GAS／Sheets 作外部適配器或報表而非多使用者預約的唯一真實資料來源。最初避免不必要的 Kubernetes、微服務、雙前端與全量事件溯源。若未來需要原生裝置能力再評估 MAUI／React Native 共用 API。
+- **Agent 開發控制層**：沿用現有 Python 交付路由、工作台 SQLite、八角色十五技能及原專案 GitHub 來源；任務／決策／產物／測試／授權閘及跨對話接續與業務 APP 資料庫**邏輯隔離**。Agent 先產生需求→版本化架構／程式→隔離測試→CI→精確遠端對帳→人工准入／正式 UI UAT。無真工具／權限不可宣稱已操作或正式發布；未知 POST 先唯讀對帳。
+- **替代方案與理由**：B「全 GAS＋Sheets」可作極小低併發原型，但有執行與配額、交易與持久性邊界，不作可持續預約主系統的預設。C「原生 Android/iOS + 微服務」在尚無裝置原生需求／多獨立團隊與容量證據下增加交付、驗收及維護成本，暫不採。官方參考：Microsoft .NET 10 LTS（https://learn.microsoft.com/en-us/dotnet/core/releases-and-support）；ASP.NET Core 單體應用架構（https://learn.microsoft.com/en-us/dotnet/architecture/modern-web-apps-azure/）；LINE webhook 驗簽／可能重送（https://developers.line.biz/en/docs/messaging-api/receiving-messages/）；Apps Script 配額（https://developers.google.com/apps-script/guides/services/quotas）。
+- **評估及後續**：先依實際 APP 功能、使用者／管理者角色、資料敏感度、離線／推播／裝置需求與預期成本精化；正式決策須使用者確認。優先以現有合成候補範例驗「UI／業務層／資料層／通知出站／回執」可交付切片與高自主接續，獨立檢查安全、負例、併發、對帳與不重問已知答案；現有 .NET 合成測試不重做。120 分鐘是效率經驗參照，非保證或發布門檻。無 main merge、外部部署、付費或真私人資料授權；本筆僅記錄提案。
+

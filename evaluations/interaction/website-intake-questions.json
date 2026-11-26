@@ -1,0 +1,88 @@
+{
+  "schema_version": 1,
+  "language": "zh-TW",
+  "scope": "website_creation_before_design",
+  "question_count": 13,
+  "questions": [
+    {
+      "id": "purpose",
+      "number": 1,
+      "prompt": "網站目的、成功判準與首要問題是什麼？",
+      "can_answer_unknown": true
+    },
+    {
+      "id": "audience",
+      "number": 2,
+      "prompt": "主要使用者與管理人員有哪些類型及不同權限？",
+      "can_answer_unknown": true
+    },
+    {
+      "id": "journey",
+      "number": 3,
+      "prompt": "使用者最重要的 1–3 條操作流程是什麼？",
+      "can_answer_unknown": true
+    },
+    {
+      "id": "pages",
+      "number": 4,
+      "prompt": "有哪些必備頁面、內容和現有素材？",
+      "can_answer_unknown": true
+    },
+    {
+      "id": "identity",
+      "number": 5,
+      "prompt": "需要登入、身分確認及角色權限嗎？",
+      "can_answer_unknown": true
+    },
+    {
+      "id": "forms",
+      "number": 6,
+      "prompt": "需收集哪些資料、表單欄位或檔案？",
+      "can_answer_unknown": true
+    },
+    {
+      "id": "slots",
+      "number": 7,
+      "prompt": "有報名、預約、名額、候補、改期或取消規則嗎？",
+      "can_answer_unknown": true
+    },
+    {
+      "id": "notice",
+      "number": 8,
+      "prompt": "哪些事件需要通知、由誰接收、使用何種管道？",
+      "can_answer_unknown": true
+    },
+    {
+      "id": "admin",
+      "number": 9,
+      "prompt": "管理員需執行哪些後台、審核及查詢工作？",
+      "can_answer_unknown": true
+    },
+    {
+      "id": "privacy",
+      "number": 10,
+      "prompt": "涉及什麼個資、同意、保留期限或相關核准？",
+      "can_answer_unknown": true
+    },
+    {
+      "id": "integrations",
+      "number": 11,
+      "prompt": "有既有網域、GitHub、主機、資料庫或第三方系統嗎？",
+      "can_answer_unknown": true
+    },
+    {
+      "id": "experience",
+      "number": 12,
+      "prompt": "期待的視覺風格、語言、手機及無障礙需求是什麼？",
+      "can_answer_unknown": true
+    },
+    {
+      "id": "release",
+      "number": 13,
+      "prompt": "預算、時程、首版範圍、驗收者與後續維護是什麼？",
+      "can_answer_unknown": true
+    }
+  ],
+  "initial_question_cap": 15,
+  "requires_user_spec_confirmation": true
+}

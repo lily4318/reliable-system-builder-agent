@@ -1,0 +1,124 @@
+{
+  "schema_version": 1,
+  "language": "zh-TW",
+  "examples_only": true,
+  "no_automatic_account_or_settings_changes": true,
+  "workflows": [
+    {
+      "id": "github_signup",
+      "title": "建立個人 GitHub 帳號（只有使用者自行操作）",
+      "prerequisite": "個人的電子郵件帳號；不將密碼或驗證碼交給 Agent。",
+      "steps": [
+        {
+          "number": 1,
+          "action": "在瀏覽器打開 https://github.com/signup。",
+          "verification": "看到 GitHub 註冊頁；若已有帳號可改登入。"
+        },
+        {
+          "number": 2,
+          "action": "依頁面指示輸入自己的電子郵件並建立密碼與使用者名稱。",
+          "verification": "頁面接受輸入並提供下一步；不要在聊天提供密碼。"
+        },
+        {
+          "number": 3,
+          "action": "依照 GitHub 畫面完成寄至個人電子郵件的驗證及必要的註冊確認步驟。",
+          "verification": "完成驗證後應能以新帳號登入 GitHub，並看到個人首頁。"
+        },
+        {
+          "number": 4,
+          "action": "進入 GitHub 個人頭像 → Settings → Password and authentication。",
+          "verification": "看到帳號安全與 Two-factor authentication 選項（介面文字可能改變）。"
+        },
+        {
+          "number": 5,
+          "action": "依 GitHub 提示啟用可用的雙因素驗證並自行保管復原碼。",
+          "verification": "帳號安全頁顯示 2FA 已啟用；不要傳送復原碼。"
+        },
+        {
+          "number": 6,
+          "action": "回到 GitHub 首頁，按個人頭像確認目前登入的是預期的使用者帳號。",
+          "verification": "僅提供非敏感的 GitHub 使用者名稱或個人頁面 URL 作為完成證據。"
+        }
+      ]
+    },
+    {
+      "id": "github_repository",
+      "title": "建立專用的 GitHub Repository（未授權時只教學）",
+      "prerequisite": "已登入正確 GitHub 帳號，確認 Repo 名稱、用途與 Public／Private 選項。",
+      "steps": [
+        {
+          "number": 1,
+          "action": "在 GitHub 右上角選擇 ＋ → New repository。",
+          "verification": "應顯示建立儲存庫畫面，其中包含 Owner、名稱與可見性設定。"
+        },
+        {
+          "number": 2,
+          "action": "在 Owner 選正確帳號，輸入 Repository name 和 Description。",
+          "verification": "確認 Owner／名稱沒有選到其他組織或專案。"
+        },
+        {
+          "number": 3,
+          "action": "依資料敏感性選擇 Private 或 Public（涉及私人資料時先以 Private 評估）。",
+          "verification": "可清楚看到所選可見性；未授權不建立正式服務。"
+        },
+        {
+          "number": 4,
+          "action": "視需要勾選 Add a README，再點 Create repository。",
+          "verification": "新的儲存庫頁面已顯示；不要誤建於外部正式專案。"
+        },
+        {
+          "number": 5,
+          "action": "開啟 Settings → General，核對預設分支及基本存取設定。",
+          "verification": "能看到設定頁並確認權責；若無 Settings 權限則停止。"
+        },
+        {
+          "number": 6,
+          "action": "進入 Settings → Rules → Rulesets 或 Branches，檢視是否可保護 main 分支。",
+          "verification": "回報可使用的保護選項及其目前狀態；不把建議當作已生效。"
+        },
+        {
+          "number": 7,
+          "action": "複製新儲存庫的非敏感網址供 Agent 唯讀核對。",
+          "verification": "Agent 能核對 Repo URL、預設分支、實際權限後才評估候選 PR。"
+        }
+      ]
+    },
+    {
+      "id": "github_actions_secret",
+      "title": "當必要且已授權時，由使用者自行設定 GitHub Actions Secret",
+      "prerequisite": "先確認確實需要外部服務、正式授權和用途；沒有必要就不要設定。",
+      "steps": [
+        {
+          "number": 1,
+          "action": "打開需要設定的正確 Repository，確認網址和管理權限。",
+          "verification": "確認瀏覽器網址的 Owner 和 Repository 名稱正確，避免放錯。"
+        },
+        {
+          "number": 2,
+          "action": "進入 Settings → Secrets and variables → Actions。",
+          "verification": "看到 Actions secrets 區域；介面名稱可能依權限不同。"
+        },
+        {
+          "number": 3,
+          "action": "點選 New repository secret（若無權限即停止並向 Owner 回報）。",
+          "verification": "應出現 Name 與 Secret 輸入欄位；不要分享欄位內的任何值。"
+        },
+        {
+          "number": 4,
+          "action": "在 Name 填入事先核准的環境變數名稱；Secret 欄只在 GitHub 網站自行貼入憑證。",
+          "verification": "不得在聊天、PR、截圖、程式碼或 CI 日誌貼出 Secret。"
+        },
+        {
+          "number": 5,
+          "action": "確認變更的用途與範圍後，點 Add secret。",
+          "verification": "Secrets 列表出現名稱；值不可回讀，也不應嘗試取得。"
+        },
+        {
+          "number": 6,
+          "action": "回報 Secret 名稱是否出現在列表和工作流程是否仍被安全阻擋。",
+          "verification": "只提供非敏感名稱及狀態；不把設定 Secret 視為已批准執行模型或部署。"
+        }
+      ]
+    }
+  ]
+}

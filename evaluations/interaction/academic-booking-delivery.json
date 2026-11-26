@@ -1,0 +1,14 @@
+{
+  "purpose": "合成研究專題時段預約",
+  "audience": "合成參與者與研究助理",
+  "journey": "看場次、送出預約、查收確認",
+  "pages": "說明與預約表單",
+  "identity": "合成識別碼，不開放外部登入",
+  "forms": "合成參與者代碼與時段",
+  "slots": "單一時段一個名額",
+  "notice": "合成 LINE 通知",
+  "privacy": "僅合成資料",
+  "integrations": "本機模擬 GAS、Sheets、LINE",
+  "experience": "繁體中文及手機版",
+  "release": "僅本機驗收，禁止部署"
+}

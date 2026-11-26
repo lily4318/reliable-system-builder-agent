@@ -20,3 +20,120 @@ quality_baseline: evaluations/baselines/v0.1.0-initial.json
 quality_targets: evaluations/quality-targets.json
 manual_release_approval_required: true
 automatic_formal_release: false
+
+agent_development_capability_candidate:
+  tasks: evaluations/capability/public_tasks.json
+  self_authored_reference: evaluations/capability/self_authored_reference.json
+  scorer: src.capability_workbench
+  assignment_generator: src.capability_prompts
+  structural_requirements_to_qa_trace: true
+  architecture_components_and_task_dag_check: true
+  candidate_python_checked_via_ast_only: true
+  code_behavior_trust_reference_unit_tests_only: true
+  seven_roles_structural_handoff_check: true
+  synthetic_public_development_cases: true
+  no_model_or_subagent_executed_in_ci: true
+  human_architecture_review_still_required: true
+  isolated_candidate_code_execution_requires_separate_authorization: true
+  formal_release_approved: false
+
+agent_offline_execution_adapter_candidate:
+  task_packets: B001_B002_B003_B004_B005
+  module: src.capability_execution
+  prepare_offline_only: true
+  ingest_external_json_only: true
+  inputs_must_match_public_task_digest: true
+  input_unverified_model_identity: true
+  unknown_candidate_code_ast_only: true
+  copied_self_authored_reference_not_accepted_as_agent_run: true
+  no_provider_calls_or_model_invocation: true
+  no_model_code_execution_in_ci: true
+  true_agent_execution_verified: false
+  true_agent_capability_gain_measured: false
+  formal_release_authorized: false
+
+website_private_holdout_candidate:
+  protocol: src.website_holdout_compare
+  human_rubric: docs/WEBSITE_HOLDOUT_EVALUATION.md
+  min_private_cases: 5
+  paired_same_model_runner_budget: true
+  blind_review_requires_two_independent_humans: true
+  score_gap_two_requires_third_adjudicator: true
+  private_cases_never_in_public_ci: true
+  synthetic_ci_only: true
+  real_agent_runner_authorized_and_executed: false
+  independent_unseen_holdout_verified: false
+  model_skill_improvement_demonstrated: false
+  automatic_release_allowed: false
+
+task_scope_regression:
+  case_dataset: evaluations/cases/task_scope.json
+  evaluator: src.task_scope
+  schema: explicit_human_labelled_intent
+  public_synthetic_cases: true
+  min_cases: 12
+  min_critical_cases: 8
+  zero_failures_required: true
+  does_not_measure_natural_language_understanding: true
+  automatic_external_project_writes: false
+
+engineering_handoff_candidate:
+  evaluator: src.engineering_workflow
+  case_dataset: evaluations/cases/engineering_handoffs.json
+  public_human_labelled_structured_cases: true
+  minimum_cases: 20
+  minimum_critical_cases: 15
+  zero_failure_required: true
+  zero_mutation_actions_required: true
+  independent_blind_holdout: false
+  measures_real_llm_multi_agent_performance: false
+  release_requires_independent_human_approval: true
+
+llm_requirements_candidate:
+  evaluator: src.llm_requirements_eval
+  development_cases: evaluations/llm/public_dev_cases.json
+  public_synthetic_provisional_labels: true
+  real_model_runner_required_for_accuracy_claims: true
+  runner_not_invoked_in_ci: true
+  independent_holdout_must_be_outside_public_repo: true
+  independent_annotation_and_adjudication_required: true
+  architecture_semantic_human_review_required: true
+  model_weight_training_claim_allowed: false
+  automatic_formal_release: false
+
+llm_runner_provenance_candidate:
+  evaluator: src.llm_runner_preflight
+  audit_is_read_only: true
+  audited_environment: synthetic_protocol_ci
+  runner_script_sha_check_required: true
+  prompt_sha_check_required: true
+  model_provider_identity_verified_by_config: false
+  approval_independently_verified_by_config: false
+  provider_response_origin_verified_by_config: false
+  live_inference_authorized_by_config: false
+  no_real_model_run_in_ci: true
+
+llm_provider_evidence_candidate:
+  offline_evaluator: src.llm_provider_evidence
+  only_public_synthetic_cases: true
+  no_llm_api_in_ci: true
+  local_manifest_runner_response_sha_match_required: true
+  requested_and_reported_model_version_match_required: true
+  request_response_id_consistency_required: true
+  declared_approval_scope_and_validity_window_required: true
+  independent_provider_origin_verification_still_required: true
+  independent_human_authorization_still_required: true
+  matching_synthetic_receipt_never_authorizes_real_inference: true
+
+llm_dual_source_candidate:
+  evaluator: src.llm_provider_dual_source
+  provider_export_source_declared_only: true
+  runner_manifest_independent_of_export_required: true
+  historical_id_snapshot_required: true
+  identical_request_or_response_ids_rejected: true
+  local_replay_free_does_not_prove_global_uniqueness: true
+  fully_matching_forged_copies_can_pass_local_check: true
+  provider_identity_authenticated: false
+  approval_independently_verified: false
+  real_llm_calls_in_ci: false
+  release_authorized: false
